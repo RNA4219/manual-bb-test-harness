@@ -1,0 +1,20 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/RNA4219/manual-bb-test-harness/schemas/feature_spec.schema.json",
+  "title": "FeatureSpec",
+  "type": "object",
+  "required": ["feature_id", "title", "acceptance_criteria", "source_refs"],
+  "properties": {
+    "feature_id": {"type": "string", "minLength": 1},
+    "title": {"type": "string", "minLength": 1},
+    "summary": {"type": "string"},
+    "actors": {"type": "array", "items": {"type": "string"}},
+    "acceptance_criteria": {"type": "array", "items": {"type": "string"}, "minItems": 1},
+    "business_rules": {"type": "array", "items": {"type": "string"}},
+    "changed_areas": {"type": "array", "items": {"type": "string"}},
+    "devices": {"type": "array", "items": {"type": "string"}},
+    "source_refs": {"type": "array", "items": {"$ref": "shared_defs.schema.json#/$defs/SourceRef"}, "minItems": 1},
+    "assumptions": {"type": "array", "items": {"$ref": "shared_defs.schema.json#/$defs/Assumption"}}
+  },
+  "additionalProperties": false
+}

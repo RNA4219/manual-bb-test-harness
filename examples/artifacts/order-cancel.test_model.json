@@ -1,0 +1,13 @@
+{
+  "feature_id": "ORD-CANCEL-01",
+  "flows": ["buyer cancellation", "cs delegated cancellation"],
+  "data_partitions": ["coupon_used", "coupon_not_used", "payment_failed"],
+  "boundaries": ["last cancellable state before shipped", "already cancelled"],
+  "rule_columns": ["order_state x coupon_used x actor"],
+  "states": ["pending", "shipped", "cancelled", "payment_failed"],
+  "valid_transitions": ["pending -> cancelled"],
+  "invalid_transitions": ["shipped -> cancelled", "cancelled -> cancelled", "payment_failed -> cancelled"],
+  "role_matrix": ["buyer x cancel x own_order x pending", "cs_agent x cancel x delegated_order x pending"],
+  "regression_edges": ["direct:order_detail", "external:inventory_service", "external:coupon_service"],
+  "quality_lenses": ["idempotency", "recovery", "error messaging"]
+}

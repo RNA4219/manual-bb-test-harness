@@ -1,0 +1,21 @@
+name: validate
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+
+jobs:
+  skill:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Validate repository-local skill structure
+        run: python scripts/quick-validate-skill.py skills/manual-bb-test-harness
+      - name: Validate PowerShell checks
+        shell: pwsh
+        run: ./scripts/validate-skill.ps1

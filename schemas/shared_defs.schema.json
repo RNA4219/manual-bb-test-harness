@@ -1,0 +1,27 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/RNA4219/manual-bb-test-harness/schemas/shared_defs.schema.json",
+  "$defs": {
+    "SourceRef": {
+      "type": "object",
+      "required": ["id", "kind"],
+      "properties": {
+        "id": {"type": "string", "minLength": 1},
+        "kind": {"enum": ["spec", "ac", "rule", "bug", "auto_test", "code_review", "ops"]},
+        "excerpt": {"type": "string"}
+      },
+      "additionalProperties": false
+    },
+    "Assumption": {
+      "type": "object",
+      "required": ["id", "text", "severity"],
+      "properties": {
+        "id": {"type": "string", "minLength": 1},
+        "text": {"type": "string", "minLength": 1},
+        "severity": {"enum": ["low", "medium", "high", "critical"]},
+        "impact_on_coverage": {"type": "string"}
+      },
+      "additionalProperties": false
+    }
+  }
+}

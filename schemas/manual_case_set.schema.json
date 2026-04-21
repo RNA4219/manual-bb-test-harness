@@ -1,0 +1,61 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/RNA4219/manual-bb-test-harness/schemas/manual_case_set.schema.json",
+  "title": "ManualCaseSet",
+  "type": "object",
+  "required": ["feature_id", "manual_cases"],
+  "properties": {
+    "feature_id": {"type": "string", "minLength": 1},
+    "manual_cases": {
+      "type": "array",
+      "items": {"$ref": "#/$defs/ManualTestCase"}
+    },
+    "exploratory_charters": {
+      "type": "array",
+      "items": {"$ref": "#/$defs/ExploratoryCharter"}
+    }
+  },
+  "additionalProperties": false,
+  "$defs": {
+    "ManualTestCase": {
+      "type": "object",
+      "required": ["tc_id", "title", "priority", "primary_view", "steps", "expected_results", "oracle", "trace_to"],
+      "properties": {
+        "tc_id": {"type": "string", "minLength": 1},
+        "title": {"type": "string", "minLength": 1},
+        "priority": {"enum": ["P0", "P1", "P2", "P3"]},
+        "primary_view": {"enum": ["black", "gray", "white"]},
+        "techniques": {"type": "array", "items": {"type": "string"}},
+        "preconditions": {"type": "array", "items": {"type": "string"}},
+        "steps": {"type": "array", "items": {"type": "string"}, "minItems": 1},
+        "expected_results": {"type": "array", "items": {"type": "string"}, "minItems": 1},
+        "oracle": {
+          "type": "object",
+          "required": ["type", "refs"],
+          "properties": {
+            "type": {"enum": ["specified", "derived", "implicit", "human"]},
+            "refs": {"type": "array", "items": {"type": "string"}, "minItems": 1}
+          },
+          "additionalProperties": false
+        },
+        "estimate_minutes": {"type": "number", "minimum": 0},
+        "trace_to": {"type": "array", "items": {"type": "string"}, "minItems": 1}
+      },
+      "additionalProperties": false
+    },
+    "ExploratoryCharter": {
+      "type": "object",
+      "required": ["id", "title", "scope", "questions", "trace_to"],
+      "properties": {
+        "id": {"type": "string", "minLength": 1},
+        "title": {"type": "string", "minLength": 1},
+        "priority": {"enum": ["P0", "P1", "P2", "P3"]},
+        "scope": {"type": "string", "minLength": 1},
+        "questions": {"type": "array", "items": {"type": "string"}, "minItems": 1},
+        "estimate_minutes": {"type": "number", "minimum": 0},
+        "trace_to": {"type": "array", "items": {"type": "string"}, "minItems": 1}
+      },
+      "additionalProperties": false
+    }
+  }
+}

@@ -1,0 +1,24 @@
+{
+  "feature_id": "ORD-CANCEL-01",
+  "title": "注文キャンセル機能",
+  "summary": "出荷前の注文のみキャンセル可能。成功時は在庫とクーポン残数を復元する。",
+  "actors": ["buyer", "cs_agent"],
+  "acceptance_criteria": [
+    "出荷前の注文のみキャンセルできる",
+    "出荷済み注文はキャンセル不可メッセージを表示する",
+    "キャンセル成功時は在庫を戻す",
+    "クーポン利用注文ではクーポン残数を復元する"
+  ],
+  "business_rules": [
+    "決済失敗注文はキャンセル済み扱いにしない",
+    "二重キャンセルは不可"
+  ],
+  "changed_areas": ["order_detail", "inventory_service", "coupon_service"],
+  "devices": ["Web", "iOS", "Android"],
+  "source_refs": [
+    {"id": "AC-1", "kind": "ac"},
+    {"id": "AC-2", "kind": "ac"},
+    {"id": "BR-1", "kind": "rule"}
+  ],
+  "assumptions": []
+}

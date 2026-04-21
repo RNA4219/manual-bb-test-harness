@@ -1,0 +1,4 @@
+interface:
+  display_name: "Manual BB Test Harness"
+  short_description: "手動ブラックボックス前提の観点、リスク、ケース、ゲート判定を作る"
+  default_prompt: "仕様や受入条件から、根拠付き観点、リスク、手動テストケース、工数、Go/No-Go brief を作成してください。"

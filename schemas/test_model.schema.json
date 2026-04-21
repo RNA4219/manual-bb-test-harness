@@ -1,0 +1,21 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/RNA4219/manual-bb-test-harness/schemas/test_model.schema.json",
+  "title": "TestModel",
+  "type": "object",
+  "required": ["feature_id", "flows", "data_partitions", "rule_columns", "states", "role_matrix", "regression_edges"],
+  "properties": {
+    "feature_id": {"type": "string", "minLength": 1},
+    "flows": {"type": "array", "items": {"type": "string"}},
+    "data_partitions": {"type": "array", "items": {"type": "string"}},
+    "boundaries": {"type": "array", "items": {"type": "string"}},
+    "rule_columns": {"type": "array", "items": {"type": "string"}},
+    "states": {"type": "array", "items": {"type": "string"}},
+    "valid_transitions": {"type": "array", "items": {"type": "string"}},
+    "invalid_transitions": {"type": "array", "items": {"type": "string"}},
+    "role_matrix": {"type": "array", "items": {"type": "string"}},
+    "regression_edges": {"type": "array", "items": {"type": "string"}},
+    "quality_lenses": {"type": "array", "items": {"type": "string"}}
+  },
+  "additionalProperties": false
+}
