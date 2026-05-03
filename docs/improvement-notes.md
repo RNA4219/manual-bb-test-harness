@@ -2,26 +2,30 @@
 
 このメモは、`manual-bb-test-harness` の改善履歴を記録する。
 
-## 2026-05-03 改善完了
+## 2026-05-03 改善完了 ✅
 
 ### 完了した改善項目
 
 | Category | Count | Details |
 |---|---|---|
-| Critical | 1 | Unit tests追加 (42 tests, 94% coverage) |
+| Critical | 1 | Unit tests追加 (48 tests, 98% coverage) |
 | High | 5 | Exception handling, null check, CI multi-platform, pyproject.toml |
 | Medium | 9 | Schema descriptions, READMEs, type hints, version/debug flags |
 | Low | 6 | CHANGELOG, SPEC, generic.yaml, JSON golden examples |
 
 ### CI状況
 
-- 3 OS × 3 Python versions 全成功
-- Node.js 20 deprecation対応: actions更新済み (v5/v6)
+- 3 OS × 3 Python versions 全成功 ✅
+- Node.js 24対応: actions更新済み (checkout@v5, setup-python@v6, codecov@v5)
 
-### 残課題（必要時のみ）
+### Optional（必要時のみ）
 
-- GitHub Pages hosting for schemas ($id URL resolution)
-- Coverage 100%達成（現在94%）
+| Task | Priority | Note |
+|---|---|---|
+| GitHub Pages hosting | 低 | $id URL解決が必要な場合のみ |
+| Coverage 100% | 低 | 現在98%、実質十分 |
+
+---
 
 ## 初版運用方針（廃止）
 
