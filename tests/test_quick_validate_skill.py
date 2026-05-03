@@ -225,6 +225,7 @@ class TestVersionSubprocess:
 
     def test_version_output(self) -> None:
         script = Path(__file__).parent.parent / "scripts" / "quick-validate-skill.py"
-        result = subprocess.run(["py", str(script), "--version"], capture_output=True, text=True, timeout=30)
+        # Use sys.executable instead of 'py' for cross-platform compatibility
+        result = subprocess.run([sys.executable, str(script), "--version"], capture_output=True, text=True, timeout=30)
         assert result.returncode == 0
         assert "0.1.1" in result.stdout
