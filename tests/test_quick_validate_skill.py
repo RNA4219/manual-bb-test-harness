@@ -43,6 +43,13 @@ class TestParseFrontmatter:
         content = "---\r\nname: test-skill\r\ndescription: Test\r\n---\r\nBody"
         assert parse_frontmatter(content)["name"] == "test-skill"
 
+    def test_empty_lines_in_frontmatter(self) -> None:
+        """Test frontmatter with empty lines (covers line 59 continue)."""
+        content = "---\n\nname: test-skill\n\ndescription: Test\n\n---"
+        result = parse_frontmatter(content)
+        assert result["name"] == "test-skill"
+        assert result["description"] == "Test"
+
     def test_missing(self) -> None:
         with pytest.raises(ValueError, match="Invalid or missing"):
             parse_frontmatter("No frontmatter")
@@ -94,6 +101,13 @@ class TestValidateSkill:
         errors = validate_skill(tmp_path)
         assert any("SKILL.md not found" in e for e in errors)
 
+    def test_frontmatter_error_returns_single_error(self, tmp_path: Path) -> None:
+        """Test frontmatter error path (covers line 114-115)."""
+        (tmp_path / "SKILL.md").write_text("No frontmatter here", encoding="utf-8")
+        errors = validate_skill(tmp_path)
+        assert len(errors) == 1
+        assert "frontmatter" in errors[0].lower()
+
     def test_valid_structure(self, tmp_path: Path) -> None:
         (tmp_path / "SKILL.md").write_text("---\nname: test-skill\ndescription: Test\n---\n", encoding="utf-8")
         errors = validate_skill(tmp_path)
@@ -107,6 +121,18 @@ class TestValidateSkill:
         long_name = "a" * (MAX_SKILL_NAME_LENGTH + 1)
         (tmp_path / "SKILL.md").write_text(f"---\nname: {long_name}\ndescription: Test\n---\n", encoding="utf-8")
         assert any("too long" in e for e in validate_skill(tmp_path))
+
+    def test_invalid_name_double_hyphen(self, tmp_path: Path) -> None:
+        (tmp_path / "SKILL.md").write_text("---\nname: test--skill\ndescription: Test\n---\n", encoding="utf-8")
+        assert any("hyphen" in e.lower() for e in validate_skill(tmp_path))
+
+    def test_invalid_name_starts_hyphen(self, tmp_path: Path) -> None:
+        (tmp_path / "SKILL.md").write_text("---\nname: -test-skill\ndescription: Test\n---\n", encoding="utf-8")
+        assert any("hyphen" in e.lower() for e in validate_skill(tmp_path))
+
+    def test_invalid_name_ends_hyphen(self, tmp_path: Path) -> None:
+        (tmp_path / "SKILL.md").write_text("---\nname: test-skill-\ndescription: Test\n---\n", encoding="utf-8")
+        assert any("hyphen" in e.lower() for e in validate_skill(tmp_path))
 
     def test_missing_name(self, tmp_path: Path) -> None:
         (tmp_path / "SKILL.md").write_text("---\ndescription: Test\n---\n", encoding="utf-8")
@@ -164,6 +190,19 @@ class TestValidateJsonFiles:
         (tmp_path / "schemas").mkdir()
         (tmp_path / "schemas" / "bad.schema.json").write_bytes(b'\xff\xfe {}')
         assert any("UTF-8" in e or "Invalid JSON" in e for e in validate_json_files(tmp_path))
+
+    def test_os_error_permission(self, tmp_path: Path) -> None:
+        """Test OSError handling (covers line 231-232)."""
+        (tmp_path / "schemas").mkdir()
+        bad_file = tmp_path / "schemas" / "unreadable.schema.json"
+        bad_file.write_text('{}', encoding="utf-8")
+        # Note: Can't actually cause OSError in test, but this documents the path
+        # OSError would occur on permission denied, disk full, etc.
+        # For coverage, we mock the read_text to raise OSError
+        import unittest.mock
+        with unittest.mock.patch.object(Path, 'read_text', side_effect=OSError("Permission denied")):
+            errors = validate_json_files(tmp_path)
+            assert any("Cannot read" in e or "OSError" in e for e in errors)
 
 
 # ============== Main Tests ==============
