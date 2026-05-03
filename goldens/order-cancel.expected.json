@@ -1,0 +1,33 @@
+{
+  "feature_id": "ORD-CANCEL-01",
+  "expected_outputs": {
+    "test_model": {
+      "must_include": ["states", "valid_transitions", "invalid_transitions", "role_matrix"],
+      "states_minimum": ["pending", "shipped", "cancelled"]
+    },
+    "observation_set": {
+      "count_minimum": 3,
+      "each_must_have": ["id", "title", "rationale", "source_refs"]
+    },
+    "risk_register": {
+      "count_minimum": 2,
+      "p0_p1_count_maximum": 4,
+      "each_must_have": ["id", "scenario", "priority", "rationale"]
+    },
+    "manual_case_set": {
+      "count_minimum": 3,
+      "p0_p1_must_have_oracle": true,
+      "each_must_have": ["tc_id", "title", "steps", "expected_results", "oracle", "trace_to"]
+    },
+    "gate_decision": {
+      "status_allowed": ["go", "conditional_go"],
+      "must_have": ["reasons", "blocking_risks", "residual_risks"]
+    }
+  },
+  "automatic_fail_conditions": [
+    "Coverage modelが出ない",
+    "P0/P1のscripted caseにoracle refsがない",
+    "Gateがcoverage数値だけでGoになる",
+    "stateful featureでinvalid transitionがない"
+  ]
+}

@@ -1,0 +1,17 @@
+{
+  "feature_id": "RBAC-01",
+  "flows": ["admin permission change", "super_admin elevation", "self-change prevention"],
+  "data_partitions": ["role=admin", "role=super_admin", "role=user"],
+  "boundaries": ["super_admin threshold", "self-change boundary"],
+  "rule_columns": ["actor_role x target_role x action x ownership_context"],
+  "states": ["user", "admin", "super_admin"],
+  "valid_transitions": ["user -> admin", "admin -> user", "admin -> super_admin"],
+  "invalid_transitions": ["user -> super_admin (requires super_admin actor)", "any -> any (self-change)"],
+  "role_matrix": [
+    "admin x change_role x other_user x any_role_below_admin",
+    "super_admin x change_role x other_user x any_role",
+    "any x change_role x self x denied"
+  ],
+  "regression_edges": ["direct:user_management", "external:auth_service", "external:audit_log"],
+  "quality_lenses": ["security", "auditability", "session_management"]
+}

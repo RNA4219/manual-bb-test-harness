@@ -1,0 +1,51 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "manual-bb-test-harness"
+version = "0.1.1"
+description = "Manual black-box test design skill repository for Codex"
+requires-python = ">=3.10"
+readme = "README.md"
+license = "MIT"
+# This is a skill repository, not a Python package to install
+# No packages are defined - scripts are run directly
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.0.0",
+    "pytest-cov>=4.0.0",
+    "ruff>=0.1.0",
+]
+
+[tool.setuptools]
+# Explicitly set no packages - this is a skill repository
+packages = []
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
+addopts = "-v --tb=short"
+pythonpath = ["scripts"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py310"
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "UP", "B"]
+ignore = ["BLE001"]  # Bare Exception handled in SPEC.md H1
+
+[tool.coverage.run]
+source = ["scripts"]
+branch = true
+
+[tool.coverage.report]
+exclude_lines = [
+    "pragma: no cover",
+    "if __name__ == .__main__.:",
+    "raise SystemExit",
+]

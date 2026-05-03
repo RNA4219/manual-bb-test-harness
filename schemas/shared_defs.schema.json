@@ -1,25 +1,53 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://github.com/RNA4219/manual-bb-test-harness/schemas/shared_defs.schema.json",
+  "title": "SharedDefinitions",
+  "description": "Shared type definitions used across multiple artifact schemas. Note: $id URLs are identifiers, not resolvable endpoints.",
   "$defs": {
     "SourceRef": {
       "type": "object",
       "required": ["id", "kind"],
+      "description": "Reference to a source document that provides basis for artifact content.",
       "properties": {
-        "id": {"type": "string", "minLength": 1},
-        "kind": {"enum": ["spec", "ac", "rule", "bug", "auto_test", "code_review", "ops"]},
-        "excerpt": {"type": "string"}
+        "id": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Identifier of the source item, e.g., 'AC-1', 'BR-2', 'BUG-123'."
+        },
+        "kind": {
+          "enum": ["spec", "ac", "rule", "bug", "auto_test", "code_review", "ops"],
+          "description": "Kind of source: spec (specification), ac (acceptance criteria), rule (business rule), bug (defect), auto_test (automated test), code_review (review comment), ops (operational data)."
+        },
+        "excerpt": {
+          "type": "string",
+          "description": "Optional excerpt of the source content for reference."
+        }
       },
       "additionalProperties": false
     },
     "Assumption": {
       "type": "object",
       "required": ["id", "text", "severity"],
+      "description": "Assumption made when information is incomplete. Must be tracked for risk assessment.",
       "properties": {
-        "id": {"type": "string", "minLength": 1},
-        "text": {"type": "string", "minLength": 1},
-        "severity": {"enum": ["low", "medium", "high", "critical"]},
-        "impact_on_coverage": {"type": "string"}
+        "id": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Unique assumption identifier, e.g., 'ASM-1'."
+        },
+        "text": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Description of the assumption made."
+        },
+        "severity": {
+          "enum": ["low", "medium", "high", "critical"],
+          "description": "Severity level: low (minor impact), medium (some impact), high (significant impact), critical (blocking if wrong)."
+        },
+        "impact_on_coverage": {
+          "type": "string",
+          "description": "How this assumption affects test coverage or approach."
+        }
       },
       "additionalProperties": false
     }

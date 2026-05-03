@@ -1,0 +1,61 @@
+# Provider-agnostic configuration for Manual BB Test Harness
+# Use this config when working with any LLM provider (OpenAI, Anthropic, local, etc.)
+#
+# Provider-specific overrides can be specified in separate files:
+# - openai.yaml: OpenAI-specific settings
+# - anthropic.yaml: Anthropic/Claude-specific settings (if needed)
+
+interface:
+  display_name: "Manual BB Test Harness"
+  short_description: "手動ブラックボックス前提の観点、リスク、ケース、ゲート判定を作る"
+  long_description: |
+    仕様、受入条件、業務ルール、変更点、対象環境、既存証跡を入力にして、
+    以下の順で出力する Skill:
+    1. 根拠付き観点 (observation_set)
+    2. リスク (risk_register)
+    3. 優先度 (P0-P3)
+    4. 手動テストケース (manual_case_set)
+    5. 工数 (effort_plan)
+    6. Gate 判定 (gate_decision)
+    7. Go/No-Go brief (release_brief)
+
+    Coverage model を先に作り、観点、リスク、ケース、Gate と段階的につなぐ。
+    巨大な一枚岩プロンプトではなく、短い責務と型付き artifact を JSON 契約でつなぐ。
+
+  default_prompt: |
+    仕様や受入条件から、根拠付き観点、リスク、手動テストケース、工数、Go/No-Go brief を作成してください。
+
+    入力: 仕様、受入条件、業務ルール、変更点、対象環境、既存証跡
+
+    出力順序:
+    1. Coverage model (flow/state/rule/data/role/regression)
+    2. 根拠付き観点 (source_ref付き)
+    3. リスクと優先度 (impact x likelihood + modifiers)
+    4. 手動テストケース (oracle必須, trace_to必須)
+    5. 工数見積り
+    6. Gate判定
+    7. Go/No-Go brief
+
+# Default model settings (can be overridden by provider-specific configs)
+model_defaults:
+  temperature: 0.3
+  max_tokens: 8000
+
+# Workflow steps reference
+workflow:
+  - step: normalize_intake
+    output: feature_spec
+  - step: model_test_surface
+    output: test_model
+  - step: derive_observations
+    output: observation_set
+  - step: assess_risk
+    output: risk_register
+  - step: synthesize_manual_cases
+    output: manual_case_set
+  - step: estimate_effort
+    output: effort_plan
+  - step: evaluate_gates
+    output: gate_decision
+  - step: assemble_release_brief
+    output: release_brief

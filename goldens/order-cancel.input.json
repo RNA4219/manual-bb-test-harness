@@ -1,0 +1,30 @@
+{
+  "feature_id": "ORD-CANCEL-01",
+  "title": "注文キャンセル機能",
+  "summary": "出荷前の注文のみ購入者がキャンセルできる。キャンセル成功時は在庫を戻し、クーポン利用注文ではクーポン残数を復元する。",
+  "acceptance_criteria": [
+    {"id": "AC-1", "text": "出荷前の注文のみキャンセルできる"},
+    {"id": "AC-2", "text": "出荷済み注文はキャンセル不可メッセージを表示する"},
+    {"id": "AC-3", "text": "キャンセル成功時は在庫を戻す"},
+    {"id": "AC-4", "text": "クーポン利用注文ではクーポン残数を復元する"}
+  ],
+  "business_rules": [
+    {"id": "BR-1", "text": "決済失敗注文はキャンセル済み扱いにしない"},
+    {"id": "BR-2", "text": "二重キャンセルは不可"},
+    {"id": "BR-3", "text": "CS担当は購入者依頼を受けて代理キャンセルできる"}
+  ],
+  "expected_observations": [
+    {"id": "OBS-STATE-01", "title": "状態差でキャンセル可否が変わる", "mandatory": true},
+    {"id": "OBS-STATE-02", "title": "pending -> cancelled遷移が成功", "mandatory": true},
+    {"id": "OBS-DATA-01", "title": "クーポン残数復元", "mandatory": true}
+  ],
+  "expected_risks": [
+    {"id": "RISK-01", "scenario": "出荷済み注文がキャンセルできてしまう", "priority": "P1"},
+    {"id": "RISK-02", "scenario": "二重キャンセルで在庫過剰復元", "priority": "P1"}
+  ],
+  "expected_gate": {
+    "status": "conditional_go",
+    "must_have": ["P0/P1 cases passed", "State transition coverage complete"],
+    "may_have": ["Exploratory charter results"]
+  }
+}

@@ -2,20 +2,65 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://github.com/RNA4219/manual-bb-test-harness/schemas/test_model.schema.json",
   "title": "TestModel",
+  "description": "Coverage model artifact representing test surface decomposition. Produced by model_test_surface workflow step.",
   "type": "object",
   "required": ["feature_id", "flows", "data_partitions", "rule_columns", "states", "role_matrix", "regression_edges"],
   "properties": {
-    "feature_id": {"type": "string", "minLength": 1},
-    "flows": {"type": "array", "items": {"type": "string"}},
-    "data_partitions": {"type": "array", "items": {"type": "string"}},
-    "boundaries": {"type": "array", "items": {"type": "string"}},
-    "rule_columns": {"type": "array", "items": {"type": "string"}},
-    "states": {"type": "array", "items": {"type": "string"}},
-    "valid_transitions": {"type": "array", "items": {"type": "string"}},
-    "invalid_transitions": {"type": "array", "items": {"type": "string"}},
-    "role_matrix": {"type": "array", "items": {"type": "string"}},
-    "regression_edges": {"type": "array", "items": {"type": "string"}},
-    "quality_lenses": {"type": "array", "items": {"type": "string"}}
+    "feature_id": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Reference to the feature_spec feature_id this model covers."
+    },
+    "flows": {
+      "type": "array",
+      "items": {"type": "string"},
+      "description": "User/system flows identified from the feature, e.g., 'buyer cancellation', 'admin approval'."
+    },
+    "data_partitions": {
+      "type": "array",
+      "items": {"type": "string"},
+      "description": "Equivalence class partitions for data values, e.g., 'coupon_used', 'payment_failed'."
+    },
+    "boundaries": {
+      "type": "array",
+      "items": {"type": "string"},
+      "description": "Boundary values identified for testing, e.g., 'last cancellable state before shipped'."
+    },
+    "rule_columns": {
+      "type": "array",
+      "items": {"type": "string"},
+      "description": "Decision table columns derived from business rules, e.g., 'order_state x coupon_used x actor'."
+    },
+    "states": {
+      "type": "array",
+      "items": {"type": "string"},
+      "description": "State machine states identified, e.g., 'pending', 'shipped', 'cancelled'."
+    },
+    "valid_transitions": {
+      "type": "array",
+      "items": {"type": "string"},
+      "description": "Valid state transitions that should succeed, e.g., 'pending -> cancelled'."
+    },
+    "invalid_transitions": {
+      "type": "array",
+      "items": {"type": "string"},
+      "description": "Invalid state transitions that should fail, e.g., 'shipped -> cancelled'."
+    },
+    "role_matrix": {
+      "type": "array",
+      "items": {"type": "string"},
+      "description": "Role-permission matrix entries, e.g., 'buyer x cancel x own_order x pending'."
+    },
+    "regression_edges": {
+      "type": "array",
+      "items": {"type": "string"},
+      "description": "Regression impact edges to other services/systems, e.g., 'external:inventory_service'."
+    },
+    "quality_lenses": {
+      "type": "array",
+      "items": {"type": "string"},
+      "description": "Quality characteristic perspectives to apply, e.g., 'usability', 'recovery', 'security'."
+    }
   },
   "additionalProperties": false
 }

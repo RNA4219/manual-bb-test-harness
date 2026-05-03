@@ -1,0 +1,27 @@
+{
+  "feature_id": "RBAC-01",
+  "title": "管理者権限変更機能",
+  "summary": "管理者が他ユーザーの権限を変更できる。変更時はaudit logに記録し、即時反映する。",
+  "actors": ["admin", "target_user", "system"],
+  "acceptance_criteria": [
+    "管理者は他ユーザーの権限を変更できる",
+    "権限変更は即時反映される",
+    "権限変更はaudit logに記録される",
+    "自分自身の権限は変更できない"
+  ],
+  "business_rules": [
+    "権限変更にはadmin roleが必要",
+    "super_admin権限の付与にはsuper_admin roleが必要",
+    "権限剥奪は対象ユーザーのactive sessionをterminateする"
+  ],
+  "changed_areas": ["user_management", "auth_service", "audit_log"],
+  "devices": ["Web"],
+  "source_refs": [
+    {"id": "AC-1", "kind": "ac", "excerpt": "管理者は他ユーザーの権限を変更できる"},
+    {"id": "AC-4", "kind": "ac", "excerpt": "自分自身の権限は変更できない"},
+    {"id": "BR-2", "kind": "rule", "excerpt": "super_admin権限の付与にはsuper_admin roleが必要"}
+  ],
+  "assumptions": [
+    {"id": "ASM-1", "text": "Session terminationは最大5秒で完了", "severity": "medium", "impact_on_coverage": "Session state checkに待機時間を含める"}
+  ]
+}

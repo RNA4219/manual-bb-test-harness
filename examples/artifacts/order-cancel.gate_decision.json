@@ -1,0 +1,22 @@
+{
+  "feature_id": "ORD-CANCEL-01",
+  "status": "conditional_go",
+  "profile": "standard",
+  "reasons": [
+    "P0/P1 manual cases executed and passed",
+    "Coupon restoration integration test not automated (waiver)",
+    "Exploratory charter for recovery completed"
+  ],
+  "blocking_risks": [],
+  "waivers": [
+    "Coupon restoration integration test: manual verification sufficient for this release"
+  ],
+  "residual_risks": [
+    "Network interruption during cancellation may cause inconsistent state (low severity)",
+    "Mobile app cancellation flow not fully verified (P2 items deferred)"
+  ],
+  "required_follow_up": [
+    "Monitor cancellation error rate for 2 weeks post-release",
+    "Add coupon restoration to automated integration tests next sprint"
+  ]
+}

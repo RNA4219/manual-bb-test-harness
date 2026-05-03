@@ -2,19 +2,61 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://github.com/RNA4219/manual-bb-test-harness/schemas/feature_spec.schema.json",
   "title": "FeatureSpec",
+  "description": "Normalized specification artifact for a feature under test. Produced by normalize_intake workflow step.",
   "type": "object",
   "required": ["feature_id", "title", "acceptance_criteria", "source_refs"],
   "properties": {
-    "feature_id": {"type": "string", "minLength": 1},
-    "title": {"type": "string", "minLength": 1},
-    "summary": {"type": "string"},
-    "actors": {"type": "array", "items": {"type": "string"}},
-    "acceptance_criteria": {"type": "array", "items": {"type": "string"}, "minItems": 1},
-    "business_rules": {"type": "array", "items": {"type": "string"}},
-    "changed_areas": {"type": "array", "items": {"type": "string"}},
-    "devices": {"type": "array", "items": {"type": "string"}},
-    "source_refs": {"type": "array", "items": {"$ref": "shared_defs.schema.json#/$defs/SourceRef"}, "minItems": 1},
-    "assumptions": {"type": "array", "items": {"$ref": "shared_defs.schema.json#/$defs/Assumption"}}
+    "feature_id": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Unique identifier for the feature, e.g., 'ORD-CANCEL-01'. Should be uppercase alphanumeric with hyphens."
+    },
+    "title": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Human-readable feature title in Japanese or English."
+    },
+    "summary": {
+      "type": "string",
+      "description": "Brief description of the feature's purpose and behavior. Optional but recommended."
+    },
+    "actors": {
+      "type": "array",
+      "items": {"type": "string"},
+      "description": "List of user roles or system actors involved in the feature, e.g., ['buyer', 'admin', 'system']."
+    },
+    "acceptance_criteria": {
+      "type": "array",
+      "items": {"type": "string"},
+      "minItems": 1,
+      "description": "Acceptance criteria (AC) statements. Each should be testable and atomic. Required field."
+    },
+    "business_rules": {
+      "type": "array",
+      "items": {"type": "string"},
+      "description": "Business rules (BR) that constrain the feature behavior. Optional but important for coverage."
+    },
+    "changed_areas": {
+      "type": "array",
+      "items": {"type": "string"},
+      "description": "Code areas, services, or components affected by the change. Used for regression analysis."
+    },
+    "devices": {
+      "type": "array",
+      "items": {"type": "string"},
+      "description": "Target platforms or devices, e.g., ['Web', 'iOS', 'Android', 'API']."
+    },
+    "source_refs": {
+      "type": "array",
+      "items": {"$ref": "shared_defs.schema.json#/$defs/SourceRef"},
+      "minItems": 1,
+      "description": "References to source documents (spec, AC, rules). Required for traceability."
+    },
+    "assumptions": {
+      "type": "array",
+      "items": {"$ref": "shared_defs.schema.json#/$defs/Assumption"},
+      "description": "Assumptions made when information is missing. Each must have severity level."
+    }
   },
   "additionalProperties": false
 }

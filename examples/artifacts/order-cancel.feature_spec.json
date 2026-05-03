@@ -16,9 +16,9 @@
   "changed_areas": ["order_detail", "inventory_service", "coupon_service"],
   "devices": ["Web", "iOS", "Android"],
   "source_refs": [
-    {"id": "AC-1", "kind": "ac"},
-    {"id": "AC-2", "kind": "ac"},
-    {"id": "BR-1", "kind": "rule"}
+    {"id": "AC-1", "kind": "ac", "excerpt": "出荷前の注文のみキャンセルできる"},
+    {"id": "AC-2", "kind": "ac", "excerpt": "出荷済み注文はキャンセル不可メッセージを表示する"},
+    {"id": "BR-1", "kind": "rule", "excerpt": "決済失敗注文はキャンセル済み扱いにしない"}
   ],
   "assumptions": []
 }

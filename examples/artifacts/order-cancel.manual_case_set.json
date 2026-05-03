@@ -1,0 +1,76 @@
+{
+  "feature_id": "ORD-CANCEL-01",
+  "manual_cases": [
+    {
+      "tc_id": "TC-001",
+      "title": "出荷済み注文はキャンセル不可",
+      "priority": "P1",
+      "primary_view": "black",
+      "techniques": ["state_transition"],
+      "preconditions": ["注文状態=shipped"],
+      "steps": [
+        "注文詳細画面を開く",
+        "キャンセル操作を行う"
+      ],
+      "expected_results": [
+        "キャンセル不可メッセージを表示",
+        "注文状態は変化しない"
+      ],
+      "oracle": {"type": "specified", "refs": ["AC-2"]},
+      "estimate_minutes": 8,
+      "trace_to": ["OBS-STATE-01", "RISK-01"]
+    },
+    {
+      "tc_id": "TC-002",
+      "title": "pending注文はキャンセル可能",
+      "priority": "P0",
+      "primary_view": "black",
+      "techniques": ["state_transition"],
+      "preconditions": ["注文状態=pending"],
+      "steps": [
+        "注文詳細画面を開く",
+        "キャンセル操作を行う",
+        "キャンセル確認ダイアログでOKを選択"
+      ],
+      "expected_results": [
+        "注文状態がcancelledに変更",
+        "キャンセル完了メッセージを表示"
+      ],
+      "oracle": {"type": "specified", "refs": ["AC-1"]},
+      "estimate_minutes": 10,
+      "trace_to": ["OBS-STATE-02", "RISK-02"]
+    },
+    {
+      "tc_id": "TC-003",
+      "title": "クーポン利用注文キャンセル時はクーポン残数復元",
+      "priority": "P1",
+      "primary_view": "gray",
+      "techniques": ["data_partition"],
+      "preconditions": ["注文状態=pending", "クーポン使用済み"],
+      "steps": [
+        "クーポン残数を確認",
+        "注文をキャンセル",
+        "クーポン残数を再確認"
+      ],
+      "expected_results": [
+        "クーポン残数が+1されている"
+      ],
+      "oracle": {"type": "specified", "refs": ["AC-4"]},
+      "estimate_minutes": 15,
+      "trace_to": ["OBS-DATA-01"]
+    }
+  ],
+  "exploratory_charters": [
+    {
+      "id": "CHARTER-001",
+      "title": "キャンセル操作のエラー表示と復帰性を探索する",
+      "scope": "network loss and retry during cancellation",
+      "questions": [
+        "二重実行にならないか",
+        "ユーザーに再試行可否が伝わるか"
+      ],
+      "estimate_minutes": 30,
+      "trace_to": ["OBS-RECOVERY-01"]
+    }
+  ]
+}

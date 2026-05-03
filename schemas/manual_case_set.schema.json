@@ -2,17 +2,24 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://github.com/RNA4219/manual-bb-test-harness/schemas/manual_case_set.schema.json",
   "title": "ManualCaseSet",
+  "description": "Executable manual test cases and exploratory charters artifact. Produced by synthesize_manual_cases workflow step.",
   "type": "object",
   "required": ["feature_id", "manual_cases"],
   "properties": {
-    "feature_id": {"type": "string", "minLength": 1},
+    "feature_id": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Reference to the feature_spec feature_id these cases cover."
+    },
     "manual_cases": {
       "type": "array",
-      "items": {"$ref": "#/$defs/ManualTestCase"}
+      "items": {"$ref": "#/$defs/ManualTestCase"},
+      "description": "Scripted manual test cases with steps, expected results, and oracle references."
     },
     "exploratory_charters": {
       "type": "array",
-      "items": {"$ref": "#/$defs/ExploratoryCharter"}
+      "items": {"$ref": "#/$defs/ExploratoryCharter"},
+      "description": "Exploratory testing charters for areas with weak oracles or high uncertainty."
     }
   },
   "additionalProperties": false,
@@ -20,40 +27,121 @@
     "ManualTestCase": {
       "type": "object",
       "required": ["tc_id", "title", "priority", "primary_view", "steps", "expected_results", "oracle", "trace_to"],
+      "description": "Single scripted manual test case with complete execution instructions.",
       "properties": {
-        "tc_id": {"type": "string", "minLength": 1},
-        "title": {"type": "string", "minLength": 1},
-        "priority": {"enum": ["P0", "P1", "P2", "P3"]},
-        "primary_view": {"enum": ["black", "gray", "white"]},
-        "techniques": {"type": "array", "items": {"type": "string"}},
-        "preconditions": {"type": "array", "items": {"type": "string"}},
-        "steps": {"type": "array", "items": {"type": "string"}, "minItems": 1},
-        "expected_results": {"type": "array", "items": {"type": "string"}, "minItems": 1},
+        "tc_id": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Unique test case identifier, e.g., 'TC-001'. Should be sequential within feature."
+        },
+        "title": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Short descriptive title for the test case."
+        },
+        "priority": {
+          "enum": ["P0", "P1", "P2", "P3"],
+          "description": "Risk-based priority: P0 (critical), P1 (high), P2 (medium), P3 (low)."
+        },
+        "primary_view": {
+          "enum": ["black", "gray", "white"],
+          "description": "Testing view: black (external UI), gray (limited internal), white (full internal)."
+        },
+        "techniques": {
+          "type": "array",
+          "items": {"type": "string"},
+          "description": "Test techniques used, e.g., 'state_transition', 'boundary_value', 'decision_table'."
+        },
+        "preconditions": {
+          "type": "array",
+          "items": {"type": "string"},
+          "description": "Setup conditions required before execution, e.g., '注文状態=pending'."
+        },
+        "steps": {
+          "type": "array",
+          "items": {"type": "string"},
+          "minItems": 1,
+          "description": "Sequential execution steps. Each should be actionable and specific."
+        },
+        "expected_results": {
+          "type": "array",
+          "items": {"type": "string"},
+          "minItems": 1,
+          "description": "Observable expected outcomes after each step or at end."
+        },
         "oracle": {
           "type": "object",
           "required": ["type", "refs"],
+          "description": "Oracle definition: how expected results are determined.",
           "properties": {
-            "type": {"enum": ["specified", "derived", "implicit", "human"]},
-            "refs": {"type": "array", "items": {"type": "string"}, "minItems": 1}
+            "type": {
+              "enum": ["specified", "derived", "implicit", "human"],
+              "description": "Oracle type: specified (in spec), derived (from rules), implicit (standard), human (judgment)."
+            },
+            "refs": {
+              "type": "array",
+              "items": {"type": "string"},
+              "minItems": 1,
+              "description": "References to source for oracle, e.g., ['AC-1', 'BR-2']."
+            }
           },
           "additionalProperties": false
         },
-        "estimate_minutes": {"type": "number", "minimum": 0},
-        "trace_to": {"type": "array", "items": {"type": "string"}, "minItems": 1}
+        "estimate_minutes": {
+          "type": "number",
+          "minimum": 0,
+          "description": "Estimated execution time in minutes. Used for effort planning."
+        },
+        "trace_to": {
+          "type": "array",
+          "items": {"type": "string"},
+          "minItems": 1,
+          "description": "Traceability to observations and risks, e.g., ['OBS-STATE-01', 'RISK-01']."
+        }
       },
       "additionalProperties": false
     },
     "ExploratoryCharter": {
       "type": "object",
       "required": ["id", "title", "scope", "questions", "trace_to"],
+      "description": "Exploratory testing charter for areas requiring investigation rather than scripted steps.",
       "properties": {
-        "id": {"type": "string", "minLength": 1},
-        "title": {"type": "string", "minLength": 1},
-        "priority": {"enum": ["P0", "P1", "P2", "P3"]},
-        "scope": {"type": "string", "minLength": 1},
-        "questions": {"type": "array", "items": {"type": "string"}, "minItems": 1},
-        "estimate_minutes": {"type": "number", "minimum": 0},
-        "trace_to": {"type": "array", "items": {"type": "string"}, "minItems": 1}
+        "id": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Unique charter identifier, e.g., 'CHARTER-001'."
+        },
+        "title": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Short descriptive title for the charter's focus area."
+        },
+        "priority": {
+          "enum": ["P0", "P1", "P2", "P3"],
+          "description": "Risk-based priority for charter allocation."
+        },
+        "scope": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Scope or domain to explore, e.g., 'network loss and retry during cancellation'."
+        },
+        "questions": {
+          "type": "array",
+          "items": {"type": "string"},
+          "minItems": 1,
+          "description": "Specific questions to answer during exploration."
+        },
+        "estimate_minutes": {
+          "type": "number",
+          "minimum": 0,
+          "description": "Timebox for charter exploration in minutes."
+        },
+        "trace_to": {
+          "type": "array",
+          "items": {"type": "string"},
+          "minItems": 1,
+          "description": "Traceability to observations, e.g., ['OBS-RECOVERY-01']."
+        }
       },
       "additionalProperties": false
     }

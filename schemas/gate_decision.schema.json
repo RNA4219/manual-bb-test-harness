@@ -2,17 +2,49 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://github.com/RNA4219/manual-bb-test-harness/schemas/gate_decision.schema.json",
   "title": "GateDecision",
+  "description": "Quality gate decision artifact for release readiness. Produced by evaluate_gates workflow step.",
   "type": "object",
   "required": ["feature_id", "status", "reasons"],
   "properties": {
-    "feature_id": {"type": "string", "minLength": 1},
-    "status": {"enum": ["go", "conditional_go", "no_go"]},
-    "profile": {"enum": ["strict", "standard", "lean"]},
-    "reasons": {"type": "array", "items": {"type": "string"}, "minItems": 1},
-    "blocking_risks": {"type": "array", "items": {"type": "string"}},
-    "waivers": {"type": "array", "items": {"type": "string"}},
-    "residual_risks": {"type": "array", "items": {"type": "string"}},
-    "required_follow_up": {"type": "array", "items": {"type": "string"}}
+    "feature_id": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Reference to the feature_spec feature_id being evaluated."
+    },
+    "status": {
+      "enum": ["go", "conditional_go", "no_go"],
+      "description": "Gate decision: go (release ready), conditional_go (with conditions), no_go (blocked)."
+    },
+    "profile": {
+      "enum": ["strict", "standard", "lean"],
+      "description": "Quality profile applied: strict (high coverage), standard (balanced), lean (minimal)."
+    },
+    "reasons": {
+      "type": "array",
+      "items": {"type": "string"},
+      "minItems": 1,
+      "description": "Reasons supporting the gate decision. Must be specific and actionable."
+    },
+    "blocking_risks": {
+      "type": "array",
+      "items": {"type": "string"},
+      "description": "Risk IDs that block release if status is no_go."
+    },
+    "waivers": {
+      "type": "array",
+      "items": {"type": "string"},
+      "description": "Accepted waivers for conditional_go status with justification."
+    },
+    "residual_risks": {
+      "type": "array",
+      "items": {"type": "string"},
+      "description": "Risks remaining at release, accepted with monitoring plan."
+    },
+    "required_follow_up": {
+      "type": "array",
+      "items": {"type": "string"},
+      "description": "Follow-up actions required after release, e.g., 'monitor error rate for 2 weeks'."
+    }
   },
   "additionalProperties": false
 }

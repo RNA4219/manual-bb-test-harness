@@ -8,14 +8,46 @@ on:
 
 jobs:
   skill:
-    runs-on: windows-latest
+    strategy:
+      matrix:
+        os: [windows-latest, ubuntu-latest, macos-latest]
+        python-version: ["3.10", "3.11", "3.12"]
+      fail-fast: false
+    runs-on: ${{ matrix.os }}
+
     steps:
       - uses: actions/checkout@v4
+
       - uses: actions/setup-python@v5
         with:
-          python-version: "3.12"
-      - name: Validate repository-local skill structure
+          python-version: ${{ matrix.python-version }}
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install pytest pytest-cov ruff
+
+      - name: Lint Python scripts
+        run: ruff check scripts/ tests/
+        continue-on-error: true
+
+      - name: Validate repository-local skill structure (Python)
         run: python scripts/quick-validate-skill.py skills/manual-bb-test-harness
+
       - name: Validate PowerShell checks
         shell: pwsh
         run: ./scripts/validate-skill.ps1
+
+      - name: Run unit tests
+        run: pytest tests/ -v --tb=short
+
+      - name: Run tests with coverage
+        if: matrix.os == 'ubuntu-latest' && matrix.python-version == '3.12'
+        run: pytest tests/ -v --cov=scripts --cov-report=xml
+
+      - name: Upload coverage
+        if: matrix.os == 'ubuntu-latest' && matrix.python-version == '3.12'
+        uses: codecov/codecov-action@v4
+        with:
+          files: ./coverage.xml
+          fail_ci_if_error: false
