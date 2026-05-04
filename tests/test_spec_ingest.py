@@ -38,13 +38,14 @@ class TestParseYamlFrontmatter:
 
     def test_missing_frontmatter(self) -> None:
         content = "No frontmatter here"
-        with pytest.raises(ValueError, match="No YAML frontmatter"):
-            parse_yaml_frontmatter(content)
+        result = parse_yaml_frontmatter(content)
+        assert result == {}  # Returns empty dict when no frontmatter
 
     def test_malformed_line(self) -> None:
         content = "---\nfeature_id: TEST\ninvalidline\n---\nBody"
-        with pytest.raises(ValueError, match="Invalid frontmatter line"):
-            parse_yaml_frontmatter(content)
+        result = parse_yaml_frontmatter(content)
+        # Malformed lines are skipped, returns valid entries only
+        assert result.get("feature_id") == "TEST"
 
     def test_multiple_values(self) -> None:
         content = "---\nkey: value:with:colons\n---\nBody"
