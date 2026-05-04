@@ -15,12 +15,17 @@
           "description": "Identifier of the source item, e.g., 'AC-1', 'BR-2', 'BUG-123'."
         },
         "kind": {
-          "enum": ["spec", "ac", "rule", "bug", "auto_test", "code_review", "ops"],
-          "description": "Kind of source: spec (specification), ac (acceptance criteria), rule (business rule), bug (defect), auto_test (automated test), code_review (review comment), ops (operational data)."
+          "enum": ["spec", "ac", "rule", "bug", "auto_test", "code_review", "ops", "confluence", "jira"],
+          "description": "Kind of source: spec (specification), ac (acceptance criteria), rule (business rule), bug (defect), auto_test (automated test), code_review (review comment), ops (operational data), confluence (Confluence page), jira (Jira issue)."
         },
         "excerpt": {
           "type": "string",
           "description": "Optional excerpt of the source content for reference."
+        },
+        "url": {
+          "type": "string",
+          "format": "uri",
+          "description": "Optional URL to the source document."
         }
       },
       "additionalProperties": false
@@ -47,9 +52,56 @@
         "impact_on_coverage": {
           "type": "string",
           "description": "How this assumption affects test coverage or approach."
+        },
+        "resolution_status": {
+          "enum": ["open", "resolved", "accepted"],
+          "default": "open",
+          "description": "Current status of the assumption."
         }
       },
       "additionalProperties": false
+    },
+    "Oracle": {
+      "type": "object",
+      "required": ["type", "refs"],
+      "description": "Oracle definition: how expected results are determined.",
+      "properties": {
+        "type": {
+          "enum": ["specified", "derived", "implicit", "human"],
+          "description": "Oracle type: specified (in spec/AC), derived (from rules/old system), implicit (standard expectations), human (judgment needed)."
+        },
+        "refs": {
+          "type": "array",
+          "items": {"type": "string"},
+          "minItems": 1,
+          "description": "References to source for oracle, e.g., ['AC-1', 'BR-2']."
+        },
+        "notes": {
+          "type": "string",
+          "description": "Additional notes on oracle derivation or limitations."
+        }
+      },
+      "additionalProperties": false
+    },
+    "ConfidenceLevel": {
+      "type": "string",
+      "enum": ["high", "medium", "low"],
+      "description": "Confidence in correctness: high (well-established), medium (reasonable basis), low (uncertain)."
+    },
+    "Priority": {
+      "type": "string",
+      "enum": ["P0", "P1", "P2", "P3"],
+      "description": "Risk-based priority: P0 (critical), P1 (high), P2 (medium), P3 (low)."
+    },
+    "TestView": {
+      "type": "string",
+      "enum": ["black", "gray", "white"],
+      "description": "Testing view: black (external UI), gray (limited internal), white (full internal)."
+    },
+    "GateStatus": {
+      "type": "string",
+      "enum": ["go", "conditional_go", "no_go"],
+      "description": "Gate decision: go (release ready), conditional_go (with conditions), no_go (blocked)."
     }
   }
 }

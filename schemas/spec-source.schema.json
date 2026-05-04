@@ -1,0 +1,57 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/RNA4219/manual-bb-test-harness/schemas/spec-source.schema.json",
+  "title": "SpecSource",
+  "description": "Input specification source format for spec-ingest.py. Defines the expected structure for Markdown, Confluence, and Jira inputs.",
+  "type": "object",
+  "properties": {
+    "source_type": {
+      "type": "string",
+      "enum": ["markdown", "confluence", "jira"],
+      "description": "Type of the specification source."
+    },
+    "source_path": {
+      "type": "string",
+      "description": "Path or URL to the source document."
+    },
+    "feature_id": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Unique identifier for the feature (optional in Markdown, will be generated from filename if missing)."
+    },
+    "title": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Human-readable title of the feature."
+    },
+    "summary": {
+      "type": "string",
+      "description": "Brief description of the feature's purpose."
+    },
+    "actors": {
+      "type": "string",
+      "description": "Comma-separated list of actors (in frontmatter)."
+    },
+    "acceptance_criteria": {
+      "type": "array",
+      "items": {"type": "string"},
+      "description": "Acceptance criteria items (extracted from sections)."
+    },
+    "business_rules": {
+      "type": "array",
+      "items": {"type": "string"},
+      "description": "Business rules items (extracted from sections)."
+    },
+    "devices": {
+      "type": "array",
+      "items": {"type": "string"},
+      "description": "Target platforms/devices."
+    },
+    "changed_areas": {
+      "type": "array",
+      "items": {"type": "string"},
+      "description": "Affected code areas/services."
+    }
+  },
+  "additionalProperties": true
+}

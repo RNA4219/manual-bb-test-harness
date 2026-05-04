@@ -1,0 +1,9 @@
+digraph RegressionImpact {
+  rankdir=LR;
+  node [shape=box, style=filled, fillcolor=lightblue];
+  "RBAC-01" [label="RBAC-01\n管理者権限変更機能"];
+  "ORD-CANCEL-02" [label="ORD-CANCEL-02\nOrder Cancellation with Partial Refund"];
+  "ORD-CANCEL-01" [label="ORD-CANCEL-01\n注文キャンセル機能"];
+
+  // Regression dependencies
+}

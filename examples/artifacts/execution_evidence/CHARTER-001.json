@@ -1,0 +1,18 @@
+{
+  "run_id": "RUN-2026-05-04-003",
+  "charter_id": "CHARTER-001",
+  "tc_id": "",
+  "feature_id": "ORD-CANCEL-01",
+  "build_id": "web-1.42.0+1289",
+  "env": "stg",
+  "device": "iPhone 15 / iOS 18.4",
+  "network_profile": "4g-lossy",
+  "tester": "qa_b",
+  "result": "pass",
+  "findings": [
+    "二重キャンセルは防止されている",
+    "再試行時は適切なエラー表示あり"
+  ],
+  "attachments": ["s3://evidence/RUN-003/session_notes.md"],
+  "time_spent_minutes": 25
+}

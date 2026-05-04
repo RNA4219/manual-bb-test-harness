@@ -58,6 +58,18 @@ python .\scripts\quick-validate-skill.py .\skills\manual-bb-test-harness
 - Improvement notes: `docs/improvement-notes.md`
 - 原典調査: `docs/research/deep-research-report.md`
 
+## Scripts
+
+- `scripts/quick-validate-skill.py`: Skill構造検証
+- `scripts/state-diagram.py`: 状態遷移図(Mermaid)生成
+- `scripts/regression-graph.py`: 回帰影響グラフ(DOT/HTML)生成
+- `scripts/spec-ingest.py`: 仕様取り込み(Markdown/Confluence/Jira)
+- `scripts/export-testrail.py`: TestRail CSV/JSONエクスポート
+- `scripts/export-xray.py`: Xrayエクスポート
+- `scripts/evaluate-gate.py`: Gate判定自動化（execution_evidence→gate_decision）
+- `scripts/risk-heatmap.py`: リスクヒートマップ(HTML/SVG)生成
+- `scripts/export-notion.py`: Notion API forward-test結果投稿
+
 ## 何をする Skill か
 
 仕様、受入条件、変更点、不具合履歴、自動テスト証跡を入力にして、次の順で出力します。

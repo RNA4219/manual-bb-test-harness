@@ -1,0 +1,81 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/RNA4219/manual-bb-test-harness/schemas/observation_set.schema.json",
+  "title": "ObservationSet",
+  "description": "Rooted observations artifact with coverage items and traceability. Produced by derive_observations workflow step.",
+  "type": "object",
+  "required": ["feature_id", "observations"],
+  "properties": {
+    "feature_id": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Reference to the feature_spec feature_id."
+    },
+    "observations": {
+      "type": "array",
+      "items": {"$ref": "#/$defs/Observation"},
+      "minItems": 1,
+      "description": "List of grounded test observations."
+    }
+  },
+  "additionalProperties": false,
+  "$defs": {
+    "Observation": {
+      "type": "object",
+      "required": ["id", "title", "view", "mandatory", "techniques", "source_refs"],
+      "description": "Single observation with coverage rationale.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^OBS-[A-Z]+-[0-9]+$",
+          "description": "Observation ID, e.g., 'OBS-STATE-01'."
+        },
+        "title": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Short descriptive title for the observation."
+        },
+        "view": {
+          "enum": ["black", "gray", "white"],
+          "description": "Testing view: black (external), gray (limited internal), white (full internal)."
+        },
+        "coverage_item_id": {
+          "type": "string",
+          "description": "Reference to coverage item in test_model, e.g., 'STATE-pending-cancel'."
+        },
+        "mandatory": {
+          "type": "boolean",
+          "description": "Whether this observation must be covered in gate evaluation."
+        },
+        "techniques": {
+          "type": "array",
+          "items": {
+            "enum": ["equivalence_partitioning", "boundary_value", "decision_table", "state_transition", "exploratory", "error_guessing", "use_case", "user_scenario"]
+          },
+          "minItems": 1,
+          "description": "Test techniques applicable to this observation."
+        },
+        "rationale": {
+          "type": "string",
+          "description": "Reasoning for why this observation matters."
+        },
+        "source_refs": {
+          "type": "array",
+          "items": {"$ref": "shared_defs.schema.json#/$defs/SourceRef"},
+          "minItems": 1,
+          "description": "References to source material supporting this observation."
+        },
+        "assumptions": {
+          "type": "array",
+          "items": {"$ref": "shared_defs.schema.json#/$defs/Assumption"},
+          "description": "Assumptions made if source was incomplete."
+        },
+        "confidence": {
+          "enum": ["high", "medium", "low"],
+          "description": "Confidence level in this observation's validity."
+        }
+      },
+      "additionalProperties": false
+    }
+  }
+}

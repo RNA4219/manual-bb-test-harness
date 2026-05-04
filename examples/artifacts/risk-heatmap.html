@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Risk Heatmap - ORD-CANCEL-01</title>
+  <style>
+    body { font-family: sans-serif; margin: 20px; background: #f5f5f5; }
+    .container { max-width: 900px; margin: auto; background: white; padding: 20px; border-radius: 8px; }
+    .heatmap-container { margin: 20px 0; }
+    .risk-table { margin-top: 30px; border-collapse: collapse; width: 100%; }
+    .risk-table th, .risk-table td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+    .risk-table th { background: #f0f0f0; }
+    .risk-table tr:hover { background: #f9f9f9; }
+    .p0 { background: #ff4444; color: white; }
+    .p1 { background: #ff8844; }
+    .p2 { background: #ffcc44; }
+    .p3 { background: #44ff44; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Risk Heatmap - ORD-CANCEL-01</h1>
+    <p>Total risks: 4</p>
+    <div class="heatmap-container">
+<?xml version="1.0" encoding="UTF-8?>
+<svg xmlns="http://www.w3.org/2000/svg" width="700" height="550" viewBox="0 0 700 550">
+  <style>
+    .title { font: bold 16px sans-serif; }
+    .axis-label { font: 12px sans-serif; }
+    .risk-label { font: 10px sans-serif; fill: #333; }
+    .cell { stroke: #333; stroke-width: 1; }
+  </style>
+  <text class="title" x="350" y="20" text-anchor="middle">Risk Heatmap: Impact x Likelihood</text>
+  <rect class="cell" x="60" y="416" width="94" height="94" fill="#44ff44"/>
+  <rect class="cell" x="154" y="416" width="94" height="94" fill="#88ff88"/>
+  <rect class="cell" x="248" y="416" width="94" height="94" fill="#ccff88"/>
+  <rect class="cell" x="342" y="416" width="94" height="94" fill="#ffff88"/>
+  <rect class="cell" x="436" y="416" width="94" height="94" fill="#ffff44"/>
+  <rect class="cell" x="60" y="322" width="94" height="94" fill="#88ff88"/>
+  <rect class="cell" x="154" y="322" width="94" height="94" fill="#ccff88"/>
+  <rect class="cell" x="248" y="322" width="94" height="94" fill="#ffff88"/>
+  <rect class="cell" x="342" y="322" width="94" height="94" fill="#ffff44"/>
+  <rect class="cell" x="436" y="322" width="94" height="94" fill="#ffcc44"/>
+  <rect class="cell" x="60" y="228" width="94" height="94" fill="#ccff88"/>
+  <rect class="cell" x="154" y="228" width="94" height="94" fill="#ffff88"/>
+  <rect class="cell" x="248" y="228" width="94" height="94" fill="#ffff44"/>
+  <rect class="cell" x="342" y="228" width="94" height="94" fill="#ffcc44"/>
+  <rect class="cell" x="436" y="228" width="94" height="94" fill="#ff8844"/>
+  <rect class="cell" x="60" y="134" width="94" height="94" fill="#ffff88"/>
+  <rect class="cell" x="154" y="134" width="94" height="94" fill="#ffff44"/>
+  <rect class="cell" x="248" y="134" width="94" height="94" fill="#ffcc44"/>
+  <rect class="cell" x="342" y="134" width="94" height="94" fill="#ff8844"/>
+  <rect class="cell" x="436" y="134" width="94" height="94" fill="#ff4444"/>
+  <rect class="cell" x="60" y="40" width="94" height="94" fill="#ffff44"/>
+  <rect class="cell" x="154" y="40" width="94" height="94" fill="#ffcc44"/>
+  <rect class="cell" x="248" y="40" width="94" height="94" fill="#ff8844"/>
+  <rect class="cell" x="342" y="40" width="94" height="94" fill="#ff4444"/>
+  <rect class="cell" x="436" y="40" width="94" height="94" fill="#ff4444"/>
+  <text class="axis-label" x="350" y="540" text-anchor="middle">Impact</text>
+  <text class="axis-label" x="107" y="525" text-anchor="middle">1</text>
+  <text class="axis-label" x="201" y="525" text-anchor="middle">2</text>
+  <text class="axis-label" x="295" y="525" text-anchor="middle">3</text>
+  <text class="axis-label" x="389" y="525" text-anchor="middle">4</text>
+  <text class="axis-label" x="483" y="525" text-anchor="middle">5</text>
+  <text class="axis-label" x="40" y="87" text-anchor="end">5</text>
+  <text class="axis-label" x="40" y="181" text-anchor="end">4</text>
+  <text class="axis-label" x="40" y="275" text-anchor="end">3</text>
+  <text class="axis-label" x="40" y="369" text-anchor="end">2</text>
+  <text class="axis-label" x="40" y="463" text-anchor="end">1</text>
+  <circle cx="389.0" cy="369.0" r="12" fill="#ff8844" stroke="#333" stroke-width="1"/>
+  <text class="risk-label" x="389.0" y="372.0" text-anchor="middle">RISK-01</text>
+  <circle cx="483.0" cy="369.0" r="12" fill="#ff4444" stroke="#333" stroke-width="1"/>
+  <text class="risk-label" x="483.0" y="372.0" text-anchor="middle">RISK-02</text>
+  <circle cx="295.0" cy="369.0" r="12" fill="#ffcc44" stroke="#333" stroke-width="1"/>
+  <text class="risk-label" x="295.0" y="372.0" text-anchor="middle">RISK-03</text>
+  <circle cx="389.0" cy="275.0" r="12" fill="#ff8844" stroke="#333" stroke-width="1"/>
+  <text class="risk-label" x="389.0" y="278.0" text-anchor="middle">RISK-04</text>
+  <text class="axis-label" x="600" y="40">Priority</text>
+  <rect x="600" y="60" width="15" height="15" fill="#ff4444" stroke="#333"/>
+  <text class="risk-label" x="620" y="72">P0</text>
+  <rect x="600" y="80" width="15" height="15" fill="#ff8844" stroke="#333"/>
+  <text class="risk-label" x="620" y="92">P1</text>
+  <rect x="600" y="100" width="15" height="15" fill="#ffcc44" stroke="#333"/>
+  <text class="risk-label" x="620" y="112">P2</text>
+  <rect x="600" y="120" width="15" height="15" fill="#44ff44" stroke="#333"/>
+  <text class="risk-label" x="620" y="132">P3</text>
+</svg>
+    </div>
+    <h2>Risk Details</h2>
+    <table class="risk-table">
+      <thead>
+        <tr><th>ID</th><th>Scenario</th><th>Impact</th><th>Likelihood</th><th>Score</th><th>Priority</th><th>Rationale</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>RISK-01</td>
+          <td>出荷済み注文がキャンセルできてしまう</td>
+          <td>4</td>
+          <td>2</td>
+          <td>68</td>
+          <td class="p1">P1</td>
+          <td>売上、配送、返金の整合性を損なう</td>
+        </tr>
+        <tr>
+          <td>RISK-02</td>
+          <td>pending注文キャンセルで在庫が復元されない</td>
+          <td>5</td>
+          <td>2</td>
+          <td>72</td>
+          <td class="p0">P0</td>
+          <td>在庫不一致で販売機会損失</td>
+        </tr>
+        <tr>
+          <td>RISK-03</td>
+          <td>クーポン残数が復元されない</td>
+          <td>3</td>
+          <td>2</td>
+          <td>44</td>
+          <td class="p2">P2</td>
+          <td>クーポン利用制限への影響</td>
+        </tr>
+        <tr>
+          <td>RISK-04</td>
+          <td>二重キャンセルで副作用が二重発生</td>
+          <td>4</td>
+          <td>3</td>
+          <td>58</td>
+          <td class="p1">P1</td>
+          <td>返金、在庫復元の重複</td>
+        </tr>
+      </tbody>
+    </table>
+    <h2>Priority Distribution</h2>
+    <ul>
+      <li><strong>P0</strong>: 1 risks</li>
+      <li><strong>P1</strong>: 2 risks</li>
+      <li><strong>P2</strong>: 1 risks</li>
+      <li><strong>P3</strong>: 0 risks</li>
+    </ul>
+  </div>
+</body>
+</html>

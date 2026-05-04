@@ -1,0 +1,105 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/RNA4219/manual-bb-test-harness/schemas/execution_evidence.schema.json",
+  "title": "ExecutionEvidence",
+  "description": "Test execution result artifact. Records actual vs expected results for manual test cases.",
+  "type": "object",
+  "required": ["run_id", "result"],
+  "properties": {
+    "run_id": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Unique execution run identifier, e.g., 'RUN-2026-05-04-001'."
+    },
+    "tc_id": {
+      "type": "string",
+      "description": "Test case ID (for scripted tests), e.g., 'TC-001'."
+    },
+    "charter_id": {
+      "type": "string",
+      "description": "Charter ID (for exploratory tests), e.g., 'CHARTER-001'."
+    },
+    "feature_id": {
+      "type": "string",
+      "description": "Reference to the feature being tested."
+    },
+    "build_id": {
+      "type": "string",
+      "description": "Build or version identifier, e.g., 'web-1.42.0+1289'."
+    },
+    "env": {
+      "type": "string",
+      "description": "Environment name, e.g., 'stg', 'prod'."
+    },
+    "device": {
+      "type": "string",
+      "description": "Device/platform used, e.g., 'iPhone 15 / iOS 18.4'."
+    },
+    "network_profile": {
+      "type": "string",
+      "description": "Network condition, e.g., '4g-lossy', 'wifi'."
+    },
+    "tester": {
+      "type": "string",
+      "description": "Tester identifier, e.g., 'qa_a'."
+    },
+    "oracle_type": {
+      "enum": ["specified", "derived", "implicit", "human"],
+      "description": "Oracle type used for expected result validation."
+    },
+    "oracle_refs": {
+      "type": "array",
+      "items": {"type": "string"},
+      "description": "References to oracle sources, e.g., ['AC-2']."
+    },
+    "expected": {
+      "type": "array",
+      "items": {"type": "string"},
+      "description": "Expected results from test case."
+    },
+    "actual": {
+      "type": "array",
+      "items": {"type": "string"},
+      "description": "Actual observed results."
+    },
+    "result": {
+      "enum": ["pass", "fail", "skip", "blocked", "unknown"],
+      "description": "Execution result: pass, fail, skip, blocked, or unknown."
+    },
+    "attachments": {
+      "type": "array",
+      "items": {"type": "string"},
+      "description": "Evidence attachment URLs, e.g., screenshots, logs."
+    },
+    "anomaly_notes": {
+      "type": "array",
+      "items": {"type": "string"},
+      "description": "Observed anomalies or unexpected behaviors."
+    },
+    "defect_stub": {
+      "type": "object",
+      "description": "Defect information if result is fail.",
+      "properties": {
+        "title": {
+          "type": "string",
+          "description": "Defect title."
+        },
+        "severity": {
+          "enum": ["blocker", "critical", "high", "medium", "low"],
+          "description": "Defect severity."
+        }
+      }
+    },
+    "findings": {
+      "type": "array",
+      "items": {"type": "string"},
+      "description": "Findings from exploratory charter execution."
+    },
+    "time_spent_minutes": {
+      "type": "number",
+      "minimum": 0,
+      "description": "Time spent on exploratory charter (minutes)."
+    }
+  },
+  "additionalProperties": false
+}

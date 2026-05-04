@@ -1,0 +1,78 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/RNA4219/manual-bb-test-harness/schemas/risk_register.schema.json",
+  "title": "RiskRegister",
+  "description": "Risk assessment artifact with impact, likelihood, and priority ratings. Produced by assess_risk workflow step.",
+  "type": "object",
+  "required": ["feature_id", "risks"],
+  "properties": {
+    "feature_id": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Reference to the feature_spec feature_id being assessed."
+    },
+    "risks": {
+      "type": "array",
+      "items": {"$ref": "#/$defs/Risk"},
+      "minItems": 1,
+      "description": "List of identified risks with scoring and priority."
+    }
+  },
+  "additionalProperties": false,
+  "$defs": {
+    "Risk": {
+      "type": "object",
+      "required": ["id", "scenario", "impact", "likelihood", "priority"],
+      "description": "Single risk entry with scoring.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Unique risk identifier, e.g., 'RISK-01'."
+        },
+        "scenario": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Risk scenario description."
+        },
+        "impact": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 5,
+          "description": "Impact score (1=low, 5=high)."
+        },
+        "likelihood": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 5,
+          "description": "Likelihood score (1=low, 5=high)."
+        },
+        "modifiers": {
+          "type": "array",
+          "items": {"type": "string"},
+          "description": "Risk modifiers, e.g., 'detectability_difficulty=2'."
+        },
+        "score": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 100,
+          "description": "Calculated risk score (0-100)."
+        },
+        "priority": {
+          "enum": ["P0", "P1", "P2", "P3"],
+          "description": "Risk priority: P0 (critical), P1 (high), P2 (medium), P3 (low)."
+        },
+        "rationale": {
+          "type": "string",
+          "description": "Reasoning for the risk assessment."
+        },
+        "trace_to": {
+          "type": "array",
+          "items": {"type": "string"},
+          "description": "References to test cases or charters that cover this risk."
+        }
+      },
+      "additionalProperties": false
+    }
+  }
+}

@@ -1,0 +1,18 @@
+{
+  "run_id": "RUN-2026-05-04-002",
+  "tc_id": "TC-002",
+  "feature_id": "ORD-CANCEL-01",
+  "build_id": "web-1.42.0+1289",
+  "env": "stg",
+  "device": "iPhone 15 / iOS 18.4",
+  "network_profile": "4g-lossy",
+  "tester": "qa_a",
+  "oracle_type": "specified",
+  "oracle_refs": ["AC-3"],
+  "expected": ["在庫数が+1される"],
+  "actual": ["在庫数が+1された"],
+  "result": "pass",
+  "attachments": ["s3://evidence/RUN-002/step3.png"],
+  "anomaly_notes": [],
+  "defect_stub": null
+}

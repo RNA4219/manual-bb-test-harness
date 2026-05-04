@@ -45,6 +45,44 @@ jobs:
         if: matrix.os == 'ubuntu-latest' && matrix.python-version == '3.12'
         run: pytest tests/ -v --cov=scripts --cov-report=xml
 
+      - name: Test script help commands
+        run: |
+          for script in scripts/*.py; do
+            python "$script" --help > /dev/null || exit 1
+          done
+        shell: bash
+
+      - name: Test evaluate-gate.py
+        run: |
+          python scripts/evaluate-gate.py \
+            --evidence examples/artifacts/execution_evidence \
+            --risk examples/artifacts/order-cancel.risk_register.json \
+            --cases examples/artifacts/order-cancel.manual_case_set.json \
+            --output /tmp/gate_test.json \
+            --profile standard
+        shell: bash
+
+      - name: Test risk-heatmap.py
+        run: |
+          python scripts/risk-heatmap.py \
+            --input examples/artifacts/order-cancel.risk_register.json \
+            --output /tmp/heatmap_test.html
+        shell: bash
+
+      - name: Test state-diagram.py
+        run: |
+          python scripts/state-diagram.py \
+            --input examples/artifacts/order-cancel.test_model.json \
+            --output /tmp/states_test.mmd
+        shell: bash
+
+      - name: Validate JSON schemas
+        run: |
+          for f in schemas/*.json examples/artifacts/*.json; do
+            python -m json.tool "$f" > /dev/null || exit 1
+          done
+        shell: bash
+
       - name: Upload coverage
         if: matrix.os == 'ubuntu-latest' && matrix.python-version == '3.12'
         uses: codecov/codecov-action@v5

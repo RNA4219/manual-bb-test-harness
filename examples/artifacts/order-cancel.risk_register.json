@@ -1,0 +1,49 @@
+{
+  "feature_id": "ORD-CANCEL-01",
+  "risks": [
+    {
+      "id": "RISK-01",
+      "scenario": "出荷済み注文がキャンセルできてしまう",
+      "impact": 4,
+      "likelihood": 2,
+      "modifiers": ["detectability_difficulty=1", "change_surface=2"],
+      "score": 68,
+      "priority": "P1",
+      "rationale": "売上、配送、返金の整合性を損なう",
+      "trace_to": ["TC-001"]
+    },
+    {
+      "id": "RISK-02",
+      "scenario": "pending注文キャンセルで在庫が復元されない",
+      "impact": 5,
+      "likelihood": 2,
+      "modifiers": ["externality=1"],
+      "score": 72,
+      "priority": "P0",
+      "rationale": "在庫不一致で販売機会損失",
+      "trace_to": ["TC-002"]
+    },
+    {
+      "id": "RISK-03",
+      "scenario": "クーポン残数が復元されない",
+      "impact": 3,
+      "likelihood": 2,
+      "modifiers": [],
+      "score": 44,
+      "priority": "P2",
+      "rationale": "クーポン利用制限への影響",
+      "trace_to": ["TC-003"]
+    },
+    {
+      "id": "RISK-04",
+      "scenario": "二重キャンセルで副作用が二重発生",
+      "impact": 4,
+      "likelihood": 3,
+      "modifiers": ["detectability_difficulty=2"],
+      "score": 58,
+      "priority": "P1",
+      "rationale": "返金、在庫復元の重複",
+      "trace_to": ["CHARTER-001"]
+    }
+  ]
+}

@@ -1,0 +1,218 @@
+[
+  {
+    "file": "spec-01-ci-cd-enhancement.md",
+    "path": "docs\\specs\\spec-01-ci-cd-enhancement.md",
+    "sections": [],
+    "quality": [
+      {
+        "criterion": "has_priority_table",
+        "description": "Requirements table with P0/P1/P2 priorities",
+        "status": "pass"
+      },
+      {
+        "criterion": "has_cli_example",
+        "description": "CLI usage examples",
+        "status": "pass"
+      },
+      {
+        "criterion": "has_checklist",
+        "description": "Acceptance criteria checklist",
+        "status": "pass"
+      },
+      {
+        "criterion": "has_table",
+        "description": "Table format for requirements/design",
+        "status": "pass"
+      }
+    ],
+    "requirements": {
+      "status": "found",
+      "total": 0,
+      "p0_count": 0,
+      "p1_count": 0,
+      "requirements": []
+    },
+    "acceptance": {
+      "status": "found",
+      "total": 1,
+      "checked": 0,
+      "unchecked": 1,
+      "items": [
+        {
+          "text": "実行時間5分以内",
+          "checked": false
+        }
+      ]
+    },
+    "summary": {
+      "section_errors": 0,
+      "quality_score": 100.0,
+      "has_requirements": true,
+      "has_acceptance": true,
+      "acceptance_items": 1,
+      "overall": "pass"
+    }
+  },
+  {
+    "file": "spec-02-cli-integration.md",
+    "path": "docs\\specs\\spec-02-cli-integration.md",
+    "sections": [],
+    "quality": [
+      {
+        "criterion": "has_priority_table",
+        "description": "Requirements table with P0/P1/P2 priorities",
+        "status": "pass"
+      },
+      {
+        "criterion": "has_cli_example",
+        "description": "CLI usage examples",
+        "status": "pass"
+      },
+      {
+        "criterion": "has_checklist",
+        "description": "Acceptance criteria checklist",
+        "status": "pass"
+      },
+      {
+        "criterion": "has_table",
+        "description": "Table format for requirements/design",
+        "status": "pass"
+      }
+    ],
+    "requirements": {
+      "status": "found",
+      "total": 0,
+      "p0_count": 0,
+      "p1_count": 0,
+      "requirements": []
+    },
+    "acceptance": {
+      "status": "found",
+      "total": 1,
+      "checked": 0,
+      "unchecked": 1,
+      "items": [
+        {
+          "text": "dry-runモードでAPI送信回避",
+          "checked": false
+        }
+      ]
+    },
+    "summary": {
+      "section_errors": 0,
+      "quality_score": 100.0,
+      "has_requirements": true,
+      "has_acceptance": true,
+      "acceptance_items": 1,
+      "overall": "pass"
+    }
+  },
+  {
+    "file": "spec-03-schema-extension.md",
+    "path": "docs\\specs\\spec-03-schema-extension.md",
+    "sections": [],
+    "quality": [
+      {
+        "criterion": "has_priority_table",
+        "description": "Requirements table with P0/P1/P2 priorities",
+        "status": "pass"
+      },
+      {
+        "criterion": "has_cli_example",
+        "description": "CLI usage examples",
+        "status": "pass"
+      },
+      {
+        "criterion": "has_checklist",
+        "description": "Acceptance criteria checklist",
+        "status": "pass"
+      },
+      {
+        "criterion": "has_table",
+        "description": "Table format for requirements/design",
+        "status": "pass"
+      }
+    ],
+    "requirements": {
+      "status": "found",
+      "total": 0,
+      "p0_count": 0,
+      "p1_count": 0,
+      "requirements": []
+    },
+    "acceptance": {
+      "status": "found",
+      "total": 1,
+      "checked": 0,
+      "unchecked": 1,
+      "items": [
+        {
+          "text": "CI validate.ymlに統合",
+          "checked": false
+        }
+      ]
+    },
+    "summary": {
+      "section_errors": 0,
+      "quality_score": 100.0,
+      "has_requirements": true,
+      "has_acceptance": true,
+      "acceptance_items": 1,
+      "overall": "pass"
+    }
+  },
+  {
+    "file": "spec-04-test-result-import.md",
+    "path": "docs\\specs\\spec-04-test-result-import.md",
+    "sections": [],
+    "quality": [
+      {
+        "criterion": "has_priority_table",
+        "description": "Requirements table with P0/P1/P2 priorities",
+        "status": "pass"
+      },
+      {
+        "criterion": "has_cli_example",
+        "description": "CLI usage examples",
+        "status": "pass"
+      },
+      {
+        "criterion": "has_checklist",
+        "description": "Acceptance criteria checklist",
+        "status": "pass"
+      },
+      {
+        "criterion": "has_table",
+        "description": "Table format for requirements/design",
+        "status": "pass"
+      }
+    ],
+    "requirements": {
+      "status": "found",
+      "total": 0,
+      "p0_count": 0,
+      "p1_count": 0,
+      "requirements": []
+    },
+    "acceptance": {
+      "status": "found",
+      "total": 1,
+      "checked": 0,
+      "unchecked": 1,
+      "items": [
+        {
+          "text": "dry-runモード動作",
+          "checked": false
+        }
+      ]
+    },
+    "summary": {
+      "section_errors": 0,
+      "quality_score": 100.0,
+      "has_requirements": true,
+      "has_acceptance": true,
+      "acceptance_items": 1,
+      "overall": "pass"
+    }
+  }
+]
