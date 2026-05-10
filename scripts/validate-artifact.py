@@ -27,6 +27,7 @@ SCHEMA_DIR = Path("schemas")
 
 # Mapping artifact type to schema
 ARTifact_SCHEMA_MAP = {
+    "phase_contract": "phase_contract.schema.json",
     "feature_spec": "feature_spec.schema.json",
     "test_model": "test_model.schema.json",
     "observation_set": "observation_set.schema.json",
@@ -119,6 +120,7 @@ def validate_artifact_basic(artifact: dict[str, Any], schema_type: str) -> list[
 
     # Check required fields based on type
     required_fields: dict[str, list[str]] = {
+        "phase_contract": ["contract_id", "feature_id", "readiness", "problem_owner"],
         "feature_spec": ["feature_id"],
         "test_model": ["feature_id", "flows"],
         "observation_set": ["feature_id", "observations"],

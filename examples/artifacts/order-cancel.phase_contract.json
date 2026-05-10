@@ -1,0 +1,100 @@
+{
+  "contract_id": "PHASE-ORD-CANCEL-001",
+  "feature_id": "ORD-CANCEL-01",
+  "readiness": {
+    "status": "blocked",
+    "decision": "not_ready",
+    "reasons": [
+      "出荷前キャンセルの主要導線は見えているが、返金責務とキャンセル可能状態の oracle が未確定"
+    ],
+    "required_before_dev": [
+      "キャンセル可能な注文状態の一覧を確定する",
+      "決済確定後キャンセル時の返金責務を確定する"
+    ]
+  },
+  "problem_owner": {
+    "persona": "購入者",
+    "problem": "出荷前の注文を問い合わせなしで自分でキャンセルしたい"
+  },
+  "success_conditions": [
+    {
+      "id": "SC-1",
+      "text": "購入者が注文詳細から出荷前注文をキャンセルできる",
+      "metric": "キャンセル問い合わせ件数が減る",
+      "source_refs": ["MOCK-1"]
+    }
+  ],
+  "phase1_scope": [
+    "Web 注文詳細からの出荷前キャンセル",
+    "キャンセル完了後の注文状態表示"
+  ],
+  "phase1_non_goals": [
+    "出荷後キャンセル",
+    "管理画面での代理キャンセル",
+    "返金処理の詳細管理 UI"
+  ],
+  "open_questions": [
+    {
+      "id": "Q-1",
+      "severity": "critical",
+      "question": "決済確定後キャンセル時の返金責務は注文サービスと決済サービスのどちらが持つか",
+      "owner": "PM",
+      "blocks_ready": true,
+      "source_refs": ["MEMO-1"]
+    }
+  ],
+  "spec_gaps": [
+    {
+      "id": "GAP-1",
+      "severity": "high",
+      "gap": "キャンセル可能状態とキャンセル不可状態の一覧がない",
+      "impact": "状態遷移テストの expected result を確定できない",
+      "needed_oracle": "注文状態ごとのキャンセル可否表",
+      "source_refs": ["MOCK-1"]
+    }
+  ],
+  "technical_risks": [
+    {
+      "id": "TR-1",
+      "severity": "medium",
+      "risk": "在庫復元が非同期の場合、キャンセル完了直後の表示と実在庫がずれる",
+      "mitigation": "Phase 1 は注文状態表示を主 oracle にし、在庫復元確認は探索チャーターに分離する",
+      "owner": "Tech Lead",
+      "source_refs": ["MEMO-1"]
+    }
+  ],
+  "metrics": [
+    "キャンセル問い合わせ件数",
+    "出荷前キャンセル成功率"
+  ],
+  "test_lenses": [
+    {
+      "id": "TL-1",
+      "lens": "state",
+      "title": "注文状態別にキャンセル可否が変わる",
+      "rationale": "Phase 1 scope が出荷前キャンセルに限定されているため",
+      "trace_to": ["SC-1", "GAP-1"]
+    },
+    {
+      "id": "TL-2",
+      "lens": "recovery",
+      "title": "キャンセル操作中の失敗から復帰できる",
+      "rationale": "決済や在庫の外部依存があるため",
+      "trace_to": ["Q-1", "TR-1"]
+    }
+  ],
+  "source_refs": [
+    {
+      "id": "MOCK-1",
+      "kind": "mock",
+      "excerpt": "注文詳細画面にキャンセルボタンと確認モーダルがある"
+    },
+    {
+      "id": "MEMO-1",
+      "kind": "memo",
+      "excerpt": "Phase 1 は問い合わせ削減を目的に出荷前キャンセルだけを扱う"
+    }
+  ],
+  "assumptions": [],
+  "confidence": "medium"
+}

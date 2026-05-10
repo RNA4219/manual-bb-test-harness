@@ -2,7 +2,7 @@
 
 ## 概要
 
-本仕様書は `manual-bb-test-harness` リポジトリの品質改善（21件）と機能拡張（4件）を定義・記録する。
+本仕様書は `manual-bb-test-harness` リポジトリの品質改善（21件）と機能拡張（5件）を定義・記録する。
 
 ## 改修項目 (21件)
 
@@ -15,7 +15,7 @@
 
 詳細は CHANGELOG.md を参照。
 
-## 機能拡張 (4件 - HIGH Impact)
+## 機能拡張 (5件 - HIGH Impact)
 
 | Feature | Status | Description |
 |---|---|---|
@@ -23,6 +23,38 @@
 | F2: Regression Graph | OK | 依存関係可視化 (DOT/HTML) |
 | F3: State Diagram | OK | Mermaid stateDiagram生成 |
 | F4: TestRail/Xray | OK | Export to test management tools |
+| F5: Ready Phase Contract | OK | 企画・モック・要件メモ → Definition of Ready / Phase 1 契約 |
+
+## F5: Ready Phase Contract
+
+開発着手前の企画、モック、要件メモを `phase_contract` に正規化し、締め切り決定前の健全性を `ok / degraded / blocked` で判定する。
+
+### 必須項目
+
+- 誰の課題か: `problem_owner`
+- 成功条件: `success_conditions`
+- Phase 1 の範囲: `phase1_scope`
+- Phase 1 でやらないこと: `phase1_non_goals`
+- 未決事項: `open_questions`
+- 仕様不足: `spec_gaps`
+- 技術リスク: `technical_risks`
+- 指標: `metrics`
+- 初期テスト観点: `test_lenses`
+
+### Ready 判定
+
+- `ok`: Phase 1 の対象ユーザー、成功条件、in/out、主要 oracle、未決事項の owner が揃っている。
+- `degraded`: 軽微または中程度の未決事項はあるが、仮説と owner と期限があり、Phase 1 の範囲を壊さない。
+- `blocked`: critical 未決事項、検証不能な成功条件、主要状態/権限/データ境界の欠落、または外部依存の未合意がある。
+
+### 成果物
+
+- Skill 導線: `skills/manual-bb-test-harness/SKILL.md`
+- 詳細仕様: `skills/manual-bb-test-harness/references/ready-phase-contract.md`
+- artifact 契約: `skills/manual-bb-test-harness/references/artifact-contract.md`
+- 出力テンプレート: `skills/manual-bb-test-harness/references/output-templates.md`
+- JSON Schema: `schemas/phase_contract.schema.json`
+- Example: `examples/artifacts/order-cancel.phase_contract.json`
 
 ## 検証
 
@@ -35,6 +67,7 @@
 | 5 | Schema validation | OK |
 | 6 | Agent config | OK |
 | 7 | F1-F4 functionality | OK |
+| 8 | F5 phase_contract schema/example validation | OK |
 
 **全検証完了 ✅**
 

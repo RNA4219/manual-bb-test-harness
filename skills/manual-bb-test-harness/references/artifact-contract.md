@@ -22,8 +22,11 @@ policies:
 
 Use these artifacts in order.
 
+開発着手前の入力を扱う場合は、通常 chain の前に `phase_contract` を作る。`phase_contract.readiness.status = blocked` の場合は、詳細な手動ケース生成へ進まず、未決事項、仕様不足、Go/No-Go 判断材料を返す。
+
 | artifact | purpose | produced by |
 |---|---|---|
+| `phase_contract` | 企画、モック、要件メモを Definition of Ready と Phase 1 契約へ正規化する | `normalize_ready_intake` |
 | `feature_spec` | 仕様、AC、業務ルール、変更点、環境、前提を正規化する | `normalize_intake` |
 | `test_model` | flow/state/rule/data/role/regression の coverage item を表す | `model_test_surface` |
 | `observation_set` | 根拠付き観点を表す | `derive_observations` |
@@ -56,6 +59,7 @@ Prefer these fields across artifacts.
 ```
 
 `SourceRef.kind` は `spec / ac / rule / bug / auto_test / code_review / ops` を基本にする。
+企画段階では `mock / memo / interview / metric` も使える。
 
 ## Minimal Schema Shape
 
@@ -63,6 +67,68 @@ Use this reduced schema when the user asks for machine-readable output.
 
 ```json
 {
+  "phase_contract": {
+    "contract_id": "string",
+    "feature_id": "string",
+    "readiness": {
+      "status": "ok | degraded | blocked",
+      "decision": "ready | ready_with_conditions | not_ready",
+      "reasons": ["string"],
+      "required_before_dev": ["string"]
+    },
+    "problem_owner": {
+      "persona": "string",
+      "problem": "string"
+    },
+    "success_conditions": [
+      {
+        "id": "SC-1",
+        "text": "string",
+        "metric": "string",
+        "source_refs": ["MOCK-1"]
+      }
+    ],
+    "phase1_scope": ["string"],
+    "phase1_non_goals": ["string"],
+    "open_questions": [
+      {
+        "id": "Q-1",
+        "severity": "critical",
+        "question": "string",
+        "owner": "string",
+        "blocks_ready": true
+      }
+    ],
+    "spec_gaps": [
+      {
+        "id": "GAP-1",
+        "severity": "high",
+        "gap": "string",
+        "impact": "string",
+        "needed_oracle": "string"
+      }
+    ],
+    "technical_risks": [
+      {
+        "id": "TR-1",
+        "severity": "medium",
+        "risk": "string",
+        "mitigation": "string"
+      }
+    ],
+    "metrics": ["string"],
+    "test_lenses": [
+      {
+        "id": "TL-1",
+        "lens": "state",
+        "title": "string",
+        "rationale": "string",
+        "trace_to": ["SC-1"]
+      }
+    ],
+    "source_refs": [],
+    "assumptions": []
+  },
   "feature_spec": {
     "feature_id": "string",
     "title": "string",

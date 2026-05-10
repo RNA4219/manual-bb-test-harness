@@ -9,6 +9,7 @@
 
 | file | purpose |
 |---|---|
+| `phase_contract.schema.json` | phase_contract artifact の構造定義 |
 | `feature_spec.schema.json` | feature_spec artifact の構造定義 |
 | `test_model.schema.json` | test_model artifact の構造定義 |
 | `manual_case_set.schema.json` | manual_case_set artifact の構造定義 |

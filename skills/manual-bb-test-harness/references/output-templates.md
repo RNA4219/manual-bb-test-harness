@@ -1,5 +1,45 @@
 # Output Templates
 
+## Ready / Phase Contract
+
+```md
+## Definition of Ready
+- status: ok | degraded | blocked
+- decision: ready | ready_with_conditions | not_ready
+- reasons:
+- required_before_dev:
+
+## Phase Contract
+- problem_owner:
+- target_problem:
+- success_conditions:
+- phase1_scope:
+- phase1_non_goals:
+- metrics:
+
+## 未決事項
+| id | severity | question | owner | due | blocks_ready | source |
+|---|---|---|---|---|---|---|
+
+## 仕様不足
+| id | severity | gap | impact | needed_oracle | source |
+|---|---|---|---|---|---|
+
+## 技術リスク
+| id | severity | risk | mitigation | owner | source |
+|---|---|---|---|---|---|
+
+## 初期テスト観点
+| id | lens | title | rationale | trace_to |
+|---|---|---|---|---|
+
+## Go/No-Go 判断材料
+- go_when:
+- no_go_when:
+- deadline_risk:
+- evidence_needed:
+```
+
 ## Markdown Response
 
 ```md

@@ -15,8 +15,8 @@
           "description": "Identifier of the source item, e.g., 'AC-1', 'BR-2', 'BUG-123'."
         },
         "kind": {
-          "enum": ["spec", "ac", "rule", "bug", "auto_test", "code_review", "ops", "confluence", "jira"],
-          "description": "Kind of source: spec (specification), ac (acceptance criteria), rule (business rule), bug (defect), auto_test (automated test), code_review (review comment), ops (operational data), confluence (Confluence page), jira (Jira issue)."
+          "enum": ["spec", "ac", "rule", "bug", "auto_test", "code_review", "ops", "confluence", "jira", "mock", "memo", "interview", "metric"],
+          "description": "Kind of source: spec (specification), ac (acceptance criteria), rule (business rule), bug (defect), auto_test (automated test), code_review (review comment), ops (operational data), confluence (Confluence page), jira (Jira issue), mock (mockup), memo (planning note), interview (user or stakeholder interview), metric (measurement or KPI)."
         },
         "excerpt": {
           "type": "string",

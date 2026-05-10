@@ -21,6 +21,8 @@ description: 手動ブラックボックス前提で、仕様・受入条件・�
 
 ## 基本ワークフロー
 
+企画、モック、要件メモなど、開発着手前の入力を扱う場合は、先に `references/ready-phase-contract.md` を読み、`phase_contract` で Definition of Ready を判定する。
+
 1. `normalize_intake`: 仕様、受入条件、業務ルール、変更点、対象環境、既存証跡を `feature_spec` に正規化する。不足情報は `ok / degraded / blocked` で分類し、推測は assumption として残す。
 2. `model_test_surface`: `flow / state / rule / data / role / regression impact` に分解し、coverage item の母集合を作る。
 3. `derive_observations`: 同値分割、境界値、デシジョンテーブル、状態遷移、経験ベース探索チャーターから観点を作る。
