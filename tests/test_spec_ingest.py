@@ -103,6 +103,9 @@ class TestNormalizeSectionName:
         assert normalize_section_name("Business Rules") == "business_rules"
         assert normalize_section_name("BR") == "business_rules"
 
+    def test_mobile_contexts(self) -> None:
+        assert normalize_section_name("Mobile Contexts") == "mobile_contexts"
+
     def test_unknown_section(self) -> None:
         assert normalize_section_name("Custom Section") == "custom_section"
 
@@ -158,6 +161,19 @@ class TestIngestMarkdownSpec:
         result = ingest_markdown_spec(md_file)
         assert "user" in result["actors"]
         assert "admin" in result["actors"]
+
+    def test_mobile_contexts_from_section(self, tmp_path: Path) -> None:
+        md_file = tmp_path / "mobile.md"
+        md_file.write_text(
+            "---\nfeature_id: MOB-01\ntitle: Mobile Feature\n---\n"
+            "## Acceptance Criteria\n- AC-1: Item\n"
+            "## Devices\n- iOS\n- Android\n"
+            "## Mobile Contexts\n- foreground\n- background_resume\n",
+            encoding="utf-8"
+        )
+        result = ingest_markdown_spec(md_file)
+        assert result["devices"] == ["iOS", "Android"]
+        assert result["mobile_contexts"] == ["foreground", "background_resume"]
 
 
 class TestMain:

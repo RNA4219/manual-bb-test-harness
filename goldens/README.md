@@ -15,6 +15,8 @@
 | `order-cancel.expected.md` | 期待される出力の anchor |
 | `admin-role-change.input.md` | 権限変更機能の入力仕様 |
 | `admin-role-change.expected.md` | 期待される出力の anchor |
+| `mobile-session-resume.input.md` | スマホアプリの中断復帰を含む入力仕様 |
+| `mobile-session-resume.expected.md` | mobile coverage の期待 anchor |
 
 ### JSON形式
 

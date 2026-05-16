@@ -20,8 +20,13 @@ examples/
 | `order-cancel.test_model.json` | test_model の最小例 |
 | `order-cancel.manual_case_set.json` | manual_case_set の最小例 |
 | `order-cancel.gate_decision.json` | gate_decision の最小例 |
+| `order-cancel.states.mmd` | state-diagram の出力例 |
 | `admin-role-change.feature_spec.json` | feature_spec (権限系) の最小例 |
 | `admin-role-change.test_model.json` | test_model (権限系) の最小例 |
+| `admin-role-change.states.mmd` | state-diagram の出力例 |
+| `order-cancel-partial.feature_spec.json` | spec-ingest の取り込み例 |
+| `gate_decision_new.json` | evaluate-gate の出力例 |
+| `test_spec.json` | spec-ingest の生成例 |
 
 ## 使い方
 

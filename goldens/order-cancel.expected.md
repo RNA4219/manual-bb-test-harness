@@ -9,6 +9,7 @@
 - ルール組合せ: order_state x coupon_used x actor
 - 権限: buyer own order, buyer other user's order, CS delegated cancellation
 - 回帰: inventory_service, coupon_service, order_detail
+- mobile 対象: iOS / Android の代表 platform_matrix
 - 品質 lens: 二重実行、外部サービス失敗、復帰性、エラーメッセージ
 
 ## Required Observations

@@ -7,11 +7,14 @@
 ## Default Workflow
 
 1. まず `README.md` を読む。
-2. Skill 本体を変更する場合は `skills/manual-bb-test-harness/SKILL.md` を読む。
-3. 詳細方針は `skills/manual-bb-test-harness/references/` の該当ファイルだけ読む。
-4. 背景調査が必要な場合のみ `docs/research/deep-research-report.md` を読む。
-5. 出力品質を変える場合は `docs/evaluation-rubric.md`、`docs/notion-report-guide.md`、`goldens/` を確認する。
-6. 変更後は validation を実行する。
+2. repo 全体の読み順は `HUB.codex.md` を確認する。
+3. 設計を変える場合は `BLUEPRINT.md`、運用を変える場合は `RUNBOOK.md`、
+   品質基準を変える場合は `EVALUATION.md`、原則を確認する場合は `GUARDRAILS.md` を読む。
+4. Skill 本体を変更する場合は `skills/manual-bb-test-harness/SKILL.md` を読む。
+5. 詳細方針は `skills/manual-bb-test-harness/references/` の該当ファイルだけ読む。
+6. 背景調査が必要な場合のみ `docs/research/deep-research-report.md` を読む。
+7. 出力品質を変える場合は `docs/evaluation-rubric.md`、`docs/notion-report-guide.md`、`goldens/` を確認する。
+8. 変更後は validation を実行する。
 
 ## Editing Rules
 

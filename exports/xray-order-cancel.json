@@ -1,0 +1,112 @@
+{
+  "tests": [
+    {
+      "summary": "出荷済み注文はキャンセル不可",
+      "steps": [
+        {
+          "action": "注文詳細画面を開く",
+          "result": "キャンセル不可メッセージを表示"
+        },
+        {
+          "action": "キャンセル操作を行う",
+          "result": "注文状態は変化しない"
+        }
+      ],
+      "labels": [
+        "ORD-CANCEL-01",
+        "OBS-STATE-01",
+        "RISK-01"
+      ],
+      "priority": "High",
+      "testType": "Manual",
+      "preconditions": [
+        "注文状態=shipped"
+      ]
+    },
+    {
+      "summary": "pending注文はキャンセル可能",
+      "steps": [
+        {
+          "action": "注文詳細画面を開く",
+          "result": "注文状態がcancelledに変更"
+        },
+        {
+          "action": "キャンセル操作を行う",
+          "result": "キャンセル完了メッセージを表示"
+        },
+        {
+          "action": "キャンセル確認ダイアログでOKを選択",
+          "result": ""
+        }
+      ],
+      "labels": [
+        "ORD-CANCEL-01",
+        "OBS-STATE-02",
+        "RISK-02"
+      ],
+      "priority": "Highest",
+      "testType": "Manual",
+      "preconditions": [
+        "注文状態=pending"
+      ]
+    },
+    {
+      "summary": "クーポン利用注文キャンセル時はクーポン残数復元",
+      "steps": [
+        {
+          "action": "クーポン残数を確認",
+          "result": "クーポン残数が+1されている"
+        },
+        {
+          "action": "注文をキャンセル",
+          "result": ""
+        },
+        {
+          "action": "クーポン残数を再確認",
+          "result": ""
+        }
+      ],
+      "labels": [
+        "ORD-CANCEL-01",
+        "OBS-DATA-01"
+      ],
+      "priority": "High",
+      "testType": "Manual",
+      "preconditions": [
+        "注文状態=pending",
+        "クーポン使用済み"
+      ]
+    },
+    {
+      "summary": "キャンセル操作のエラー表示と復帰性を探索する",
+      "steps": [
+        {
+          "action": "Explore: network loss and retry during cancellation",
+          "result": "Questions: 二重実行にならないか, ユーザーに再試行可否が伝わるか"
+        }
+      ],
+      "labels": [
+        "ORD-CANCEL-01",
+        "exploratory",
+        "OBS-RECOVERY-01"
+      ],
+      "priority": "Medium",
+      "testType": "Exploratory",
+      "estimate": "30m"
+    }
+  ],
+  "preconditions": [
+    {
+      "summary": "クーポン使用済み",
+      "tests": []
+    },
+    {
+      "summary": "注文状態=pending",
+      "tests": []
+    },
+    {
+      "summary": "注文状態=shipped",
+      "tests": []
+    }
+  ]
+}

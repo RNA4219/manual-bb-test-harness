@@ -15,6 +15,7 @@
   ],
   "changed_areas": ["order_detail", "inventory_service", "coupon_service"],
   "devices": ["Web", "iOS", "Android"],
+  "mobile_contexts": ["foreground", "background_resume", "offline"],
   "source_refs": [
     {"id": "AC-1", "kind": "ac", "excerpt": "出荷前の注文のみキャンセルできる"},
     {"id": "AC-2", "kind": "ac", "excerpt": "出荷済み注文はキャンセル不可メッセージを表示する"},

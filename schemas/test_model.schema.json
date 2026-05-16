@@ -56,6 +56,11 @@
       "items": {"type": "string"},
       "description": "Regression impact edges to other services/systems, e.g., 'external:inventory_service'."
     },
+    "platform_matrix": {
+      "type": "array",
+      "items": {"type": "string"},
+      "description": "Platform coverage combinations such as 'iOS x background_resume x 4g-lossy' or 'Android x notification_denied x offline'."
+    },
     "quality_lenses": {
       "type": "array",
       "items": {"type": "string"},

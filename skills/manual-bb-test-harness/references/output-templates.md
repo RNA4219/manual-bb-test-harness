@@ -61,6 +61,7 @@
 - invalid_transitions:
 - role_matrix:
 - regression_edges:
+- platform_matrix:
 - quality_lenses:
 
 ## リスク

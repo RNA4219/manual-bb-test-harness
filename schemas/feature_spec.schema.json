@@ -46,6 +46,11 @@
       "items": {"type": "string"},
       "description": "Target platforms or devices, e.g., ['Web', 'iOS', 'Android', 'API']."
     },
+    "mobile_contexts": {
+      "type": "array",
+      "items": {"type": "string"},
+      "description": "Mobile-specific execution contexts, e.g., ['foreground', 'background_resume', 'offline', 'push_notification_entry']."
+    },
     "source_refs": {
       "type": "array",
       "items": {"$ref": "shared_defs.schema.json#/$defs/SourceRef"},

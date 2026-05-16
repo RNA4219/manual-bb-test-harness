@@ -1,0 +1,12 @@
+Section,Title,Priority,Estimate,Preconditions,Steps,Expected Result,Refs
+ORD-CANCEL-01,出荷済み注文はキャンセル不可,P1,8m,注文状態=shipped,"1. 注文詳細画面を開く
+2. キャンセル操作を行う","キャンセル不可メッセージを表示
+注文状態は変化しない","OBS-STATE-01,RISK-01"
+ORD-CANCEL-01,pending注文はキャンセル可能,P0,10m,注文状態=pending,"1. 注文詳細画面を開く
+2. キャンセル操作を行う
+3. キャンセル確認ダイアログでOKを選択","注文状態がcancelledに変更
+キャンセル完了メッセージを表示","OBS-STATE-02,RISK-02"
+ORD-CANCEL-01,クーポン利用注文キャンセル時はクーポン残数復元,P1,15m,"注文状態=pending
+クーポン使用済み","1. クーポン残数を確認
+2. 注文をキャンセル
+3. クーポン残数を再確認",クーポン残数が+1されている,OBS-DATA-01

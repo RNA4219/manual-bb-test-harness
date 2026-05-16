@@ -12,6 +12,7 @@ Split the test surface into these dimensions.
 | `data` | 同値クラス、境界値、null/empty、形式違反、履歴依存 |
 | `role` | role x action x resource_state x ownership_context |
 | `regression` | 直接影響、共有資産経由、外部連携経由 |
+| `platform` | OS、端末、アプリ状態、権限、通知入口、ネットワーク条件 |
 
 ## Observation Extraction Checklist
 
@@ -23,7 +24,8 @@ Treat observation extraction as coverage item discovery. Do not jump directly fr
 4. Extract data dimensions from inputs, configuration values, time, external responses, locale, device, network profile, feature flags, and permissions.
 5. Extract role dimensions as `role x action x resource_state x ownership_context`.
 6. Extract regression edges from changed areas, shared libraries, schema changes, external integrations, and reused UI/API flows.
-7. Mark each coverage item as mandatory or optional before synthesizing cases.
+7. For mobile targets, extract platform candidates from OS, app lifecycle, install/update state, notification entry, permission state, and network condition.
+8. Mark each coverage item as mandatory or optional before synthesizing cases.
 
 Minimum `test_model` coverage items:
 
@@ -35,6 +37,7 @@ Minimum `test_model` coverage items:
 - `invalid_transitions`
 - `role_matrix`
 - `regression_edges`
+- `platform_matrix` when the target includes iOS, Android, or another mobile app surface
 - `quality_lenses`
 
 ## Technique Rules
@@ -47,6 +50,7 @@ Minimum `test_model` coverage items:
 - Add quality lenses outside pure function behavior: usability, compatibility, flexibility/adaptability, environment difference, user context, recovery, and error messaging.
 - Include idempotency and duplicate operation checks for submit, cancel, refund, invite, retry, and webhook-like flows.
 - Include interruption and recovery checks for multi-step flows, mobile app backgrounding, network loss, expired session, and partial external failure.
+- For mobile apps, cover foreground/background/resume, rotation or viewport change when relevant, permission allow/deny, push/deep-link entry, offline to online recovery, and app update or cold-start state when they can alter behavior.
 
 ## Oracle Priority
 

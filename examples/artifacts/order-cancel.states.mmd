@@ -1,0 +1,8 @@
+stateDiagram-v2
+  [*] --> pending
+  pending --> cancelled
+  shipped -.-> cancelled: invalid
+  cancelled -.-> cancelled: invalid
+  payment_failed -.-> cancelled: invalid
+  note right of [*] : Flow 1: buyer cancellation
+  note right of [*] : Flow 2: cs delegated cancellation

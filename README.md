@@ -12,6 +12,7 @@
 - リリース前に P0/P1 の手動確認範囲と残余リスクを整理する。
 - 仕様不足、oracle 不足、権限や状態遷移の抜けを早めに見つける。
 - forward-test の結果を Notion に記録し、Skill の出力品質を継続的に改善する。
+- Web に加えて iOS / Android アプリの中断復帰、権限、通知入口、ネットワーク差分を含む手動設計を行う。
 
 ## クイックスタート
 
@@ -50,11 +51,19 @@ python .\scripts\quick-validate-skill.py .\skills\manual-bb-test-harness
 
 ## 入口
 
+- Agent 向けハブ: `HUB.codex.md`
+- 設計正本: `BLUEPRINT.md`
+- 実行手順: `RUNBOOK.md`
+- 運用原則: `GUARDRAILS.md`
+- 検収基準: `EVALUATION.md`
 - Skill 本体: `skills/manual-bb-test-harness/SKILL.md`
 - 詳細参照: `skills/manual-bb-test-harness/references/`
 - Golden examples: `goldens/`
 - JSON Schema: `schemas/`
+- Export examples: `exports/`
 - Evaluation docs: `docs/evaluation-rubric.md`
+- Task seeds: `docs/tasks/`
+- Acceptance records: `docs/acceptance/`
 - Improvement notes: `docs/improvement-notes.md`
 - 原典調査: `docs/research/deep-research-report.md`
 
@@ -69,6 +78,8 @@ python .\scripts\quick-validate-skill.py .\skills\manual-bb-test-harness
 - `scripts/evaluate-gate.py`: Gate判定自動化（execution_evidence→gate_decision）
 - `scripts/risk-heatmap.py`: リスクヒートマップ(HTML/SVG)生成
 - `scripts/export-notion.py`: Notion API forward-test結果投稿
+
+mobile 対象では `skills/manual-bb-test-harness/references/platform-pack-mobile.md` が追加観点を補う。
 
 ## 何をする Skill か
 
@@ -118,6 +129,9 @@ python .\scripts\quick-validate-skill.py .\skills\manual-bb-test-harness
 - `goldens/order-cancel.expected.md`
 - `goldens/admin-role-change.input.md`
 - `goldens/admin-role-change.expected.md`
+- `goldens/mobile-session-resume.input.md`
+- `goldens/mobile-session-resume.expected.md`
+- `docs/release-review-20260516.md`
 
 Forward test の投げ方は `skills/manual-bb-test-harness/references/forward-test.md` を参照してください。
 
@@ -133,7 +147,7 @@ Forward test の投げ方は `skills/manual-bb-test-harness/references/forward-t
 - `gate_decision.schema.json`
 - `shared_defs.schema.json`
 
-`examples/artifacts/` には schema 化した artifact の最小例を置いています。
+`examples/artifacts/` には schema 化した artifact の最小例を置いています。`exports/` には TestRail / Xray 連携の生成例を置いています。
 
 ## CI
 
@@ -145,6 +159,8 @@ Forward test の投げ方は `skills/manual-bb-test-harness/references/forward-t
 ## 育て方
 
 - `SKILL.md` は短い運用手順に保つ。
+- repo の正本関係は `HUB.codex.md`、設計は `BLUEPRINT.md`、運用は `RUNBOOK.md`、
+  検収は `EVALUATION.md` に寄せる。
 - 詳細な契約、方針、テンプレートは `references/` に置く。
 - 失敗モードや domain pack は `references/` に追加し、必要なときだけ読めるようにする。
 - 原典調査や長文メモは `docs/research/` に置き、Skill 本体へ直接詰め込まない。

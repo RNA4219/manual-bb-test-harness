@@ -41,6 +41,7 @@ description: 手動ブラックボックス前提で、仕様・受入条件・�
 - 出力をレビューするときは、典型的な失敗モードを `references/failure-modes.md` で確認する。
 
 詳細な artifact と schema の形は `references/artifact-contract.md` を読む。
+対象に iOS / Android / mobile が含まれる場合は `references/platform-pack-mobile.md` も読む。
 
 ## ケース設計ルール
 

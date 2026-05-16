@@ -1,0 +1,10 @@
+stateDiagram-v2
+  [*] --> user
+  user --> admin
+  admin --> user
+  admin --> super_admin
+  user -.-> super_admin (requires super_admin actor): invalid
+  any -.-> any (self-change): invalid
+  note right of [*] : Flow 1: admin permission change
+  note right of [*] : Flow 2: super_admin elevation
+  note right of [*] : Flow 3: self-change prevention

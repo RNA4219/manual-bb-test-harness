@@ -15,6 +15,7 @@ schema 定義に対応する concrete example を提供する。
 | `order-cancel.test_model.json` | test_model: coverage model |
 | `order-cancel.manual_case_set.json` | manual_case_set: 手動テストケース |
 | `order-cancel.gate_decision.json` | gate_decision: 品質ゲート判定 |
+| `order-cancel.states.mmd` | state-diagram: Mermaid 出力例 |
 
 ### admin-role-change (権限変更機能)
 
@@ -22,6 +23,15 @@ schema 定義に対応する concrete example を提供する。
 |---|---|
 | `admin-role-change.feature_spec.json` | feature_spec: 正規化された仕様 |
 | `admin-role-change.test_model.json` | test_model: coverage model |
+| `admin-role-change.states.mmd` | state-diagram: Mermaid 出力例 |
+
+### その他
+
+| file | description |
+|---|---|
+| `order-cancel-partial.feature_spec.json` | Markdown spec-ingest の生成例 |
+| `gate_decision_new.json` | `evaluate-gate.py` の出力例 |
+| `test_spec.json` | Markdown intake の生成例 |
 
 ## Schema 対応
 
@@ -33,6 +43,7 @@ schema 定義に対応する concrete example を提供する。
 | `*.test_model.json` | `schemas/test_model.schema.json` |
 | `*.manual_case_set.json` | `schemas/manual_case_set.schema.json` |
 | `*.gate_decision.json` | `schemas/gate_decision.schema.json` |
+| `*.states.mmd` | `scripts/state-diagram.py` の出力例 |
 
 ## 使い方
 

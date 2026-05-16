@@ -138,6 +138,7 @@ Use this reduced schema when the user asks for machine-readable output.
     "business_rules": ["string"],
     "changed_areas": ["string"],
     "devices": ["string"],
+    "mobile_contexts": ["foreground", "background_resume", "offline", "push_notification_entry"],
     "source_refs": [],
     "assumptions": []
   },
@@ -152,6 +153,7 @@ Use this reduced schema when the user asks for machine-readable output.
     "invalid_transitions": ["string"],
     "role_matrix": ["role x action x resource_state x ownership_context"],
     "regression_edges": ["direct/shared_asset/external_integration"],
+    "platform_matrix": ["iOS x background_resume x 4g-lossy"],
     "quality_lenses": ["usability", "compatibility", "recovery"]
   },
   "observation_set": [

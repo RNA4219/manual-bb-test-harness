@@ -1,0 +1,15 @@
+{
+  "feature_id": "ORD-CANCEL-01",
+  "status": "go",
+  "profile": "standard",
+  "reasons": [
+    "P0 pass rate: 100.0% (1/1)",
+    "P1 pass rate: 100.0% (1/1)"
+  ],
+  "residual_risks": [
+    "RISK-03: クーポン残数が復元されない"
+  ],
+  "required_follow_up": [
+    "Review residual risks in next sprint"
+  ]
+}

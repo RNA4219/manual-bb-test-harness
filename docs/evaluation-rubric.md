@@ -16,7 +16,7 @@ Skill 出力を forward-test した後、この rubric で採点する。
 
 | category | weight | checks |
 |---|---:|---|
-| Coverage model | 20 | data/rule/state/role/regression/quality lens が cases より先に出ている |
+| Coverage model | 20 | data/rule/state/role/regression/quality lens が cases より先に出ている。mobile 対象では platform_matrix も出ている |
 | Observation quality | 15 | 観点が source_ref または assumption に紐づき、mandatory/optional が分かる |
 | Risk quality | 15 | impact/likelihood/modifier の根拠があり、P0/P1 の乱発がない |
 | Manual cases | 20 | scripted case に oracle refs、observable expected、trace_to、工数がある |
@@ -37,4 +37,5 @@ Skill 出力を forward-test した後、この rubric で採点する。
 - Gate が coverage 数値だけで Go になる。
 - 権限 feature で ownership context がない。
 - stateful feature で invalid transition がない。
+- mobile feature で platform_matrix がなく、background / network / permission の差分が考慮されていない。
 - 重大な不足情報があるのに `ok` または `go` になる。

@@ -47,6 +47,11 @@
       "items": {"type": "string"},
       "description": "Target platforms/devices."
     },
+    "mobile_contexts": {
+      "type": "array",
+      "items": {"type": "string"},
+      "description": "Mobile-specific lifecycle or entry contexts."
+    },
     "changed_areas": {
       "type": "array",
       "items": {"type": "string"},

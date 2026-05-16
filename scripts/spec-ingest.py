@@ -125,6 +125,7 @@ def normalize_section_name(name: str) -> str:
         "actors": "actors",
         "summary": "summary",
         "devices": "devices",
+        "mobile contexts": "mobile_contexts",
         "changed areas": "changed_areas",
     }
 
@@ -210,6 +211,9 @@ def ingest_markdown_spec(path: Path) -> dict[str, Any]:
 
     if "devices" in normalized_sections:
         result["devices"] = normalized_sections["devices"]
+
+    if "mobile_contexts" in normalized_sections:
+        result["mobile_contexts"] = normalized_sections["mobile_contexts"]
 
     if "changed_areas" in normalized_sections:
         result["changed_areas"] = normalized_sections["changed_areas"]
@@ -314,7 +318,7 @@ def ingest_confluence_spec(url: str, api_key: str | None = None) -> dict[str, An
     content_html = data.get("body", {}).get("storage", {}).get("value", "")
 
     # Extract structured content from HTML
-    acceptance_criteria, business_rules, actors, devices, changed_areas = parse_confluence_html(content_html)
+    acceptance_criteria, business_rules, actors, devices, mobile_contexts, changed_areas = parse_confluence_html(content_html)
 
     # Build feature_spec
     feature_id = generate_feature_id(title, page_id)
@@ -347,6 +351,9 @@ def ingest_confluence_spec(url: str, api_key: str | None = None) -> dict[str, An
     if devices:
         result["devices"] = devices
 
+    if mobile_contexts:
+        result["mobile_contexts"] = mobile_contexts
+
     if changed_areas:
         result["changed_areas"] = changed_areas
 
@@ -376,7 +383,7 @@ def extract_confluence_page_id(url: str, base_url: str) -> str:
     return ""
 
 
-def parse_confluence_html(html: str) -> tuple[list[str], list[str], list[str], list[str], list[str]]:
+def parse_confluence_html(html: str) -> tuple[list[str], list[str], list[str], list[str], list[str], list[str]]:
     """Parse Confluence HTML to extract structured sections."""
     import re
 
@@ -394,6 +401,7 @@ def parse_confluence_html(html: str) -> tuple[list[str], list[str], list[str], l
     business_rules: list[str] = []
     actors: list[str] = []
     devices: list[str] = []
+    mobile_contexts: list[str] = []
     changed_areas: list[str] = []
 
     # Find sections by heading
@@ -427,10 +435,12 @@ def parse_confluence_html(html: str) -> tuple[list[str], list[str], list[str], l
                         actors.append(item)
                     elif "device" in current_section or "platform" in current_section:
                         devices.append(item)
+                    elif "mobile context" in current_section:
+                        mobile_contexts.append(item)
                     elif "changed" in current_section or "affected" in current_section:
                         changed_areas.append(item)
 
-    return acceptance_criteria, business_rules, actors, devices, changed_areas
+    return acceptance_criteria, business_rules, actors, devices, mobile_contexts, changed_areas
 
 
 def generate_feature_id(title: str, page_id: str) -> str:
