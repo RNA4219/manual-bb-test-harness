@@ -5,7 +5,6 @@ from __future__ import annotations
 import importlib.util
 import json
 import sys
-import tempfile
 from pathlib import Path
 from unittest import mock
 
@@ -13,8 +12,7 @@ import pytest
 
 # Load module dynamically
 spec = importlib.util.spec_from_file_location(
-    "state_diagram",
-    Path(__file__).parent.parent / "scripts" / "state-diagram.py"
+    "state_diagram", Path(__file__).parent.parent / "scripts" / "state-diagram.py"
 )
 state_diagram = importlib.util.module_from_spec(spec)
 sys.modules["state_diagram"] = state_diagram
@@ -162,19 +160,27 @@ class TestMain:
         # Create input
         input_file = tmp_path / "test.test_model.json"
         input_file.write_text(
-            json.dumps({
-                "states": ["pending", "cancelled"],
-                "valid_transitions": ["pending -> cancelled"],
-            }),
-            encoding="utf-8"
+            json.dumps(
+                {
+                    "states": ["pending", "cancelled"],
+                    "valid_transitions": ["pending -> cancelled"],
+                }
+            ),
+            encoding="utf-8",
         )
         output_file = tmp_path / "output.mmd"
 
-        with mock.patch.object(sys, "argv", [
-            "script",
-            "--input", str(input_file),
-            "--output", str(output_file),
-        ]):
+        with mock.patch.object(
+            sys,
+            "argv",
+            [
+                "script",
+                "--input",
+                str(input_file),
+                "--output",
+                str(output_file),
+            ],
+        ):
             assert main() == 0
             assert output_file.exists()
             content = output_file.read_text(encoding="utf-8")
@@ -185,9 +191,15 @@ class TestMain:
         input_file.write_text("{invalid}", encoding="utf-8")
         output_file = tmp_path / "out.mmd"
 
-        with mock.patch.object(sys, "argv", [
-            "script",
-            "--input", str(input_file),
-            "--output", str(output_file),
-        ]):
+        with mock.patch.object(
+            sys,
+            "argv",
+            [
+                "script",
+                "--input",
+                str(input_file),
+                "--output",
+                str(output_file),
+            ],
+        ):
             assert main() == 1

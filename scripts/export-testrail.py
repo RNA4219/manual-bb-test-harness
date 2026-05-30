@@ -70,7 +70,7 @@ def convert_to_testrail(case_set: dict[str, Any]) -> dict[str, Any]:
             "title": case.get("title", f"Test Case {i}"),
             "priority_id": priority_int,
             "estimate": f"{case.get('estimate_minutes', 10)}m",
-            "custom_steps": "\n".join(f"{j+1}. {s}" for j, s in enumerate(steps)),
+            "custom_steps": "\n".join(f"{j + 1}. {s}" for j, s in enumerate(steps)),
             "custom_expected": "\n".join(expected),
             "custom_preconds": "\n".join(case.get("preconditions", [])),
             "refs": ",".join(case.get("trace_to", [])),
@@ -89,33 +89,40 @@ def export_testrail_csv(testrail_data: dict[str, Any], output: Path) -> None:
         writer = csv.writer(f)
 
         # Header
-        writer.writerow([
-            "Section", "Title", "Priority", "Estimate",
-            "Preconditions", "Steps", "Expected Result", "Refs"
-        ])
+        writer.writerow(
+            [
+                "Section",
+                "Title",
+                "Priority",
+                "Estimate",
+                "Preconditions",
+                "Steps",
+                "Expected Result",
+                "Refs",
+            ]
+        )
 
         # Cases
         section_name = testrail_data["sections"][0]["name"]
         for case in testrail_data["cases"]:
-            writer.writerow([
-                section_name,
-                case["title"],
-                f"P{5 - case['priority_id']}",  # Convert back to P0-P4
-                case["estimate"],
-                case.get("custom_preconds", ""),
-                case["custom_steps"],
-                case["custom_expected"],
-                case.get("refs", ""),
-            ])
+            writer.writerow(
+                [
+                    section_name,
+                    case["title"],
+                    f"P{5 - case['priority_id']}",  # Convert back to P0-P4
+                    case["estimate"],
+                    case.get("custom_preconds", ""),
+                    case["custom_steps"],
+                    case["custom_expected"],
+                    case.get("refs", ""),
+                ]
+            )
 
 
 def export_testrail_json(testrail_data: dict[str, Any], output: Path) -> None:
     """Export to TestRail JSON format."""
     output.parent.mkdir(parents=True, exist_ok=True)
-    output.write_text(
-        json.dumps(testrail_data, indent=2, ensure_ascii=False),
-        encoding="utf-8"
-    )
+    output.write_text(json.dumps(testrail_data, indent=2, ensure_ascii=False), encoding="utf-8")
 
 
 def main() -> int:

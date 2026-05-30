@@ -13,6 +13,5 @@
   "actual": ["キャンセル不可メッセージを表示"],
   "result": "pass",
   "attachments": ["s3://evidence/RUN-001/step2.png"],
-  "anomaly_notes": [],
-  "defect_stub": null
+  "anomaly_notes": []
 }

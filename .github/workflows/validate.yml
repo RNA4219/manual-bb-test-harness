@@ -25,11 +25,10 @@ jobs:
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install pytest pytest-cov ruff
+          pip install -e ".[dev]"
 
       - name: Lint Python scripts
-        run: ruff check scripts/ tests/ --fix
-        continue-on-error: true
+        run: ruff check scripts/ tests/
 
       - name: Validate repository-local skill structure (Python)
         run: python scripts/quick-validate-skill.py skills/manual-bb-test-harness
@@ -76,11 +75,16 @@ jobs:
             --output /tmp/states_test.mmd
         shell: bash
 
-      - name: Validate JSON schemas
+      - name: Validate JSON syntax
         run: |
-          for f in schemas/*.json examples/artifacts/*.json; do
+          for f in schemas/*.json; do
             python -m json.tool "$f" > /dev/null || exit 1
           done
+        shell: bash
+
+      - name: Validate artifacts against schemas
+        run: |
+          python scripts/validate-artifact.py --all examples/artifacts --strict
         shell: bash
 
       - name: Upload coverage

@@ -79,7 +79,12 @@ def load_evidence_files(path: Path) -> list[dict[str, Any]]:
         # Accept: execution_*.json, *_evidence.json, TC-*.json (test case results)
         for f in path.glob("*.json"):
             name_lower = f.name.lower()
-            if "execution" in name_lower or "evidence" in name_lower or f.name.startswith("TC-") or f.name.startswith("tc-"):
+            if (
+                "execution" in name_lower
+                or "evidence" in name_lower
+                or f.name.startswith("TC-")
+                or f.name.startswith("tc-")
+            ):
                 evidence_list.append(load_json_file(f))
             # Also check if file has tc_id field (execution evidence marker)
             else:
@@ -96,8 +101,7 @@ def load_evidence_files(path: Path) -> list[dict[str, Any]]:
 
 
 def extract_case_results(
-    evidence_list: list[dict[str, Any]],
-    manual_cases: dict[str, Any]
+    evidence_list: list[dict[str, Any]], manual_cases: dict[str, Any]
 ) -> dict[str, dict[str, Any]]:
     """Extract pass/fail results for each test case and charter from evidence."""
     results: dict[str, dict[str, Any]] = {}
@@ -144,9 +148,7 @@ def extract_case_results(
     return results
 
 
-def count_results_by_priority(
-    case_results: dict[str, dict[str, Any]]
-) -> dict[str, dict[str, int]]:
+def count_results_by_priority(case_results: dict[str, dict[str, Any]]) -> dict[str, dict[str, int]]:
     """Count pass/fail/skip by priority."""
     counts: dict[str, dict[str, int]] = {
         "P0": {"pass": 0, "fail": 0, "skip": 0, "total": 0},
@@ -155,7 +157,7 @@ def count_results_by_priority(
         "P3": {"pass": 0, "fail": 0, "skip": 0, "total": 0},
     }
 
-    for tc_id, data in case_results.items():
+    for _tc_id, data in case_results.items():
         priority = data.get("priority", "P2")
         if priority not in counts:
             priority = "P2"
@@ -171,9 +173,7 @@ def count_results_by_priority(
     return counts
 
 
-def extract_open_defects(
-    evidence_list: list[dict[str, Any]]
-) -> list[dict[str, Any]]:
+def extract_open_defects(evidence_list: list[dict[str, Any]]) -> list[dict[str, Any]]:
     """Extract open defects from execution evidence."""
     defects: list[dict[str, Any]] = []
 
@@ -181,18 +181,19 @@ def extract_open_defects(
         if evidence.get("result") == "fail":
             defect_stub = evidence.get("defect_stub")
             if defect_stub:
-                defects.append({
-                    "tc_id": evidence.get("tc_id", ""),
-                    "title": defect_stub.get("title", "Untitled defect"),
-                    "severity": defect_stub.get("severity", "unknown"),
-                })
+                defects.append(
+                    {
+                        "tc_id": evidence.get("tc_id", ""),
+                        "title": defect_stub.get("title", "Untitled defect"),
+                        "severity": defect_stub.get("severity", "unknown"),
+                    }
+                )
 
     return defects
 
 
 def assess_residual_risks(
-    risk_register: dict[str, Any],
-    case_results: dict[str, dict[str, Any]]
+    risk_register: dict[str, Any], case_results: dict[str, dict[str, Any]]
 ) -> tuple[list[str], list[str]]:
     """Assess residual and blocking risks based on test results."""
     residual: list[str] = []
@@ -226,8 +227,7 @@ def assess_residual_risks(
 
         tested = len(tracing_cases) > 0
         passed = all(
-            case_results.get(case_id, {}).get("result") == "pass"
-            for case_id in tracing_cases
+            case_results.get(case_id, {}).get("result") == "pass" for case_id in tracing_cases
         )
 
         if priority in ["P0", "P1"] and not tested:
@@ -244,7 +244,7 @@ def determine_gate_status(
     counts: dict[str, dict[str, int]],
     defects: list[dict[str, Any]],
     blocking_risks: list[str],
-    profile: str = "standard"
+    profile: str = "standard",
 ) -> tuple[str, list[str], list[str]]:
     """Determine gate status based on policy thresholds."""
     thresholds = GATE_THRESHOLDS.get(profile, GATE_THRESHOLDS["standard"])
@@ -262,7 +262,11 @@ def determine_gate_status(
     if p0_total > 0:
         p0_rate = (p0_pass / p0_total) * 100
         if p0_rate < thresholds["p0_pass"]:
-            return "no_go", [f"P0 pass rate: {p0_rate:.1f}% (required: {thresholds['p0_pass']}%)"], []
+            return (
+                "no_go",
+                [f"P0 pass rate: {p0_rate:.1f}% (required: {thresholds['p0_pass']}%)"],
+                [],
+            )
         reasons.append(f"P0 pass rate: {p0_rate:.1f}% ({p0_pass}/{p0_total})")
 
     # Check P1 pass rate
@@ -273,7 +277,9 @@ def determine_gate_status(
         required_p1 = thresholds["p1_pass"]
         if p1_rate < required_p1:
             if profile == "lean":
-                waivers.append(f"P1 pass rate {p1_rate:.1f}% below {required_p1}% (waived for lean profile)")
+                waivers.append(
+                    f"P1 pass rate {p1_rate:.1f}% below {required_p1}% (waived for lean profile)"
+                )
             else:
                 return "no_go", [f"P1 pass rate: {p1_rate:.1f}% (required: {required_p1}%)"], []
         reasons.append(f"P1 pass rate: {p1_rate:.1f}% ({p1_pass}/{p1_total})")
@@ -296,7 +302,7 @@ def generate_gate_decision(
     blocking_risks: list[str],
     waivers: list[str],
     residual_risks: list[str],
-    defects: list[dict[str, Any]]
+    defects: list[dict[str, Any]],
 ) -> dict[str, Any]:
     """Generate gate_decision.json structure."""
     gate: dict[str, Any] = {
@@ -433,16 +439,19 @@ def main() -> int:
 
         # Generate output
         gate = generate_gate_decision(
-            feature_id, status, args.profile, reasons,
-            blocking_risks, waivers, residual_risks, defects
+            feature_id,
+            status,
+            args.profile,
+            reasons,
+            blocking_risks,
+            waivers,
+            residual_risks,
+            defects,
         )
 
         # Write output
         args.output.parent.mkdir(parents=True, exist_ok=True)
-        args.output.write_text(
-            json.dumps(gate, indent=2, ensure_ascii=False),
-            encoding="utf-8"
-        )
+        args.output.write_text(json.dumps(gate, indent=2, ensure_ascii=False), encoding="utf-8")
 
         print(f"Generated: {args.output}")
         print(f"  Status: {status}")

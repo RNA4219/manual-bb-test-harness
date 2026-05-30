@@ -3,10 +3,8 @@
 from __future__ import annotations
 
 import importlib.util
-import json
 import subprocess
 import sys
-import tempfile
 from pathlib import Path
 from unittest import mock
 
@@ -14,8 +12,7 @@ import pytest
 
 # Load module dynamically from scripts directory
 spec = importlib.util.spec_from_file_location(
-    "quick_validate_skill",
-    Path(__file__).parent.parent / "scripts" / "quick-validate-skill.py"
+    "quick_validate_skill", Path(__file__).parent.parent / "scripts" / "quick-validate-skill.py"
 )
 quick_validate_skill = importlib.util.module_from_spec(spec)
 sys.modules["quick_validate_skill"] = quick_validate_skill
@@ -30,6 +27,7 @@ main = quick_validate_skill.main
 
 
 # ============== Frontmatter Tests ==============
+
 
 class TestParseFrontmatter:
     """Tests for frontmatter parsing."""
@@ -73,6 +71,7 @@ class TestParseFrontmatter:
 
 # ============== FindRepoRoot Tests ==============
 
+
 class TestFindRepoRoot:
     """Tests for find_repo_root."""
 
@@ -94,6 +93,7 @@ class TestFindRepoRoot:
 
 # ============== ValidateSkill Tests ==============
 
+
 class TestValidateSkill:
     """Tests for skill validation."""
 
@@ -109,29 +109,41 @@ class TestValidateSkill:
         assert "frontmatter" in errors[0].lower()
 
     def test_valid_structure(self, tmp_path: Path) -> None:
-        (tmp_path / "SKILL.md").write_text("---\nname: test-skill\ndescription: Test\n---\n", encoding="utf-8")
+        (tmp_path / "SKILL.md").write_text(
+            "---\nname: test-skill\ndescription: Test\n---\n", encoding="utf-8"
+        )
         errors = validate_skill(tmp_path)
         assert not any("SKILL.md not found" in e for e in errors)
 
     def test_invalid_name_uppercase(self, tmp_path: Path) -> None:
-        (tmp_path / "SKILL.md").write_text("---\nname: Test-Skill\ndescription: Test\n---\n", encoding="utf-8")
+        (tmp_path / "SKILL.md").write_text(
+            "---\nname: Test-Skill\ndescription: Test\n---\n", encoding="utf-8"
+        )
         assert any("Invalid skill name" in e for e in validate_skill(tmp_path))
 
     def test_invalid_name_too_long(self, tmp_path: Path) -> None:
         long_name = "a" * (MAX_SKILL_NAME_LENGTH + 1)
-        (tmp_path / "SKILL.md").write_text(f"---\nname: {long_name}\ndescription: Test\n---\n", encoding="utf-8")
+        (tmp_path / "SKILL.md").write_text(
+            f"---\nname: {long_name}\ndescription: Test\n---\n", encoding="utf-8"
+        )
         assert any("too long" in e for e in validate_skill(tmp_path))
 
     def test_invalid_name_double_hyphen(self, tmp_path: Path) -> None:
-        (tmp_path / "SKILL.md").write_text("---\nname: test--skill\ndescription: Test\n---\n", encoding="utf-8")
+        (tmp_path / "SKILL.md").write_text(
+            "---\nname: test--skill\ndescription: Test\n---\n", encoding="utf-8"
+        )
         assert any("hyphen" in e.lower() for e in validate_skill(tmp_path))
 
     def test_invalid_name_starts_hyphen(self, tmp_path: Path) -> None:
-        (tmp_path / "SKILL.md").write_text("---\nname: -test-skill\ndescription: Test\n---\n", encoding="utf-8")
+        (tmp_path / "SKILL.md").write_text(
+            "---\nname: -test-skill\ndescription: Test\n---\n", encoding="utf-8"
+        )
         assert any("hyphen" in e.lower() for e in validate_skill(tmp_path))
 
     def test_invalid_name_ends_hyphen(self, tmp_path: Path) -> None:
-        (tmp_path / "SKILL.md").write_text("---\nname: test-skill-\ndescription: Test\n---\n", encoding="utf-8")
+        (tmp_path / "SKILL.md").write_text(
+            "---\nname: test-skill-\ndescription: Test\n---\n", encoding="utf-8"
+        )
         assert any("hyphen" in e.lower() for e in validate_skill(tmp_path))
 
     def test_missing_name(self, tmp_path: Path) -> None:
@@ -143,69 +155,88 @@ class TestValidateSkill:
         assert any("Missing frontmatter.description" in e for e in validate_skill(tmp_path))
 
     def test_description_angle_brackets(self, tmp_path: Path) -> None:
-        (tmp_path / "SKILL.md").write_text("---\nname: test-skill\ndescription: <placeholder>\n---\n", encoding="utf-8")
+        (tmp_path / "SKILL.md").write_text(
+            "---\nname: test-skill\ndescription: <placeholder>\n---\n", encoding="utf-8"
+        )
         assert any("angle brackets" in e for e in validate_skill(tmp_path))
 
     def test_description_too_long(self, tmp_path: Path) -> None:
         long_desc = "x" * 1025
-        (tmp_path / "SKILL.md").write_text(f"---\nname: test-skill\ndescription: {long_desc}\n---\n", encoding="utf-8")
+        (tmp_path / "SKILL.md").write_text(
+            f"---\nname: test-skill\ndescription: {long_desc}\n---\n", encoding="utf-8"
+        )
         assert any("too long" in e and "Description" in e for e in validate_skill(tmp_path))
 
     def test_todo_marker(self, tmp_path: Path) -> None:
-        (tmp_path / "SKILL.md").write_text("---\nname: test-skill\ndescription: Test\n---\nTODO: fix\n", encoding="utf-8")
+        (tmp_path / "SKILL.md").write_text(
+            "---\nname: test-skill\ndescription: Test\n---\nTODO: fix\n", encoding="utf-8"
+        )
         assert any("placeholder" in e.lower() or "TODO" in e for e in validate_skill(tmp_path))
 
     def test_unexpected_keys(self, tmp_path: Path) -> None:
-        (tmp_path / "SKILL.md").write_text("---\nname: test-skill\ndescription: Test\nextra: value\n---\n", encoding="utf-8")
+        (tmp_path / "SKILL.md").write_text(
+            "---\nname: test-skill\ndescription: Test\nextra: value\n---\n", encoding="utf-8"
+        )
         assert any("Unexpected frontmatter keys" in e for e in validate_skill(tmp_path))
 
     def test_binary_file(self, tmp_path: Path) -> None:
-        (tmp_path / "SKILL.md").write_text("---\nname: test-skill\ndescription: Test\n---\n", encoding="utf-8")
-        (tmp_path / "image.png").write_bytes(b'\x89PNG')
+        (tmp_path / "SKILL.md").write_text(
+            "---\nname: test-skill\ndescription: Test\n---\n", encoding="utf-8"
+        )
+        (tmp_path / "image.png").write_bytes(b"\x89PNG")
         assert any("UTF-8" in e for e in validate_skill(tmp_path))
 
     def test_missing_required_file(self, tmp_path: Path) -> None:
-        (tmp_path / "SKILL.md").write_text("---\nname: test-skill\ndescription: Test\n---\n", encoding="utf-8")
+        (tmp_path / "SKILL.md").write_text(
+            "---\nname: test-skill\ndescription: Test\n---\n", encoding="utf-8"
+        )
         assert any("Missing required file" in e for e in validate_skill(tmp_path))
 
 
 # ============== ValidateJson Tests ==============
+
 
 class TestValidateJsonFiles:
     """Tests for JSON validation."""
 
     def test_valid_json(self, tmp_path: Path) -> None:
         (tmp_path / "schemas").mkdir()
-        (tmp_path / "schemas" / "test.schema.json").write_text('{}', encoding="utf-8")
+        (tmp_path / "schemas" / "test.schema.json").write_text("{}", encoding="utf-8")
         errors = validate_json_files(tmp_path)
         assert not any("Invalid JSON" in e for e in errors)
 
     def test_invalid_json(self, tmp_path: Path) -> None:
         (tmp_path / "schemas").mkdir()
         bad_file = tmp_path / "schemas" / "bad.schema.json"
-        bad_file.write_text('{invalid}', encoding="utf-8")
-        assert any("Invalid JSON" in e and str(bad_file) in e for e in validate_json_files(tmp_path))
+        bad_file.write_text("{invalid}", encoding="utf-8")
+        assert any(
+            "Invalid JSON" in e and str(bad_file) in e for e in validate_json_files(tmp_path)
+        )
 
     def test_non_utf8(self, tmp_path: Path) -> None:
         (tmp_path / "schemas").mkdir()
-        (tmp_path / "schemas" / "bad.schema.json").write_bytes(b'\xff\xfe {}')
+        (tmp_path / "schemas" / "bad.schema.json").write_bytes(b"\xff\xfe {}")
         assert any("UTF-8" in e or "Invalid JSON" in e for e in validate_json_files(tmp_path))
 
     def test_os_error_permission(self, tmp_path: Path) -> None:
         """Test OSError handling (covers line 231-232)."""
         (tmp_path / "schemas").mkdir()
         bad_file = tmp_path / "schemas" / "unreadable.schema.json"
-        bad_file.write_text('{}', encoding="utf-8")
+        bad_file.write_text("{}", encoding="utf-8")
         # Note: Can't actually cause OSError in test, but this documents the path
         # OSError would occur on permission denied, disk full, etc.
         # For coverage, we mock the read_text to raise OSError
         import unittest.mock
-        with unittest.mock.patch.object(Path, 'read_text', side_effect=OSError("Permission denied")):
+
+        with unittest.mock.patch.object(
+            Path, "read_text", side_effect=OSError("Permission denied")
+        ):
             errors = validate_json_files(tmp_path)
             assert any("Cannot read" in e or "OSError" in e for e in errors)
 
 
 # ============== Main Tests ==============
+
 
 class TestMain:
     """Tests for main() entry point."""
@@ -221,12 +252,20 @@ class TestMain:
         (tmp_path / "schemas").mkdir()
         skill = tmp_path / "skills" / "test-skill"
         skill.mkdir(parents=True)
-        (skill / "SKILL.md").write_text("---\nname: test-skill\ndescription: test\n---\n", encoding="utf-8")
+        (skill / "SKILL.md").write_text(
+            "---\nname: test-skill\ndescription: test\n---\n", encoding="utf-8"
+        )
         (skill / "agents").mkdir()
         (skill / "agents" / "openai.yaml").write_text("", encoding="utf-8")
         (skill / "references").mkdir()
-        for ref in ["artifact-contract.md", "case-design-policy.md", "failure-modes.md",
-                    "forward-test.md", "output-templates.md", "risk-and-gate-policy.md"]:
+        for ref in [
+            "artifact-contract.md",
+            "case-design-policy.md",
+            "failure-modes.md",
+            "forward-test.md",
+            "output-templates.md",
+            "risk-and-gate-policy.md",
+        ]:
             (skill / "references" / ref).write_text("", encoding="utf-8")
 
         with mock.patch.object(sys, "argv", ["script", "--debug", str(skill)]):
@@ -259,12 +298,15 @@ class TestMain:
 
 # ============== Subprocess Tests (version flag) ==============
 
+
 class TestVersionSubprocess:
     """Test --version via subprocess."""
 
     def test_version_output(self) -> None:
         script = Path(__file__).parent.parent / "scripts" / "quick-validate-skill.py"
         # Use sys.executable instead of 'py' for cross-platform compatibility
-        result = subprocess.run([sys.executable, str(script), "--version"], capture_output=True, text=True, timeout=30)
+        result = subprocess.run(
+            [sys.executable, str(script), "--version"], capture_output=True, text=True, timeout=30
+        )
         assert result.returncode == 0
         assert "0.1.1" in result.stdout

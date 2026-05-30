@@ -63,7 +63,7 @@ def create_notion_page(
     try:
         import requests
     except ImportError:
-        raise ValueError("requests library required. Install: pip install requests")
+        raise ValueError("requests library required. Install: pip install requests") from None
 
     # Notion API endpoint
     url = "https://api.notion.com/v1/pages"
@@ -78,7 +78,7 @@ def create_notion_page(
     # Extract report data
     feature_id = report.get("feature_id", "UNKNOWN")
     skill_name = report.get("skill_name", "manual-bb-test-harness")
-    input_file = report.get("input_file", "")
+    _input_file = report.get("input_file", "")
     score = report.get("score", 0)
     pass_status = report.get("pass_status", "unknown")
     rubric_breakdown = report.get("rubric_breakdown", {})
@@ -132,147 +132,26 @@ def create_notion_page(
     children: list[dict[str, Any]] = []
 
     # Summary header
-    children.append({
-        "object": "block",
-        "type": "header",
-        "header": {
-            "rich_text": [
-                {
-                    "type": "text",
-                    "text": {
-                        "content": "Forward Test Summary",
+    children.append(
+        {
+            "object": "block",
+            "type": "header",
+            "header": {
+                "rich_text": [
+                    {
+                        "type": "text",
+                        "text": {
+                            "content": "Forward Test Summary",
+                        },
                     },
-                },
-            ],
-        },
-    })
+                ],
+            },
+        }
+    )
 
     # Score summary
-    children.append({
-        "object": "block",
-        "type": "paragraph",
-        "paragraph": {
-            "rich_text": [
-                {
-                    "type": "text",
-                    "text": {
-                        "content": f"Total Score: {score} / 100 | Status: {pass_status}",
-                    },
-                },
-            ],
-        },
-    })
-
-    # Rubric breakdown table
-    if rubric_breakdown:
-        children.append({
-            "object": "block",
-            "type": "header",
-            "header": {
-                "rich_text": [
-                    {
-                        "type": "text",
-                        "text": {
-                            "content": "Rubric Breakdown",
-                        },
-                    },
-                ],
-            },
-        })
-
-        # Create table rows as bullet list
-        for category, data in rubric_breakdown.items():
-            cat_score = data.get("score", 0)
-            cat_weight = data.get("weight", 0)
-            cat_checks = data.get("checks", [])
-
-            children.append({
-                "object": "block",
-                "type": "bulleted_list_item",
-                "bulleted_list_item": {
-                    "rich_text": [
-                        {
-                            "type": "text",
-                            "text": {
-                                "content": f"{category}: {cat_score}/{cat_weight}",
-                            },
-                        },
-                    ],
-                },
-            })
-
-            # Add check items
-            for check in cat_checks[:5]:  # Limit to 5 checks per category
-                children.append({
-                    "object": "block",
-                    "type": "bulleted_list_item",
-                    "bulleted_list_item": {
-                        "rich_text": [
-                            {
-                                "type": "text",
-                                "text": {
-                                    "content": f"  - {check}",
-                                },
-                            },
-                        ],
-                    },
-                })
-
-    # Findings
-    if findings:
-        children.append({
-            "object": "block",
-            "type": "header",
-            "header": {
-                "rich_text": [
-                    {
-                        "type": "text",
-                        "text": {
-                            "content": "Findings",
-                        },
-                    },
-                ],
-            },
-        })
-
-        for finding in findings:
-            finding_type = finding.get("type", "observation")
-            finding_text = finding.get("text", "")
-            finding_priority = finding.get("priority", "")
-
-            children.append({
-                "object": "block",
-                "type": "bulleted_list_item",
-                "bulleted_list_item": {
-                    "rich_text": [
-                        {
-                            "type": "text",
-                            "text": {
-                                "content": f"[{finding_type}] {finding_text}",
-                            },
-                        },
-                    ],
-                },
-            })
-
-    # Notes
-    if notes:
-        children.append({
-            "object": "block",
-            "type": "header",
-            "header": {
-                "rich_text": [
-                    {
-                        "type": "text",
-                        "text": {
-                            "content": "Notes",
-                        },
-                    },
-                ],
-            },
-        })
-
-        children.append({
+    children.append(
+        {
             "object": "block",
             "type": "paragraph",
             "paragraph": {
@@ -280,12 +159,151 @@ def create_notion_page(
                     {
                         "type": "text",
                         "text": {
-                            "content": notes,
+                            "content": f"Total Score: {score} / 100 | Status: {pass_status}",
                         },
                     },
                 ],
             },
-        })
+        }
+    )
+
+    # Rubric breakdown table
+    if rubric_breakdown:
+        children.append(
+            {
+                "object": "block",
+                "type": "header",
+                "header": {
+                    "rich_text": [
+                        {
+                            "type": "text",
+                            "text": {
+                                "content": "Rubric Breakdown",
+                            },
+                        },
+                    ],
+                },
+            }
+        )
+
+        # Create table rows as bullet list
+        for category, data in rubric_breakdown.items():
+            cat_score = data.get("score", 0)
+            cat_weight = data.get("weight", 0)
+            cat_checks = data.get("checks", [])
+
+            children.append(
+                {
+                    "object": "block",
+                    "type": "bulleted_list_item",
+                    "bulleted_list_item": {
+                        "rich_text": [
+                            {
+                                "type": "text",
+                                "text": {
+                                    "content": f"{category}: {cat_score}/{cat_weight}",
+                                },
+                            },
+                        ],
+                    },
+                }
+            )
+
+            # Add check items
+            for check in cat_checks[:5]:  # Limit to 5 checks per category
+                children.append(
+                    {
+                        "object": "block",
+                        "type": "bulleted_list_item",
+                        "bulleted_list_item": {
+                            "rich_text": [
+                                {
+                                    "type": "text",
+                                    "text": {
+                                        "content": f"  - {check}",
+                                    },
+                                },
+                            ],
+                        },
+                    }
+                )
+
+    # Findings
+    if findings:
+        children.append(
+            {
+                "object": "block",
+                "type": "header",
+                "header": {
+                    "rich_text": [
+                        {
+                            "type": "text",
+                            "text": {
+                                "content": "Findings",
+                            },
+                        },
+                    ],
+                },
+            }
+        )
+
+        for finding in findings:
+            finding_type = finding.get("type", "observation")
+            finding_text = finding.get("text", "")
+            _finding_priority = finding.get("priority", "")
+
+            children.append(
+                {
+                    "object": "block",
+                    "type": "bulleted_list_item",
+                    "bulleted_list_item": {
+                        "rich_text": [
+                            {
+                                "type": "text",
+                                "text": {
+                                    "content": f"[{finding_type}] {finding_text}",
+                                },
+                            },
+                        ],
+                    },
+                }
+            )
+
+    # Notes
+    if notes:
+        children.append(
+            {
+                "object": "block",
+                "type": "header",
+                "header": {
+                    "rich_text": [
+                        {
+                            "type": "text",
+                            "text": {
+                                "content": "Notes",
+                            },
+                        },
+                    ],
+                },
+            }
+        )
+
+        children.append(
+            {
+                "object": "block",
+                "type": "paragraph",
+                "paragraph": {
+                    "rich_text": [
+                        {
+                            "type": "text",
+                            "text": {
+                                "content": notes,
+                            },
+                        },
+                    ],
+                },
+            }
+        )
 
     # Build request body
     body: dict[str, Any] = {
@@ -379,16 +397,13 @@ def main() -> int:
     args = parser.parse_args()
 
     try:
-        # Get API token
-        api_token = os.environ.get("NOTION_API_TOKEN", "")
-        if not api_token:
-            print("Error: NOTION_API_TOKEN environment variable required", file=sys.stderr)
-            return 1
-
         # Get database ID
         database_id = args.db or os.environ.get("NOTION_DATABASE_ID", "")
         if not database_id:
-            print("Error: Database ID required via --db or NOTION_DATABASE_ID env var", file=sys.stderr)
+            print(
+                "Error: Database ID required via --db or NOTION_DATABASE_ID env var",
+                file=sys.stderr,
+            )
             return 1
 
         # Load or create report
@@ -416,12 +431,18 @@ def main() -> int:
             )
 
         if args.dry_run:
-            # Print payload without sending
+            # Print payload without sending - no API token required
             print("=== DRY RUN ===")
             print(f"Database ID: {database_id}")
             print(f"Title: {args.title}")
             print(f"Report: {json.dumps(report, indent=2, ensure_ascii=False)}")
             return 0
+
+        # Get API token (only needed for actual API calls)
+        api_token = os.environ.get("NOTION_API_TOKEN", "")
+        if not api_token:
+            print("Error: NOTION_API_TOKEN environment variable required", file=sys.stderr)
+            return 1
 
         # Create Notion page
         result = create_notion_page(database_id, args.title, report, api_token)

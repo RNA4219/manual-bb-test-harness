@@ -30,6 +30,7 @@ __version__ = "0.2.0"
 
 # ============== Dependency Parsing ==============
 
+
 def load_json_file(path: Path) -> dict[str, Any]:
     """Load and parse JSON file."""
     try:
@@ -85,8 +86,7 @@ def build_area_feature_map(features: dict[str, dict[str, Any]]) -> dict[str, lis
 
 
 def build_regression_edges(
-    features: dict[str, dict[str, Any]],
-    test_models: dict[str, dict[str, Any]]
+    features: dict[str, dict[str, Any]], test_models: dict[str, dict[str, Any]]
 ) -> list[dict[str, Any]]:
     """Build regression dependency edges.
 
@@ -100,13 +100,15 @@ def build_regression_edges(
         if len(feature_ids) > 1:
             # All features sharing this area are related
             for i, src in enumerate(feature_ids):
-                for tgt in feature_ids[i + 1:]:
-                    edges.append({
-                        "source": src,
-                        "target": tgt,
-                        "type": "shared_area",
-                        "area": area,
-                    })
+                for tgt in feature_ids[i + 1 :]:
+                    edges.append(
+                        {
+                            "source": src,
+                            "target": tgt,
+                            "type": "shared_area",
+                            "area": area,
+                        }
+                    )
 
     # Edges from test_model regression_edges
     for feature_id, model in test_models.items():
@@ -121,12 +123,14 @@ def build_regression_edges(
                 for other_id, other_data in features.items():
                     other_areas = other_data.get("changed_areas", [])
                     if service in other_areas and other_id != feature_id:
-                        edges.append({
-                            "source": feature_id,
-                            "target": other_id,
-                            "type": edge_type,
-                            "area": service,
-                        })
+                        edges.append(
+                            {
+                                "source": feature_id,
+                                "target": other_id,
+                                "type": edge_type,
+                                "area": service,
+                            }
+                        )
 
     return edges
 
@@ -146,10 +150,8 @@ def deduplicate_edges(edges: list[dict[str, Any]]) -> list[dict[str, Any]]:
 
 # ============== GraphViz DOT Output ==============
 
-def generate_dot(
-    features: dict[str, dict[str, Any]],
-    edges: list[dict[str, Any]]
-) -> str:
+
+def generate_dot(features: dict[str, dict[str, Any]], edges: list[dict[str, Any]]) -> str:
     """Generate GraphViz DOT format output."""
     lines: list[str] = [
         "digraph RegressionImpact {",
@@ -185,28 +187,32 @@ def generate_dot(
 
 # ============== D3.js HTML Output ==============
 
+
 def generate_d3_json(
-    features: dict[str, dict[str, Any]],
-    edges: list[dict[str, Any]]
+    features: dict[str, dict[str, Any]], edges: list[dict[str, Any]]
 ) -> dict[str, Any]:
     """Generate D3.js force layout compatible JSON."""
     nodes: list[dict[str, Any]] = []
     links: list[dict[str, Any]] = []
 
     for feature_id, data in features.items():
-        nodes.append({
-            "id": feature_id,
-            "label": data.get("title", feature_id),
-            "areas": data.get("changed_areas", []),
-        })
+        nodes.append(
+            {
+                "id": feature_id,
+                "label": data.get("title", feature_id),
+                "areas": data.get("changed_areas", []),
+            }
+        )
 
-    for i, edge in enumerate(edges):
-        links.append({
-            "source": edge["source"],
-            "target": edge["target"],
-            "type": edge.get("type", "dependency"),
-            "area": edge.get("area", ""),
-        })
+    for _i, edge in enumerate(edges):
+        links.append(
+            {
+                "source": edge["source"],
+                "target": edge["target"],
+                "type": edge.get("type", "dependency"),
+                "area": edge.get("area", ""),
+            }
+        )
 
     return {"nodes": nodes, "links": links}
 
@@ -216,102 +222,103 @@ def generate_html_wrapper(d3_data: dict[str, Any]) -> str:
     d3_json_str = json.dumps(d3_data, indent=2)
 
     html_parts = [
-        '<!DOCTYPE html>',
-        '<html>',
-        '<head>',
+        "<!DOCTYPE html>",
+        "<html>",
+        "<head>",
         '  <meta charset="utf-8">',
-        '  <title>Regression Impact Graph</title>',
+        "  <title>Regression Impact Graph</title>",
         '  <script src="https://d3js.org/d3.v7.min.js"></script>',
-        '  <style>',
-        '    body { margin: 0; font-family: sans-serif; }',
-        '    .node { cursor: pointer; }',
-        '    .node rect { fill: lightblue; stroke: steelblue; stroke-width: 1px; }',
-        '    .node text { font-size: 12px; }',
-        '    .link { stroke: #999; stroke-opacity: 0.6; }',
-        '    .link.direct { stroke: red; stroke-width: 2px; }',
-        '    .link.external { stroke: orange; stroke-dasharray: 5,5; }',
-        '    .link.shared_area { stroke: #666; }',
-        '  </style>',
-        '</head>',
-        '<body>',
+        "  <style>",
+        "    body { margin: 0; font-family: sans-serif; }",
+        "    .node { cursor: pointer; }",
+        "    .node rect { fill: lightblue; stroke: steelblue; stroke-width: 1px; }",
+        "    .node text { font-size: 12px; }",
+        "    .link { stroke: #999; stroke-opacity: 0.6; }",
+        "    .link.direct { stroke: red; stroke-width: 2px; }",
+        "    .link.external { stroke: orange; stroke-dasharray: 5,5; }",
+        "    .link.shared_area { stroke: #666; }",
+        "  </style>",
+        "</head>",
+        "<body>",
         '  <svg id="graph" width="800" height="600"></svg>',
-        '  <script>',
-        f'    const data = {d3_json_str};',
-        '',
+        "  <script>",
+        f"    const data = {d3_json_str};",
+        "",
         '    const svg = d3.select("#graph");',
-        '    const width = 800;',
-        '    const height = 600;',
-        '',
-        '    const simulation = d3.forceSimulation(data.nodes)',
+        "    const width = 800;",
+        "    const height = 600;",
+        "",
+        "    const simulation = d3.forceSimulation(data.nodes)",
         '      .force("link", d3.forceLink(data.links).id(d => d.id).distance(150))',
         '      .force("charge", d3.forceManyBody().strength(-300))',
         '      .force("center", d3.forceCenter(width / 2, height / 2));',
-        '',
+        "",
         '    const link = svg.selectAll(".link")',
-        '      .data(data.links)',
+        "      .data(data.links)",
         '      .enter().append("line")',
         '      .attr("class", d => "link " + d.type)',
         '      .attr("stroke-width", d => d.type === "direct" ? 2 : 1);',
-        '',
+        "",
         '    const node = svg.selectAll(".node")',
-        '      .data(data.nodes)',
+        "      .data(data.nodes)",
         '      .enter().append("g")',
         '      .attr("class", "node")',
-        '      .call(d3.drag()',
+        "      .call(d3.drag()",
         '        .on("start", dragstarted)',
         '        .on("drag", dragged)',
         '        .on("end", dragended));',
-        '',
+        "",
         '    node.append("rect")',
         '      .attr("width", 100)',
         '      .attr("height", 40)',
         '      .attr("x", -50)',
         '      .attr("y", -20);',
-        '',
+        "",
         '    node.append("text")',
         '      .attr("dy", -5)',
         '      .attr("text-anchor", "middle")',
-        '      .text(d => d.id);',
-        '',
+        "      .text(d => d.id);",
+        "",
         '    node.append("text")',
         '      .attr("dy", 10)',
         '      .attr("text-anchor", "middle")',
         '      .attr("font-size", "10px")',
         '      .text(d => d.label.substring(0, 15) + (d.label.length > 15 ? "..." : ""));',
-        '',
+        "",
         '    simulation.on("tick", () => {',
-        '      link',
+        "      link",
         '        .attr("x1", d => d.source.x)',
         '        .attr("y1", d => d.source.y)',
         '        .attr("x2", d => d.target.x)',
         '        .attr("y2", d => d.target.y);',
         '      node.attr("transform", d => "translate(" + d.x + "," + d.y + ")");',
-        '    });',
-        '',
-        '    function dragstarted(event, d) {',
-        '      if (!event.active) simulation.alphaTarget(0.3).restart();',
-        '      d.fx = d.x;',
-        '      d.fy = d.y;',
-        '    }',
-        '',
-        '    function dragged(event, d) {',
-        '      d.fx = event.x;',
-        '      d.fy = event.y;',
-        '    }',
-        '',
-        '    function dragended(event, d) {',
-        '      if (!event.active) simulation.alphaTarget(0);',
-        '      d.fx = null;',
-        '      d.fy = null;',
-        '    }',
-        '  </script>',
-        '</body>',
-        '</html>',
+        "    });",
+        "",
+        "    function dragstarted(event, d) {",
+        "      if (!event.active) simulation.alphaTarget(0.3).restart();",
+        "      d.fx = d.x;",
+        "      d.fy = d.y;",
+        "    }",
+        "",
+        "    function dragged(event, d) {",
+        "      d.fx = event.x;",
+        "      d.fy = event.y;",
+        "    }",
+        "",
+        "    function dragended(event, d) {",
+        "      if (!event.active) simulation.alphaTarget(0);",
+        "      d.fx = null;",
+        "      d.fy = null;",
+        "    }",
+        "  </script>",
+        "</body>",
+        "</html>",
     ]
-    return '\n'.join(html_parts)
+    return "\n".join(html_parts)
 
 
 # ============== Main ==============
+
 
 def expand_input_paths(input_arg: Path) -> tuple[list[Path], list[Path]]:
     """Expand input argument to lists of feature_spec and test_model files."""

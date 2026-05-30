@@ -13,6 +13,5 @@
   "actual": ["在庫数が+1された"],
   "result": "pass",
   "attachments": ["s3://evidence/RUN-002/step3.png"],
-  "anomaly_notes": [],
-  "defect_stub": null
+  "anomaly_notes": []
 }

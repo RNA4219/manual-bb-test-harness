@@ -15,7 +15,6 @@ import logging
 import re
 import sys
 from pathlib import Path
-from typing import Any
 
 __version__: str = "0.1.1"
 
@@ -29,9 +28,9 @@ logger: logging.Logger = logging.getLogger(__name__)
 # U+FFFD is the Unicode replacement character, indicating mojibake
 # or corrupted encoding that should not be released in production artifacts.
 BAD_MARKERS: list[str] = [
-    "TO" + "DO",       # Placeholder text (obfuscated to avoid self-detection)
-    "[TO" + "DO",      # TODO checkbox marker
-    "�",          # Unicode replacement character (mojibake)
+    "TO" + "DO",  # Placeholder text (obfuscated to avoid self-detection)
+    "[TO" + "DO",  # TODO checkbox marker
+    "�",  # Unicode replacement character (mojibake)
 ]
 
 
@@ -49,7 +48,9 @@ def parse_frontmatter(content: str) -> dict[str, str]:
     """
     match: re.Match[str] | None = re.match(r"^---\r?\n(.*?)\r?\n---", content, re.DOTALL)
     if not match:
-        raise ValueError("Invalid or missing YAML frontmatter. SKILL.md must start with '---' block.")
+        raise ValueError(
+            "Invalid or missing YAML frontmatter. SKILL.md must start with '---' block."
+        )
 
     data: dict[str, str] = {}
     frontmatter_text: str = match.group(1)
@@ -146,16 +147,16 @@ def validate_skill(skill_path: Path) -> list[str]:
     # Validate description
     description: str = frontmatter.get("description", "")
     if not description:
-        errors.append("Missing frontmatter.description. Skill must have a description in frontmatter.")
+        errors.append(
+            "Missing frontmatter.description. Skill must have a description in frontmatter."
+        )
     elif "<" in description or ">" in description:
         errors.append(
             "Description contains angle brackets '<' or '>' which are not allowed. "
             "Remove placeholder markers like <value>."
         )
     elif len(description) > 1024:
-        errors.append(
-            f"Description is too long ({len(description)} chars). Maximum allowed: 1024."
-        )
+        errors.append(f"Description is too long ({len(description)} chars). Maximum allowed: 1024.")
 
     # Check required files
     required: list[str] = [
@@ -172,10 +173,7 @@ def validate_skill(skill_path: Path) -> list[str]:
     for relative in required:
         file_path = skill_path / relative
         if not file_path.exists():
-            errors.append(
-                f"Missing required file: {relative}. "
-                f"Expected at {file_path}."
-            )
+            errors.append(f"Missing required file: {relative}. Expected at {file_path}.")
 
     # Check for placeholder markers in all files
     path: Path
@@ -186,8 +184,10 @@ def validate_skill(skill_path: Path) -> list[str]:
             continue
         try:
             text = path.read_text(encoding="utf-8")
-        except UnicodeDecodeError as exc:
-            errors.append(f"File is not valid UTF-8: {path}. All skill files must be UTF-8 encoded.")
+        except UnicodeDecodeError:
+            errors.append(
+                f"File is not valid UTF-8: {path}. All skill files must be UTF-8 encoded."
+            )
             continue
         for marker in BAD_MARKERS:
             if marker in text:
@@ -209,8 +209,9 @@ def validate_json_files(repo_root: Path) -> list[str]:
         List of error messages, empty if all JSON files are valid
     """
     errors: list[str] = []
-    json_files: list[Path] = list((repo_root / "schemas").glob("*.schema.json")) + \
-                             list((repo_root / "examples").rglob("*.json"))
+    json_files: list[Path] = list((repo_root / "schemas").glob("*.schema.json")) + list(
+        (repo_root / "examples").rglob("*.json")
+    )
 
     path: Path
     content: str
@@ -248,23 +249,13 @@ Examples:
     python quick-validate-skill.py skills/my-skill
     python quick-validate-skill.py --debug skills/my-skill
     python quick-validate-skill.py --version
-        """
+        """,
     )
     parser.add_argument(
-        "skill_directory",
-        nargs="?",
-        help="Path to the skill directory to validate"
+        "skill_directory", nargs="?", help="Path to the skill directory to validate"
     )
-    parser.add_argument(
-        "--version", "-v",
-        action="store_true",
-        help="Show version and exit"
-    )
-    parser.add_argument(
-        "--debug", "-d",
-        action="store_true",
-        help="Enable debug logging"
-    )
+    parser.add_argument("--version", "-v", action="store_true", help="Show version and exit")
+    parser.add_argument("--debug", "-d", action="store_true", help="Enable debug logging")
 
     args: argparse.Namespace = parser.parse_args()
 
@@ -275,15 +266,9 @@ Examples:
 
     # Setup logging
     if args.debug:
-        logging.basicConfig(
-            level=logging.DEBUG,
-            format="%(levelname)s: %(message)s"
-        )
+        logging.basicConfig(level=logging.DEBUG, format="%(levelname)s: %(message)s")
     else:
-        logging.basicConfig(
-            level=logging.WARNING,
-            format="%(levelname)s: %(message)s"
-        )
+        logging.basicConfig(level=logging.WARNING, format="%(levelname)s: %(message)s")
 
     # Check for required argument
     if not args.skill_directory:

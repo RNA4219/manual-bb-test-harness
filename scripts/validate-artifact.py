@@ -43,6 +43,7 @@ ARTifact_SCHEMA_MAP = {
 # Try to import jsonschema
 try:
     import jsonschema
+
     HAS_JSONSCHEMA = True
 except ImportError:
     HAS_JSONSCHEMA = False
@@ -106,11 +107,20 @@ def resolve_schema_refs(schema: dict[str, Any], schema_dir: Path) -> dict[str, A
 
 
 def detect_artifact_type(path: Path) -> str:
-    """Detect artifact type from filename."""
+    """Detect artifact type from filename or parent directory."""
     name_lower = path.name.lower()
-    for artifact_type, schema_file in ARTifact_SCHEMA_MAP.items():
+
+    # Check filename first
+    for artifact_type, _schema_file in ARTifact_SCHEMA_MAP.items():
         if artifact_type in name_lower:
             return artifact_type
+
+    # Check parent directory name for nested artifacts
+    parent_name = path.parent.name.lower()
+    for artifact_type, _schema_file in ARTifact_SCHEMA_MAP.items():
+        if artifact_type == parent_name:
+            return artifact_type
+
     return ""
 
 
@@ -140,10 +150,7 @@ def validate_artifact_basic(artifact: dict[str, Any], schema_type: str) -> list[
     return errors
 
 
-def validate_artifact_jsonschema(
-    artifact: dict[str, Any],
-    schema: dict[str, Any]
-) -> list[str]:
+def validate_artifact_jsonschema(artifact: dict[str, Any], schema: dict[str, Any]) -> list[str]:
     """Validate using jsonschema library."""
     errors: list[str] = []
 
@@ -210,12 +217,16 @@ def validate_artifact(artifact_path: Path, schema_type: str | None = None) -> di
 
 
 def validate_all(directory: Path) -> list[dict[str, Any]]:
-    """Validate all JSON artifacts in directory."""
+    """Validate all JSON artifacts in directory recursively."""
     results: list[dict[str, Any]] = []
 
-    for f in directory.glob("*.json"):
-        if f.name in ["validation-report.json"]:
-            continue  # Skip non-artifact files
+    for f in directory.rglob("*.json"):
+        # Skip non-artifact files
+        if f.name in ["validation-report.json", "validation-report.jsonl"]:
+            continue
+        # Skip files in . directories (like .git)
+        if any(part.startswith(".") for part in f.parts):
+            continue
 
         result = validate_artifact(f)
         results.append(result)

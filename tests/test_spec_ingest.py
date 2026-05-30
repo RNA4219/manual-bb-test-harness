@@ -5,7 +5,6 @@ from __future__ import annotations
 import importlib.util
 import json
 import sys
-import tempfile
 from pathlib import Path
 from unittest import mock
 
@@ -13,8 +12,7 @@ import pytest
 
 # Load module dynamically
 spec = importlib.util.spec_from_file_location(
-    "spec_ingest",
-    Path(__file__).parent.parent / "scripts" / "spec-ingest.py"
+    "spec_ingest", Path(__file__).parent.parent / "scripts" / "spec-ingest.py"
 )
 spec_ingest = importlib.util.module_from_spec(spec)
 sys.modules["spec_ingest"] = spec_ingest
@@ -119,7 +117,7 @@ class TestIngestMarkdownSpec:
             "---\nfeature_id: TEST-01\ntitle: Test Feature\n---\n"
             "## Acceptance Criteria\n- AC-1: First criterion\n- AC-2: Second criterion\n"
             "## Business Rules\n- BR-1: First rule\n",
-            encoding="utf-8"
+            encoding="utf-8",
         )
         result = ingest_markdown_spec(md_file)
 
@@ -132,9 +130,8 @@ class TestIngestMarkdownSpec:
     def test_missing_ac_adds_assumption(self, tmp_path: Path) -> None:
         md_file = tmp_path / "test.md"
         md_file.write_text(
-            "---\nfeature_id: TEST-02\ntitle: Test\n---\n"
-            "## Summary\nSome summary\n",
-            encoding="utf-8"
+            "---\nfeature_id: TEST-02\ntitle: Test\n---\n## Summary\nSome summary\n",
+            encoding="utf-8",
         )
         result = ingest_markdown_spec(md_file)
 
@@ -144,9 +141,7 @@ class TestIngestMarkdownSpec:
     def test_generates_feature_id_from_filename(self, tmp_path: Path) -> None:
         md_file = tmp_path / "order-cancel.md"
         md_file.write_text(
-            "---\ntitle: Test\n---\n"
-            "## Acceptance Criteria\n- AC-1: Item\n",
-            encoding="utf-8"
+            "---\ntitle: Test\n---\n## Acceptance Criteria\n- AC-1: Item\n", encoding="utf-8"
         )
         result = ingest_markdown_spec(md_file)
         assert "ORDER" in result["feature_id"] or "CANCEL" in result["feature_id"]
@@ -156,7 +151,7 @@ class TestIngestMarkdownSpec:
         md_file.write_text(
             "---\nfeature_id: TEST\nactors: user, admin, system\n---\n"
             "## Acceptance Criteria\n- AC-1: Item\n",
-            encoding="utf-8"
+            encoding="utf-8",
         )
         result = ingest_markdown_spec(md_file)
         assert "user" in result["actors"]
@@ -169,7 +164,7 @@ class TestIngestMarkdownSpec:
             "## Acceptance Criteria\n- AC-1: Item\n"
             "## Devices\n- iOS\n- Android\n"
             "## Mobile Contexts\n- foreground\n- background_resume\n",
-            encoding="utf-8"
+            encoding="utf-8",
         )
         result = ingest_markdown_spec(md_file)
         assert result["devices"] == ["iOS", "Android"]
@@ -188,49 +183,69 @@ class TestMain:
     def test_markdown_ingestion(self, tmp_path: Path) -> None:
         md_file = tmp_path / "test.md"
         md_file.write_text(
-            "---\nfeature_id: TEST-01\ntitle: Test\n---\n"
-            "## Acceptance Criteria\n- AC-1: Item\n",
-            encoding="utf-8"
+            "---\nfeature_id: TEST-01\ntitle: Test\n---\n## Acceptance Criteria\n- AC-1: Item\n",
+            encoding="utf-8",
         )
         output_file = tmp_path / "output.json"
 
-        with mock.patch.object(sys, "argv", [
-            "script",
-            "--source", "markdown",
-            "--input", str(md_file),
-            "--output", str(output_file),
-        ]):
+        with mock.patch.object(
+            sys,
+            "argv",
+            [
+                "script",
+                "--source",
+                "markdown",
+                "--input",
+                str(md_file),
+                "--output",
+                str(output_file),
+            ],
+        ):
             assert main() == 0
             assert output_file.exists()
             data = json.loads(output_file.read_text(encoding="utf-8"))
             assert data["feature_id"] == "TEST-01"
 
     def test_missing_input_for_markdown(self) -> None:
-        with mock.patch.object(sys, "argv", [
-            "script", "--source", "markdown", "--output", "out.json"
-        ]):
+        with mock.patch.object(
+            sys, "argv", ["script", "--source", "markdown", "--output", "out.json"]
+        ):
             assert main() == 1
 
     def test_confluence_stub(self, tmp_path: Path) -> None:
         output_file = tmp_path / "output.json"
-        with mock.patch.object(sys, "argv", [
-            "script",
-            "--source", "confluence",
-            "--url", "https://example.com/wiki/page",
-            "--output", str(output_file),
-        ]):
+        with mock.patch.object(
+            sys,
+            "argv",
+            [
+                "script",
+                "--source",
+                "confluence",
+                "--url",
+                "https://example.com/wiki/page",
+                "--output",
+                str(output_file),
+            ],
+        ):
             assert main() == 0
             data = json.loads(output_file.read_text(encoding="utf-8"))
             assert "CONFLUENCE" in data["feature_id"]
 
     def test_jira_stub(self, tmp_path: Path) -> None:
         output_file = tmp_path / "output.json"
-        with mock.patch.object(sys, "argv", [
-            "script",
-            "--source", "jira",
-            "--issue", "PROJ-123",
-            "--output", str(output_file),
-        ]):
+        with mock.patch.object(
+            sys,
+            "argv",
+            [
+                "script",
+                "--source",
+                "jira",
+                "--issue",
+                "PROJ-123",
+                "--output",
+                str(output_file),
+            ],
+        ):
             assert main() == 0
             data = json.loads(output_file.read_text(encoding="utf-8"))
             assert data["feature_id"] == "PROJ-123"

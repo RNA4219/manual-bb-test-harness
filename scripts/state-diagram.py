@@ -89,7 +89,7 @@ def generate_mermaid(
     # Add flow descriptions as notes (if provided)
     if flows:
         for i, flow in enumerate(flows):
-            lines.append(f"  note right of [*] : Flow {i+1}: {flow}")
+            lines.append(f"  note right of [*] : Flow {i + 1}: {flow}")
 
     return "\n".join(lines)
 

@@ -28,6 +28,7 @@ __version__ = "0.2.0"
 
 # ============== Markdown Parser ==============
 
+
 def parse_yaml_frontmatter(content: str) -> dict[str, str]:
     """Parse YAML frontmatter from Markdown content.
 
@@ -92,7 +93,11 @@ def extract_markdown_sections(content: str) -> dict[str, list[str]]:
             continue
 
         # List item
-        if stripped.startswith("- ") or stripped.startswith("* ") or re.match(r"^\d+\.\s", stripped):
+        if (
+            stripped.startswith("- ")
+            or stripped.startswith("* ")
+            or re.match(r"^\d+\.\s", stripped)
+        ):
             item_text = stripped.lstrip("- *").strip()
             # Remove leading number if present
             item_text = re.sub(r"^\d+\.\s*", "", item_text)
@@ -197,11 +202,13 @@ def ingest_markdown_spec(path: Path) -> dict[str, Any]:
     else:
         # Required field, add placeholder
         result["acceptance_criteria"] = ["[NO ACCEPTANCE CRITERIA FOUND]"]
-        result.setdefault("assumptions", []).append({
-            "id": "ASM-1",
-            "text": "No acceptance criteria section found in source",
-            "severity": "high",
-        })
+        result.setdefault("assumptions", []).append(
+            {
+                "id": "ASM-1",
+                "text": "No acceptance criteria section found in source",
+                "severity": "high",
+            }
+        )
 
     if "business_rules" in normalized_sections:
         result["business_rules"] = normalized_sections["business_rules"]
@@ -219,12 +226,15 @@ def ingest_markdown_spec(path: Path) -> dict[str, Any]:
         result["changed_areas"] = normalized_sections["changed_areas"]
 
     if "summary" in normalized_sections and "summary" not in result:
-        result["summary"] = normalized_sections["summary"][0] if normalized_sections["summary"] else ""
+        result["summary"] = (
+            normalized_sections["summary"][0] if normalized_sections["summary"] else ""
+        )
 
     return result
 
 
 # ============== Confluence Parser ==============
+
 
 def ingest_confluence_spec(url: str, api_key: str | None = None) -> dict[str, Any]:
     """Ingest specification from Confluence page.
@@ -259,7 +269,13 @@ def ingest_confluence_spec(url: str, api_key: str | None = None) -> dict[str, An
             "title": "Confluence Import (requests not installed)",
             "acceptance_criteria": ["[Install requests: pip install requests]"],
             "source_refs": [{"id": "CONFLUENCE-URL", "kind": "spec", "excerpt": url}],
-            "assumptions": [{"id": "ASM-REQUESTS", "text": "requests library not installed", "severity": "critical"}],
+            "assumptions": [
+                {
+                    "id": "ASM-REQUESTS",
+                    "text": "requests library not installed",
+                    "severity": "critical",
+                }
+            ],
         }
 
     # Extract page ID from URL or use directly
@@ -271,7 +287,9 @@ def ingest_confluence_spec(url: str, api_key: str | None = None) -> dict[str, An
             "title": "Confluence Import (Invalid URL)",
             "acceptance_criteria": ["[Could not extract page ID from URL]"],
             "source_refs": [{"id": "CONFLUENCE-URL", "kind": "spec", "excerpt": url}],
-            "assumptions": [{"id": "ASM-URL", "text": "Could not parse Confluence URL", "severity": "critical"}],
+            "assumptions": [
+                {"id": "ASM-URL", "text": "Could not parse Confluence URL", "severity": "critical"}
+            ],
         }
 
     # Build API URL
@@ -294,9 +312,17 @@ def ingest_confluence_spec(url: str, api_key: str | None = None) -> dict[str, An
         return {
             "feature_id": "CONFLUENCE-NO-AUTH",
             "title": "Confluence Import (No credentials)",
-            "acceptance_criteria": ["[Set CONFLUENCE_API_TOKEN or CONFLUENCE_PAT environment variable]"],
+            "acceptance_criteria": [
+                "[Set CONFLUENCE_API_TOKEN or CONFLUENCE_PAT environment variable]"
+            ],
             "source_refs": [{"id": "CONFLUENCE-URL", "kind": "spec", "excerpt": url}],
-            "assumptions": [{"id": "ASM-AUTH", "text": "No Confluence credentials configured", "severity": "critical"}],
+            "assumptions": [
+                {
+                    "id": "ASM-AUTH",
+                    "text": "No Confluence credentials configured",
+                    "severity": "critical",
+                }
+            ],
         }
 
     # Fetch page content
@@ -318,7 +344,9 @@ def ingest_confluence_spec(url: str, api_key: str | None = None) -> dict[str, An
     content_html = data.get("body", {}).get("storage", {}).get("value", "")
 
     # Extract structured content from HTML
-    acceptance_criteria, business_rules, actors, devices, mobile_contexts, changed_areas = parse_confluence_html(content_html)
+    acceptance_criteria, business_rules, actors, devices, mobile_contexts, changed_areas = (
+        parse_confluence_html(content_html)
+    )
 
     # Build feature_spec
     feature_id = generate_feature_id(title, page_id)
@@ -336,11 +364,13 @@ def ingest_confluence_spec(url: str, api_key: str | None = None) -> dict[str, An
         result["acceptance_criteria"] = acceptance_criteria
     else:
         result["acceptance_criteria"] = ["[NO ACCEPTANCE CRITERIA FOUND IN PAGE]"]
-        result.setdefault("assumptions", []).append({
-            "id": "ASM-AC",
-            "text": "No acceptance criteria section found in Confluence page",
-            "severity": "high",
-        })
+        result.setdefault("assumptions", []).append(
+            {
+                "id": "ASM-AC",
+                "text": "No acceptance criteria section found in Confluence page",
+                "severity": "high",
+            }
+        )
 
     if business_rules:
         result["business_rules"] = business_rules
@@ -383,7 +413,9 @@ def extract_confluence_page_id(url: str, base_url: str) -> str:
     return ""
 
 
-def parse_confluence_html(html: str) -> tuple[list[str], list[str], list[str], list[str], list[str], list[str]]:
+def parse_confluence_html(
+    html: str,
+) -> tuple[list[str], list[str], list[str], list[str], list[str], list[str]]:
     """Parse Confluence HTML to extract structured sections."""
     import re
 
@@ -393,7 +425,12 @@ def parse_confluence_html(html: str) -> tuple[list[str], list[str], list[str], l
         # Remove tags
         text = re.sub(r"<[^>]+>", "", text)
         # Decode common entities
-        text = text.replace("&nbsp;", " ").replace("&amp;", "&").replace("&lt;", "<").replace("&gt;", ">")
+        text = (
+            text.replace("&nbsp;", " ")
+            .replace("&amp;", "&")
+            .replace("&lt;", "<")
+            .replace("&gt;", ">")
+        )
         return text.strip()
 
     # Extract list items from sections
@@ -446,6 +483,7 @@ def parse_confluence_html(html: str) -> tuple[list[str], list[str], list[str], l
 def generate_feature_id(title: str, page_id: str) -> str:
     """Generate feature_id from title and page_id."""
     import re
+
     # Extract key words from title
     words = re.findall(r"[A-Z]+|[a-zA-Z]+", title)
     # Take first 2-3 meaningful words
@@ -456,6 +494,7 @@ def generate_feature_id(title: str, page_id: str) -> str:
 
 
 # ============== Jira Parser ==============
+
 
 def ingest_jira_issue(issue_key: str, api_key: str | None = None) -> dict[str, Any]:
     """Ingest specification from Jira issue.
@@ -488,12 +527,22 @@ def ingest_jira_issue(issue_key: str, api_key: str | None = None) -> dict[str, A
             "feature_id": issue_key.upper(),
             "title": "Jira Import (requests not installed)",
             "acceptance_criteria": ["[Install requests: pip install requests]"],
-            "source_refs": [{"id": issue_key, "kind": "spec", "excerpt": f"Jira issue {issue_key}"}],
-            "assumptions": [{"id": "ASM-REQUESTS", "text": "requests library not installed", "severity": "critical"}],
+            "source_refs": [
+                {"id": issue_key, "kind": "spec", "excerpt": f"Jira issue {issue_key}"}
+            ],
+            "assumptions": [
+                {
+                    "id": "ASM-REQUESTS",
+                    "text": "requests library not installed",
+                    "severity": "critical",
+                }
+            ],
         }
 
     # Build API URL
-    api_endpoint = f"{base_url}/rest/api/2/issue/{issue_key}?fields=summary,description,labels,customFields"
+    api_endpoint = (
+        f"{base_url}/rest/api/2/issue/{issue_key}?fields=summary,description,labels,customFields"
+    )
 
     # Setup authentication
     headers = {"Accept": "application/json"}
@@ -510,8 +559,12 @@ def ingest_jira_issue(issue_key: str, api_key: str | None = None) -> dict[str, A
             "feature_id": issue_key.upper(),
             "title": "Jira Import (No credentials)",
             "acceptance_criteria": ["[Set JIRA_API_TOKEN or JIRA_PAT environment variable]"],
-            "source_refs": [{"id": issue_key, "kind": "spec", "excerpt": f"Jira issue {issue_key}"}],
-            "assumptions": [{"id": "ASM-AUTH", "text": "No Jira credentials configured", "severity": "critical"}],
+            "source_refs": [
+                {"id": issue_key, "kind": "spec", "excerpt": f"Jira issue {issue_key}"}
+            ],
+            "assumptions": [
+                {"id": "ASM-AUTH", "text": "No Jira credentials configured", "severity": "critical"}
+            ],
         }
 
     # Fetch issue
@@ -524,7 +577,9 @@ def ingest_jira_issue(issue_key: str, api_key: str | None = None) -> dict[str, A
             "feature_id": issue_key.upper(),
             "title": f"Jira Import Error: {e}",
             "acceptance_criteria": ["[API request failed]"],
-            "source_refs": [{"id": issue_key, "kind": "spec", "excerpt": f"Jira issue {issue_key}"}],
+            "source_refs": [
+                {"id": issue_key, "kind": "spec", "excerpt": f"Jira issue {issue_key}"}
+            ],
             "assumptions": [{"id": "ASM-ERROR", "text": f"API error: {e}", "severity": "critical"}],
         }
 
@@ -550,11 +605,13 @@ def ingest_jira_issue(issue_key: str, api_key: str | None = None) -> dict[str, A
         result["acceptance_criteria"] = acceptance_criteria
     else:
         result["acceptance_criteria"] = ["[NO ACCEPTANCE CRITERIA FOUND IN ISSUE]"]
-        result.setdefault("assumptions", []).append({
-            "id": "ASM-AC",
-            "text": "No acceptance criteria found in Jira issue",
-            "severity": "high",
-        })
+        result.setdefault("assumptions", []).append(
+            {
+                "id": "ASM-AC",
+                "text": "No acceptance criteria found in Jira issue",
+                "severity": "high",
+            }
+        )
 
     if business_rules:
         result["business_rules"] = business_rules
@@ -620,6 +677,7 @@ def parse_jira_description(description: str) -> tuple[list[str], list[str], list
 
 
 # ============== Main ==============
+
 
 def main() -> int:
     """Main entry point."""
@@ -693,10 +751,7 @@ def main() -> int:
 
         # Write output
         args.output.parent.mkdir(parents=True, exist_ok=True)
-        args.output.write_text(
-            json.dumps(result, indent=2, ensure_ascii=False),
-            encoding="utf-8"
-        )
+        args.output.write_text(json.dumps(result, indent=2, ensure_ascii=False), encoding="utf-8")
 
         print(f"Generated: {args.output}")
         return 0

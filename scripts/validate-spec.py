@@ -37,9 +37,13 @@ REQUIRED_SECTIONS = [
 
 # Quality criteria
 QUALITY_CRITERIA = [
-    ("has_priority_table", r"P0.*優先度|優先度.*P0|P0.*P1.*P2|\|.*P0.*\|", "Requirements table with P0/P1/P2 priorities"),
+    (
+        "has_priority_table",
+        r"P0.*優先度|優先度.*P0|P0.*P1.*P2|\|.*P0.*\|",
+        "Requirements table with P0/P1/P2 priorities",
+    ),
     ("has_cli_example", r"```bash|# CLI|bb-harness|python scripts", "CLI usage examples"),
-    ("has_checklist", r"\- \[ \]", "Acceptance criteria checklist"),
+    ("has_checklist", r"\- \[[ xX]\]", "Acceptance criteria checklist"),
     ("has_table", r"\|.+\|.+\|", "Table format for requirements/design"),
 ]
 
@@ -66,12 +70,14 @@ def check_required_sections(content: str) -> list[dict[str, Any]]:
                 break
 
         if not found:
-            errors.append({
-                "section": section_id,
-                "expected": section_names[0],
-                "status": "missing",
-                "message": f"Section '{section_names[0]}' not found",
-            })
+            errors.append(
+                {
+                    "section": section_id,
+                    "expected": section_names[0],
+                    "status": "missing",
+                    "message": f"Section '{section_names[0]}' not found",
+                }
+            )
 
     return errors
 
@@ -82,11 +88,13 @@ def check_quality_criteria(content: str) -> list[dict[str, Any]]:
 
     for criterion_id, pattern, description in QUALITY_CRITERIA:
         found = bool(re.search(pattern, content, re.MULTILINE))
-        results.append({
-            "criterion": criterion_id,
-            "description": description,
-            "status": "pass" if found else "fail",
-        })
+        results.append(
+            {
+                "criterion": criterion_id,
+                "description": description,
+                "status": "pass" if found else "fail",
+            }
+        )
 
     return results
 
@@ -107,11 +115,13 @@ def check_requirements_table(content: str) -> dict[str, Any]:
         if "|" in line and re.search(r"P[0-3]", line):
             parts = [p.strip() for p in line.split("|") if p.strip()]
             if len(parts) >= 2 and not parts[0].startswith("id"):
-                requirements.append({
-                    "id": parts[0] if parts else "",
-                    "content": parts[1] if len(parts) > 1 else "",
-                    "priority": parts[2] if len(parts) > 2 else "unknown",
-                })
+                requirements.append(
+                    {
+                        "id": parts[0] if parts else "",
+                        "content": parts[1] if len(parts) > 1 else "",
+                        "priority": parts[2] if len(parts) > 2 else "unknown",
+                    }
+                )
 
     # Count by priority
     p0_count = sum(1 for r in requirements if "P0" in r.get("priority", ""))
@@ -129,7 +139,9 @@ def check_requirements_table(content: str) -> dict[str, Any]:
 def check_acceptance_criteria(content: str) -> dict[str, Any]:
     """Extract and validate acceptance criteria checklist."""
     # Find acceptance section
-    acc_match = re.search(r"^##+ .*受入基準.*\n(.*?)(?=^##+ |\Z)", content, re.DOTALL | re.MULTILINE)
+    acc_match = re.search(
+        r"^##+ .*受入基準.*\n(.*?)(?=^##+ |\Z)", content, re.DOTALL | re.MULTILINE
+    )
 
     if not acc_match:
         return {"status": "missing", "items": []}
@@ -140,15 +152,19 @@ def check_acceptance_criteria(content: str) -> dict[str, Any]:
     items: list[dict[str, str]] = []
     for line in acc_section.split("\n"):
         if line.strip().startswith("- [ ]"):
-            items.append({
-                "text": line.strip()[5:].strip(),
-                "checked": False,
-            })
+            items.append(
+                {
+                    "text": line.strip()[5:].strip(),
+                    "checked": False,
+                }
+            )
         elif line.strip().startswith("- [x]"):
-            items.append({
-                "text": line.strip()[5:].strip(),
-                "checked": True,
-            })
+            items.append(
+                {
+                    "text": line.strip()[5:].strip(),
+                    "checked": True,
+                }
+            )
 
     return {
         "status": "found",
@@ -174,10 +190,10 @@ def validate_spec(path: Path) -> dict[str, Any]:
 
     # Calculate overall status
     section_errors = [s for s in result["sections"] if s["status"] == "missing"]
-    quality_fails = [q for q in result["quality"] if q["status"] == "fail"]
-
     critical_errors = len(section_errors)
-    quality_score = len([q for q in result["quality"] if q["status"] == "pass"]) / len(QUALITY_CRITERIA) * 100
+    quality_score = (
+        len([q for q in result["quality"] if q["status"] == "pass"]) / len(QUALITY_CRITERIA) * 100
+    )
 
     result["summary"] = {
         "section_errors": critical_errors,
@@ -218,7 +234,7 @@ def print_report(results: list[dict[str, Any]]) -> int:
                     print(f"  - {s['expected']}")
 
         # Quality criteria
-        print(f"\nQuality Criteria:")
+        print("\nQuality Criteria:")
         for q in result["quality"]:
             icon = "[OK]" if q["status"] == "pass" else "[X]"
             print(f"  {icon} {q['criterion']}: {q['status']}")
@@ -226,16 +242,18 @@ def print_report(results: list[dict[str, Any]]) -> int:
         # Requirements
         req = result["requirements"]
         if req["status"] == "found":
-            print(f"\nRequirements: {req['total']} items (P0: {req['p0_count']}, P1: {req['p1_count']})")
+            print(
+                f"\nRequirements: {req['total']} items (P0: {req['p0_count']}, P1: {req['p1_count']})"
+            )
         else:
-            print(f"\nRequirements: MISSING")
+            print("\nRequirements: MISSING")
 
         # Acceptance criteria
         acc = result["acceptance"]
         if acc["status"] == "found":
             print(f"Acceptance Criteria: {acc['total']} items ({acc['unchecked']} unchecked)")
         else:
-            print(f"Acceptance Criteria: MISSING")
+            print("Acceptance Criteria: MISSING")
 
         if summary["overall"] == "pass":
             total_pass += 1
@@ -312,8 +330,7 @@ def main() -> int:
         if args.json:
             args.json.parent.mkdir(parents=True, exist_ok=True)
             args.json.write_text(
-                json.dumps(results, indent=2, ensure_ascii=False),
-                encoding="utf-8"
+                json.dumps(results, indent=2, ensure_ascii=False), encoding="utf-8"
             )
             print(f"\nJSON report: {args.json}")
 

@@ -5,7 +5,6 @@ from __future__ import annotations
 import importlib.util
 import json
 import sys
-import tempfile
 from pathlib import Path
 from unittest import mock
 
@@ -13,8 +12,7 @@ import pytest
 
 # Load module dynamically
 spec = importlib.util.spec_from_file_location(
-    "regression_graph",
-    Path(__file__).parent.parent / "scripts" / "regression-graph.py"
+    "regression_graph", Path(__file__).parent.parent / "scripts" / "regression-graph.py"
 )
 regression_graph = importlib.util.module_from_spec(spec)
 sys.modules["regression_graph"] = regression_graph
@@ -58,10 +56,7 @@ class TestParseFeatureSpecs:
 
     def test_single_spec(self, tmp_path: Path) -> None:
         file = tmp_path / "test.feature_spec.json"
-        file.write_text(
-            json.dumps({"feature_id": "TEST-01", "title": "Test"}),
-            encoding="utf-8"
-        )
+        file.write_text(json.dumps({"feature_id": "TEST-01", "title": "Test"}), encoding="utf-8")
         result = parse_feature_specs([file])
         assert "TEST-01" in result
         assert result["TEST-01"]["title"] == "Test"
@@ -71,8 +66,7 @@ class TestParseFeatureSpecs:
         for i in range(3):
             f = tmp_path / f"spec{i}.feature_spec.json"
             f.write_text(
-                json.dumps({"feature_id": f"TEST-{i}", "title": f"Test {i}"}),
-                encoding="utf-8"
+                json.dumps({"feature_id": f"TEST-{i}", "title": f"Test {i}"}), encoding="utf-8"
             )
             files.append(f)
         result = parse_feature_specs(files)
@@ -196,9 +190,9 @@ class TestExpandInputPaths:
     """Tests for input path expansion."""
 
     def test_directory_expansion(self, tmp_path: Path) -> None:
-        (tmp_path / "test.feature_spec.json").write_text('{}', encoding="utf-8")
-        (tmp_path / "test.test_model.json").write_text('{}', encoding="utf-8")
-        (tmp_path / "other.json").write_text('{}', encoding="utf-8")
+        (tmp_path / "test.feature_spec.json").write_text("{}", encoding="utf-8")
+        (tmp_path / "test.test_model.json").write_text("{}", encoding="utf-8")
+        (tmp_path / "other.json").write_text("{}", encoding="utf-8")
 
         specs, models = expand_input_paths(tmp_path)
         assert len(specs) == 1
@@ -206,7 +200,7 @@ class TestExpandInputPaths:
 
     def test_single_file(self, tmp_path: Path) -> None:
         file = tmp_path / "test.feature_spec.json"
-        file.write_text('{}', encoding="utf-8")
+        file.write_text("{}", encoding="utf-8")
         specs, models = expand_input_paths(file)
         assert len(specs) == 1
 
@@ -225,16 +219,23 @@ class TestMain:
         spec_file = tmp_path / "test.feature_spec.json"
         spec_file.write_text(
             json.dumps({"feature_id": "TEST-01", "title": "Test", "changed_areas": []}),
-            encoding="utf-8"
+            encoding="utf-8",
         )
         output_file = tmp_path / "output.dot"
 
-        with mock.patch.object(sys, "argv", [
-            "script",
-            "--input", str(tmp_path),
-            "--format", "dot",
-            "--output", str(output_file),
-        ]):
+        with mock.patch.object(
+            sys,
+            "argv",
+            [
+                "script",
+                "--input",
+                str(tmp_path),
+                "--format",
+                "dot",
+                "--output",
+                str(output_file),
+            ],
+        ):
             assert main() == 0
             assert output_file.exists()
             content = output_file.read_text(encoding="utf-8")
@@ -243,17 +244,23 @@ class TestMain:
     def test_html_output(self, tmp_path: Path) -> None:
         spec_file = tmp_path / "test.feature_spec.json"
         spec_file.write_text(
-            json.dumps({"feature_id": "TEST-01", "title": "Test"}),
-            encoding="utf-8"
+            json.dumps({"feature_id": "TEST-01", "title": "Test"}), encoding="utf-8"
         )
         output_file = tmp_path / "output.html"
 
-        with mock.patch.object(sys, "argv", [
-            "script",
-            "--input", str(tmp_path),
-            "--format", "html",
-            "--output", str(output_file),
-        ]):
+        with mock.patch.object(
+            sys,
+            "argv",
+            [
+                "script",
+                "--input",
+                str(tmp_path),
+                "--format",
+                "html",
+                "--output",
+                str(output_file),
+            ],
+        ):
             assert main() == 0
             assert output_file.exists()
             content = output_file.read_text(encoding="utf-8")
@@ -264,10 +271,17 @@ class TestMain:
         (tmp_path / "other.txt").write_text("", encoding="utf-8")
         output_file = tmp_path / "output.dot"
 
-        with mock.patch.object(sys, "argv", [
-            "script",
-            "--input", str(tmp_path),
-            "--format", "dot",
-            "--output", str(output_file),
-        ]):
+        with mock.patch.object(
+            sys,
+            "argv",
+            [
+                "script",
+                "--input",
+                str(tmp_path),
+                "--format",
+                "dot",
+                "--output",
+                str(output_file),
+            ],
+        ):
             assert main() == 1

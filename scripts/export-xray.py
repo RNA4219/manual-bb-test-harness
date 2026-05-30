@@ -80,7 +80,7 @@ def convert_to_xray(case_set: dict[str, Any]) -> dict[str, Any]:
 
         # If more expected than steps, add to last step
         if len(expected) > len(steps) and steps:
-            xray_steps[-1]["result"] = "\n".join(expected[len(steps)-1:])
+            xray_steps[-1]["result"] = "\n".join(expected[len(steps) - 1 :])
 
         xray_test: dict[str, Any] = {
             "summary": case.get("title", case.get("tc_id", "Test")),
@@ -120,10 +120,7 @@ def convert_to_xray(case_set: dict[str, Any]) -> dict[str, Any]:
 def export_xray_json(xray_data: dict[str, Any], output: Path) -> None:
     """Export to Xray JSON format."""
     output.parent.mkdir(parents=True, exist_ok=True)
-    output.write_text(
-        json.dumps(xray_data, indent=2, ensure_ascii=False),
-        encoding="utf-8"
-    )
+    output.write_text(json.dumps(xray_data, indent=2, ensure_ascii=False), encoding="utf-8")
 
 
 def main() -> int:

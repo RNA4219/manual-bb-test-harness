@@ -3,6 +3,7 @@
 Usage:
     python scripts/check-utf8.py <file>
     python scripts/check-utf8.py <file1> <file2> ...
+    python scripts/check-utf8.py --version
 
 Exit codes:
     0: All files are UTF-8
@@ -14,8 +15,11 @@ Example:
 
 from __future__ import annotations
 
+import argparse
 import sys
 from pathlib import Path
+
+__version__ = "0.1.0"
 
 
 def check_utf8(path: Path) -> bool:
@@ -29,25 +33,43 @@ def check_utf8(path: Path) -> bool:
 
 def main() -> int:
     """Main entry point."""
-    if len(sys.argv) < 2:
-        print("Usage: python scripts/check-utf8.py <file> [<file> ...]", file=sys.stderr)
+    parser = argparse.ArgumentParser(
+        description="Check UTF-8 encoding for text files",
+    )
+    parser.add_argument(
+        "files",
+        nargs="*",
+        type=Path,
+        help="Files to check",
+    )
+    parser.add_argument(
+        "--version",
+        action="version",
+        version=f"check-utf8 {__version__}",
+    )
+
+    args = parser.parse_args()
+
+    if not args.files:
+        parser.print_help()
         return 1
 
     errors: list[str] = []
 
-    for arg in sys.argv[1:]:
-        path = Path(arg)
+    for path in args.files:
         if not path.exists():
+            print(f"File not found: {path}", file=sys.stderr)
             continue
         if not check_utf8(path):
             errors.append(str(path))
 
     if errors:
-        print(f"UTF-8 encoding errors in:", file=sys.stderr)
+        print("UTF-8 encoding errors in:", file=sys.stderr)
         for p in errors:
             print(f"  - {p}", file=sys.stderr)
         return 1
 
+    print(f"All {len(args.files)} files are valid UTF-8")
     return 0
 
 
