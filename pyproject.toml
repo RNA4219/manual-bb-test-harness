@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "bb-harness"
-version = "0.2.0"
+version = "1.0.0"
 description = "Manual black-box test harness CLI tool"
 readme = "README.md"
 license = {text = "MIT"}

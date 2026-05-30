@@ -2,13 +2,20 @@
 
 ## Unreleased
 
+## [1.0.0] - 2026-05-30
+
 - README を AI-first 入口へ再構成し、人間向け概要を `docs/human-readme.md` に分離。
 - artifact 検証で `jsonschema` を標準依存にし、`examples/artifacts/` の全 JSON example が `validate-artifact --all --strict` で通るように整理。
-- 検証記録を現状の `145 passed` に更新。
+- 検証記録を現状の `654 passed` に更新。
 - mobile 対象向けに `mobile_contexts` と `platform_matrix` を追加し、iOS / Android の中断復帰、権限、通知入口、ネットワーク差分を扱う platform pack と golden を追加。
 - workflow-cookbook 準拠の正本ドキュメントとして `HUB.codex.md`、`BLUEPRINT.md`、`RUNBOOK.md`、`GUARDRAILS.md`、`EVALUATION.md` を追加。
 - `docs/tasks/` と `docs/acceptance/` を追加し、repo self-review と release readiness 記録を残せるようにした。
 - 既存の spec-ingest / state-diagram / export 生成例と `uv.lock` を repo の追跡対象として整理し、README 群へ反映した。
+- `spec-ingest.py` を Markdown / Confluence / Jira helper に分割し、大型モジュール指摘を解消。
+- code-to-gate strict policy の findings を 0 件まで解消。
+- release bundle dry-run validator を追加し、配布対象の schema / examples / goldens / README 参照を検証可能にした。
+- README に 15分 Quick Start、RUNBOOK に Failure Triage を追加し、初回利用と失敗時切り分けを強化。
+- 公開リポジトリ向けに `IPO` / `社内` / `company.*` などの非公開文脈に見える表現を除去。
 
 ### Added (PLAN 完了分)
 - **F6: TestRail/Xray Import** (`scripts/import-testrail.py`, `scripts/import-xray.py`)
