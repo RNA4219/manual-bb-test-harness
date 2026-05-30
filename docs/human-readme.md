@@ -14,55 +14,66 @@
 - Web に加えて iOS / Android アプリの中断復帰、権限、通知入口、ネットワーク差分を含む手動設計を行う。
 - forward-test の結果を記録し、Skill の出力品質を継続的に改善する。
 
-## クイックスタート
+- 
+## 15分 Quick Start (人間向け)
 
-1. Skill の入口を読む。
+初めて触る利用者は、まずこの順で動かす。目的は「環境が作れる」「代表コマンドが通る」「失敗時の入口が分かる」を 15 分以内に確認すること。
 
-```powershell
-Get-Content .\skills\manual-bb-test-harness\SKILL.md
-```
-
-2. 仕様または golden input を渡して Skill を使う。
-
-```text
-Use $manual-bb-test-harness at ./skills/manual-bb-test-harness to create a manual black-box test design for ./goldens/order-cancel.input.md.
-```
-
-3. 出力を golden expected と rubric で確認する。
+### 0-3分: セットアップ
 
 ```powershell
-Get-Content .\goldens\order-cancel.expected.md
-Get-Content .\docs\evaluation-rubric.md
+uv sync
+uv run bb-harness --help
 ```
 
-4. repo 側の構造を検証する。
+期待結果:
+
+- `uv sync` が依存関係を解決する。
+- `bb-harness --help` に `validate / ingest / gate / export / import / run` が表示される。
+
+### 3-8分: 最小検証
 
 ```powershell
-.\scripts\validate-skill.ps1
-python .\scripts\quick-validate-skill.py .\skills\manual-bb-test-harness
+uv run pytest tests\test_cli_unit.py tests\test_spec_ingest.py
+uv run ruff check .
+uv run python .\scripts\quick-validate-skill.py .\skills\manual-bb-test-harness
 ```
 
-## 入力と出力
+期待結果:
 
-入力例:
+- pytest が pass する。
+- ruff が `All checks passed!` を返す。
+- Skill validator が pass する。
 
-- 仕様メモ
-- Acceptance Criteria
-- 業務ルール
-- 変更箇所
-- 既存の自動テスト証跡
-- 既知不具合
-- 対象環境
+### 8-12分: サンプル入出力を確認
 
-出力:
+```powershell
+uv run bb-harness ingest --source markdown --input .\goldens\order-cancel.input.md --output .\tmp-onboarding.feature_spec.json
+uv run python .\scripts\validate-artifact.py --artifact .\tmp-onboarding.feature_spec.json --type feature_spec --strict
+uv run bb-harness run forward-test --input .\goldens\order-cancel.input.md
+```
 
-1. 根拠付き観点
-2. リスク
-3. 優先度
-4. 手動テストケース
-5. 工数
-6. Gate 判定
-7. Go/No-Go brief
+期待結果:
+
+- `tmp-onboarding.feature_spec.json` が生成される。
+- 生成 artifact が `feature_spec` として valid になる。
+- forward-test が Skill 評価用プロンプトを出力する。
+
+### 12-15分: 全体検証に進む
+
+```powershell
+uv run pytest
+uv run python .\scripts\validate-artifact.py --all examples\artifacts --strict
+uv run python .\scripts\validate-spec.py --all
+uv run python .\scripts\validate-release-bundle.py --dry-run
+```
+
+期待結果:
+
+- 全テストが pass する。
+- artifact / spec / release bundle の検証が pass する。
+
+失敗した場合は [RUNBOOK.md](RUNBOOK.md) の「Failure Triage」を見る。
 
 ## 用語
 
