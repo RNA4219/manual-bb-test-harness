@@ -1,0 +1,108 @@
+{
+  "feature_id": "MOBILE-SESSION-RESUME-01",
+  "manual_cases": [
+    {
+      "tc_id": "TC-MOBILE-001",
+      "title": "background復帰後に送信状態を再開",
+      "priority": "P0",
+      "primary_view": "black",
+      "techniques": ["lifecycle_transition"],
+      "preconditions": ["状態=uploading", "platform=iOS"],
+      "source_ref": {"type": "spec", "refs": ["SPEC-MOBILE-RESUME-01", "AC-1"]},
+      "steps": [
+        "申請画面からアップロード開始",
+        "アプリをbackgroundに移動",
+        "foregroundに復帰"
+      ],
+      "expected_results": [
+        "アップロードが再開される",
+        "送信状態が継続表示"
+      ],
+      "oracle": {"type": "specified", "refs": ["AC-1"]},
+      "estimate_minutes": 12,
+      "trace_to": ["OBS-LIFECYCLE-01", "RISK-MOBILE-01"]
+    },
+    {
+      "tc_id": "TC-MOBILE-002",
+      "title": "offline後の再試行で重複送信なし",
+      "priority": "P1",
+      "primary_view": "black",
+      "techniques": ["network_partition"],
+      "preconditions": ["状態=uploading", "network=offline"],
+      "source_ref": {"type": "spec", "refs": ["SPEC-MOBILE-RESUME-01", "AC-2"]},
+      "steps": [
+        "アップロード開始",
+        "network切断",
+        "network復旧"
+      ],
+      "expected_results": [
+        "再試行が1回のみ実行",
+        "申請状態がsubmittedに遷移",
+        "重複申請が作成されない"
+      ],
+      "oracle": {"type": "specified", "refs": ["AC-2"]},
+      "estimate_minutes": 15,
+      "trace_to": ["OBS-NETWORK-01", "RISK-MOBILE-02"]
+    },
+    {
+      "tc_id": "TC-MOBILE-003",
+      "title": "camera denied時に設定案内表示",
+      "priority": "P2",
+      "primary_view": "black",
+      "techniques": ["permission_boundary"],
+      "preconditions": ["camera_permission=denied"],
+      "source_ref": {"type": "spec", "refs": ["SPEC-MOBILE-RESUME-01", "AC-3"]},
+      "steps": [
+        "camera使用操作を実行"
+      ],
+      "expected_results": [
+        "設定案内ダイアログが表示",
+        "撮影操作がブロック"
+      ],
+      "oracle": {"type": "specified", "refs": ["AC-3"]},
+      "estimate_minutes": 8,
+      "trace_to": ["OBS-PERMISSION-01"]
+    },
+    {
+      "tc_id": "TC-MOBILE-004",
+      "title": "push経由と通常起動で申請状態一致",
+      "priority": "P1",
+      "primary_view": "black",
+      "techniques": ["push_entrypoint"],
+      "preconditions": ["push_notification受信済み"],
+      "source_ref": {"type": "spec", "refs": ["SPEC-MOBILE-RESUME-01", "AC-4"]},
+      "steps": [
+        "push通知からアプリ起動",
+        "通常起動でアプリ開く",
+        "申請状態比較"
+      ],
+      "expected_results": [
+        "両経路で申請状態が同一"
+      ],
+      "oracle": {"type": "specified", "refs": ["AC-4"]},
+      "estimate_minutes": 10,
+      "trace_to": ["OBS-PUSH-01", "RISK-MOBILE-03"]
+    }
+  ],
+  "exploratory_charters": [
+    {
+      "id": "CHARTER-MOBILE-001",
+      "title": "端末差による復帰性を探索",
+      "scope": "iOS/Android version differences",
+      "questions": [
+        "古いOSでのbackground復帰挙動",
+        "低メモリ端末での状態保持"
+      ],
+      "estimate_minutes": 45,
+      "trace_to": ["OBS-COMPAT-01"]
+    }
+  ],
+  "platform_matrix": [
+    {"platform": "iOS", "lifecycle": "foreground", "network": "online"},
+    {"platform": "iOS", "lifecycle": "background_resume", "network": "online"},
+    {"platform": "iOS", "lifecycle": "foreground", "network": "offline"},
+    {"platform": "Android", "lifecycle": "foreground", "network": "online"},
+    {"platform": "Android", "lifecycle": "background_resume", "network": "online"},
+    {"platform": "Android", "lifecycle": "foreground", "network": "offline"}
+  ]
+}

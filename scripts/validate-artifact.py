@@ -75,7 +75,7 @@ def resolve_schema_refs(schema: dict[str, Any], schema_dir: Path) -> dict[str, A
             result: dict[str, Any] = {}
             for k, v in obj.items():
                 if k == "$ref" and isinstance(v, str):
-                    # Convert external ref to internal ref
+                    # Convert shared schema refs to local refs.
                     if "shared_defs.schema.json" in v:
                         # Extract the definition name
                         parts = v.split("$defs/")

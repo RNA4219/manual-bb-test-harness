@@ -6,12 +6,12 @@ Usage:
     python scripts/import-testrail.py --version
 
 Environment:
-    TESTRAIL_URL: Base URL (e.g., https://company.testrail.io)
+    TESTRAIL_URL: Base URL (e.g., https://example.testrail.io)
     TESTRAIL_USER: Username or email
     TESTRAIL_API_KEY: API token
 
 Example:
-    export TESTRAIL_URL="https://company.testrail.io"
+    export TESTRAIL_URL="https://example.testrail.io"
     export TESTRAIL_USER="qa_lead"
     export TESTRAIL_API_KEY="xxx"
 

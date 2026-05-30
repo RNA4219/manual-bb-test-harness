@@ -1,0 +1,143 @@
+{
+  "feature_id": "ADMIN-ROLE-CHANGE-01",
+  "manual_cases": [
+    {
+      "tc_id": "TC-ADMIN-001",
+      "title": "ownerはmemberロールを変更可能",
+      "priority": "P0",
+      "primary_view": "black",
+      "techniques": ["role_matrix"],
+      "preconditions": ["actor_role=owner", "target_role=member", "ownership_context=own_workspace"],
+      "source_ref": {"type": "spec", "refs": ["SPEC-ADMIN-ROLE-01", "AC-1"]},
+      "steps": [
+        "ワークスペース管理画面を開く",
+        "対象ユーザーを選択",
+        "ロールをeditorに変更"
+      ],
+      "expected_results": [
+        "変更成功メッセージ表示",
+        "対象ユーザー権限が即時反映"
+      ],
+      "oracle": {"type": "specified", "refs": ["AC-1"]},
+      "estimate_minutes": 10,
+      "trace_to": ["OBS-ROLE-01", "RISK-ADMIN-01"]
+    },
+    {
+      "tc_id": "TC-ADMIN-002",
+      "title": "adminはownerを変更不可",
+      "priority": "P1",
+      "primary_view": "black",
+      "techniques": ["role_boundary"],
+      "preconditions": ["actor_role=admin", "target_role=owner"],
+      "source_ref": {"type": "spec", "refs": ["SPEC-ADMIN-ROLE-01", "AC-2"]},
+      "steps": [
+        "ワークスペース管理画面を開く",
+        "ownerユーザーを選択",
+        "ロール変更操作を実行"
+      ],
+      "expected_results": [
+        "変更不可メッセージ表示",
+        "操作が拒否される"
+      ],
+      "oracle": {"type": "specified", "refs": ["AC-2"]},
+      "estimate_minutes": 8,
+      "trace_to": ["OBS-ROLE-02", "RISK-ADMIN-02"]
+    },
+    {
+      "tc_id": "TC-ADMIN-003",
+      "title": "viewer/editorは変更操作不可",
+      "priority": "P1",
+      "primary_view": "black",
+      "techniques": ["permission_boundary"],
+      "preconditions": ["actor_role=viewer", "target_role=member"],
+      "source_ref": {"type": "spec", "refs": ["SPEC-ADMIN-ROLE-01", "AC-3"]},
+      "steps": [
+        "ワークスペース管理画面を開く"
+      ],
+      "expected_results": [
+        "ロール変更UIが非表示またはdisabled"
+      ],
+      "oracle": {"type": "specified", "refs": ["AC-3"]},
+      "estimate_minutes": 5,
+      "trace_to": ["OBS-ROLE-03"]
+    },
+    {
+      "tc_id": "TC-ADMIN-004",
+      "title": "最後のowner降格は禁止",
+      "priority": "P0",
+      "primary_view": "black",
+      "techniques": ["boundary_value"],
+      "preconditions": ["actor_role=owner", "owner_count=1"],
+      "source_ref": {"type": "spec", "refs": ["SPEC-ADMIN-ROLE-01", "AC-4"]},
+      "steps": [
+        "自分自身のロールをmemberに変更"
+      ],
+      "expected_results": [
+        "降格不可メッセージ表示",
+        "owner roleが維持"
+      ],
+      "oracle": {"type": "specified", "refs": ["AC-4"]},
+      "estimate_minutes": 8,
+      "trace_to": ["OBS-ROLE-04", "RISK-ADMIN-03"]
+    },
+    {
+      "tc_id": "TC-ADMIN-005",
+      "title": "invited userは招待更新へ誘導",
+      "priority": "P2",
+      "primary_view": "black",
+      "techniques": ["state_boundary"],
+      "preconditions": ["target_state=invited"],
+      "source_ref": {"type": "spec", "refs": ["SPEC-ADMIN-ROLE-01", "AC-5"]},
+      "steps": [
+        "invitedユーザーのロール変更操作"
+      ],
+      "expected_results": [
+        "招待更新誘導メッセージ表示"
+      ],
+      "oracle": {"type": "specified", "refs": ["AC-5"]},
+      "estimate_minutes": 5,
+      "trace_to": ["OBS-INVITE-01"]
+    },
+    {
+      "tc_id": "TC-ADMIN-006",
+      "title": "監査ログにbefore/afterが残る",
+      "priority": "P1",
+      "primary_view": "gray",
+      "techniques": ["audit_trail"],
+      "preconditions": ["ロール変更実行済み"],
+      "source_ref": {"type": "spec", "refs": ["SPEC-ADMIN-ROLE-01", "AC-6"]},
+      "steps": [
+        "監査ログ画面を開く",
+        "該当イベントを確認"
+      ],
+      "expected_results": [
+        "before_roleとafter_roleが記録",
+        "actor、timestamp、target_userが記録"
+      ],
+      "oracle": {"type": "specified", "refs": ["AC-6"]},
+      "estimate_minutes": 10,
+      "trace_to": ["OBS-AUDIT-01", "RISK-ADMIN-04"]
+    }
+  ],
+  "exploratory_charters": [
+    {
+      "id": "CHARTER-ADMIN-001",
+      "title": "複数owner同時変更の整合性を探索",
+      "scope": "concurrent role changes",
+      "questions": [
+        "複数ownerが同時に1人を降格した場合の挙動",
+        "降格直後の権限反映タイミング"
+      ],
+      "estimate_minutes": 30,
+      "trace_to": ["OBS-CONCURRENT-01"]
+    }
+  ],
+  "role_matrix": [
+    {"actor_role": "owner", "target_role": "owner", "action": "cannot_change_last"},
+    {"actor_role": "owner", "target_role": "member", "action": "can_change"},
+    {"actor_role": "admin", "target_role": "owner", "action": "cannot_change"},
+    {"actor_role": "admin", "target_role": "member", "action": "can_change"},
+    {"actor_role": "editor", "target_role": "member", "action": "cannot_change"},
+    {"actor_role": "viewer", "target_role": "member", "action": "cannot_change"}
+  ]
+}

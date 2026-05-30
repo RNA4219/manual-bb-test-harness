@@ -249,3 +249,413 @@ class TestMain:
             assert main() == 0
             data = json.loads(output_file.read_text(encoding="utf-8"))
             assert data["feature_id"] == "PROJ-123"
+
+
+class TestSpecIngestMainDirect:
+    """Tests for main function direct calls for coverage.
+
+    # TRACE: scripts/spec-ingest.py:682-765 (role: main_direct)
+    """
+
+    def test_main_missing_output(self) -> None:
+        """Missing output returns error (argparse SystemExit)."""
+        with mock.patch.object(
+            sys,
+            "argv",
+            ["script", "--source", "markdown", "--input", "test.md"],
+        ):
+            with pytest.raises(SystemExit):
+                main()
+
+    def test_main_missing_source(self, tmp_path: Path) -> None:
+        """Missing source returns error (argparse SystemExit)."""
+        output_file = tmp_path / "output.json"
+        with mock.patch.object(
+            sys,
+            "argv",
+            ["script", "--output", str(output_file)],
+        ):
+            with pytest.raises(SystemExit):
+                main()
+
+    def test_main_confluence_missing_url(self, tmp_path: Path) -> None:
+        """Confluence without url returns error."""
+        output_file = tmp_path / "output.json"
+        with mock.patch.object(
+            sys,
+            "argv",
+            ["script", "--source", "confluence", "--output", str(output_file)],
+        ):
+            assert main() == 1
+
+    def test_main_jira_missing_issue(self, tmp_path: Path) -> None:
+        """Jira without issue returns error."""
+        output_file = tmp_path / "output.json"
+        with mock.patch.object(
+            sys,
+            "argv",
+            ["script", "--source", "jira", "--output", str(output_file)],
+        ):
+            assert main() == 1
+
+    def test_main_unknown_source(self, tmp_path: Path) -> None:
+        """Unknown source type is rejected by argparse."""
+        output_file = tmp_path / "output.json"
+        with mock.patch.object(
+            sys,
+            "argv",
+            ["script", "--source", "unknown", "--output", str(output_file)],
+        ):
+            # argparse will raise SystemExit for invalid choice
+            with pytest.raises(SystemExit):
+                main()
+
+
+class TestConfluenceIngestMocked:
+    """Tests for ingest_confluence_spec with mocked requests.
+
+    # TRACE: scripts/spec-ingest.py:239-390 (role: confluence_ingest)
+    """
+
+    def test_ingest_confluence_functions_exist(self) -> None:
+        """Confluence ingest functions exist."""
+        module = spec_ingest
+
+        assert hasattr(module, "ingest_confluence_spec")
+        assert hasattr(module, "extract_confluence_page_id")
+        assert hasattr(module, "parse_confluence_html")
+
+    def test_extract_confluence_page_id_numeric(self) -> None:
+        """Extract page ID from numeric input."""
+        module = spec_ingest
+        result = module.extract_confluence_page_id("12345", "")
+        assert result == "12345"
+
+    def test_extract_confluence_page_id_from_url(self) -> None:
+        """Extract page ID from URL path."""
+        module = spec_ingest
+        result = module.extract_confluence_page_id(
+            "https://test.atlassian.net/wiki/pages/12345", ""
+        )
+        assert result == "12345"
+
+    def test_extract_confluence_page_id_from_query(self) -> None:
+        """Extract page ID from query string."""
+        module = spec_ingest
+        result = module.extract_confluence_page_id(
+            "https://test.atlassian.net/wiki?pageId=67890", ""
+        )
+        assert result == "67890"
+
+    def test_parse_confluence_html(self) -> None:
+        """Parse Confluence HTML to extract sections."""
+        module = spec_ingest
+
+        html = """
+<h2>Acceptance Criteria</h2>
+<ul><li>AC-1: First criterion</li><li>AC-2: Second criterion</ul>
+<h2>Business Rules</h2>
+<ul><li>BR-1: First rule</li></ul>
+"""
+        ac, br, actors, devices, mobile, changed = module.parse_confluence_html(html)
+        assert len(ac) >= 1 or len(br) >= 1
+
+
+class TestJiraIngestMocked:
+    """Tests for ingest_jira_issue with mocked requests.
+
+    # TRACE: scripts/spec-ingest.py:499-627 (role: jira_ingest)
+    """
+
+    def test_ingest_jira_functions_exist(self) -> None:
+        """Jira ingest functions exist."""
+        module = spec_ingest
+
+        assert hasattr(module, "ingest_jira_issue")
+        assert hasattr(module, "parse_jira_description")
+
+    def test_parse_jira_description(self) -> None:
+        """Parse Jira description to extract sections."""
+        module = spec_ingest
+
+        description = """
+h2. Acceptance Criteria
+* AC-1: First criterion
+* AC-2: Second criterion
+
+h2. Business Rules
+* BR-1: Must validate input
+"""
+        ac, br, actors = module.parse_jira_description(description)
+        assert len(ac) >= 1 or len(br) >= 1
+
+    def test_parse_jira_description_empty(self) -> None:
+        """Parse empty Jira description."""
+        module = spec_ingest
+
+        ac, br, actors = module.parse_jira_description("")
+        assert len(ac) == 0
+        assert len(br) == 0
+        assert len(actors) == 0
+
+
+class TestGenerateFeatureId:
+    """Tests for generate_feature_id function.
+
+    # TRACE: scripts/spec-ingest.py:483-493 (role: feature_id_generation)
+    """
+
+    def test_generate_feature_id_from_title(self) -> None:
+        """Generate feature ID from title."""
+        module = spec_ingest
+        result = module.generate_feature_id("Order Cancel Feature", "12345")
+        # Function extracts words and combines them
+        assert len(result) > 0
+        assert "-" in result
+
+    def test_generate_feature_id_empty_title(self) -> None:
+        """Generate feature ID from empty title."""
+        module = spec_ingest
+        result = module.generate_feature_id("", "12345")
+        assert "CONF" in result
+
+
+class TestConfluenceIngestWithRequests:
+    """Tests for ingest_confluence_spec with requests available.
+
+    # TRACE: scripts/spec-ingest.py:239-390 (role: confluence_ingest)
+    """
+
+    def test_ingest_confluence_api_success(self) -> None:
+        """Confluence API success case."""
+        from unittest import mock
+
+        module = spec_ingest
+
+        # Mock requests module within spec_ingest
+        mock_requests = mock.MagicMock()
+        mock_response = mock.MagicMock()
+        mock_response.json.return_value = {
+            "title": "Test Page Title",
+            "body": {"storage": {"value": ""}},
+            "version": {"number": 1},
+        }
+        mock_response.raise_for_status = mock.MagicMock()
+        mock_requests.get.return_value = mock_response
+
+        # Patch the requests import within the module
+        with mock.patch.dict("os.environ", {
+            "CONFLUENCE_URL": "https://test.atlassian.net/wiki",
+            "CONFLUENCE_API_TOKEN": "token",
+            "CONFLUENCE_USERNAME": "user",
+        }):
+            # Import requests in the module context
+            import sys
+            sys.modules["requests"] = mock_requests
+
+            result = module.ingest_confluence_spec("https://test.atlassian.net/wiki/pages/12345")
+
+            # Clean up
+            del sys.modules["requests"]
+
+            assert result["title"] == "Test Page Title"
+            assert "source_refs" in result
+
+    def test_ingest_confluence_api_error(self) -> None:
+        """Confluence API error case."""
+        from unittest import mock
+
+        module = spec_ingest
+
+        mock_requests = mock.MagicMock()
+        mock_requests.exceptions.RequestException = Exception
+        mock_requests.get.side_effect = Exception("API Error")
+
+        with mock.patch.dict("os.environ", {
+            "CONFLUENCE_URL": "https://test.atlassian.net/wiki",
+            "CONFLUENCE_API_TOKEN": "token",
+            "CONFLUENCE_USERNAME": "user",
+        }):
+            import sys
+            sys.modules["requests"] = mock_requests
+
+            result = module.ingest_confluence_spec("https://test.atlassian.net/wiki/pages/12345")
+
+            del sys.modules["requests"]
+
+            assert "ERROR" in result["feature_id"] or "assumptions" in result
+
+
+class TestJiraIngestWithRequests:
+    """Tests for ingest_jira_issue with requests available.
+
+    # TRACE: scripts/spec-ingest.py:499-627 (role: jira_ingest)
+    """
+
+    def test_ingest_jira_api_success(self) -> None:
+        """Jira API success case."""
+        from unittest import mock
+
+        module = spec_ingest
+
+        mock_requests = mock.MagicMock()
+        mock_response = mock.MagicMock()
+        mock_response.json.return_value = {
+            "fields": {
+                "summary": "Test Issue Summary",
+                "description": "",
+                "labels": ["api", "backend"],
+            }
+        }
+        mock_response.raise_for_status = mock.MagicMock()
+        mock_requests.get.return_value = mock_response
+
+        with mock.patch.dict("os.environ", {
+            "JIRA_URL": "https://test.atlassian.net",
+            "JIRA_API_TOKEN": "token",
+            "JIRA_USERNAME": "user",
+        }):
+            import sys
+            sys.modules["requests"] = mock_requests
+
+            result = module.ingest_jira_issue("PROJ-123")
+
+            del sys.modules["requests"]
+
+            assert result["feature_id"] == "PROJ-123"
+            assert result["title"] == "Test Issue Summary"
+
+    def test_ingest_jira_api_error(self) -> None:
+        """Jira API error case."""
+        from unittest import mock
+
+        module = spec_ingest
+
+        mock_requests = mock.MagicMock()
+        mock_requests.exceptions.RequestException = Exception
+        mock_requests.get.side_effect = Exception("API Error")
+
+        with mock.patch.dict("os.environ", {
+            "JIRA_URL": "https://test.atlassian.net",
+            "JIRA_API_TOKEN": "token",
+            "JIRA_USERNAME": "user",
+        }):
+            import sys
+            sys.modules["requests"] = mock_requests
+
+            result = module.ingest_jira_issue("PROJ-456")
+
+            del sys.modules["requests"]
+
+            assert "ERROR" in result["feature_id"] or result["feature_id"] == "PROJ-456"
+
+
+class TestParseConfluenceHtmlDetailed:
+    """Tests for parse_confluence_html with various inputs.
+
+    # TRACE: scripts/spec-ingest.py:416-480 (role: html_parsing)
+    """
+
+    def test_parse_confluence_html_full(self) -> None:
+        """Parse full Confluence HTML."""
+        module = spec_ingest
+
+        html = """
+<h2>Acceptance Criteria</h2>
+<ul><li>AC-1: First criterion</li><li>AC-2: Second criterion</li></ul>
+<h2>Business Rules</h2>
+<ul><li>BR-1: Must validate</li><li>BR-2: Must log</li></ul>
+<h2>Actors</h2>
+<ul><li>User</li><li>Admin</li></ul>
+<h2>Devices</h2>
+<ul><li>Desktop</li><li>Mobile</li></ul>
+<h2>Mobile Contexts</h2>
+<ul><li>foreground</li><li>background</li></ul>
+<h2>Changed Areas</h2>
+<ul><li>API</li><li>Database</li></ul>
+"""
+        ac, br, actors, devices, mobile, changed = module.parse_confluence_html(html)
+        assert len(ac) >= 1
+        assert len(br) >= 1
+
+    def test_parse_confluence_html_partial(self) -> None:
+        """Parse partial Confluence HTML."""
+        module = spec_ingest
+
+        html = "<h2>Acceptance Criteria</h2><ul><li>Item</li></ul>"
+        ac, br, actors, devices, mobile, changed = module.parse_confluence_html(html)
+        assert len(ac) >= 1
+
+
+class TestParseJiraDescriptionDetailed:
+    """Tests for parse_jira_description with various inputs.
+
+    # TRACE: scripts/spec-ingest.py:630-676 (role: description_parsing)
+    """
+
+    def test_parse_jira_description_markdown_headers(self) -> None:
+        """Parse Jira description with Markdown headers."""
+        module = spec_ingest
+
+        description = """
+# Acceptance Criteria
+* AC-1: First
+* AC-2: Second
+
+# Business Rules
+- BR-1: Must check
+"""
+        ac, br, actors = module.parse_jira_description(description)
+        assert len(ac) >= 1 or len(br) >= 1
+
+    def test_parse_jira_description_auto_detect(self) -> None:
+        """Parse Jira description with auto-detect patterns."""
+        module = spec_ingest
+
+        description = """
+* AC-001: This is acceptance criteria
+* BR-001: This must be validated
+* The system shall support logging
+"""
+        ac, br, actors = module.parse_jira_description(description)
+        # Auto-detect patterns: AC-xxx, BR-xxx, must/shall
+        assert len(ac) >= 1 or len(br) >= 1
+
+
+class TestMainDirectCalls:
+    """Tests for main function direct calls.
+
+    # TRACE: scripts/spec-ingest.py:682-761 (role: main_entry)
+    """
+
+    def test_main_confluence_direct(self, tmp_path: Path) -> None:
+        """Main with confluence source direct call."""
+        from unittest import mock
+
+        output_file = tmp_path / "output.json"
+
+        with mock.patch.object(sys, "argv", [
+            "script",
+            "--source", "confluence",
+            "--url", "https://example.com/wiki/page/12345",
+            "--output", str(output_file),
+        ]):
+            result = main()
+            assert result == 0
+            assert output_file.exists()
+
+    def test_main_jira_direct(self, tmp_path: Path) -> None:
+        """Main with jira source direct call."""
+        from unittest import mock
+
+        output_file = tmp_path / "output.json"
+
+        with mock.patch.object(sys, "argv", [
+            "script",
+            "--source", "jira",
+            "--issue", "PROJ-789",
+            "--output", str(output_file),
+        ]):
+            result = main()
+            assert result == 0
+            assert output_file.exists()

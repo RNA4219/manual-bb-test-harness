@@ -74,3 +74,51 @@ Evaluate these six conditions in parallel:
 6. residual risk sign-off
 
 Coverage alone never decides release readiness.
+
+## Stakeholder Alignment
+
+Before using gate profiles, confirm alignment with stakeholders:
+
+### Alignment Checklist
+
+| Item | Question | Stakeholder |
+|---|---|---|
+| Profile selection | Which profile (strict/standard/lean) applies to this release? | Tech Lead |
+| Coverage threshold | Is the coverage threshold acceptable? | Dev Team |
+| Manual evidence | Are P0/P1 pass rate thresholds achievable? | QA Lead |
+| Residual risk | What is the acceptable residual risk level? | PM |
+| Waiver process | Who approves waivers and what is the approval flow? | PM + Tech Lead |
+| Rollback plan | Is there a rollback or containment plan for Conditional Go? | Tech Lead |
+
+### Profile Decision Matrix
+
+| Release Type | Recommended Profile | Rationale |
+|---|---|---|
+| Payment/Auth/Personal Data | `strict` | Regulatory compliance, irreversible operations |
+| New Feature Launch | `standard` | Default for most releases |
+| Hotfix/Narrow Scope | `lean` | Limited blast radius, fast turnaround |
+| Shared Library Change | `strict` | Broad impact across dependent services |
+| Mobile App Release | `standard` + platform_matrix | Device/network variation coverage |
+
+### Waiver Template
+
+When granting a waiver, document:
+
+```markdown
+- Risk ID: [RISK-XXX]
+- Content: [Brief description]
+- Owner: [Name/Role]
+- Due Date: [YYYY-MM-DD]
+- Containment: [Rollback plan or monitoring]
+- Approval: [Name/Role] approved on [YYYY-MM-DD]
+```
+
+### Stakeholder Communication
+
+For Go/No-Go brief:
+
+1. Summarize in 1 page
+2. Highlight blockers and waivers
+3. State residual risks with owners
+4. Provide rollback/containment summary
+5. Request explicit sign-off

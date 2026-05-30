@@ -10,6 +10,7 @@ import importlib.util
 import json
 import sys
 from pathlib import Path
+from unittest import mock
 
 import pytest
 
@@ -372,3 +373,144 @@ class TestXrayEvidenceSchema:
         for evidence in results:
             errors = _validate_schema(evidence, schema)
             assert errors == []
+
+
+class TestTestRailMainDirect:
+    """Tests for main function direct calls for coverage.
+
+    # TRACE: scripts/import-testrail.py:263-322 (role: main_direct)
+    """
+
+    def test_main_dry_run(self, tmp_path: Path) -> None:
+        """Direct main call with dry-run."""
+        output_dir = tmp_path / "output"
+
+        with mock.patch.object(
+            sys,
+            "argv",
+            [
+                "import-testrail",
+                "--project",
+                "12",
+                "--run",
+                "1234",
+                "--output",
+                str(output_dir),
+                "--dry-run",
+            ],
+        ):
+            result = import_testrail.main()
+            assert result == 0
+
+    def test_main_version(self) -> None:
+        """Version flag works."""
+        with mock.patch.object(sys, "argv", ["import-testrail", "--version"]):
+            with pytest.raises(SystemExit) as exc_info:
+                import_testrail.main()
+            assert exc_info.value.code == 0
+
+    def test_main_missing_project(self) -> None:
+        """Missing project returns error (argparse SystemExit)."""
+        with mock.patch.object(
+            sys,
+            "argv",
+            ["import-testrail", "--run", "1234", "--output", "out"],
+        ):
+            with pytest.raises(SystemExit):
+                import_testrail.main()
+
+    def test_main_missing_run(self) -> None:
+        """Missing run returns error (argparse SystemExit)."""
+        with mock.patch.object(
+            sys,
+            "argv",
+            ["import-testrail", "--project", "12", "--output", "out"],
+        ):
+            with pytest.raises(SystemExit):
+                import_testrail.main()
+
+    def test_main_missing_output(self) -> None:
+        """Missing output returns error (argparse SystemExit)."""
+        with mock.patch.object(
+            sys,
+            "argv",
+            ["import-testrail", "--project", "12", "--run", "1234"],
+        ):
+            with pytest.raises(SystemExit):
+                import_testrail.main()
+
+    def test_main_with_tc_prefix(self, tmp_path: Path) -> None:
+        """Main with custom tc_prefix."""
+        output_dir = tmp_path / "output"
+
+        with mock.patch.object(
+            sys,
+            "argv",
+            [
+                "import-testrail",
+                "--project",
+                "12",
+                "--run",
+                "1234",
+                "--output",
+                str(output_dir),
+                "--tc-prefix",
+                "CUSTOM",
+                "--dry-run",
+            ],
+        ):
+            result = import_testrail.main()
+            assert result == 0
+
+
+class TestXrayMainDirect:
+    """Tests for main function direct calls for coverage.
+
+    # TRACE: scripts/import-xray.py:221-266 (role: main_direct)
+    """
+
+    def test_main_dry_run(self, tmp_path: Path) -> None:
+        """Direct main call with dry-run."""
+        output_dir = tmp_path / "output"
+
+        with mock.patch.object(
+            sys,
+            "argv",
+            [
+                "import-xray",
+                "--exec",
+                "PROJ-TE-123",
+                "--output",
+                str(output_dir),
+                "--dry-run",
+            ],
+        ):
+            result = import_xray.main()
+            assert result == 0
+
+    def test_main_version(self) -> None:
+        """Version flag works."""
+        with mock.patch.object(sys, "argv", ["import-xray", "--version"]):
+            with pytest.raises(SystemExit) as exc_info:
+                import_xray.main()
+            assert exc_info.value.code == 0
+
+    def test_main_missing_exec(self) -> None:
+        """Missing exec returns error (argparse SystemExit)."""
+        with mock.patch.object(
+            sys,
+            "argv",
+            ["import-xray", "--output", "out"],
+        ):
+            with pytest.raises(SystemExit):
+                import_xray.main()
+
+    def test_main_missing_output(self) -> None:
+        """Missing output returns error (argparse SystemExit)."""
+        with mock.patch.object(
+            sys,
+            "argv",
+            ["import-xray", "--exec", "PROJ-TE-123"],
+        ):
+            with pytest.raises(SystemExit):
+                import_xray.main()

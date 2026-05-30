@@ -8,6 +8,7 @@
       "primary_view": "black",
       "techniques": ["state_transition"],
       "preconditions": ["注文状態=shipped"],
+      "source_ref": {"type": "spec", "refs": ["SPEC-ORD-CANCEL-01", "AC-2"]},
       "steps": [
         "注文詳細画面を開く",
         "キャンセル操作を行う"
@@ -27,6 +28,7 @@
       "primary_view": "black",
       "techniques": ["state_transition"],
       "preconditions": ["注文状態=pending"],
+      "source_ref": {"type": "spec", "refs": ["SPEC-ORD-CANCEL-01", "AC-1"]},
       "steps": [
         "注文詳細画面を開く",
         "キャンセル操作を行う",
@@ -47,6 +49,7 @@
       "primary_view": "gray",
       "techniques": ["data_partition"],
       "preconditions": ["注文状態=pending", "クーポン使用済み"],
+      "source_ref": {"type": "spec", "refs": ["SPEC-ORD-CANCEL-01", "AC-4"]},
       "steps": [
         "クーポン残数を確認",
         "注文をキャンセル",

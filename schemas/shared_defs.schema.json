@@ -96,7 +96,7 @@
     "TestView": {
       "type": "string",
       "enum": ["black", "gray", "white"],
-      "description": "Testing view: black (external UI), gray (limited internal), white (full internal)."
+      "description": "Testing view: black (external UI), gray (limited diagnostic signals), white (implementation-level)."
     },
     "GateStatus": {
       "type": "string",

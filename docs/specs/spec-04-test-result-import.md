@@ -105,7 +105,7 @@ Usage:
     python scripts/import-testrail.py --project <id> --date-range <start> <end> --output <dir>
 
 Environment:
-    TESTRAIL_URL: https://company.testrail.io
+    TESTRAIL_URL: https://example.testrail.io
     TESTRAIL_USER: username
     TESTRAIL_API_KEY: API token
 
@@ -157,7 +157,7 @@ Usage:
     python scripts/import-xray.py --project <key> --date-range <start> <end> --output <dir>
 
 Environment:
-    JIRA_URL: https://company.atlassian.net
+    JIRA_URL: https://example.atlassian.net
     JIRA_USER: username
     JIRA_API_KEY: API token
 
@@ -202,7 +202,7 @@ def import_xray_results(exec_key: str) -> list[dict]:
 
 ```bash
 # TestRail
-export TESTRAIL_URL="https://company.testrail.io"
+export TESTRAIL_URL="https://example.testrail.io"
 export TESTRAIL_USER="qa_lead"
 export TESTRAIL_API_KEY="xxx"
 
@@ -212,7 +212,7 @@ python scripts/import-testrail.py \
     --output examples/artifacts/execution_evidence/
 
 # Xray
-export JIRA_URL="https://company.atlassian.net"
+export JIRA_URL="https://example.atlassian.net"
 export JIRA_USER="qa_lead"  
 export JIRA_API_KEY="xxx"
 

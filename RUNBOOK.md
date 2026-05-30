@@ -100,3 +100,219 @@ uv run bb-harness --verbose gate --input artifacts --output gate.json
 - schema 変更で既存 example が通らない場合は、先に契約差分と example の期待値を見直す。
 - golden 更新が必要な場合は、期待 anchor の意味を維持したまま更新する。
 - validation が環境依存で失敗した場合は、Windows では `python` より `uv run python` を優先する。
+
+## Failure Triage
+
+失敗時は、先に「どの層で失敗しているか」を切り分ける。最初から全ログを追わず、下の順で最小再現コマンドを実行する。
+
+### 1. 環境・依存関係
+
+症状:
+
+- `uv` が見つからない。
+- import error が出る。
+- `bb-harness` コマンドが見つからない。
+
+確認:
+
+```powershell
+uv --version
+uv sync
+uv run python --version
+uv run bb-harness --help
+```
+
+見方:
+
+- `uv --version` が失敗する場合は、まず uv の導入問題。
+- `uv sync` が失敗する場合は、`pyproject.toml` / `uv.lock` / ネットワークを確認する。
+- `uv run bb-harness --help` が失敗する場合は、package entry point または editable install 周辺を見る。
+
+### 2. CLI 引数・入力ファイル
+
+症状:
+
+- `Error: --input required` などの引数エラー。
+- `Cannot read ...` が出る。
+- 生成ファイルが見つからない。
+
+確認:
+
+```powershell
+uv run bb-harness ingest --source markdown --input .\goldens\order-cancel.input.md --output .\tmp-triage.feature_spec.json
+uv run python .\scripts\validate-artifact.py --artifact .\tmp-triage.feature_spec.json --type feature_spec --strict
+```
+
+見方:
+
+- `--input` は既存ファイルを指定する。
+- `--output` の親ディレクトリがない場合、CLI が作成できるかを確認する。
+- 生成 JSON が invalid の場合は、schema と生成処理の契約差分を見る。
+
+### 3. Schema / Artifact 契約
+
+症状:
+
+- `Additional properties are not allowed`。
+- `required property ... missing`。
+- `validate-artifact --all --strict` が失敗する。
+
+確認:
+
+```powershell
+uv run python .\scripts\validate-artifact.py --all examples\artifacts --strict
+```
+
+見方:
+
+- `Additional properties` は artifact に新しい field を足したが schema が追随していない可能性が高い。
+- `required ... missing` は schema が期待する必須 field を example / generator が出していない。
+- 契約変更時は `schemas/`、`examples/artifacts/`、`skills/manual-bb-test-harness/references/artifact-contract.md` を同時に見る。
+
+### 4. Spec 品質
+
+症状:
+
+- `validate-spec --all` が FAIL。
+- requirement / acceptance criteria が検出されない。
+
+確認:
+
+```powershell
+uv run python .\scripts\validate-spec.py --all
+uv run python .\scripts\validate-spec.py --input .\docs\specs\spec-02-cli-integration.md
+```
+
+見方:
+
+- 見出し、requirements table、acceptance checklist の形式が validator の期待とずれていないかを見る。
+- 仕様ファイルを変えた場合は、品質スコアだけでなく FAIL 理由を acceptance record に残す。
+
+### 5. Skill 構造
+
+症状:
+
+- Skill validator が失敗する。
+- frontmatter / required reference / JSON syntax のエラーが出る。
+
+確認:
+
+```powershell
+uv run python .\scripts\quick-validate-skill.py .\skills\manual-bb-test-harness --debug
+.\scripts\validate-skill.ps1 -Debug
+```
+
+見方:
+
+- frontmatter エラーは `skills/manual-bb-test-harness/SKILL.md` の先頭 YAML を見る。
+- required reference エラーは `skills/manual-bb-test-harness/references/` の欠落を確認する。
+- placeholder / mojibake エラーは release 前に必ず解消する。
+
+### 6. 外部サービス連携
+
+症状:
+
+- TestRail / Xray / Notion / Jira / Confluence の本実行だけ失敗する。
+- dry-run は通るが API 実行が失敗する。
+
+確認:
+
+```powershell
+uv run bb-harness import testrail --project 12 --run 1234 --output tmp-import --dry-run
+uv run bb-harness import xray --exec TEST-1 --output tmp-import --dry-run
+uv run bb-harness --dry-run export notion --score 90 --status pass --db dummy_db
+```
+
+見方:
+
+- dry-run が通るなら CLI と artifact 生成は概ね正常。本実行の secret / URL / 権限を疑う。
+- Secret 名はこの Runbook の「Secret 境界」を見る。
+- Secret はログ、artifact、git diff に残さない。
+
+### 7. Release / 検収
+
+症状:
+
+- 個別テストは通るが、release bundle dry-run が失敗する。
+- README 参照、schema、golden、UTF-8 のいずれかで落ちる。
+
+確認:
+
+```powershell
+uv run python .\scripts\validate-release-bundle.py --dry-run
+uv run pytest
+uv run ruff check .
+```
+
+見方:
+
+- bundle エラーは配布物に含めるべきファイルの欠落として扱う。
+- pytest / ruff が同時に落ちる場合は、release bundle より先にコード品質を戻す。
+- 検収時は `docs/acceptance/` と `docs/release-review-YYYYMMDD.md` に実行コマンドと結果を残す。
+
+## Security / Dependency
+
+### uv.lock 再現性確認
+
+```powershell
+uv lock --check
+```
+
+結果: **Resolved 30 packages** (再現性確認 OK)
+
+### 依存関係 Audit
+
+現在の依存関係一覧:
+
+| Package | Version | 用途 |
+|---|---|---|
+| pytest | 9.0.3 | テスト実行 |
+| pytest-cov | 7.1.0 | Coverage測定 |
+| ruff | 0.15.13 | Lint |
+| jsonschema | 4.26.0 | Schema検証 |
+| pyyaml | 6.0.3 | YAML解析 |
+
+Audit 方法:
+```powershell
+# pip-audit が利用可能な場合
+pip-audit
+
+# または pyproject.toml 依存関係の確認
+uv pip list
+```
+
+### GitHub Actions Action Version 方針
+
+`.github/workflows/validate.yml` で pinned version を使用:
+- `actions/checkout@v5`
+- `actions/setup-python@v6`
+- `codecov/codecov-action@v5`
+
+方針: major version pinning を採用。月次で version 更新を確認。
+
+### Secret 境界
+
+| 命令 | Dry-run | 本実行 (Secret必須) |
+|---|---|---|
+| `validate` | 不要 | 不要 |
+| `ingest` (markdown) | 不要 | 不要 |
+| `ingest` (confluence/jira) | `--url`/--issue`のみ | `CONFLUENCE_API_KEY` / `JIRA_API_KEY` |
+| `import testrail` | `--dry-run` | `TESTRAIL_URL/USER/API_KEY` |
+| `import xray` | `--dry-run` | `JIRA_URL/USER/API_KEY` |
+| `export notion` | `--dry-run` | `NOTION_API_KEY` |
+| `gate` | 不要 | 不要 |
+| `heatmap` | 不要 | 不要 |
+
+### 本実行の手順
+
+```powershell
+# 1. 環境変数設定 (PowerShell)
+$env:TESTRAIL_URL = "https://example.testrail.io"
+$env:TESTRAIL_USER = "user@example.com"
+$env:TESTRAIL_API_KEY = "api_key_here"
+
+# 2. 本実行
+uv run bb-harness import testrail --project 12 --run 1234 --output execution_evidence/
+```
+
+**重要**: Secret は `.env` ファイルや CI secrets に保存し、repo に commit しない。

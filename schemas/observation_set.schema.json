@@ -37,7 +37,7 @@
         },
         "view": {
           "enum": ["black", "gray", "white"],
-          "description": "Testing view: black (external), gray (limited internal), white (full internal)."
+          "description": "Testing view: black (external), gray (limited diagnostic signals), white (implementation-level)."
         },
         "coverage_item_id": {
           "type": "string",

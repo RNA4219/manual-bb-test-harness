@@ -606,20 +606,20 @@ AI ばらつき対策として、`derive_observations` と `synthesize_manual_ca
 
 3. **entity["organization","NIST","us standards institute"] の gray-box 定義** — black/gray/white tag を曖昧語で終わらせず、「限定的な内部知識を使う補助視点」として運用するための基準です。 citeturn30search1
 
-4. **entity["company","OpenAI","ai research company"] の harness engineering 記事** — source-of-truth を repo/docs に分け、短い AGENTS.md を map にする設計、observability を feedback loop に入れる設計が、この suite の orchestrator 方針に直結します。 citeturn14view4turn20view0turn20view3turn20view4
+4. **OpenAI の harness engineering 記事** — source-of-truth を repo/docs に分け、短い AGENTS.md を map にする設計、observability を feedback loop に入れる設計が、この suite の orchestrator 方針に直結します。 citeturn14view4turn20view0turn20view3turn20view4
 
-5. **entity["company","Anthropic","ai company"] の context / harness / tools 記事群** — context は有限資源であり、long-running task では structured handoff、tool namespacing、high-signal response、evaluation-driven 改善が重要だと示しています。skill suite を小さく分ける根拠として有用です。 citeturn14view9turn16view8turn29view0turn15view7
+5. **Anthropic の context / harness / tools 記事群** — context は有限資源であり、long-running task では structured handoff、tool namespacing、high-signal response、evaluation-driven 改善が重要だと示しています。skill suite を小さく分ける根拠として有用です。 citeturn14view9turn16view8turn29view0turn15view7
 
-6. **entity["company","Thoughtworks","technology consultancy"] の AI-assisted test case 実験** — AI 生成ケースは one-shot ではなく、初回生成 → 評価 → prompt/refinement のループが必要で、境界や例外、再現性・保守性まで見ないといけないことを示しています。 citeturn14view2turn16view6turn16view7
+6. **Thoughtworks の AI-assisted test case 実験** — AI 生成ケースは one-shot ではなく、初回生成 → 評価 → prompt/refinement のループが必要で、境界や例外、再現性・保守性まで見ないといけないことを示しています。 citeturn14view2turn16view6turn16view7
 
-7. **entity["company","Sansan","japan software company"] の日本語実装知見** — 根拠明示、`[要確認]`、影響度×発生確率、出力制御という guardrail 設計が、今回の根拠付き観点・不足情報 handling にかなり近いです。 citeturn15view12
+7. **Sansan の日本語実装知見** — 根拠明示、`[要確認]`、影響度×発生確率、出力制御という guardrail 設計が、今回の根拠付き観点・不足情報 handling にかなり近いです。 citeturn15view12
 
-8. **entity["company","エムスリー","japan healthcare company"] の最新実験** — 同じ入力でも run ごとのぶれが大きく、重要仕様は 3〜5 回実行比較した方がよいという実務示唆が得られます。multi-run を P0/P1 だけに限定する設計の根拠として有用です。 citeturn27view1turn27view2
+8. **エムスリー の最新実験** — 同じ入力でも run ごとのぶれが大きく、重要仕様は 3〜5 回実行比較した方がよいという実務示唆が得られます。multi-run を P0/P1 だけに限定する設計の根拠として有用です。 citeturn27view1turn27view2
 
-9. **entity["company","ユニファ","japan childcare tech"] の具体→抽象→具体アプローチ** — 人が持つ具体観点をいったん抽象モデルへ上げ、そこから再具体化してテスト設計へ戻す流れが、`feature_spec -> test_model -> manual_case_set` の発想とよく噛み合います。 citeturn15view13
+9. **ユニファ の具体→抽象→具体アプローチ** — 人が持つ具体観点をいったん抽象モデルへ上げ、そこから再具体化してテスト設計へ戻す流れが、`feature_spec -> test_model -> manual_case_set` の発想とよく噛み合います。 citeturn15view13
 
 10. **TMAP の Test Strategy と DCoT** — product risk analysis を起点に test depth と residual risk を決める考え方、data combination/pairwise/classification tree による test data 戦略が、手動ケース圧縮に実用的です。 citeturn31view1turn31view0
 
-11. **entity["company","Google","technology company"] の coverage guidance と entity["company","SonarSource","code quality company"] の quality gate** — coverage は readiness の一部であり、new code 중심で no-new-issues と組み合わせるべきこと、しかし理想の数値は固定ではなく gap analysis が重要であることを補完的に示します。 citeturn16view1turn16view2turn16view3turn16view5
+11. **Google の coverage guidance と SonarSource の quality gate** — coverage は readiness の一部であり、new code 중심で no-new-issues と組み合わせるべきこと、しかし理想の数値は固定ではなく gap analysis が重要であることを補完的に示します。 citeturn16view1turn16view2turn16view3turn16view5
 
 12. **FMEA と change impact の補助資料** — RPN は補助的に使うのは有効ですが、主ランキングには向かないこと、回帰範囲は直接影響だけでなく間接影響まで見るべきことを補強します。 citeturn34view1turn35view0turn33search1

@@ -6,13 +6,13 @@ Usage:
     python scripts/import-xray.py --version
 
 Environment:
-    JIRA_URL: Base URL (e.g., https://company.atlassian.net)
+    JIRA_URL: Base URL (e.g., https://example.atlassian.net)
     JIRA_USER: Username or email
     JIRA_API_KEY: API token
 
 Example:
-    export JIRA_URL="https://company.atlassian.net"
-    export JIRA_USER="qa_lead@company.com"
+    export JIRA_URL="https://example.atlassian.net"
+    export JIRA_USER="qa_lead@example.com"
     export JIRA_API_KEY="xxx"
 
     python scripts/import-xray.py --execution-key PROJ-TE-123 --output execution_evidence/

@@ -101,8 +101,12 @@ def check_quality_criteria(content: str) -> list[dict[str, Any]]:
 
 def check_requirements_table(content: str) -> dict[str, Any]:
     """Extract and validate requirements table."""
-    # Find requirements section
-    req_match = re.search(r"^##+ .*要件.*\n(.*?)(?=^##+ |\Z)", content, re.DOTALL | re.MULTILINE)
+    # Find requirements section (Japanese or English)
+    req_match = re.search(
+        r"^##+ .*(要件|Requirements).*\n+(.*?)(?=^##+ |\Z)",
+        content,
+        re.DOTALL | re.MULTILINE,
+    )
 
     if not req_match:
         return {"status": "missing", "requirements": []}
@@ -138,15 +142,17 @@ def check_requirements_table(content: str) -> dict[str, Any]:
 
 def check_acceptance_criteria(content: str) -> dict[str, Any]:
     """Extract and validate acceptance criteria checklist."""
-    # Find acceptance section
+    # Find acceptance section (Japanese or English)
     acc_match = re.search(
-        r"^##+ .*受入基準.*\n(.*?)(?=^##+ |\Z)", content, re.DOTALL | re.MULTILINE
+        r"^##+ .*(受入基準|Acceptance).*\n+(.*?)(?=^##+ |\Z)",
+        content,
+        re.DOTALL | re.MULTILINE,
     )
 
     if not acc_match:
         return {"status": "missing", "items": []}
 
-    acc_section = acc_match.group(1)
+    acc_section = acc_match.group(2)
 
     # Extract checklist items
     items: list[dict[str, str]] = []

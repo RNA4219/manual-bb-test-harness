@@ -20,6 +20,16 @@
       "type": "array",
       "items": {"$ref": "#/$defs/ExploratoryCharter"},
       "description": "Exploratory testing charters for areas with weak oracles or high uncertainty."
+    },
+    "platform_matrix": {
+      "type": "array",
+      "items": {"$ref": "#/$defs/PlatformMatrixEntry"},
+      "description": "Platform coverage matrix for mobile testing: OS x lifecycle x network combinations."
+    },
+    "role_matrix": {
+      "type": "array",
+      "items": {"$ref": "#/$defs/RoleMatrixEntry"},
+      "description": "Role-based access matrix: actor_role x target_role x action combinations."
     }
   },
   "additionalProperties": false,
@@ -45,7 +55,7 @@
         },
         "primary_view": {
           "enum": ["black", "gray", "white"],
-          "description": "Testing view: black (external UI), gray (limited internal), white (full internal)."
+          "description": "Testing view: black (external UI), gray (limited diagnostic signals), white (implementation-level)."
         },
         "techniques": {
           "type": "array",
@@ -83,6 +93,24 @@
               "items": {"type": "string"},
               "minItems": 1,
               "description": "References to source for oracle, e.g., ['AC-1', 'BR-2']."
+            }
+          },
+          "additionalProperties": false
+        },
+        "source_ref": {
+          "type": "object",
+          "required": ["type", "refs"],
+          "description": "Source reference: where the test case requirement comes from.",
+          "properties": {
+            "type": {
+              "enum": ["spec", "requirement", "acceptance", "risk", "user_request"],
+              "description": "Source type: spec, requirement, acceptance criteria, risk, or user request."
+            },
+            "refs": {
+              "type": "array",
+              "items": {"type": "string"},
+              "minItems": 1,
+              "description": "References to source documents, e.g., ['SPEC-ORD-CANCEL-01', 'AC-1']."
             }
           },
           "additionalProperties": false
@@ -141,6 +169,62 @@
           "items": {"type": "string"},
           "minItems": 1,
           "description": "Traceability to observations, e.g., ['OBS-RECOVERY-01']."
+        }
+      },
+      "additionalProperties": false
+    },
+    "PlatformMatrixEntry": {
+      "type": "object",
+      "required": ["platform", "lifecycle", "network"],
+      "description": "Platform coverage entry for mobile testing: OS, lifecycle state, and network condition.",
+      "properties": {
+        "platform": {
+          "type": "string",
+          "enum": ["iOS", "Android"],
+          "description": "Mobile platform: iOS or Android."
+        },
+        "lifecycle": {
+          "type": "string",
+          "enum": ["foreground", "background", "background_resume", "terminated"],
+          "description": "App lifecycle state: foreground, background, background_resume, or terminated."
+        },
+        "network": {
+          "type": "string",
+          "enum": ["online", "offline", "slow"],
+          "description": "Network condition: online, offline, or slow."
+        },
+        "permission": {
+          "type": "string",
+          "enum": ["granted", "denied", "not_requested"],
+          "description": "Optional permission state for permission-related tests."
+        }
+      },
+      "additionalProperties": false
+    },
+    "RoleMatrixEntry": {
+      "type": "object",
+      "required": ["actor_role", "target_role", "action"],
+      "description": "Role-based access matrix entry: what action an actor can perform on a target.",
+      "properties": {
+        "actor_role": {
+          "type": "string",
+          "enum": ["owner", "admin", "editor", "viewer", "member", "invited"],
+          "description": "Role of the user performing the action."
+        },
+        "target_role": {
+          "type": "string",
+          "enum": ["owner", "admin", "editor", "viewer", "member", "invited"],
+          "description": "Role of the target user being acted upon."
+        },
+        "action": {
+          "type": "string",
+          "enum": ["can_change", "cannot_change", "cannot_change_last", "invite_only"],
+          "description": "Permitted action: can_change, cannot_change, cannot_change_last (boundary), or invite_only."
+        },
+        "ownership_context": {
+          "type": "string",
+          "enum": ["own_workspace", "other_workspace"],
+          "description": "Optional ownership context for multi-workspace scenarios."
         }
       },
       "additionalProperties": false

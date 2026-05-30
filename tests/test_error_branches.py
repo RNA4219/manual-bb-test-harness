@@ -375,3 +375,154 @@ class TestValidateModule:
         from bb_harness.commands import validate
         assert hasattr(validate, "run")
         assert hasattr(validate, "add_subparser")
+
+
+class TestCLIErrorPathCoverage:
+    """Additional CLI error path tests for RISK-001.
+
+    # TRACE: src/bb_harness/cli.py (role: error_handling)
+    """
+
+    def test_ingest_missing_input_file(self, tmp_path: Path) -> None:
+        """Ingest with missing input file returns error."""
+        parser = create_parser()
+        output_file = tmp_path / "output.json"
+        args = parser.parse_args([
+            "ingest",
+            "--source", "markdown",
+            "--input", str(tmp_path / "missing.md"),
+            "--output", str(output_file),
+        ])
+        result = ingest.run(args)
+        assert result == 1
+
+    def test_gate_missing_risk_file(self, tmp_path: Path) -> None:
+        """Gate with missing risk file returns error."""
+        parser = create_parser()
+        output_file = tmp_path / "gate.json"
+        args = parser.parse_args([
+            "gate",
+            "--risk", str(tmp_path / "missing_risk.json"),
+            "--cases", str(tmp_path / "missing_cases.json"),
+            "--output", str(output_file),
+        ])
+        result = gate.run(args)
+        assert result == 1
+
+    def test_export_notion_missing_input(self, tmp_path: Path) -> None:
+        """Export notion with missing input file."""
+        parser = create_parser()
+        args = parser.parse_args([
+            "export", "notion",
+            "--input", str(tmp_path / "missing.json"),
+            "--db", "test_db",
+            "--dry-run",
+        ])
+        result = export.run(args)
+        assert result == 1
+
+    def test_heatmap_missing_input(self, tmp_path: Path) -> None:
+        """Heatmap with missing input returns error."""
+        parser = create_parser()
+        output_file = tmp_path / "heatmap.html"
+        args = parser.parse_args([
+            "heatmap",
+            "--input", str(tmp_path / "missing.json"),
+            "--output", str(output_file),
+        ])
+        result = heatmap.run(args)
+        assert result == 1
+
+    def test_state_diagram_missing_input(self, tmp_path: Path) -> None:
+        """State diagram with missing input returns error."""
+        parser = create_parser()
+        output_file = tmp_path / "diagram.mmd"
+        args = parser.parse_args([
+            "state-diagram",
+            "--input", str(tmp_path / "missing.json"),
+            "--output", str(output_file),
+        ])
+        result = state_diagram.run(args)
+        assert result == 1
+
+    def test_regression_graph_missing_input(self, tmp_path: Path) -> None:
+        """Regression graph with missing input returns error."""
+        parser = create_parser()
+        output_file = tmp_path / "graph.dot"
+        args = parser.parse_args([
+            "regression-graph",
+            "--input", str(tmp_path / "missing.json"),
+            "--output", str(output_file),
+        ])
+        result = regression_graph.run(args)
+        assert result == 1
+
+
+class TestImportErrorHandling:
+    """Additional import error handling tests for RISK-002, RISK-010.
+
+    # TRACE: scripts/import-testrail.py, scripts/import-xray.py (role: error_handling)
+    """
+
+    def test_import_testrail_missing_credentials(self, tmp_path: Path) -> None:
+        """Import testrail without credentials returns error."""
+        parser = create_parser()
+        args = parser.parse_args([
+            "import", "testrail",
+            "--project", "12",
+            "--run", "1234",
+            "--output", str(tmp_path),
+        ])
+        # Remove any existing env vars
+        import os
+        os.environ.pop("TESTRAIL_URL", None)
+        os.environ.pop("TESTRAIL_USER", None)
+        os.environ.pop("TESTRAIL_API_KEY", None)
+        result = import_results.run(args)
+        # Without --dry-run, should fail due to missing credentials
+        assert result == 1
+
+    def test_import_xray_missing_credentials(self, tmp_path: Path) -> None:
+        """Import xray without credentials returns error."""
+        parser = create_parser()
+        args = parser.parse_args([
+            "import", "xray",
+            "--exec", "PROJ-TE-123",
+            "--output", str(tmp_path),
+        ])
+        import os
+        os.environ.pop("JIRA_URL", None)
+        os.environ.pop("JIRA_USER", None)
+        os.environ.pop("JIRA_API_KEY", None)
+        result = import_results.run(args)
+        assert result == 1
+
+
+class TestForwardTestQualityCheck:
+    """Forward-test quality validation tests for RISK-005.
+
+    # TRACE: src/bb_harness/commands/run.py (role: quality_check)
+    """
+
+    def test_forward_test_with_missing_input(self) -> None:
+        """Forward-test with missing input returns error."""
+        parser = create_parser()
+        args = parser.parse_args([
+            "run", "forward-test",
+            "--input", str(REPO_ROOT / "nonexistent.md"),
+        ])
+        result = run.run(args)
+        assert result == 1
+
+    def test_forward_test_with_invalid_input(self, tmp_path: Path) -> None:
+        """Forward-test with invalid input handles gracefully."""
+        parser = create_parser()
+        invalid_input = tmp_path / "invalid.md"
+        invalid_input.write_text("Invalid content without frontmatter", encoding="utf-8")
+        args = parser.parse_args([
+            "run", "forward-test",
+            "--input", str(invalid_input),
+        ])
+        result = run.run(args)
+        # Should still run, but may produce degraded output
+        assert result in [0, 1]

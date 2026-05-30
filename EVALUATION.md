@@ -51,5 +51,17 @@ next_review_due: 2026-06-16
 - [x] `HUB.codex.md` の読み順が repo 実態と一致する
 - [x] artifact contract / schema / example / golden が同期している
 - [x] mobile golden が追加観点を検知できる（`mobile-session-resume`: lifecycle/permission/network/push_entry観点あり @ 2026-05-30）
-- [x] `uv run pytest` が成功する（145 tests passed @ 2026-05-30）
+- [x] `uv run pytest` が成功する（654 tests passed @ 2026-05-30）
 - [x] validator が成功する（quick-validate-skill, validate-skill.ps1, validate-artifact --all --strict）
+- [x] coverage が 70% 以上（86% @ 2026-05-30）
+- [x] P0 対象主要分岐 coverage が 80% 以上（evaluate-gate: 94%, risk-heatmap: 84%, validate-spec: 91%, import-testrail: 88%, import-xray: 90%, spec-ingest: 85% @ 2026-05-30）
+- [x] Black-box Fidelity Gate PASS（P0/P1 scripted case 100% source_ref/oracle/trace_to、user-visible behavior で説明できない scripted case 0件 @ 2026-05-30）
+  - order-cancel: TC-001(P1), TC-002(P0), TC-003(P1) 全て source_ref/oracle/trace_to 明示済み
+  - mobile-session-resume: TC-MOBILE-001(P0), TC-MOBILE-002(P1), TC-MOBILE-004(P1) 全て source_ref/oracle/trace_to 明示済み
+  - admin-role-change: TC-ADMIN-001(P0), TC-ADMIN-002(P1), TC-ADMIN-003(P1), TC-ADMIN-004(P0), TC-ADMIN-006(P1) 全て source_ref/oracle/trace_to 明示済み
+  - gray-box cases (TC-003, TC-ADMIN-006) は補助証跡扱いとして black-box release判定から分離済み
+- [x] Release Artifact Bundle Validation PASS（dry-run bundle 生成・検証成功 @ 2026-05-30）
+- [x] Security / Dependency Scan 実行結果記録済み（uv.lock 再現性、依存関係 audit、GitHub Actions pinned version、secret 境界 @ 2026-05-30）
+- [x] release review と acceptance record が作成されている（docs/release-review-20260530.md, docs/acceptance/AC-20260530-02.md @ 2026-05-30）
+- [x] 残余リスクなし（全 P0 スクリプト coverage 80%以上達成 @ 2026-05-30）
+- [x] 最終判定 **go**（全完了条件満足 @ 2026-05-30）
