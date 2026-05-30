@@ -21,12 +21,21 @@ Example:
 from __future__ import annotations
 
 import argparse
-import json
 import os
 import sys
 from datetime import datetime
 from pathlib import Path
 from typing import Any
+
+# Add scripts/ to path for _shared imports
+sys.path.insert(0, str(Path(__file__).parent))
+from _shared.import_common import (
+    create_import_stats,
+    lazy_import_requests,
+    print_dry_run_summary,
+    print_import_summary,
+    write_evidence_files,
+)
 
 __version__ = "0.1.0"
 
@@ -71,11 +80,7 @@ def fetch_tests(
     base_url: str, headers: dict[str, str], auth: tuple[str, str], run_id: int
 ) -> list[dict[str, Any]]:
     """Fetch tests from TestRail run."""
-    try:
-        import requests
-    except ImportError:
-        raise ValueError("requests library required: pip install requests") from None
-
+    requests = lazy_import_requests()
     url = f"{base_url}/index.php?/api/v2/get_tests/{run_id}"
     response = requests.get(url, headers=headers, auth=auth, timeout=30)
     response.raise_for_status()
@@ -86,11 +91,7 @@ def fetch_test_results(
     base_url: str, headers: dict[str, str], auth: tuple[str, str], test_id: int
 ) -> dict[str, Any]:
     """Fetch results for a single test."""
-    try:
-        import requests
-    except ImportError:
-        raise ValueError("requests library required: pip install requests") from None
-
+    requests = lazy_import_requests()
     url = f"{base_url}/index.php?/api/v2/get_results/{test_id}"
     response = requests.get(url, headers=headers, auth=auth, timeout=30)
     response.raise_for_status()
@@ -102,11 +103,7 @@ def fetch_user(
     base_url: str, headers: dict[str, str], auth: tuple[str, str], user_id: int
 ) -> dict[str, Any]:
     """Fetch user info."""
-    try:
-        import requests
-    except ImportError:
-        raise ValueError("requests library required: pip install requests") from None
-
+    requests = lazy_import_requests()
     url = f"{base_url}/index.php?/api/v2/get_user/{user_id}"
     response = requests.get(url, headers=headers, auth=auth, timeout=30)
     response.raise_for_status()
@@ -195,17 +192,7 @@ def import_testrail_results(
         tc_prefix: Prefix for test case IDs
         dry_run: If True, skip API calls and return preview data
     """
-    stats = {
-        "source": "testrail",
-        "project_id": project_id,
-        "run_id": run_id,
-        "imported_count": 0,
-        "pass_count": 0,
-        "fail_count": 0,
-        "skip_count": 0,
-        "blocked_count": 0,
-        "import_timestamp": datetime.now().isoformat(),
-    }
+    stats = create_import_stats("testrail", project_id=project_id, run_id=run_id)
 
     if dry_run:
         # Return preview data without API calls
@@ -321,32 +308,12 @@ def main() -> int:
         )
 
         if args.dry_run:
-            print("=== DRY RUN ===")
-            print(f"Project: {args.project}, Run: {args.run}")
-            print(f"Stats: {json.dumps(stats, indent=2)}")
-            print(f"Results: {len(results)} tests")
-            for r in results[:5]:
-                print(f"  - {r['tc_id']}: {r['result']}")
+            print_dry_run_summary(f"Project: {args.project}, Run: {args.run}", stats, results)
             return 0
 
         # Write output
-        args.output.mkdir(parents=True, exist_ok=True)
-
-        for evidence in results:
-            filename = f"{evidence['tc_id']}.json"
-            file_path = args.output / filename
-            file_path.write_text(
-                json.dumps(evidence, indent=2, ensure_ascii=False), encoding="utf-8"
-            )
-
-        # Write summary
-        summary_path = args.output / "summary.json"
-        summary_path.write_text(json.dumps(stats, indent=2, ensure_ascii=False), encoding="utf-8")
-
-        print(f"Imported: {args.output}")
-        print(f"  Total: {stats['imported_count']} tests")
-        print(f"  Pass: {stats['pass_count']}, Fail: {stats['fail_count']}")
-        print(f"  Skip: {stats['skip_count']}, Blocked: {stats['blocked_count']}")
+        write_evidence_files(results, args.output)
+        print_import_summary(args.output, stats)
 
         return 0
 
