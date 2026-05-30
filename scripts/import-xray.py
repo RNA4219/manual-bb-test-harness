@@ -1,7 +1,7 @@
 """Import Xray (Jira) test results to execution_evidence format.
 
 Usage:
-    python scripts/import-xray.py --exec <key> --output <dir>
+    python scripts/import-xray.py --execution-key <key> --output <dir>
     python scripts/import-xray.py --project <key> --date-range <start> <end> --output <dir>
     python scripts/import-xray.py --version
 
@@ -15,7 +15,7 @@ Example:
     export JIRA_USER="qa_lead@company.com"
     export JIRA_API_KEY="xxx"
 
-    python scripts/import-xray.py --exec PROJ-TE-123 --output execution_evidence/
+    python scripts/import-xray.py --execution-key PROJ-TE-123 --output execution_evidence/
 """
 
 from __future__ import annotations
@@ -226,6 +226,7 @@ def main() -> int:
     )
     parser.add_argument(
         "--exec",
+        dest="execution_key",
         required=True,
         help="Xray test execution key, e.g., PROJ-TE-123",
     )
@@ -249,10 +250,10 @@ def main() -> int:
     args = parser.parse_args()
 
     try:
-        results, stats = import_xray_results(args.exec, dry_run=args.dry_run)
+        results, stats = import_xray_results(args.execution_key, dry_run=args.dry_run)
 
         if args.dry_run:
-            print_dry_run_summary(f"Execution: {args.exec}", stats, results)
+            print_dry_run_summary(f"Execution: {args.execution_key}", stats, results)
             return 0
 
         # Write output

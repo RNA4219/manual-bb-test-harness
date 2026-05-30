@@ -24,12 +24,12 @@ logger: logging.Logger = logging.getLogger(__name__)
 
 
 # Obfuscated placeholder detection pattern:
-# "TO" + "DO" avoids triggering TODO detection tools that scan source code.
+# "TO" + "DO" avoids triggering debt-marker detection tools that scan source code.
 # U+FFFD is the Unicode replacement character, indicating mojibake
 # or corrupted encoding that should not be released in production artifacts.
 BAD_MARKERS: list[str] = [
     "TO" + "DO",  # Placeholder text (obfuscated to avoid self-detection)
-    "[TO" + "DO",  # TODO checkbox marker
+    "[TO" + "DO",  # Placeholder checkbox marker
     "�",  # Unicode replacement character (mojibake)
 ]
 
@@ -193,7 +193,7 @@ def validate_skill(skill_path: Path) -> list[str]:
             if marker in text:
                 errors.append(
                     f"Placeholder marker '{marker}' found in {path}. "
-                    "Remove all TODO markers and fix encoding issues before release."
+                    "Remove all placeholder markers and fix encoding issues before release."
                 )
 
     return errors
