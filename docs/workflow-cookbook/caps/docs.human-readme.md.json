@@ -1,0 +1,11 @@
+{
+  "id": "docs/human-readme.md",
+  "role": "overview",
+  "title": "Human README",
+  "summary": "人間向け概要。手動ブラックボックス前提のテスト設計 Skill。仕様、受入条件、変更点、不具合履歴、自動テスト証跡を入力にして、根拠付き観点、リスク、手動ケース、工数、品質ゲート、Go/No-Go brief を一気通貫で作成。利用場面: QA/開発者のテスト観点洗い出し、リリース前 P0/P1 整理、仕様不足/権限/状態遷移の抜け検出、iOS/Android アプリの手動設計、forward-test 記録。",
+  "deps_out": ["skills/manual-bb-test-harness/SKILL.md", "goldens/", "docs/evaluation-rubric.md"],
+  "deps_in": ["README.md"],
+  "risks": [],
+  "tests": [],
+  "last_verified": "2026-05-30"
+}

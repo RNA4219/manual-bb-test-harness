@@ -1,0 +1,11 @@
+{
+  "id": "docs/evaluation-rubric.md",
+  "role": "reference",
+  "title": "Evaluation Rubric",
+  "summary": "Skill 出力の forward-test 採点基準。Score Bands: 5 (実務投入可能) ~ 1 (仕様言い換え)。Rubric: Coverage model (20), Observation quality (15), Risk quality (15), Manual cases (20), Exploratory charters (10), Gate decision (15), Communication (5)。Pass Rule: 合計 80点以上で pass, 70-79点は conditional pass, 69点以下は fail。Automatic Fail Conditions: coverage model なし, P0/P1 case に oracle refs なし, gate が coverage 数値だけで Go。",
+  "deps_out": [],
+  "deps_in": ["EVALUATION.md", "skills/manual-bb-test-harness/references/forward-test.md", "docs/human-readme.md"],
+  "risks": [],
+  "tests": [],
+  "last_verified": "2026-05-30"
+}

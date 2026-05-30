@@ -1,0 +1,12 @@
+{
+  "id": "skills/manual-bb-test-harness/references/failure-modes.md",
+  "role": "reference",
+  "title": "Failure Modes",
+  "summary": "Common failure modes and review questions for skill output quality. Failure modes: Case-first generation (no coverage model), Oracle invention (plausible but unsupported expected results), Over-broad P0/P1 (every risk high priority), Coverage-number bias (code coverage only), Missing invalid paths (only happy path), Hidden role gaps (ownership context missing), State collapsed into rules, Data as precondition only, Weak regression scope, Vague exploratory work.",
+  "public_api": [],
+  "deps_out": ["skills/manual-bb-test-harness/references/case-design-policy.md"],
+  "deps_in": [],
+  "risks": ["Case-first generation skips coverage model", "Oracle invention without source refs", "Missing invalid paths and boundary checks"],
+  "tests": [],
+  "last_verified": "2026-05-30"
+}

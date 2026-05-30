@@ -1,0 +1,473 @@
+{
+  "version": "1.0.0",
+  "generated_at": "00003",
+  "description": "manual-bb-test-harness Workflow Cookbook Knowledge Map",
+  "metadata": {
+    "repo": "manual-bb-test-harness",
+    "tier": 3,
+    "last_updated": "2026-05-30",
+    "total_nodes": 33,
+    "total_edges": 45,
+    "total_capsules": 33
+  },
+  "nodes": [
+    {
+      "id": "README.md",
+      "path": "./README.md",
+      "role": "overview",
+      "title": "Project Overview",
+      "description": "AI-first entry point with task classifier and quick start"
+    },
+    {
+      "id": "HUB.codex.md",
+      "path": "./HUB.codex.md",
+      "role": "navigation",
+      "title": "AI Navigation Hub",
+      "description": "Document routing and reading order for AI agents"
+    },
+    {
+      "id": "BLUEPRINT.md",
+      "path": "./BLUEPRINT.md",
+      "role": "specification",
+      "title": "Blueprint",
+      "description": "Problem statement, scope, I/O contract, constraints"
+    },
+    {
+      "id": "RUNBOOK.md",
+      "path": "./RUNBOOK.md",
+      "role": "operations",
+      "title": "Runbook",
+      "description": "Execution procedures, validation commands, update rules"
+    },
+    {
+      "id": "GUARDRAILS.md",
+      "path": "./GUARDRAILS.md",
+      "role": "policy",
+      "title": "Guardrails",
+      "description": "Operational principles, boundaries, prohibited actions"
+    },
+    {
+      "id": "EVALUATION.md",
+      "path": "./EVALUATION.md",
+      "role": "acceptance",
+      "title": "Evaluation",
+      "description": "Acceptance criteria, quality standards, verification checklist"
+    },
+    {
+      "id": "SPEC.md",
+      "path": "./SPEC.md",
+      "role": "specification",
+      "title": "Specification",
+      "description": "Implemented features and improvement history"
+    },
+    {
+      "id": "CHANGELOG.md",
+      "path": "./CHANGELOG.md",
+      "role": "history",
+      "title": "Changelog",
+      "description": "Version history in Keep a Changelog format"
+    },
+    {
+      "id": "AGENTS.md",
+      "path": "./AGENTS.md",
+      "role": "policy",
+      "title": "Agent Instructions",
+      "description": "Instructions for AI agents working in this repo"
+    },
+    {
+      "id": "skills/manual-bb-test-harness/SKILL.md",
+      "path": "./skills/manual-bb-test-harness/SKILL.md",
+      "role": "skill",
+      "title": "Skill Definition",
+      "description": "Main skill execution flow and artifact generation"
+    },
+    {
+      "id": "skills/manual-bb-test-harness/references/artifact-contract.md",
+      "path": "./skills/manual-bb-test-harness/references/artifact-contract.md",
+      "role": "reference",
+      "title": "Artifact Contract",
+      "description": "I/O schema and traceability requirements for all artifacts"
+    },
+    {
+      "id": "skills/manual-bb-test-harness/references/case-design-policy.md",
+      "path": "./skills/manual-bb-test-harness/references/case-design-policy.md",
+      "role": "reference",
+      "title": "Case Design Policy",
+      "description": "Test case design principles and prioritization"
+    },
+    {
+      "id": "skills/manual-bb-test-harness/references/forward-test.md",
+      "path": "./skills/manual-bb-test-harness/references/forward-test.md",
+      "role": "reference",
+      "title": "Forward Test Guide",
+      "description": "Prompt template and pass criteria for skill evaluation"
+    },
+    {
+      "id": "skills/manual-bb-test-harness/references/platform-pack-mobile.md",
+      "path": "./skills/manual-bb-test-harness/references/platform-pack-mobile.md",
+      "role": "reference",
+      "title": "Mobile Platform Pack",
+      "description": "iOS/Android-specific test considerations"
+    },
+    {
+      "id": "skills/manual-bb-test-harness/references/risk-and-gate-policy.md",
+      "path": "./skills/manual-bb-test-harness/references/risk-and-gate-policy.md",
+      "role": "reference",
+      "title": "Risk and Gate Policy",
+      "description": "Risk classification and gate decision logic"
+    },
+    {
+      "id": "docs/specs/spec-01-ci-cd-enhancement.md",
+      "path": "./docs/specs/spec-01-ci-cd-enhancement.md",
+      "role": "specification",
+      "title": "Spec: CI/CD Enhancement",
+      "description": "CI validation and ruff integration"
+    },
+    {
+      "id": "docs/specs/spec-02-cli-integration.md",
+      "path": "./docs/specs/spec-02-cli-integration.md",
+      "role": "specification",
+      "title": "Spec: CLI Integration",
+      "description": "bb-harness CLI subcommands and wrapper implementation"
+    },
+    {
+      "id": "docs/specs/spec-03-schema-extension.md",
+      "path": "./docs/specs/spec-03-schema-extension.md",
+      "role": "specification",
+      "title": "Spec: Schema Extension",
+      "description": "Artifact schema evolution and validation"
+    },
+    {
+      "id": "docs/specs/spec-04-test-result-import.md",
+      "path": "./docs/specs/spec-04-test-result-import.md",
+      "role": "specification",
+      "title": "Spec: Test Result Import",
+      "description": "TestRail/Xray import and execution_evidence conversion"
+    },
+    {
+      "id": "docs/evaluation-rubric.md",
+      "path": "./docs/evaluation-rubric.md",
+      "role": "reference",
+      "title": "Evaluation Rubric",
+      "description": "Scoring criteria for skill output quality"
+    },
+    {
+      "id": "docs/human-readme.md",
+      "path": "./docs/human-readme.md",
+      "role": "overview",
+      "title": "Human README",
+      "description": "Project overview and usage for human readers"
+    },
+    {
+      "id": "docs/improvement-notes.md",
+      "path": "./docs/improvement-notes.md",
+      "role": "history",
+      "title": "Improvement Notes",
+      "description": "Quality improvement tracking and metrics"
+    },
+    {
+      "id": "docs/release-review-20260516.md",
+      "path": "./docs/release-review-20260516.md",
+      "role": "history",
+      "title": "Release Review 2026-05-16",
+      "description": "Release readiness assessment and findings"
+    },
+    {
+      "id": "docs/acceptance/AC-20260516-01.md",
+      "path": "./docs/acceptance/AC-20260516-01.md",
+      "role": "acceptance",
+      "title": "Acceptance Record 2026-05-16",
+      "description": "Acceptance validation for mobile docs release"
+    },
+    {
+      "id": "docs/tasks/task-mobile-docs-release-readiness-20260516.md",
+      "path": "./docs/tasks/task-mobile-docs-release-readiness-20260516.md",
+      "role": "task",
+      "title": "Task: Mobile Docs Release",
+      "description": "Mobile platform pack and golden files release preparation"
+    },
+    {
+      "id": "goldens/order-cancel.input.md",
+      "path": "./goldens/order-cancel.input.md",
+      "role": "golden",
+      "title": "Golden: Order Cancel Input",
+      "description": "Sample input for order cancellation scenario"
+    },
+    {
+      "id": "goldens/order-cancel.expected.md",
+      "path": "./goldens/order-cancel.expected.md",
+      "role": "golden",
+      "title": "Golden: Order Cancel Expected",
+      "description": "Expected output for order cancellation scenario"
+    },
+    {
+      "id": "goldens/mobile-session-resume.input.md",
+      "path": "./goldens/mobile-session-resume.input.md",
+      "role": "golden",
+      "title": "Golden: Mobile Session Resume Input",
+      "description": "Sample input for mobile session resume scenario"
+    },
+    {
+      "id": "goldens/mobile-session-resume.expected.md",
+      "path": "./goldens/mobile-session-resume.expected.md",
+      "role": "golden",
+      "title": "Golden: Mobile Session Resume Expected",
+      "description": "Expected output anchors for mobile session resume scenario"
+    },
+    {
+      "id": "skills/manual-bb-test-harness/references/domain-pack-ec.md",
+      "path": "./skills/manual-bb-test-harness/references/domain-pack-ec.md",
+      "role": "reference",
+      "title": "Domain Pack: EC / Order Flow",
+      "description": "E-commerce domain-specific test considerations for order, payment, shipment"
+    },
+    {
+      "id": "skills/manual-bb-test-harness/references/domain-pack-finance.md",
+      "path": "./skills/manual-bb-test-harness/references/domain-pack-finance.md",
+      "role": "reference",
+      "title": "Domain Pack: Finance",
+      "description": "Finance domain-specific test considerations"
+    },
+    {
+      "id": "skills/manual-bb-test-harness/references/domain-pack-saas-rbac.md",
+      "path": "./skills/manual-bb-test-harness/references/domain-pack-saas-rbac.md",
+      "role": "reference",
+      "title": "Domain Pack: SaaS RBAC",
+      "description": "SaaS role-based access control domain-specific test considerations"
+    },
+    {
+      "id": "skills/manual-bb-test-harness/references/failure-modes.md",
+      "path": "./skills/manual-bb-test-harness/references/failure-modes.md",
+      "role": "reference",
+      "title": "Failure Modes",
+      "description": "Common failure modes and review questions for skill output quality"
+    }
+  ],
+  "edges": [
+    {
+      "from": "README.md",
+      "to": "HUB.codex.md",
+      "type": "routes_to"
+    },
+    {
+      "from": "README.md",
+      "to": "docs/human-readme.md",
+      "type": "references"
+    },
+    {
+      "from": "README.md",
+      "to": "skills/manual-bb-test-harness/SKILL.md",
+      "type": "entry_point"
+    },
+    {
+      "from": "HUB.codex.md",
+      "to": "BLUEPRINT.md",
+      "type": "navigation"
+    },
+    {
+      "from": "HUB.codex.md",
+      "to": "RUNBOOK.md",
+      "type": "navigation"
+    },
+    {
+      "from": "HUB.codex.md",
+      "to": "GUARDRAILS.md",
+      "type": "navigation"
+    },
+    {
+      "from": "HUB.codex.md",
+      "to": "EVALUATION.md",
+      "type": "navigation"
+    },
+    {
+      "from": "BLUEPRINT.md",
+      "to": "skills/manual-bb-test-harness/references/artifact-contract.md",
+      "type": "specifies"
+    },
+    {
+      "from": "RUNBOOK.md",
+      "to": "BLUEPRINT.md",
+      "type": "source_of_truth"
+    },
+    {
+      "from": "RUNBOOK.md",
+      "to": "EVALUATION.md",
+      "type": "references"
+    },
+    {
+      "from": "RUNBOOK.md",
+      "to": "docs/specs/spec-02-cli-integration.md",
+      "type": "references"
+    },
+    {
+      "from": "RUNBOOK.md",
+      "to": "docs/specs/spec-04-test-result-import.md",
+      "type": "references"
+    },
+    {
+      "from": "EVALUATION.md",
+      "to": "docs/evaluation-rubric.md",
+      "type": "references"
+    },
+    {
+      "from": "EVALUATION.md",
+      "to": "docs/acceptance/AC-20260516-01.md",
+      "type": "validated_by"
+    },
+    {
+      "from": "SPEC.md",
+      "to": "CHANGELOG.md",
+      "type": "references"
+    },
+    {
+      "from": "SPEC.md",
+      "to": "docs/specs/spec-02-cli-integration.md",
+      "type": "implements"
+    },
+    {
+      "from": "SPEC.md",
+      "to": "docs/specs/spec-04-test-result-import.md",
+      "type": "implements"
+    },
+    {
+      "from": "skills/manual-bb-test-harness/SKILL.md",
+      "to": "skills/manual-bb-test-harness/references/artifact-contract.md",
+      "type": "references"
+    },
+    {
+      "from": "skills/manual-bb-test-harness/SKILL.md",
+      "to": "skills/manual-bb-test-harness/references/case-design-policy.md",
+      "type": "references"
+    },
+    {
+      "from": "skills/manual-bb-test-harness/SKILL.md",
+      "to": "skills/manual-bb-test-harness/references/risk-and-gate-policy.md",
+      "type": "references"
+    },
+    {
+      "from": "skills/manual-bb-test-harness/SKILL.md",
+      "to": "skills/manual-bb-test-harness/references/forward-test.md",
+      "type": "references"
+    },
+    {
+      "from": "skills/manual-bb-test-harness/SKILL.md",
+      "to": "skills/manual-bb-test-harness/references/platform-pack-mobile.md",
+      "type": "references"
+    },
+    {
+      "from": "skills/manual-bb-test-harness/SKILL.md",
+      "to": "goldens/order-cancel.input.md",
+      "type": "example"
+    },
+    {
+      "from": "skills/manual-bb-test-harness/SKILL.md",
+      "to": "goldens/order-cancel.expected.md",
+      "type": "example"
+    },
+    {
+      "from": "skills/manual-bb-test-harness/SKILL.md",
+      "to": "goldens/mobile-session-resume.input.md",
+      "type": "example"
+    },
+    {
+      "from": "skills/manual-bb-test-harness/references/forward-test.md",
+      "to": "docs/evaluation-rubric.md",
+      "type": "references"
+    },
+    {
+      "from": "skills/manual-bb-test-harness/references/platform-pack-mobile.md",
+      "to": "goldens/mobile-session-resume.input.md",
+      "type": "example"
+    },
+    {
+      "from": "docs/specs/spec-02-cli-integration.md",
+      "to": "RUNBOOK.md",
+      "type": "documented_in"
+    },
+    {
+      "from": "docs/specs/spec-04-test-result-import.md",
+      "to": "RUNBOOK.md",
+      "type": "documented_in"
+    },
+    {
+      "from": "docs/acceptance/AC-20260516-01.md",
+      "to": "docs/tasks/task-mobile-docs-release-readiness-20260516.md",
+      "type": "validates"
+    },
+    {
+      "from": "docs/tasks/task-mobile-docs-release-readiness-20260516.md",
+      "to": "skills/manual-bb-test-harness/references/platform-pack-mobile.md",
+      "type": "implements"
+    },
+    {
+      "from": "docs/tasks/task-mobile-docs-release-readiness-20260516.md",
+      "to": "goldens/mobile-session-resume.input.md",
+      "type": "produces"
+    },
+    {
+      "from": "docs/release-review-20260516.md",
+      "to": "docs/acceptance/AC-20260516-01.md",
+      "type": "references"
+    },
+    {
+      "from": "docs/improvement-notes.md",
+      "to": "EVALUATION.md",
+      "type": "tracks"
+    },
+    {
+      "from": "CHANGELOG.md",
+      "to": "docs/release-review-20260516.md",
+      "type": "references"
+    },
+    {
+      "from": "AGENTS.md",
+      "to": "GUARDRAILS.md",
+      "type": "enforces"
+    },
+    {
+      "from": "AGENTS.md",
+      "to": "BLUEPRINT.md",
+      "type": "references"
+    },
+    {
+      "from": "goldens/order-cancel.expected.md",
+      "to": "goldens/order-cancel.input.md",
+      "type": "derived_from"
+    },
+    {
+      "from": "goldens/mobile-session-resume.expected.md",
+      "to": "goldens/mobile-session-resume.input.md",
+      "type": "derived_from"
+    },
+    {
+      "from": "docs/specs/spec-01-ci-cd-enhancement.md",
+      "to": "RUNBOOK.md",
+      "type": "documented_in"
+    },
+    {
+      "from": "docs/specs/spec-03-schema-extension.md",
+      "to": "skills/manual-bb-test-harness/references/artifact-contract.md",
+      "type": "extends"
+    },
+    {
+      "from": "skills/manual-bb-test-harness/references/domain-pack-ec.md",
+      "to": "skills/manual-bb-test-harness/SKILL.md",
+      "type": "extends"
+    },
+    {
+      "from": "skills/manual-bb-test-harness/references/domain-pack-finance.md",
+      "to": "skills/manual-bb-test-harness/SKILL.md",
+      "type": "extends"
+    },
+    {
+      "from": "skills/manual-bb-test-harness/references/domain-pack-saas-rbac.md",
+      "to": "skills/manual-bb-test-harness/SKILL.md",
+      "type": "extends"
+    },
+    {
+      "from": "skills/manual-bb-test-harness/references/failure-modes.md",
+      "to": "skills/manual-bb-test-harness/references/case-design-policy.md",
+      "type": "supplements"
+    }
+  ]
+}

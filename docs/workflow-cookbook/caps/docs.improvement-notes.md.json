@@ -1,0 +1,11 @@
+{
+  "id": "docs/improvement-notes.md",
+  "role": "history",
+  "title": "Improvement Notes",
+  "summary": "改善履歴記録。2026-05-03 改善完了: Critical (1, Unit tests 追加), High (5, Exception handling, null check, CI multi-platform, pyproject.toml), Medium (9, Schema descriptions, READMEs, type hints, version/debug flags), Low (6, CHANGELOG, SPEC, generic.yaml, JSON golden examples)。CI 状況: 3 OS × 3 Python versions 全成功。Node.js 24対応: actions 更新済み。",
+  "deps_out": ["CHANGELOG.md", "EVALUATION.md"],
+  "deps_in": ["SPEC.md"],
+  "risks": [],
+  "tests": [],
+  "last_verified": "2026-05-30"
+}

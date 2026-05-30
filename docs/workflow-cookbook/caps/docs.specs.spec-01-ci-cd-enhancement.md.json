@@ -1,0 +1,11 @@
+{
+  "id": "docs/specs/spec-01-ci-cd-enhancement.md",
+  "role": "specification",
+  "title": "Spec: CI/CD強化",
+  "summary": "品質保証自動化の仕様。R1: pre-commit hook (YAML frontmatter 検証, JSON syntax 検証, TODO marker 検出禁止, UTF-8 強制)。R2: GitHub Actions validate.yml (quick-validate-skill.py, JSON schema validation, script --help 動作確認, evaluate-gate.py dry-run, risk-heatmap.py SVG 生成)。R3: golden-diff.yml (golden input/output diff 可視化, schema 変更時の breaking change 警告)。R4: Release workflow (tag 作成時に artifact zip 生成)。",
+  "deps_out": [".github/workflows/validate.yml", ".github/workflows/golden-diff.yml"],
+  "deps_in": ["SPEC.md", "RUNBOOK.md"],
+  "risks": [],
+  "tests": ["tests/"],
+  "last_verified": "2026-05-30"
+}

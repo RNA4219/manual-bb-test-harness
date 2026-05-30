@@ -1,0 +1,11 @@
+{
+  "id": "goldens/order-cancel.expected.md",
+  "role": "golden",
+  "title": "Golden: Order Cancel Expected",
+  "summary": "注文キャンセル機能の expected review anchors (完全一致ではなくレビュー用アンカー)。Required Coverage Items: 状態 (pending, shipped, cancelled, payment_failed), 無効遷移 (shipped→cancelled, cancelled→cancelled, payment_failed→cancelled), ルール組合せ (order_state x coupon_used x actor), 権限 (buyer own, buyer other, CS delegated), 回帰 (inventory_service, coupon_service, order_detail), mobile 対象 (iOS/Android platform_matrix)。Required Risk Shape: 出荷済みキャンセル P1以上, 在庫/クーポン復元漏れ P1以上, 二重キャンセル重複復元 P1以上。",
+  "deps_out": [],
+  "deps_in": ["goldens/order-cancel.input.md", "skills/manual-bb-test-harness/SKILL.md"],
+  "risks": [],
+  "tests": [],
+  "last_verified": "2026-05-30"
+}

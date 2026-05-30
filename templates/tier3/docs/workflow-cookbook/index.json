@@ -1,0 +1,35 @@
+{
+  "version": "1.0.0",
+  "generated_at": "00001",
+  "nodes": [
+    {
+      "id": "README.md",
+      "path": "./README.md",
+      "role": "overview",
+      "title": "Project Overview",
+      "description": "Entry point and navigation"
+    },
+    {
+      "id": "BLUEPRINT.md",
+      "path": "./BLUEPRINT.md",
+      "role": "specification",
+      "title": "Blueprint",
+      "description": "Design principles and architecture"
+    }
+  ],
+  "edges": [
+    {
+      "from": "README.md",
+      "to": "BLUEPRINT.md",
+      "type": "references"
+    }
+  ],
+  "metadata": {
+    "repo": "your-repo-name",
+    "tier": 3,
+    "last_updated": "2026-05-30",
+    "total_nodes": 2,
+    "total_edges": 1,
+    "total_capsules": 0
+  }
+}

@@ -1,0 +1,12 @@
+{
+  "id": "docs/specs/spec-04-test-result-import.md",
+  "role": "specification",
+  "title": "Spec: Test Result Import",
+  "summary": "Defines TestRail/Xray import to execution_evidence.json conversion. Documents status mapping (TestRail: 1-5, Xray: PASS/FAIL/ABORTED/TODO/EXECUTING/PENDING), priority mapping, dry-run preview mode, CLI wrapper integration. Documents PLAN-IMPORT-01 (status tests), PLAN-IMPORT-02 (dry-run), PLAN-IMPORT-03 (CLI integration), PLAN-IMPORT-04 (schema verification), PLAN-IMPORT-05 (docs update). All plans completed 2026-05-30.",
+  "public_api": ["import-testrail.py", "import-xray.py", "bb-harness import"],
+  "deps_out": ["RUNBOOK.md", "scripts/import-testrail.py", "scripts/import-xray.py", "schemas/execution_evidence.schema.json"],
+  "deps_in": ["SPEC.md", "RUNBOOK.md"],
+  "risks": ["Requires API tokens for production use"],
+  "tests": ["tests/test_import_status.py", "tests/test_cli_dryrun.py::TestImportTestRailDryRun", "tests/test_cli_dryrun.py::TestImportXrayDryRun"],
+  "last_verified": "2026-05-30"
+}

@@ -1,0 +1,11 @@
+{
+  "id": "docs/release-review-20260516.md",
+  "role": "history",
+  "title": "Release Review 2026-05-16",
+  "summary": "Mobile/docs alignment の release readiness 評価。Intake Status: ok, blockers なし。6個の根拠付き観点: OBS-CONTRACT-01 (mobile 契約), OBS-INGEST-01 (Markdown intake), OBS-DOCS-01 (workflow docs 導線), OBS-GOLDEN-01 (mobile golden), OBS-VALIDATION-01 (既存 validation), OBS-TRACKING-01 (追跡対象)。Coverage Model: states (pre-mobile → mobile-enabled → docs-aligned → release-reviewed)。",
+  "deps_out": ["docs/acceptance/AC-20260516-01.md"],
+  "deps_in": ["CHANGELOG.md"],
+  "risks": [],
+  "tests": ["tests/", "scripts/quick-validate-skill.py"],
+  "last_verified": "2026-05-30"
+}

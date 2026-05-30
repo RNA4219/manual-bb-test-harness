@@ -1,0 +1,11 @@
+{
+  "id": "docs/acceptance/AC-20260516-01.md",
+  "role": "acceptance",
+  "title": "Acceptance Record: Mobile Docs Release Readiness",
+  "summary": "Mobile docs release の検収記録。Status: approved, reviewed_at: 2026-05-16。Scope: mobile artifact 契約追加, mobile platform pack/golden 追加, workflow-cookbook 準拠 docs 追加, repo self-review。Acceptance Criteria: mobile_contexts/platform_matrix 対応, README → 正本 docs 導線, HUB に目的別読み順, self-review gate 判定記録, example/export/lockfile 追跡対象化, test/validator 通過。",
+  "deps_out": ["docs/tasks/task-mobile-docs-release-readiness-20260516.md"],
+  "deps_in": ["EVALUATION.md", "docs/release-review-20260516.md"],
+  "risks": [],
+  "tests": ["uv run pytest", "scripts/quick-validate-skill.py", "scripts/validate-skill.ps1"],
+  "last_verified": "2026-05-30"
+}

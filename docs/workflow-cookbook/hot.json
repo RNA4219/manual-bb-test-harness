@@ -1,0 +1,134 @@
+{
+  "version": "1.0.0",
+  "generated_at": "00002",
+  "description": "manual-bb-test-harness Workflow Cookbook Hot List - Primary entry points",
+  "project_status": {
+    "tier": 3,
+    "cli_status": "complete",
+    "import_status": "complete",
+    "test_count": 212,
+    "total_capsules": 28,
+    "last_updated": "2026-05-30"
+  },
+  "hot_nodes": [
+    {
+      "id": "README.md",
+      "path": "./README.md",
+      "role": "overview",
+      "title": "Project Overview",
+      "summary": "AI-first entry point with Quick Start commands and task classifier table",
+      "priority": 1,
+      "use_cases": [
+        "Getting started with the repo",
+        "Understanding project structure",
+        "Running validation commands"
+      ]
+    },
+    {
+      "id": "HUB.codex.md",
+      "path": "./HUB.codex.md",
+      "role": "navigation",
+      "title": "AI Navigation Hub",
+      "summary": "Document routing table and reading order for AI agents. Lists all core documents and their roles",
+      "priority": 2,
+      "use_cases": [
+        "Navigating documentation",
+        "Understanding document relationships",
+        "Finding the right document for a task"
+      ]
+    },
+    {
+      "id": "BLUEPRINT.md",
+      "path": "./BLUEPRINT.md",
+      "role": "specification",
+      "title": "Blueprint",
+      "summary": "Problem statement, scope (In/Out), I/O contract, constraints, and design principles",
+      "priority": 3,
+      "use_cases": [
+        "Understanding project scope",
+        "Making architectural decisions",
+        "Verifying feature boundaries"
+      ]
+    },
+    {
+      "id": "RUNBOOK.md",
+      "path": "./RUNBOOK.md",
+      "role": "operations",
+      "title": "Runbook",
+      "summary": "Execution procedures for skill validation, artifact changes, spec ingestion, CLI import/export/run, and update rules",
+      "priority": 4,
+      "use_cases": [
+        "Running validation commands",
+        "Executing CLI operations",
+        "Making changes to artifacts"
+      ]
+    },
+    {
+      "id": "skills/manual-bb-test-harness/SKILL.md",
+      "path": "./skills/manual-bb-test-harness/SKILL.md",
+      "role": "skill",
+      "title": "Skill Definition",
+      "summary": "Main skill execution flow: generates manual test cases, risks, gate decisions from specifications",
+      "priority": 5,
+      "use_cases": [
+        "Executing the skill",
+        "Understanding artifact generation",
+        "Customizing test case output"
+      ]
+    },
+    {
+      "id": "docs/birdseye/index.json",
+      "path": "./docs/birdseye/index.json",
+      "role": "navigation",
+      "title": "Birdseye Knowledge Map",
+      "summary": "Complete node listings and edges for documentation navigation. Use to discover document relationships",
+      "priority": 6,
+      "use_cases": [
+        "Navigating documentation",
+        "Discovering document relationships",
+        "Finding related specifications"
+      ]
+    }
+  ],
+  "quick_paths": {
+    "getting_started": [
+      "README.md",
+      "HUB.codex.md",
+      "docs/human-readme.md"
+    ],
+    "skill_execution": [
+      "skills/manual-bb-test-harness/SKILL.md",
+      "skills/manual-bb-test-harness/references/artifact-contract.md",
+      "skills/manual-bb-test-harness/references/case-design-policy.md",
+      "goldens/order-cancel.input.md"
+    ],
+    "cli_operations": [
+      "RUNBOOK.md",
+      "docs/specs/spec-02-cli-integration.md",
+      "docs/specs/spec-04-test-result-import.md"
+    ],
+    "artifact_changes": [
+      "BLUEPRINT.md",
+      "skills/manual-bb-test-harness/references/artifact-contract.md",
+      "schemas/",
+      "examples/artifacts/",
+      "goldens/"
+    ],
+    "quality_assurance": [
+      "EVALUATION.md",
+      "docs/evaluation-rubric.md",
+      "docs/acceptance/AC-20260516-01.md"
+    ],
+    "mobile_testing": [
+      "skills/manual-bb-test-harness/references/platform-pack-mobile.md",
+      "goldens/mobile-session-resume.input.md",
+      "goldens/mobile-session-resume.expected.md"
+    ],
+    "specifications": [
+      "docs/specs/spec-01-ci-cd-enhancement.md",
+      "docs/specs/spec-02-cli-integration.md",
+      "docs/specs/spec-03-schema-extension.md",
+      "docs/specs/spec-04-test-result-import.md"
+    ]
+  }
+}

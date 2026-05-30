@@ -1,0 +1,12 @@
+{
+  "id": "skills/manual-bb-test-harness/SKILL.md",
+  "role": "skill",
+  "title": "Skill Definition",
+  "summary": "Main skill execution flow. Generates manual test design artifacts from specifications: observations, risks, priorities, test cases, effort estimates, gate decisions, Go/No-Go brief. References artifact-contract.md for I/O schema, case-design-policy.md for test design principles, risk-and-gate-policy.md for classification. Uses goldens/ as review anchors. Supports mobile platform pack and domain packs (EC, finance, SaaS RBAC).",
+  "public_api": ["skill execution", "artifact generation"],
+  "deps_out": ["skills/manual-bb-test-harness/references/artifact-contract.md", "skills/manual-bb-test-harness/references/case-design-policy.md", "goldens/"],
+  "deps_in": ["README.md", "HUB.codex.md"],
+  "risks": ["Output quality depends on input specification completeness"],
+  "tests": ["goldens/order-cancel.expected.md", "goldens/mobile-session-resume.expected.md"],
+  "last_verified": "2026-05-30"
+}

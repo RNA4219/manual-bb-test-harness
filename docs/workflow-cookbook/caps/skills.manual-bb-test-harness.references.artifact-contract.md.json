@@ -1,0 +1,11 @@
+{
+  "id": "skills/manual-bb-test-harness/references/artifact-contract.md",
+  "role": "reference",
+  "title": "Artifact Contract",
+  "summary": "Suite Manifest で manual-bb-harness v0.1.0 を定義。10個の Core Artifacts: phase_contract (Definition of Ready), feature_spec, test_model, observation_set, risk_register, manual_case_set, effort_plan, gate_decision, release_brief, execution_evidence。Policies: require_source_refs, require_oracle_per_case, require_traceability, degrade_on_missing_info, block_on_missing_critical_oracle。",
+  "deps_out": ["schemas/", "examples/artifacts/"],
+  "deps_in": ["BLUEPRINT.md", "skills/manual-bb-test-harness/SKILL.md"],
+  "risks": [],
+  "tests": ["scripts/validate-artifact.py"],
+  "last_verified": "2026-05-30"
+}

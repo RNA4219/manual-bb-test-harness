@@ -1,0 +1,11 @@
+{
+  "id": "docs/specs/spec-03-schema-extension.md",
+  "role": "specification",
+  "title": "Spec: Schema拡充",
+  "summary": "artifact-contract.md に定義されている未 schema 化 artifact の JSON Schema 追加。R1: 新規 schema 作成 (observation_set, effort_plan, release_brief, forward_test_report)。R2: 既存 schema 修正 (shared_defs に SourceRef/Assumption 型追加, $ref 参照統一, description/enumeration 双语化)。R3: schema 検証 tool (validate-artifact.py 作成, 全 artifact 一括検証機能, 詳細エラー出力)。",
+  "deps_out": ["schemas/", "scripts/validate-artifact.py"],
+  "deps_in": ["SPEC.md", "skills/manual-bb-test-harness/references/artifact-contract.md"],
+  "risks": [],
+  "tests": ["tests/test_validate_artifact.py"],
+  "last_verified": "2026-05-30"
+}

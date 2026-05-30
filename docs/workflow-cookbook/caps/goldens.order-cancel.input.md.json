@@ -1,0 +1,11 @@
+{
+  "id": "goldens/order-cancel.input.md",
+  "role": "golden",
+  "title": "Golden: Order Cancel Input",
+  "summary": "注文キャンセル機能の golden input。Feature: 出荷前の注文のみ購入者がキャンセル可能、キャンセル成功時は在庫戻しとクーポン残数復元。Acceptance Criteria: AC-1 (出荷前のみキャンセル可), AC-2 (出荷済みは不可メッセージ), AC-3 (在庫戻し), AC-4 (クーポン残数復元)。Business Rules: BR-1 (決済失敗はキャンセル済み扱いしない), BR-2 (二重キャンセル不可), BR-3 (CS 代理キャンセル可)。Environments: Web, iOS, Android。",
+  "deps_out": ["goldens/order-cancel.expected.md"],
+  "deps_in": ["skills/manual-bb-test-harness/SKILL.md"],
+  "risks": [],
+  "tests": [],
+  "last_verified": "2026-05-30"
+}

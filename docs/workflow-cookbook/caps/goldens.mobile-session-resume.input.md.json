@@ -1,0 +1,11 @@
+{
+  "id": "goldens/mobile-session-resume.input.md",
+  "role": "golden",
+  "title": "Golden: Mobile Session Resume Input",
+  "summary": "モバイル本人確認送信の golden input。Feature: 本人確認書類を撮影して送信、バックグラウンド移行後も復帰後に送信状態再開。Acceptance Criteria: AC-1 (iOS/Android で撮影送信), AC-2 (バックグラウンド化→復帰で再開), AC-3 (通信断→再試行、重複送信防止), AC-4 (カメラ権限拒否→設定案内)。Business Rules: BR-1 (1申請に有効書類1件のみ), BR-2 (push 通知再開も通常起動と同じ申請状態)。Environments: iOS, Android。Mobile Contexts: foreground, background_resume, offline, push_notification_entry。",
+  "deps_out": ["goldens/mobile-session-resume.expected.md"],
+  "deps_in": ["skills/manual-bb-test-harness/SKILL.md", "skills/manual-bb-test-harness/references/platform-pack-mobile.md", "docs/tasks/task-mobile-docs-release-readiness-20260516.md"],
+  "risks": [],
+  "tests": [],
+  "last_verified": "2026-05-30"
+}

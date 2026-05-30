@@ -1,0 +1,24 @@
+{
+  "version": "1.0.0",
+  "generated_at": "00001",
+  "hot_nodes": [
+    {
+      "id": "README.md",
+      "path": "./README.md",
+      "role": "overview",
+      "title": "Project Overview",
+      "summary": "Entry point and navigation for the project",
+      "priority": 1
+    }
+  ],
+  "quick_paths": {
+    "getting_started": [
+      "README.md",
+      "BLUEPRINT.md"
+    ]
+  },
+  "project_status": {
+    "tier": 3,
+    "last_updated": "2026-05-30"
+  }
+}

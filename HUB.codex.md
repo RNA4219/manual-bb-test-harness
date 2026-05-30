@@ -25,6 +25,7 @@ next_review_due: 2026-06-16
 | `EVALUATION.md` | 受入条件、品質基準、検証チェック |
 | `SPEC.md` | 実装済み機能と改修履歴の仕様メモ |
 | `skills/manual-bb-test-harness/SKILL.md` | Skill 実行時の主導線 |
+| `docs/workflow-cookbook/` | 知識マップ (index.json, hot.json, caps/) |
 | `docs/tasks/` | Task Seed |
 | `docs/acceptance/` | 検収記録 |
 
@@ -46,6 +47,7 @@ next_review_due: 2026-06-16
 5. `EVALUATION.md`
 6. `SPEC.md`
 7. 必要に応じて `docs/tasks/` と `docs/acceptance/`
+8. ドキュメント間関係を確認する場合は `docs/workflow-cookbook/index.json`
 
 ### artifact 契約を変えたい
 

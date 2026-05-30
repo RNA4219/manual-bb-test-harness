@@ -64,12 +64,15 @@
 |---|---|---|
 | 1 | `pip install -e .` | OK |
 | 2 | pytest coverage | OK (~33% @ 2026-05-30, 回帰テスト継続中) |
-| 3 | tests pass | OK (157+ tests @ 2026-05-30) |
+| 3 | tests pass | OK (212 tests @ 2026-05-30) |
 | 4 | CI 3OS×3Python | OK |
 | 5 | Schema validation | OK |
 | 6 | Agent config | OK |
 | 7 | F1-F4 functionality | OK |
 | 8 | F5 phase_contract schema/example validation | OK |
+| 9 | F6 TestRail/Xray import | OK (50 tests) |
+| 10 | F7 Forward-test CLI | OK |
+| 11 | Workflow Cookbook Tier 3 | OK (28 nodes, 45 edges, 28 capsules) |
 
 **全検証完了 ✅**
 

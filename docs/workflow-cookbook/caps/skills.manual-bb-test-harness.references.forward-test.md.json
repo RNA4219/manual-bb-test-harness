@@ -1,0 +1,12 @@
+{
+  "id": "skills/manual-bb-test-harness/references/forward-test.md",
+  "role": "reference",
+  "title": "Forward Test Guide",
+  "summary": "Skill 出力評価のための forward-test 手順。Integration tests via test_cli_coverage.py, test_coverage_90.py, test_main_module.py. Coverage: src/bb_harness 86%, 395 tests passed. Prompt Template: coverage model, observations, risks, manual cases, exploratory charters, effort, gate decision, Go/No-Go brief.",
+  "public_api": ["bb-harness run forward-test --input <file>", "bb-harness run forward-test --skill <path>"],
+  "deps_out": ["goldens/", "docs/evaluation-rubric.md"],
+  "deps_in": ["skills/manual-bb-test-harness/SKILL.md", "goldens/order-cancel.input.md", "goldens/mobile-session-resume.input.md"],
+  "risks": ["Missing input file causes error", "Skill path must be valid"],
+  "tests": ["tests/test_cli_coverage.py::TestRunCommand", "tests/test_main_module.py::TestRunDetailed", "tests/test_integration_workflow_cookbook.py::TestRunIntegration", "goldens/order-cancel.expected.md", "goldens/mobile-session-resume.expected.md"],
+  "last_verified": "2026-05-30"
+}

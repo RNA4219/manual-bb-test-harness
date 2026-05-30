@@ -1,0 +1,12 @@
+{
+  "id": "EVALUATION.md",
+  "role": "acceptance",
+  "title": "Evaluation",
+  "summary": "Defines acceptance criteria: 212+ tests passing, ruff clean, validate-spec 4 PASS, validate-artifact 14 valid. Quality standards require traceability (source_refs, assumptions, confidence). Verification checklist covers skill output, artifact contracts, schema validation, CLI operations. References evaluation-rubric.md for scoring criteria. Links to acceptance records in docs/acceptance/.",
+  "public_api": [],
+  "deps_out": ["docs/evaluation-rubric.md", "docs/acceptance/"],
+  "deps_in": ["HUB.codex.md", "RUNBOOK.md"],
+  "risks": [],
+  "tests": ["tests/", "scripts/validate-spec.py", "scripts/validate-artifact.py"],
+  "last_verified": "2026-05-30"
+}

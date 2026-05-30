@@ -1,0 +1,12 @@
+{
+  "id": "skills/manual-bb-test-harness/references/domain-pack-ec.md",
+  "role": "reference",
+  "title": "Domain Pack: EC / Order Flow",
+  "summary": "E-commerce domain-specific test considerations for order, payment, shipment, inventory, coupon, return, refund, cancellation. Common states: cart, order pending, payment authorized, paid, allocated, shipped, delivered, cancelled, returned, refunded. Risk hotspots: order/payment state divergence, inventory restoration errors, coupon/points restoration, shipped order cancellation, duplicate submit side effects, external service delayed/partial failure.",
+  "public_api": [],
+  "deps_out": ["skills/manual-bb-test-harness/SKILL.md"],
+  "deps_in": [],
+  "risks": ["Order state and payment state divergence", "Inventory restored twice or not restored", "External service returns delayed/partial failure"],
+  "tests": [],
+  "last_verified": "2026-05-30"
+}

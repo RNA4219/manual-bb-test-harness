@@ -18,6 +18,18 @@
   - import 出力が `execution_evidence.schema.json` で検証可能。
 - **F7: Forward Test CLI** (`src/bb_harness/commands/run.py`)
   - `bb-harness run forward-test --skill ... --input ...` で Skill 評価プロンプト出力。
+- **Workflow Cookbook Tier 3 達成** (`docs/workflow-cookbook/`)
+  - `index.json`: 28 nodes, 45 edges (知識マップ)
+  - `hot.json`: 6 hot nodes, 7 quick paths
+  - `caps/*.json`: 28 capsule files (全ドキュメント要約)
+  - `README.md`: Workflow Cookbook 使用手順とスキーマ定義
+  - `adoption-tiers.md`: Tier 0-3 の段階的導入フレームワーク
+  - `README.md` に LLM-BOOTSTRAP ブロック追加 (AI エージェント向け効率的ナビゲーション)
+  - Core Files テーブルに `docs/workflow-cookbook/` を追加
+  - `tools/ci/check_workflow_cookbook_tier.py`: Tier チェックツール
+  - `templates/tier1/`, `templates/tier2/`, `templates/tier3/`: テンプレート集
+  - `docs/birdseye/` → `docs/workflow-cookbook/` にリネーム（workflow-cookbook 標準準拠）
+  - `check_adoption_tier.py` → `check_workflow_cookbook_tier.py` にリネーム
 - `--verbose` を全 subcommand (validate/ingest/gate/export/import/run/heatmap/state-diagram/regression-graph) に伝播。
 - `execution_evidence.schema.json` に `timestamp` フィールド追加。
 - `RUNBOOK.md` に import/export/run CLI の実行手順を追記。

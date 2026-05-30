@@ -1,0 +1,12 @@
+{
+  "id": "GUARDRAILS.md",
+  "role": "policy",
+  "title": "Guardrails",
+  "summary": "Operational principles and boundaries. Prohibits: unauthorized artifact contract changes, golden modifications without rubric updates, schema changes without example updates, SKILL.md bloat. Requires: traceability in all artifacts, minimal diffs, test-first changes. Defines boundaries: no production configs, no external SaaS integration, no automated test framework implementation. Enforces workflow-cookbook compliance.",
+  "public_api": [],
+  "deps_out": ["BLUEPRINT.md", "AGENTS.md"],
+  "deps_in": ["HUB.codex.md"],
+  "risks": [],
+  "tests": [],
+  "last_verified": "2026-05-30"
+}

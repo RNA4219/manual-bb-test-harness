@@ -1,0 +1,11 @@
+{
+  "id": "skills/manual-bb-test-harness/references/platform-pack-mobile.md",
+  "role": "reference",
+  "title": "Platform Pack: Mobile",
+  "summary": "iOS/Android 対象時の追加正規化項目: mobile_contexts (foreground, background_resume, cold_start, offline, online_recovery, push_notification_entry, deep_link_entry), 権限差, 配布状態, OS/端末差。Coverage Checklist: 7 lens (lifecycle, interruption, connectivity, entrypoint, permission, compatibility, install_state)。典型リスク: 復帰後二重送信、offline 中操作喪失、push/deep link 経由の権限差分、OS 権限拒否後の再試行導線、upgrade install 後の古いキャッシュ。",
+  "deps_out": ["goldens/mobile-session-resume.input.md", "goldens/mobile-session-resume.expected.md"],
+  "deps_in": ["skills/manual-bb-test-harness/SKILL.md", "docs/tasks/task-mobile-docs-release-readiness-20260516.md"],
+  "risks": [],
+  "tests": ["tests/test_spec_ingest.py"],
+  "last_verified": "2026-05-30"
+}
