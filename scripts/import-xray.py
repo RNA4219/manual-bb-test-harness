@@ -68,12 +68,14 @@ def get_jira_client() -> tuple[str, dict[str, str], tuple[str, str] | None]:
     return base_url.rstrip("/"), headers, auth
 
 
-def fetch_test_execution(base_url: str, headers: dict[str, str], auth: tuple[str, str], exec_key: str) -> dict[str, Any]:
+def fetch_test_execution(
+    base_url: str, headers: dict[str, str], auth: tuple[str, str], exec_key: str
+) -> dict[str, Any]:
     """Fetch Xray test execution details."""
     try:
         import requests
     except ImportError:
-        raise ValueError("requests library required: pip install requests")
+        raise ValueError("requests library required: pip install requests") from None
 
     # Xray Cloud API
     url = f"{base_url}/rest/raven/2.0/api/testexec/{exec_key}"
@@ -82,12 +84,14 @@ def fetch_test_execution(base_url: str, headers: dict[str, str], auth: tuple[str
     return response.json()
 
 
-def fetch_jira_issue(base_url: str, headers: dict[str, str], auth: tuple[str, str], issue_key: str) -> dict[str, Any]:
+def fetch_jira_issue(
+    base_url: str, headers: dict[str, str], auth: tuple[str, str], issue_key: str
+) -> dict[str, Any]:
     """Fetch Jira issue details."""
     try:
         import requests
     except ImportError:
-        raise ValueError("requests library required: pip install requests")
+        raise ValueError("requests library required: pip install requests") from None
 
     url = f"{base_url}/rest/api/2/issue/{issue_key}"
     response = requests.get(url, headers=headers, auth=auth, timeout=30)
@@ -150,14 +154,16 @@ def convert_to_execution_evidence(
     return evidence
 
 
-def import_xray_results(exec_key: str) -> tuple[list[dict[str, Any]], dict[str, Any]]:
-    """Import Xray results and convert to execution_evidence."""
-    base_url, headers, auth = get_jira_client()
+def import_xray_results(
+    exec_key: str,
+    dry_run: bool = False,
+) -> tuple[list[dict[str, Any]], dict[str, Any]]:
+    """Import Xray results and convert to execution_evidence.
 
-    # Fetch test execution
-    exec_data = fetch_test_execution(base_url, headers, auth, exec_key)
-
-    results: list[dict[str, Any]] = []
+    Args:
+        exec_key: Xray test execution key
+        dry_run: If True, skip API calls and return preview data
+    """
     stats = {
         "source": "xray",
         "execution_key": exec_key,
@@ -166,7 +172,29 @@ def import_xray_results(exec_key: str) -> tuple[list[dict[str, Any]], dict[str, 
         "fail_count": 0,
         "skip_count": 0,
         "blocked_count": 0,
+        "import_timestamp": datetime.now().isoformat(),
     }
+
+    if dry_run:
+        # Return preview data without API calls
+        stats["dry_run"] = True
+        preview_results = [
+            {
+                "run_id": f"XRAY-{exec_key}-preview",
+                "tc_id": "PROJ-TC-001",
+                "feature_id": "IMPORTED",
+                "tester": "preview",
+                "result": "pass",
+            }
+        ]
+        return preview_results, stats
+
+    base_url, headers, auth = get_jira_client()
+
+    # Fetch test execution
+    exec_data = fetch_test_execution(base_url, headers, auth, exec_key)
+
+    results: list[dict[str, Any]] = []
 
     tests = exec_data.get("tests", [])
     for testrun in tests:
@@ -229,7 +257,7 @@ def main() -> int:
     args = parser.parse_args()
 
     try:
-        results, stats = import_xray_results(args.exec)
+        results, stats = import_xray_results(args.exec, dry_run=args.dry_run)
 
         if args.dry_run:
             print("=== DRY RUN ===")
@@ -247,16 +275,12 @@ def main() -> int:
             filename = f"{evidence['tc_id']}.json"
             file_path = args.output / filename
             file_path.write_text(
-                json.dumps(evidence, indent=2, ensure_ascii=False),
-                encoding="utf-8"
+                json.dumps(evidence, indent=2, ensure_ascii=False), encoding="utf-8"
             )
 
         # Write summary
         summary_path = args.output / "summary.json"
-        summary_path.write_text(
-            json.dumps(stats, indent=2, ensure_ascii=False),
-            encoding="utf-8"
-        )
+        summary_path.write_text(json.dumps(stats, indent=2, ensure_ascii=False), encoding="utf-8")
 
         print(f"Imported: {args.output}")
         print(f"  Total: {stats['imported_count']} tests")

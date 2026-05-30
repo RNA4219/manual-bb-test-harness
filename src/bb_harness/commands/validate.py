@@ -38,5 +38,9 @@ def run(args: argparse.Namespace) -> int:
         # Future: add JSON output support
         pass
 
+    if getattr(args, "verbose", False):
+        print(f"[verbose] Running: {' '.join(cmd)}", file=sys.stderr)
+        print(f"[verbose] Skill path: {args.skill_path}", file=sys.stderr)
+
     result = subprocess.run(cmd, check=False)
     return result.returncode

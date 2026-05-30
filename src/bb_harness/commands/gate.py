@@ -56,21 +56,32 @@ def run(args: argparse.Namespace) -> int:
     cmd = [
         sys.executable,
         str(script_path),
-        "--output", str(args.output),
-        "--profile", args.profile,
+        "--output",
+        str(args.output),
+        "--profile",
+        args.profile,
     ]
 
     if args.input:
         cmd.extend(["--input", str(args.input)])
     elif args.evidence and args.risk and args.cases:
-        cmd.extend([
-            "--evidence", str(args.evidence),
-            "--risk", str(args.risk),
-            "--cases", str(args.cases),
-        ])
+        cmd.extend(
+            [
+                "--evidence",
+                str(args.evidence),
+                "--risk",
+                str(args.risk),
+                "--cases",
+                str(args.cases),
+            ]
+        )
     else:
         print("Error: --input or (--evidence, --risk, --cases) required", file=sys.stderr)
         return 1
+
+    if getattr(args, "verbose", False):
+        print(f"[verbose] Running: {' '.join(cmd)}", file=sys.stderr)
+        print(f"[verbose] Profile: {args.profile}", file=sys.stderr)
 
     result = subprocess.run(cmd, check=False)
     return result.returncode

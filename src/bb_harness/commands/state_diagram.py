@@ -36,9 +36,15 @@ def run(args: argparse.Namespace) -> int:
     cmd = [
         sys.executable,
         str(script_path),
-        "--input", str(args.input),
-        "--output", str(args.output),
+        "--input",
+        str(args.input),
+        "--output",
+        str(args.output),
     ]
+
+    if getattr(args, "verbose", False):
+        print(f"[verbose] Running: {' '.join(cmd)}", file=sys.stderr)
+        print(f"[verbose] Input: {args.input}", file=sys.stderr)
 
     result = subprocess.run(cmd, check=False)
     return result.returncode

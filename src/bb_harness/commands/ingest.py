@@ -58,5 +58,9 @@ def run(args: argparse.Namespace) -> int:
         print(f"Error: Missing required argument for source {args.source}", file=sys.stderr)
         return 1
 
+    if getattr(args, "verbose", False):
+        print(f"[verbose] Running: {' '.join(cmd)}", file=sys.stderr)
+        print(f"[verbose] Source: {args.source}", file=sys.stderr)
+
     result = subprocess.run(cmd, check=False)
     return result.returncode

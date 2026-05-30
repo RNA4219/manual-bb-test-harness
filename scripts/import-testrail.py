@@ -32,11 +32,11 @@ __version__ = "0.1.0"
 
 # TestRail status ID mapping
 STATUS_MAP = {
-    1: "pass",       # Passed
-    2: "blocked",    # Blocked
-    3: "skip",       # Untested
-    4: "fail",       # Failed
-    5: "skip",       # Retest
+    1: "pass",  # Passed
+    2: "blocked",  # Blocked
+    3: "skip",  # Untested
+    4: "fail",  # Failed
+    5: "skip",  # Retest
 }
 
 # Priority ID to severity mapping
@@ -67,12 +67,14 @@ def get_testrail_client() -> tuple[str, dict[str, str], tuple[str, str] | None]:
     return base_url.rstrip("/"), headers, auth
 
 
-def fetch_tests(base_url: str, headers: dict[str, str], auth: tuple[str, str], run_id: int) -> list[dict[str, Any]]:
+def fetch_tests(
+    base_url: str, headers: dict[str, str], auth: tuple[str, str], run_id: int
+) -> list[dict[str, Any]]:
     """Fetch tests from TestRail run."""
     try:
         import requests
     except ImportError:
-        raise ValueError("requests library required: pip install requests")
+        raise ValueError("requests library required: pip install requests") from None
 
     url = f"{base_url}/index.php?/api/v2/get_tests/{run_id}"
     response = requests.get(url, headers=headers, auth=auth, timeout=30)
@@ -80,12 +82,14 @@ def fetch_tests(base_url: str, headers: dict[str, str], auth: tuple[str, str], r
     return response.json()
 
 
-def fetch_test_results(base_url: str, headers: dict[str, str], auth: tuple[str, str], test_id: int) -> dict[str, Any]:
+def fetch_test_results(
+    base_url: str, headers: dict[str, str], auth: tuple[str, str], test_id: int
+) -> dict[str, Any]:
     """Fetch results for a single test."""
     try:
         import requests
     except ImportError:
-        raise ValueError("requests library required: pip install requests")
+        raise ValueError("requests library required: pip install requests") from None
 
     url = f"{base_url}/index.php?/api/v2/get_results/{test_id}"
     response = requests.get(url, headers=headers, auth=auth, timeout=30)
@@ -94,12 +98,14 @@ def fetch_test_results(base_url: str, headers: dict[str, str], auth: tuple[str, 
     return results[0] if results else {}
 
 
-def fetch_user(base_url: str, headers: dict[str, str], auth: tuple[str, str], user_id: int) -> dict[str, Any]:
+def fetch_user(
+    base_url: str, headers: dict[str, str], auth: tuple[str, str], user_id: int
+) -> dict[str, Any]:
     """Fetch user info."""
     try:
         import requests
     except ImportError:
-        raise ValueError("requests library required: pip install requests")
+        raise ValueError("requests library required: pip install requests") from None
 
     url = f"{base_url}/index.php?/api/v2/get_user/{user_id}"
     response = requests.get(url, headers=headers, auth=auth, timeout=30)
@@ -175,14 +181,20 @@ def convert_to_execution_evidence(
     return evidence
 
 
-def import_testrail_results(project_id: int, run_id: int, tc_prefix: str = "TC") -> tuple[list[dict[str, Any]], dict[str, Any]]:
-    """Import TestRail results and convert to execution_evidence."""
-    base_url, headers, auth = get_testrail_client()
+def import_testrail_results(
+    project_id: int,
+    run_id: int,
+    tc_prefix: str = "TC",
+    dry_run: bool = False,
+) -> tuple[list[dict[str, Any]], dict[str, Any]]:
+    """Import TestRail results and convert to execution_evidence.
 
-    # Fetch tests
-    tests = fetch_tests(base_url, headers, auth, run_id)
-
-    results: list[dict[str, Any]] = []
+    Args:
+        project_id: TestRail project ID
+        run_id: TestRail run ID
+        tc_prefix: Prefix for test case IDs
+        dry_run: If True, skip API calls and return preview data
+    """
     stats = {
         "source": "testrail",
         "project_id": project_id,
@@ -192,13 +204,35 @@ def import_testrail_results(project_id: int, run_id: int, tc_prefix: str = "TC")
         "fail_count": 0,
         "skip_count": 0,
         "blocked_count": 0,
+        "import_timestamp": datetime.now().isoformat(),
     }
+
+    if dry_run:
+        # Return preview data without API calls
+        stats["dry_run"] = True
+        preview_results = [
+            {
+                "run_id": f"TR-RUN-{run_id}-preview",
+                "tc_id": f"{tc_prefix}-001",
+                "feature_id": "IMPORTED",
+                "tester": "preview",
+                "result": "pass",
+            }
+        ]
+        return preview_results, stats
+
+    base_url, headers, auth = get_testrail_client()
+
+    # Fetch tests
+    tests = fetch_tests(base_url, headers, auth, run_id)
+
+    results: list[dict[str, Any]] = []
 
     # Cache users
     user_cache: dict[int, str] = {}
 
     for test in tests:
-        case_id = test.get("case_id", 0)
+        _case_id = test.get("case_id", 0)
         status_id = test.get("status_id", 3)
 
         # Get assigned user
@@ -282,7 +316,9 @@ def main() -> int:
     args = parser.parse_args()
 
     try:
-        results, stats = import_testrail_results(args.project, args.run, args.tc_prefix)
+        results, stats = import_testrail_results(
+            args.project, args.run, args.tc_prefix, dry_run=args.dry_run
+        )
 
         if args.dry_run:
             print("=== DRY RUN ===")
@@ -300,16 +336,12 @@ def main() -> int:
             filename = f"{evidence['tc_id']}.json"
             file_path = args.output / filename
             file_path.write_text(
-                json.dumps(evidence, indent=2, ensure_ascii=False),
-                encoding="utf-8"
+                json.dumps(evidence, indent=2, ensure_ascii=False), encoding="utf-8"
             )
 
         # Write summary
         summary_path = args.output / "summary.json"
-        summary_path.write_text(
-            json.dumps(stats, indent=2, ensure_ascii=False),
-            encoding="utf-8"
-        )
+        summary_path.write_text(json.dumps(stats, indent=2, ensure_ascii=False), encoding="utf-8")
 
         print(f"Imported: {args.output}")
         print(f"  Total: {stats['imported_count']} tests")
