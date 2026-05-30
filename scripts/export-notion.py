@@ -27,18 +27,11 @@ import sys
 from pathlib import Path
 from typing import Any
 
+# Add scripts/ to path for _shared imports
+sys.path.insert(0, str(Path(__file__).parent))
+from _shared.io_common import load_json
+
 __version__ = "0.1.0"
-
-
-def load_report(path: Path) -> dict[str, Any]:
-    """Load and parse forward-test report JSON."""
-    try:
-        with path.open("r", encoding="utf-8") as f:
-            return json.load(f)
-    except json.JSONDecodeError as e:
-        raise ValueError(f"Invalid JSON in {path}: {e}") from e
-    except OSError as e:
-        raise ValueError(f"Cannot read {path}: {e}") from e
 
 
 def create_notion_page(
@@ -408,7 +401,7 @@ def main() -> int:
 
         # Load or create report
         if args.input:
-            report = load_report(args.input)
+            report = load_json(args.input)
         else:
             # Create from arguments
             if not args.score:

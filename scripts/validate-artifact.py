@@ -16,10 +16,13 @@ Example:
 from __future__ import annotations
 
 import argparse
-import json
 import sys
 from pathlib import Path
 from typing import Any
+
+# Add scripts/ to path for _shared imports
+sys.path.insert(0, str(Path(__file__).parent))
+from _shared.io_common import load_json
 
 __version__ = "0.1.0"
 
@@ -47,17 +50,6 @@ try:
     HAS_JSONSCHEMA = True
 except ImportError:
     HAS_JSONSCHEMA = False
-
-
-def load_json(path: Path) -> dict[str, Any]:
-    """Load and parse JSON file."""
-    try:
-        with path.open("r", encoding="utf-8") as f:
-            return json.load(f)
-    except json.JSONDecodeError as e:
-        raise ValueError(f"Invalid JSON in {path}: {e}") from e
-    except OSError as e:
-        raise ValueError(f"Cannot read {path}: {e}") from e
 
 
 def resolve_schema_refs(schema: dict[str, Any], schema_dir: Path) -> dict[str, Any]:

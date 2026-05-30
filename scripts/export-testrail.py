@@ -19,18 +19,11 @@ import sys
 from pathlib import Path
 from typing import Any
 
+# Add scripts/ to path for _shared imports
+sys.path.insert(0, str(Path(__file__).parent))
+from _shared.io_common import load_json
+
 __version__ = "0.2.0"
-
-
-def load_case_set(path: Path) -> dict[str, Any]:
-    """Load and parse manual_case_set.json."""
-    try:
-        with path.open("r", encoding="utf-8") as f:
-            return json.load(f)
-    except json.JSONDecodeError as e:
-        raise ValueError(f"Invalid JSON in {path}: {e}") from e
-    except OSError as e:
-        raise ValueError(f"Cannot read {path}: {e}") from e
 
 
 def convert_to_testrail(case_set: dict[str, Any]) -> dict[str, Any]:
@@ -158,7 +151,7 @@ def main() -> int:
     args = parser.parse_args()
 
     try:
-        case_set = load_case_set(args.input)
+        case_set = load_json(args.input)
         testrail_data = convert_to_testrail(case_set)
 
         if args.format == "csv":

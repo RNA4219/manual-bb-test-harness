@@ -28,7 +28,7 @@ spec_xray.loader.exec_module(export_xray)
 
 # ============== TestRail Tests ==============
 
-load_case_set_tr = export_testrail.load_case_set
+load_json_tr = export_testrail.load_json
 convert_to_testrail = export_testrail.convert_to_testrail
 export_testrail_csv = export_testrail.export_testrail_csv
 main_testrail = export_testrail.main
@@ -40,14 +40,14 @@ class TestLoadCaseSet:
     def test_valid_json(self, tmp_path: Path) -> None:
         file = tmp_path / "test.manual_case_set.json"
         file.write_text(json.dumps({"feature_id": "TEST", "manual_cases": []}), encoding="utf-8")
-        result = load_case_set_tr(file)
+        result = load_json_tr(file)
         assert result["feature_id"] == "TEST"
 
     def test_invalid_json(self, tmp_path: Path) -> None:
         file = tmp_path / "test.json"
         file.write_text("{invalid}", encoding="utf-8")
         with pytest.raises(ValueError, match="Invalid JSON"):
-            load_case_set_tr(file)
+            load_json_tr(file)
 
 
 class TestConvertToTestrail:
@@ -176,7 +176,6 @@ class TestMainTestrail:
 
 # ============== Xray Tests ==============
 
-load_case_set_xr = export_xray.load_case_set
 convert_to_xray = export_xray.convert_to_xray
 main_xray = export_xray.main
 

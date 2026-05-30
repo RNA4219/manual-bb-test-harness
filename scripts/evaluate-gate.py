@@ -23,6 +23,10 @@ import sys
 from pathlib import Path
 from typing import Any
 
+# Add scripts/ to path for _shared imports
+sys.path.insert(0, str(Path(__file__).parent))
+from _shared.io_common import load_json
+
 __version__ = "0.1.0"
 
 
@@ -57,23 +61,12 @@ GATE_THRESHOLDS = {
 }
 
 
-def load_json_file(path: Path) -> dict[str, Any]:
-    """Load and parse JSON file."""
-    try:
-        with path.open("r", encoding="utf-8") as f:
-            return json.load(f)
-    except json.JSONDecodeError as e:
-        raise ValueError(f"Invalid JSON in {path}: {e}") from e
-    except OSError as e:
-        raise ValueError(f"Cannot read {path}: {e}") from e
-
-
 def load_evidence_files(path: Path) -> list[dict[str, Any]]:
     """Load execution evidence from file or directory."""
     evidence_list: list[dict[str, Any]] = []
 
     if path.is_file():
-        evidence_list.append(load_json_file(path))
+        evidence_list.append(load_json(path))
     elif path.is_dir():
         # Look for execution evidence files
         # Accept: execution_*.json, *_evidence.json, TC-*.json (test case results)
@@ -85,11 +78,11 @@ def load_evidence_files(path: Path) -> list[dict[str, Any]]:
                 or f.name.startswith("TC-")
                 or f.name.startswith("tc-")
             ):
-                evidence_list.append(load_json_file(f))
+                evidence_list.append(load_json(f))
             # Also check if file has tc_id field (execution evidence marker)
             else:
                 try:
-                    data = load_json_file(f)
+                    data = load_json(f)
                     if "tc_id" in data and "result" in data:
                         evidence_list.append(data)
                 except Exception:
@@ -418,8 +411,8 @@ def main() -> int:
 
         # Load data
         evidence_list = load_evidence_files(evidence_path)
-        risk_register = load_json_file(risk_path)
-        manual_cases = load_json_file(cases_path)
+        risk_register = load_json(risk_path)
+        manual_cases = load_json(cases_path)
 
         # Get feature_id
         feature_id = manual_cases.get("feature_id", risk_register.get("feature_id", "UNKNOWN"))
