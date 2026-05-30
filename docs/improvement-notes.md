@@ -8,7 +8,7 @@
 
 | Category | Count | Details |
 |---|---|---|
-| Critical | 1 | Unit tests追加 (48 tests, 98% coverage) |
+| Critical | 1 | Unit tests追加[^1] |
 | High | 5 | Exception handling, null check, CI multi-platform, pyproject.toml |
 | Medium | 9 | Schema descriptions, READMEs, type hints, version/debug flags |
 | Low | 6 | CHANGELOG, SPEC, generic.yaml, JSON golden examples |
@@ -23,7 +23,9 @@
 | Task | Priority | Note |
 |---|---|---|
 | GitHub Pages hosting | 低 | $id URL解決が必要な場合のみ |
-| Coverage 100% | 低 | 現在98%、実質十分 |
+| Coverage向上 | 低 | 現在~33%[^1]、主要パスは保護済み |
+
+[^1]: 当時の記録（98%, 48 tests）。現在のテスト数・カバレッジは異なる。最新値は `uv run pytest --cov` で確認。
 
 ---
 

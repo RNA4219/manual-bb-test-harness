@@ -31,7 +31,7 @@ schema 定義に対応する concrete example を提供する。
 |---|---|
 | `order-cancel-partial.feature_spec.json` | Markdown spec-ingest の生成例 |
 | `gate_decision_new.json` | `evaluate-gate.py` の出力例 |
-| `test_spec.json` | Markdown intake の生成例 |
+| `test_spec.feature_spec.json` | Markdown intake の生成例 |
 
 ## Schema 対応
 

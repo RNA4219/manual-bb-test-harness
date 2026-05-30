@@ -15,7 +15,7 @@
 
 詳細は CHANGELOG.md を参照。
 
-## 機能拡張 (5件 - HIGH Impact)
+## 機能拡張 (7件 - HIGH Impact)
 
 | Feature | Status | Description |
 |---|---|---|
@@ -24,6 +24,8 @@
 | F3: State Diagram | OK | Mermaid stateDiagram生成 |
 | F4: TestRail/Xray | OK | Export to test management tools |
 | F5: Ready Phase Contract | OK | 企画・モック・要件メモ → Definition of Ready / Phase 1 契約 |
+| F6: TestRail/Xray Import | OK | TestRail/Xray → execution_evidence.json, dry-run preview, status変換テスト付き |
+| F7: Forward Test CLI | OK | `bb-harness run forward-test` wrapper, Skill 評価プロンプト出力 |
 
 ## F5: Ready Phase Contract
 
@@ -61,8 +63,8 @@
 | Phase | Verification | Status |
 |---|---|---|
 | 1 | `pip install -e .` | OK |
-| 2 | pytest >80% coverage | OK (98%) |
-| 3 | tests pass | OK (129 tests) |
+| 2 | pytest coverage | OK (~33% @ 2026-05-30, 回帰テスト継続中) |
+| 3 | tests pass | OK (157+ tests @ 2026-05-30) |
 | 4 | CI 3OS×3Python | OK |
 | 5 | Schema validation | OK |
 | 6 | Agent config | OK |

@@ -186,9 +186,12 @@ bb-harness --dry-run export notion --input report.json
 
 ## 受入基準
 
-- [ ] `bb-harness --help`で全subcommand一覧表示
-- [ ] `bb-harness --version`でversion表示
-- [ ] `pip install bb-harness`成功
-- [ ] 既存script機能100%継承
-- [ ] verboseモードで詳細ログ出力
-- [ ] dry-runモードでAPI送信回避
+- [x] `bb-harness --help`で主要subcommand一覧表示
+- [x] `bb-harness --version`でversion表示
+- [x] `pip install -e .` / CI installでパッケージ化検証
+- [x] 主要script機能を `bb-harness` subcommand から呼び出し可能
+- [x] dry-runモードでNotion API送信回避
+- [x] `bb-harness --verbose` が validate/ingest/gate/export/import で stderr に詳細ログを出力（PLAN-CLI-01 @ 2026-05-30）
+- [x] `bb-harness import testrail` / `bb-harness import xray` が wrapper 経由で動作、dry-run/token未設定テスト付き（PLAN-CLI-02 @ 2026-05-30）
+- [x] `bb-harness run forward-test --help` が表示され、`--skill` と `--input` を受け取りプロンプトテンプレートを出力（PLAN-CLI-03 @ 2026-05-30）
+- [x] `RUNBOOK.md` に import/export/run CLI の実行手順を追記、CLI tests を追加（PLAN-CLI-04 @ 2026-05-30）

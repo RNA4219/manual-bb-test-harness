@@ -227,10 +227,10 @@ python scripts/validate-artifact.py --all examples/artifacts/ --strict
 
 ## 受入基準
 
-- [ ] observation_set.schema.json作成
-- [ ] effort_plan.schema.json作成
-- [ ] release_brief.schema.json作成
-- [ ] shared_defs.schema.jsonにSourceRef/Assumption型追加
-- [ ] validate-artifact.py作成
-- [ ] examples/artifacts/*.json全検証pass
-- [ ] CI validate.ymlに統合
+- [x] observation_set.schema.json作成
+- [x] effort_plan.schema.json作成
+- [x] release_brief.schema.json作成
+- [x] shared_defs.schema.jsonにSourceRef/Assumption型追加
+- [x] validate-artifact.py作成
+- [x] examples/artifacts/*.json全検証pass
+- [x] CI validate.ymlに統合

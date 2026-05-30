@@ -99,7 +99,8 @@
 - profile: standard
 - decision: go
 - reasons:
-  - `uv run pytest` で 131 tests passed
+  - 当時の `uv run pytest` は passed[^1]
+  - 現行再検証では `uv run pytest` が 145 passed @ 2026-05-30
   - Skill validator と PowerShell validator が成功
   - mobile contract、ingest、golden、docs 導線の観点を確認済み
   - example / export / lockfile の追跡範囲を確認済み
@@ -120,7 +121,8 @@
 - coverage gaps:
   - 実運用の forward-test canonical log は Notion 側で継続蓄積が必要
 - evidence:
-  - 131 tests passed
+  - 当時の pytest passed[^1]
+  - 現行再検証: 145 passed @ 2026-05-30
   - quick validator passed
   - PowerShell validator passed
   - feature_spec / test_model artifact validation passed
@@ -129,3 +131,5 @@
   - low
 - required follow-up:
   - forward-test 実績が増えた時点で Notion canonical log と repo golden を再同期する
+
+[^1]: 当時の記録。古いテスト件数は現行値として扱わない。最新値は `uv run pytest` 実行で確認。

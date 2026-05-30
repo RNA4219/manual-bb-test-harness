@@ -275,11 +275,14 @@ execution_evidence/
 
 ## 受入基準
 
-- [ ] import-testrail.py作成
-- [ ] import-xray.py作成
-- [ ] TESTRAIL_API_KEY環境変数認証
-- [ ] JIRA_API_KEY環境変数認証
-- [ ] status変換100%正確
-- [ ] execution_evidence.json形式出力
-- [ ] gate判定スクリプト連携確認
-- [ ] dry-runモード動作
+- [x] import-testrail.py作成
+- [x] import-xray.py作成
+- [x] TESTRAIL_API_KEY環境変数認証
+- [x] JIRA_API_KEY環境変数認証
+- [x] execution_evidence.json形式出力
+- [x] gate判定スクリプト連携確認
+- [x] `--dry-run` が API token 未設定でも preview モードで成功（PLAN-IMPORT-02 @ 2026-05-30）
+- [x] `bb-harness import testrail/xray` wrapper 経由で dry-run が動作（PLAN-IMPORT-03 @ 2026-05-30）
+- [x] `tests/test_import_status.py` で TestRail/Xray の status/priority map 全分岐と convert 関数を検証（PLAN-IMPORT-01 @ 2026-05-30）
+- [x] import 出力が `execution_evidence.schema.json` で検証可能、`timestamp` を schema に追加（PLAN-IMPORT-04 @ 2026-05-30）
+- [x] `RUNBOOK.md` に import/export CLI 手順を追記、本specを更新（PLAN-IMPORT-05 @ 2026-05-30）

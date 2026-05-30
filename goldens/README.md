@@ -1,6 +1,6 @@
 # goldens/
 
-## 目要
+## 目的
 
 このディレクトリには Skill の forward-test で使用する golden input/expected を配置する。
 出力品質を見るための review anchors であり、厳密 snapshot ではない。

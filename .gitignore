@@ -2,6 +2,7 @@
 Thumbs.db
 *.tmp
 *.log
+tmp-*.json
 __pycache__/
 .pytest_cache/
 .ruff_cache/

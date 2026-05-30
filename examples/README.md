@@ -26,7 +26,7 @@ examples/
 | `admin-role-change.states.mmd` | state-diagram の出力例 |
 | `order-cancel-partial.feature_spec.json` | spec-ingest の取り込み例 |
 | `gate_decision_new.json` | evaluate-gate の出力例 |
-| `test_spec.json` | spec-ingest の生成例 |
+| `test_spec.feature_spec.json` | spec-ingest の生成例 |
 
 ## 使い方
 

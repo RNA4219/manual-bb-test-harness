@@ -13,7 +13,15 @@
 | `feature_spec.schema.json` | feature_spec artifact の構造定義 |
 | `test_model.schema.json` | test_model artifact の構造定義 |
 | `manual_case_set.schema.json` | manual_case_set artifact の構造定義 |
+| `execution_evidence.schema.json` | execution_evidence artifact の構造定義 |
+| `observation_set.schema.json` | observation_set artifact の構造定義 |
+| `risk_register.schema.json` | risk_register artifact の構造定義 |
+| `effort_plan.schema.json` | effort_plan artifact の構造定義 |
 | `gate_decision.schema.json` | gate_decision artifact の構造定義 |
+| `release_brief.schema.json` | release_brief artifact の構造定義 |
+| `spec-source.schema.json` | spec-source artifact の構造定義 |
+| `testrail-export.schema.json` | TestRail export 形式定義 |
+| `xray-export.schema.json` | Xray export 形式定義 |
 | `shared_defs.schema.json` | SourceRef, Assumption などの共通型定義 |
 
 ## $id URL について

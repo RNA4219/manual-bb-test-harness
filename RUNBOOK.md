@@ -61,6 +61,32 @@ uv run python .\scripts\quick-validate-skill.py .\skills\manual-bb-test-harness
 2. 検収時に `docs/acceptance/ACCEPTANCE_TEMPLATE.md` から acceptance record を作る。
 3. release readiness を残す場合は、必要に応じて `docs/release-review-YYYYMMDD.md` を追加する。
 
+### 6. CLI で import/export/run を実行する
+
+```powershell
+# Import dry-run (token 不要)
+uv run bb-harness import testrail --project 12 --run 1234 --output tmp-import --dry-run
+uv run bb-harness import xray --exec TEST-1 --output tmp-import --dry-run
+
+# Import 実行 (環境変数必須)
+uv run bb-harness import testrail --project 12 --run 1234 --output execution_evidence/
+uv run bb-harness import xray --exec PROJ-TE-123 --output execution_evidence/
+
+# Export dry-run (token 不要)
+uv run bb-harness --dry-run export notion --score 90 --status pass --db dummy_db
+
+# Export 実行 (環境変数必須)
+uv run bb-harness export notion --input report.json --db DATABASE_ID
+
+# Forward-test (Skill 評価)
+uv run bb-harness run forward-test --input goldens/order-cancel.input.md
+
+# 詳細出力
+uv run bb-harness --verbose validate
+uv run bb-harness --verbose ingest --source markdown --input spec.md --output feature.json
+uv run bb-harness --verbose gate --input artifacts --output gate.json
+```
+
 ## Confirm
 
 - `README.md`、`HUB.codex.md`、`BLUEPRINT.md`、`RUNBOOK.md`、`GUARDRAILS.md`、`EVALUATION.md` の役割が重複しすぎていない。

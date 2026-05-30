@@ -47,9 +47,9 @@ next_review_due: 2026-06-16
 
 ## Verification Checklist
 
-- [ ] `README.md` から正本ドキュメントへ辿れる
-- [ ] `HUB.codex.md` の読み順が repo 実態と一致する
-- [ ] artifact contract / schema / example / golden が同期している
-- [ ] mobile golden が追加観点を検知できる
-- [ ] `uv run pytest` が成功する
-- [ ] validator が成功する
+- [x] `README.md` から正本ドキュメントへ辿れる
+- [x] `HUB.codex.md` の読み順が repo 実態と一致する
+- [x] artifact contract / schema / example / golden が同期している
+- [x] mobile golden が追加観点を検知できる（`mobile-session-resume`: lifecycle/permission/network/push_entry観点あり @ 2026-05-30）
+- [x] `uv run pytest` が成功する（145 tests passed @ 2026-05-30）
+- [x] validator が成功する（quick-validate-skill, validate-skill.ps1, validate-artifact --all --strict）

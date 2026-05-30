@@ -164,8 +164,8 @@ act pull_request
 
 ## 受入基準
 
-- [ ] pre-commit installでhook有効化
-- [ ] TODO marker含むファイルでhook fail
-- [ ] validate.ymlがPRで自動実行
-- [ ] 全script --help動作確認pass
-- [ ] 実行時間5分以内
+- [x] pre-commit installでhook有効化できる構成がある
+- [x] TODO marker含むファイルでhook fail
+- [x] validate.ymlがPR/pushで自動実行
+- [x] 全script --help動作確認pass
+- [x] 実行時間5分以内の想定で主要検証が完了

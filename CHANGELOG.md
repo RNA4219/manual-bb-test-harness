@@ -2,10 +2,26 @@
 
 ## Unreleased
 
+- README を AI-first 入口へ再構成し、人間向け概要を `docs/human-readme.md` に分離。
+- artifact 検証で `jsonschema` を標準依存にし、`examples/artifacts/` の全 JSON example が `validate-artifact --all --strict` で通るように整理。
+- 検証記録を現状の `145 passed` に更新。
 - mobile 対象向けに `mobile_contexts` と `platform_matrix` を追加し、iOS / Android の中断復帰、権限、通知入口、ネットワーク差分を扱う platform pack と golden を追加。
 - workflow-cookbook 準拠の正本ドキュメントとして `HUB.codex.md`、`BLUEPRINT.md`、`RUNBOOK.md`、`GUARDRAILS.md`、`EVALUATION.md` を追加。
 - `docs/tasks/` と `docs/acceptance/` を追加し、repo self-review と release readiness 記録を残せるようにした。
 - 既存の spec-ingest / state-diagram / export 生成例と `uv.lock` を repo の追跡対象として整理し、README 群へ反映した。
+
+### Added (PLAN 完了分)
+- **F6: TestRail/Xray Import** (`scripts/import-testrail.py`, `scripts/import-xray.py`)
+  - `--dry-run` で API token 未設定でも preview モードで成功。
+  - `bb-harness import testrail/xray` CLI wrapper 経由で動作。
+  - status/priority 変換テスト (`tests/test_import_status.py`, 50 tests)。
+  - import 出力が `execution_evidence.schema.json` で検証可能。
+- **F7: Forward Test CLI** (`src/bb_harness/commands/run.py`)
+  - `bb-harness run forward-test --skill ... --input ...` で Skill 評価プロンプト出力。
+- `--verbose` を全 subcommand (validate/ingest/gate/export/import/run/heatmap/state-diagram/regression-graph) に伝播。
+- `execution_evidence.schema.json` に `timestamp` フィールド追加。
+- `RUNBOOK.md` に import/export/run CLI の実行手順を追記。
+- `tests/test_cli_dryrun.py` に import/export/run の CLI wrapper テストを追加。
 
 Keep a Changelog形式, Semantic Versioning準拠。
 
@@ -42,14 +58,14 @@ Keep a Changelog形式, Semantic Versioning準拠。
 - `exports/xray-order-cancel.json`: Xray export例
 
 ### Tests
-- Unit tests: 129 tests (from 67)
-- Coverage: ~98% (maintained)
+- Unit tests: 129 tests (from 67)[^1]
+- Coverage: ~98%[^1]
 
 ## [0.1.1] - 2026-05-03 (Quality Improvement)
 
 ### Added
 - SPEC.md: 改修仕様書
-- Unit tests (tests/) - カバレッジ98%
+- Unit tests (tests/) - カバレッジ98%[^1]
 - pyproject.toml: 依存関係設定
 - Multi-platform CI (windows/ubuntu/macos, Python 3.10/3.11/3.12)
 - Subdirectory README (schemas/, examples/, goldens/)
@@ -75,3 +91,5 @@ Keep a Changelog形式, Semantic Versioning準拠。
 - Validation scripts (Python/PowerShell)
 - CI workflow, evaluation rubric
 - Domain packs (EC, SaaS-RBAC)
+
+[^1]: 当時の記録。現在のテスト数・カバレッジは異なる可能性がある。最新値は `uv run pytest` 実行で確認。
