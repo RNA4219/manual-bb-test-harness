@@ -3,9 +3,10 @@
 from __future__ import annotations
 
 import argparse
-import subprocess
 import sys
 from pathlib import Path
+
+from bb_harness.commands._shared import run_script
 
 
 def add_subparser(subparsers: argparse._SubParsersAction) -> None:
@@ -31,16 +32,12 @@ def add_subparser(subparsers: argparse._SubParsersAction) -> None:
 
 def run(args: argparse.Namespace) -> int:
     """Run validate command."""
-    script_path = Path("scripts/quick-validate-skill.py")
-
-    cmd = [sys.executable, str(script_path), str(args.skill_path)]
+    extra_args = [str(args.skill_path)]
     if args.json:
         # Future: add JSON output support
         pass
 
     if getattr(args, "verbose", False):
-        print(f"[verbose] Running: {' '.join(cmd)}", file=sys.stderr)
         print(f"[verbose] Skill path: {args.skill_path}", file=sys.stderr)
 
-    result = subprocess.run(cmd, check=False)
-    return result.returncode
+    return run_script("quick-validate-skill.py", extra_args, args)

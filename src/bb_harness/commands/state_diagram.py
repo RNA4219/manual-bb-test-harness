@@ -3,9 +3,10 @@
 from __future__ import annotations
 
 import argparse
-import subprocess
 import sys
 from pathlib import Path
+
+from bb_harness.commands._shared import run_script
 
 
 def add_subparser(subparsers: argparse._SubParsersAction) -> None:
@@ -31,11 +32,7 @@ def add_subparser(subparsers: argparse._SubParsersAction) -> None:
 
 def run(args: argparse.Namespace) -> int:
     """Run state-diagram command."""
-    script_path = Path("scripts/state-diagram.py")
-
-    cmd = [
-        sys.executable,
-        str(script_path),
+    extra_args = [
         "--input",
         str(args.input),
         "--output",
@@ -43,8 +40,6 @@ def run(args: argparse.Namespace) -> int:
     ]
 
     if getattr(args, "verbose", False):
-        print(f"[verbose] Running: {' '.join(cmd)}", file=sys.stderr)
         print(f"[verbose] Input: {args.input}", file=sys.stderr)
 
-    result = subprocess.run(cmd, check=False)
-    return result.returncode
+    return run_script("state-diagram.py", extra_args, args)

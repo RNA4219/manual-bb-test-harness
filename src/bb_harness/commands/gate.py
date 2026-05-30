@@ -3,9 +3,10 @@
 from __future__ import annotations
 
 import argparse
-import subprocess
 import sys
 from pathlib import Path
+
+from bb_harness.commands._shared import run_script
 
 
 def add_subparser(subparsers: argparse._SubParsersAction) -> None:
@@ -51,11 +52,7 @@ def add_subparser(subparsers: argparse._SubParsersAction) -> None:
 
 def run(args: argparse.Namespace) -> int:
     """Run gate command."""
-    script_path = Path("scripts/evaluate-gate.py")
-
-    cmd = [
-        sys.executable,
-        str(script_path),
+    extra_args = [
         "--output",
         str(args.output),
         "--profile",
@@ -63,9 +60,9 @@ def run(args: argparse.Namespace) -> int:
     ]
 
     if args.input:
-        cmd.extend(["--input", str(args.input)])
+        extra_args.extend(["--input", str(args.input)])
     elif args.evidence and args.risk and args.cases:
-        cmd.extend(
+        extra_args.extend(
             [
                 "--evidence",
                 str(args.evidence),
@@ -80,8 +77,6 @@ def run(args: argparse.Namespace) -> int:
         return 1
 
     if getattr(args, "verbose", False):
-        print(f"[verbose] Running: {' '.join(cmd)}", file=sys.stderr)
         print(f"[verbose] Profile: {args.profile}", file=sys.stderr)
 
-    result = subprocess.run(cmd, check=False)
-    return result.returncode
+    return run_script("evaluate-gate.py", extra_args, args)

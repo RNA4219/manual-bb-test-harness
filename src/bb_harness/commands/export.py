@@ -3,9 +3,10 @@
 from __future__ import annotations
 
 import argparse
-import subprocess
 import sys
 from pathlib import Path
+
+from bb_harness.commands._shared import run_script
 
 
 def add_subparser(subparsers: argparse._SubParsersAction) -> None:
@@ -107,10 +108,7 @@ def run(args: argparse.Namespace) -> int:
         return 1
 
     if args.target == "testrail":
-        script_path = Path("scripts/export-testrail.py")
-        cmd = [
-            sys.executable,
-            str(script_path),
+        extra_args = [
             "--input",
             str(args.input),
             "--format",
@@ -118,38 +116,27 @@ def run(args: argparse.Namespace) -> int:
             "--output",
             str(args.output),
         ]
+        return run_script("export-testrail.py", extra_args, args)
     elif args.target == "xray":
-        script_path = Path("scripts/export-xray.py")
-        cmd = [
-            sys.executable,
-            str(script_path),
+        extra_args = [
             "--input",
             str(args.input),
             "--output",
             str(args.output),
         ]
+        return run_script("export-xray.py", extra_args, args)
     elif args.target == "notion":
-        script_path = Path("scripts/export-notion.py")
-        cmd = [sys.executable, str(script_path)]
+        extra_args = []
         if args.input:
-            cmd.extend(["--input", str(args.input)])
+            extra_args.extend(["--input", str(args.input)])
         if args.db:
-            cmd.extend(["--db", args.db])
-        cmd.extend(["--title", args.title])
+            extra_args.extend(["--db", args.db])
+        extra_args.extend(["--title", args.title])
         if args.score:
-            cmd.extend(["--score", str(args.score)])
+            extra_args.extend(["--score", str(args.score)])
         if args.status:
-            cmd.extend(["--status", args.status])
-        # Check both top-level --dry-run and subcommand --dry-run
-        if getattr(args, "dry_run", False):
-            cmd.append("--dry-run")
+            extra_args.extend(["--status", args.status])
+        return run_script("export-notion.py", extra_args, args)
     else:
         print(f"Error: Unknown export target: {args.target}", file=sys.stderr)
         return 1
-
-    if getattr(args, "verbose", False):
-        print(f"[verbose] Running: {' '.join(cmd)}", file=sys.stderr)
-        print(f"[verbose] Target: {args.target}", file=sys.stderr)
-
-    result = subprocess.run(cmd, check=False)
-    return result.returncode

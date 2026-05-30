@@ -3,13 +3,10 @@
 from __future__ import annotations
 
 import argparse
-import subprocess
 import sys
 from pathlib import Path
 
-# Resolve project root from this file's location:
-# src/bb_harness/commands/import_results.py -> project root
-PROJECT_ROOT = Path(__file__).resolve().parent.parent.parent.parent
+from bb_harness.commands._shared import run_script
 
 
 def add_subparser(subparsers: argparse._SubParsersAction) -> None:
@@ -90,10 +87,7 @@ def run(args: argparse.Namespace) -> int:
         return 1
 
     if args.source == "testrail":
-        script_path = PROJECT_ROOT / "scripts" / "import-testrail.py"
-        cmd = [
-            sys.executable,
-            str(script_path),
+        extra_args = [
             "--project",
             str(args.project),
             "--run",
@@ -102,29 +96,16 @@ def run(args: argparse.Namespace) -> int:
             str(args.output),
         ]
         if args.tc_prefix != "TC":
-            cmd.extend(["--tc-prefix", args.tc_prefix])
-        # Check both top-level --dry-run and subcommand --dry-run
-        if getattr(args, "dry_run", False):
-            cmd.append("--dry-run")
+            extra_args.extend(["--tc-prefix", args.tc_prefix])
+        return run_script("import-testrail.py", extra_args, args)
     elif args.source == "xray":
-        script_path = PROJECT_ROOT / "scripts" / "import-xray.py"
-        cmd = [
-            sys.executable,
-            str(script_path),
+        extra_args = [
             "--exec",
             args.exec,
             "--output",
             str(args.output),
         ]
-        # Check both top-level --dry-run and subcommand --dry-run
-        if getattr(args, "dry_run", False):
-            cmd.append("--dry-run")
+        return run_script("import-xray.py", extra_args, args)
     else:
         print(f"Error: Unknown import source: {args.source}", file=sys.stderr)
         return 1
-
-    if getattr(args, "verbose", False):
-        print(f"[verbose] Running: {' '.join(cmd)}", file=sys.stderr)
-
-    result = subprocess.run(cmd, check=False)
-    return result.returncode

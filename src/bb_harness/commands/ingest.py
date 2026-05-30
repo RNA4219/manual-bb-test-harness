@@ -3,9 +3,10 @@
 from __future__ import annotations
 
 import argparse
-import subprocess
 import sys
 from pathlib import Path
+
+from bb_harness.commands._shared import run_script
 
 
 def add_subparser(subparsers: argparse._SubParsersAction) -> None:
@@ -44,23 +45,19 @@ def add_subparser(subparsers: argparse._SubParsersAction) -> None:
 
 def run(args: argparse.Namespace) -> int:
     """Run ingest command."""
-    script_path = Path("scripts/spec-ingest.py")
-
-    cmd = [sys.executable, str(script_path), "--source", args.source, "--output", str(args.output)]
+    extra_args = ["--source", args.source, "--output", str(args.output)]
 
     if args.source == "markdown" and args.input:
-        cmd.extend(["--input", str(args.input)])
+        extra_args.extend(["--input", str(args.input)])
     elif args.source == "confluence" and args.url:
-        cmd.extend(["--url", args.url])
+        extra_args.extend(["--url", args.url])
     elif args.source == "jira" and args.issue:
-        cmd.extend(["--issue", args.issue])
+        extra_args.extend(["--issue", args.issue])
     else:
         print(f"Error: Missing required argument for source {args.source}", file=sys.stderr)
         return 1
 
     if getattr(args, "verbose", False):
-        print(f"[verbose] Running: {' '.join(cmd)}", file=sys.stderr)
         print(f"[verbose] Source: {args.source}", file=sys.stderr)
 
-    result = subprocess.run(cmd, check=False)
-    return result.returncode
+    return run_script("spec-ingest.py", extra_args, args)
