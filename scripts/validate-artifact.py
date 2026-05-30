@@ -26,10 +26,10 @@ from _shared.io_common import load_json
 
 __version__ = "0.1.0"
 
-SCHEMA_DIR = Path("schemas")
+SCHEMA_DIR = Path(__file__).resolve().parent.parent / "schemas"
 
 # Mapping artifact type to schema
-ARTifact_SCHEMA_MAP = {
+ARTIFACT_SCHEMA_MAP = {
     "phase_contract": "phase_contract.schema.json",
     "feature_spec": "feature_spec.schema.json",
     "test_model": "test_model.schema.json",
@@ -103,13 +103,13 @@ def detect_artifact_type(path: Path) -> str:
     name_lower = path.name.lower()
 
     # Check filename first
-    for artifact_type, _schema_file in ARTifact_SCHEMA_MAP.items():
+    for artifact_type, _schema_file in ARTIFACT_SCHEMA_MAP.items():
         if artifact_type in name_lower:
             return artifact_type
 
     # Check parent directory name for nested artifacts
     parent_name = path.parent.name.lower()
-    for artifact_type, _schema_file in ARTifact_SCHEMA_MAP.items():
+    for artifact_type, _schema_file in ARTIFACT_SCHEMA_MAP.items():
         if artifact_type == parent_name:
             return artifact_type
 
@@ -172,7 +172,7 @@ def validate_artifact(artifact_path: Path, schema_type: str | None = None) -> di
             "errors": ["Cannot detect artifact type from filename"],
         }
 
-    schema_file = ARTifact_SCHEMA_MAP.get(schema_type)
+    schema_file = ARTIFACT_SCHEMA_MAP.get(schema_type)
     if not schema_file:
         return {
             "valid": False,
@@ -270,7 +270,7 @@ def main() -> int:
     )
     parser.add_argument(
         "--type",
-        choices=list(ARTifact_SCHEMA_MAP.keys()),
+        choices=list(ARTIFACT_SCHEMA_MAP.keys()),
         help="Artifact type (auto-detected if not specified)",
     )
     parser.add_argument(

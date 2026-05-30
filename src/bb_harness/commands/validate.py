@@ -23,19 +23,11 @@ def add_subparser(subparsers: argparse._SubParsersAction) -> None:
         default=Path("skills/manual-bb-test-harness"),
         help="Path to skill directory",
     )
-    parser.add_argument(
-        "--json",
-        action="store_true",
-        help="Output JSON format",
-    )
 
 
 def run(args: argparse.Namespace) -> int:
     """Run validate command."""
     extra_args = [str(args.skill_path)]
-    if args.json:
-        # Future: add JSON output support
-        pass
 
     if getattr(args, "verbose", False):
         print(f"[verbose] Skill path: {args.skill_path}", file=sys.stderr)
