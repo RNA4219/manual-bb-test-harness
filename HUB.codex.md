@@ -11,13 +11,14 @@ next_review_due: 2026-06-16
 `HUB_SCOPE_DECLARATION`: 本ファイルの適用範囲は `manual-bb-test-harness/` 全体。
 
 この repo は、手動ブラックボックス QA 設計 Skill の正本を管理する。  
-最初に `README.md` で全体像を掴み、次に目的に応じて下記の正本へ進む。
+最初に AI-first 入口の `README.md` で task classification を行い、次に目的に応じて下記の正本へ進む。
 
 ## 1. 正本ドキュメント
 
 | file | role |
 |---|---|
-| `README.md` | 人間向け入口、利用導線 |
+| `README.md` | AI-first 入口、task classification、最短導線 |
+| `docs/human-readme.md` | 人間向け概要、利用説明 |
 | `BLUEPRINT.md` | 目的、Scope、I/O 契約、主要設計 |
 | `RUNBOOK.md` | 実行手順、検証、更新時の確認 |
 | `GUARDRAILS.md` | 変更時の運用原則、境界 |

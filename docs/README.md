@@ -6,6 +6,7 @@
 
 | file | role |
 |---|---|
+| `human-readme.md` | 人間向け概要、利用説明 |
 | `evaluation-rubric.md` | forward-test の採点基準 |
 | `release-policy.md` | gate と release 判断の補助方針 |
 | `notion-report-guide.md` | Notion への forward-test 記録手順 |

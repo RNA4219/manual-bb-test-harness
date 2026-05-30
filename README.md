@@ -1,89 +1,42 @@
 # manual-bb-test-harness
 
-手動ブラックボックス前提のテスト設計を、根拠付き観点、リスク、手動ケース、工数、品質ゲート、Go/No-Go brief まで一気通貫で作る Codex Skill リポジトリです。
+AI-first README. 人間向けの概要と利用説明は [docs/human-readme.md](docs/human-readme.md) を読む。
 
-## 目的
+## AI Routing
 
-このリポジトリの目的は、仕様や受入条件から「それっぽいテストケース」を直接作るのではなく、先に coverage model を作り、根拠付き観点、リスク、手動ケース、探索チャーター、Gate 判定へ段階的につなぐ Skill を育てることです。
+この repo は、手動ブラックボックス前提の QA 設計 Skill `manual-bb-test-harness` を配布・保守するための正本 repo。
 
-主な利用場面:
+使うべきとき:
 
-- QA / 開発者が手動ブラックボックスのテスト観点を洗い出す。
-- リリース前に P0/P1 の手動確認範囲と残余リスクを整理する。
-- 仕様不足、oracle 不足、権限や状態遷移の抜けを早めに見つける。
-- forward-test の結果を Notion に記録し、Skill の出力品質を継続的に改善する。
-- Web に加えて iOS / Android アプリの中断復帰、権限、通知入口、ネットワーク差分を含む手動設計を行う。
+- 仕様、受入条件、変更点、不具合履歴、自動テスト証跡から、手動テスト観点とケースを作る。
+- リリース前に P0/P1 の手動確認範囲、残余リスク、Gate 判定、Go/No-Go brief を整理する。
+- 仕様不足、oracle 不足、権限、状態遷移、回帰影響、mobile 固有差分を QA 観点として洗い出す。
+- Skill の artifact 契約、schema、golden、評価基準、export/import 補助を保守する。
 
-## クイックスタート
+使わないとき:
 
-1. Skill の入口を読む。
+- 自動テストフレームワークそのものを実装する。
+- 実機クラウド、MDM、外部 SaaS の本番設定を構築する。
+- プロダクト固有の業務ルール正本をこの repo に集約する。
 
-```powershell
-Get-Content .\skills\manual-bb-test-harness\SKILL.md
-```
+## Task Classifier
 
-2. 仕様または golden input を渡して Skill を使う。
+| user intent | read first | then |
+|---|---|---|
+| Skill を使って手動 QA 設計を作る | `skills/manual-bb-test-harness/SKILL.md` | 必要な `skills/manual-bb-test-harness/references/*.md`、`goldens/` |
+| repo の読み順を決める | `HUB.codex.md` | 目的別の正本 |
+| 設計方針や I/O 契約を確認する | `BLUEPRINT.md` | `skills/manual-bb-test-harness/references/artifact-contract.md` |
+| 実行手順や検証手順を確認する | `RUNBOOK.md` | `scripts/`、`.github/workflows/validate.yml` |
+| 変更時の境界や禁止事項を確認する | `GUARDRAILS.md` | `AGENTS.md` |
+| 受入条件や品質基準を見る | `EVALUATION.md` | `docs/evaluation-rubric.md`、`goldens/` |
+| artifact/schema を変える | `BLUEPRINT.md` | `schemas/`、`examples/artifacts/`、`goldens/` |
+| mobile 対応を確認する | `skills/manual-bb-test-harness/references/platform-pack-mobile.md` | `goldens/mobile-session-resume.*` |
+| forward-test を評価・記録する | `skills/manual-bb-test-harness/references/forward-test.md` | `docs/evaluation-rubric.md`、`docs/notion-report-guide.md` |
+| 人間向け説明を読む | `docs/human-readme.md` | 必要に応じて root docs |
 
-```text
-Use $manual-bb-test-harness at ./skills/manual-bb-test-harness to create a manual black-box test design for ./goldens/order-cancel.input.md.
-```
+## Required Output Chain
 
-3. 出力を golden expected と rubric で確認する。
-
-```powershell
-Get-Content .\goldens\order-cancel.expected.md
-Get-Content .\docs\evaluation-rubric.md
-```
-
-4. Notion に forward-test 結果を記録する。
-
-```powershell
-Get-Content .\docs\notion-report-guide.md
-Get-Content .\docs\notion-forward-test-template.md
-```
-
-5. repo 側の構造を検証する。
-
-```powershell
-.\scripts\validate-skill.ps1
-python .\scripts\quick-validate-skill.py .\skills\manual-bb-test-harness
-```
-
-## 入口
-
-- Agent 向けハブ: `HUB.codex.md`
-- 設計正本: `BLUEPRINT.md`
-- 実行手順: `RUNBOOK.md`
-- 運用原則: `GUARDRAILS.md`
-- 検収基準: `EVALUATION.md`
-- Skill 本体: `skills/manual-bb-test-harness/SKILL.md`
-- 詳細参照: `skills/manual-bb-test-harness/references/`
-- Golden examples: `goldens/`
-- JSON Schema: `schemas/`
-- Export examples: `exports/`
-- Evaluation docs: `docs/evaluation-rubric.md`
-- Task seeds: `docs/tasks/`
-- Acceptance records: `docs/acceptance/`
-- Improvement notes: `docs/improvement-notes.md`
-- 原典調査: `docs/research/deep-research-report.md`
-
-## Scripts
-
-- `scripts/quick-validate-skill.py`: Skill構造検証
-- `scripts/state-diagram.py`: 状態遷移図(Mermaid)生成
-- `scripts/regression-graph.py`: 回帰影響グラフ(DOT/HTML)生成
-- `scripts/spec-ingest.py`: 仕様取り込み(Markdown/Confluence/Jira)
-- `scripts/export-testrail.py`: TestRail CSV/JSONエクスポート
-- `scripts/export-xray.py`: Xrayエクスポート
-- `scripts/evaluate-gate.py`: Gate判定自動化（execution_evidence→gate_decision）
-- `scripts/risk-heatmap.py`: リスクヒートマップ(HTML/SVG)生成
-- `scripts/export-notion.py`: Notion API forward-test結果投稿
-
-mobile 対象では `skills/manual-bb-test-harness/references/platform-pack-mobile.md` が追加観点を補う。
-
-## 何をする Skill か
-
-仕様、受入条件、変更点、不具合履歴、自動テスト証跡を入力にして、次の順で出力します。
+Skill を実行する場合は、原則として次の順に出力する。
 
 1. 根拠付き観点
 2. リスク
@@ -93,77 +46,59 @@ mobile 対象では `skills/manual-bb-test-harness/references/platform-pack-mobi
 6. Gate 判定
 7. Go/No-Go brief
 
-設計方針は、巨大な一枚岩エージェントではなく、短い責務と型付き artifact を JSON 契約でつなぐことです。手動 black-box を主軸にしつつ、gray/white 情報は補助証跡として扱います。
+機械連携が必要な場合は Markdown に加えて JSON artifact を併記する。traceability、source_refs、assumptions、confidence または根拠文を落とさない。
 
-## インストール
+## Core Files
 
-Codex の skill installer から GitHub repo path を指定してインストールします。
+| file | role |
+|---|---|
+| `HUB.codex.md` | repo 全体の AI 向け読み順 |
+| `AGENTS.md` | repo 内作業時の指示 |
+| `BLUEPRINT.md` | 目的、scope、I/O contract、主要設計 |
+| `RUNBOOK.md` | 実行手順、検証、更新時の確認 |
+| `GUARDRAILS.md` | 運用原則、境界、禁止事項 |
+| `EVALUATION.md` | 受入条件、品質基準、検証チェック |
+| `SPEC.md` | 実装済み機能と改修履歴の仕様メモ |
+| `skills/manual-bb-test-harness/SKILL.md` | Skill 実行時の主導線 |
+| `skills/manual-bb-test-harness/references/` | 詳細方針、domain pack、出力テンプレート |
+| `goldens/` | 出力品質を見る review anchors |
+| `schemas/` | JSON artifact schema |
+| `examples/artifacts/` | schema 化した artifact の最小例 |
+| `exports/` | TestRail / Xray 連携の生成例 |
+| `docs/` | 評価、記録、調査、人間向け補助文書 |
 
-```powershell
-python scripts/install-skill-from-github.py --repo RNA4219/manual-bb-test-harness --path skills/manual-bb-test-harness
+## Execution Prompt
+
+Skill を repo 内から試す場合:
+
+```text
+Use $manual-bb-test-harness at ./skills/manual-bb-test-harness to create a manual black-box test design for ./goldens/order-cancel.input.md.
 ```
 
-ローカルで試す場合は、`skills/manual-bb-test-harness` を `$CODEX_HOME/skills/manual-bb-test-harness` にコピーします。
+入力に iOS / Android / mobile が含まれる場合は、`platform-pack-mobile.md` を読む。EC、SaaS RBAC、finance の主題では対応する domain pack を読む。
 
-## 検証
+## Validation
 
-Skill Creator の validator を使います。
+変更後は、影響範囲に応じて次を実行する。
+
+```powershell
+uv run pytest
+uv run python .\scripts\quick-validate-skill.py .\skills\manual-bb-test-harness
+.\scripts\validate-skill.ps1
+```
+
+Skill Creator validator が必要な場合:
 
 ```powershell
 $env:PYTHONUTF8='1'
 uv run --with pyyaml python "$env:USERPROFILE\.codex\skills\.system\skill-creator\scripts\quick_validate.py" ".\skills\manual-bb-test-harness"
 ```
 
-補助チェック:
-
-```powershell
-.\scripts\validate-skill.ps1
-python .\scripts\quick-validate-skill.py .\skills\manual-bb-test-harness
-```
-
-## 評価資材
-
-`goldens/` は完全一致 snapshot ではなく、出力品質を見るための review anchors です。
-
-- `goldens/order-cancel.input.md`
-- `goldens/order-cancel.expected.md`
-- `goldens/admin-role-change.input.md`
-- `goldens/admin-role-change.expected.md`
-- `goldens/mobile-session-resume.input.md`
-- `goldens/mobile-session-resume.expected.md`
-- `docs/release-review-20260516.md`
-
-Forward test の投げ方は `skills/manual-bb-test-harness/references/forward-test.md` を参照してください。
-
-出力品質の採点は `docs/evaluation-rubric.md` を使います。forward-test の記録は Notion を主に使う想定で、`docs/notion-report-guide.md` と `docs/notion-forward-test-template.md` を参照します。`docs/forward-test-report-template.md` は Markdown fallback です。
-
-## スキーマ
-
-`schemas/` には artifact を機械検証したいときの JSON Schema を置いています。
-
-- `feature_spec.schema.json`
-- `test_model.schema.json`
-- `manual_case_set.schema.json`
-- `gate_decision.schema.json`
-- `shared_defs.schema.json`
-
-`examples/artifacts/` には schema 化した artifact の最小例を置いています。`exports/` には TestRail / Xray 連携の生成例を置いています。
-
-## CI
-
-`.github/workflows/validate.yml` は次を実行します。
-
-- `python scripts/quick-validate-skill.py skills/manual-bb-test-harness`
-- `pwsh ./scripts/validate-skill.ps1`
-
-## 育て方
+## Update Rules
 
 - `SKILL.md` は短い運用手順に保つ。
-- repo の正本関係は `HUB.codex.md`、設計は `BLUEPRINT.md`、運用は `RUNBOOK.md`、
-  検収は `EVALUATION.md` に寄せる。
-- 詳細な契約、方針、テンプレートは `references/` に置く。
-- 失敗モードや domain pack は `references/` に追加し、必要なときだけ読めるようにする。
+- 詳細な契約、方針、テンプレートは `skills/manual-bb-test-harness/references/` に置く。
+- artifact contract を変える場合は `schemas/`、`examples/artifacts/`、`goldens/` を同時に見る。
+- 出力品質が変わる場合は `goldens/`、`docs/evaluation-rubric.md`、forward-test 記録を更新する。
+- repo の正本関係は `HUB.codex.md` に集約し、README は AI routing と最短導線を優先する。
 - 原典調査や長文メモは `docs/research/` に置き、Skill 本体へ直接詰め込まない。
-- artifact contract を変える場合は `schemas/` と `examples/artifacts/` も一緒に更新する。
-- 振る舞いが変わる場合は golden、Notion の forward-test 記録、必要なら repo 側テンプレートを更新する。
-- 変更時は validator と `scripts/validate-skill.ps1` を通す。
