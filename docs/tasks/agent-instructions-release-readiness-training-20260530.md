@@ -24,7 +24,7 @@ next_review_due: 2026-06-06
 
 ## 作業対象
 
-- repo: `C:\Users\ryo-n\Codex_dev\manual-bb-test-harness`
+- repo: `..\manual-bb-test-harness`
 - task seed: `docs/tasks/task-release-readiness-training-20260530.md`
 - acceptance record 予定: `docs/acceptance/AC-20260530-02.md`
 - release review 予定: `docs/release-review-20260530.md`
@@ -171,7 +171,7 @@ uv run pytest tests\test_scripts_coverage.py
 ## エージェントへの開始プロンプト
 
 ```text
-C:\Users\ryo-n\Codex_dev\manual-bb-test-harness で release readiness training を実行してください。
+..\manual-bb-test-harness で release readiness training を実行してください。
 
 まず AGENTS.md、README.md、HUB.codex.md、BLUEPRINT.md、RUNBOOK.md、GUARDRAILS.md、EVALUATION.md、docs/tasks/task-release-readiness-training-20260530.md、docs/tasks/agent-instructions-release-readiness-training-20260530.md を読んでください。
 
