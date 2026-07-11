@@ -2,7 +2,7 @@
 
 手動ブラックボックス QA 設計 Skill の配布・保守 repo。
 
-現行リリース系列: **2.0.0** / 検証済みテスト: **725件** / Workflow Cookbook: **33 nodes・45 edges・33 capsules** / 次回レビュー: **2026-10-11**
+現行リリース系列: **2.0.0** / 検証済みテスト: **726件** / Workflow Cookbook: **33 nodes・45 edges・33 capsules** / 次回レビュー: **2026-10-11**
 人間向け概要は [docs/human-readme.md](docs/human-readme.md) を参照。
 
 <!-- LLM-BOOTSTRAP v1 -->

@@ -8,7 +8,8 @@ It checks:
 1. All nodes in index.json have corresponding files
 2. All nodes in index.json have corresponding caps/*.json files
 3. metadata counts match actual counts
-4. Files modified after last_verified date are flagged as stale
+4. Tracked files changed in Git after last_verified are flagged as stale
+   (non-Git files fall back to filesystem modification time)
 
 Usage:
     python tools/ci/check_workflow_cookbook_freshness.py --repo /path/to/repo
@@ -25,6 +26,7 @@ from __future__ import annotations
 import argparse
 import json
 import re
+import subprocess
 import sys
 from datetime import date, datetime
 from pathlib import Path
@@ -37,6 +39,49 @@ def get_file_mtime_date(file_path: Path) -> str | None:
         return None
     mtime = file_path.stat().st_mtime
     return datetime.fromtimestamp(mtime).strftime("%Y-%m-%d")
+
+
+def run_git(repo_path: Path, *args: str) -> subprocess.CompletedProcess[str] | None:
+    """Run Git in ``repo_path`` and return None when Git is unavailable."""
+    try:
+        return subprocess.run(
+            ["git", "-C", str(repo_path), *args],
+            capture_output=True,
+            check=False,
+            text=True,
+            timeout=10,
+        )
+    except (OSError, subprocess.TimeoutExpired):
+        return None
+
+
+def is_git_repository(repo_path: Path) -> bool:
+    """Return whether ``repo_path`` is inside a Git work tree."""
+    result = run_git(repo_path, "rev-parse", "--is-inside-work-tree")
+    return result is not None and result.returncode == 0 and result.stdout.strip() == "true"
+
+
+def is_git_tracked(repo_path: Path, file_path: Path) -> bool:
+    """Return whether ``file_path`` is tracked by Git in ``repo_path``."""
+    try:
+        relative_path = file_path.relative_to(repo_path).as_posix()
+    except ValueError:
+        return False
+    result = run_git(repo_path, "ls-files", "--error-unmatch", "--", relative_path)
+    return result is not None and result.returncode == 0
+
+
+def get_git_last_change_date(repo_path: Path, file_path: Path) -> str | None:
+    """Return a tracked file's latest committed change date (YYYY-MM-DD)."""
+    try:
+        relative_path = file_path.relative_to(repo_path).as_posix()
+    except ValueError:
+        return None
+    result = run_git(repo_path, "log", "-1", "--format=%cs", "--", relative_path)
+    if result is None or result.returncode != 0:
+        return None
+    change_date = result.stdout.strip()
+    return change_date or None
 
 
 def load_json(file_path: Path) -> dict[str, Any] | None:
@@ -117,6 +162,7 @@ def check_freshness(repo_path: Path) -> dict[str, Any]:
 
     workflow_cookbook_dir = repo_path / "docs" / "workflow-cookbook"
     caps_dir = workflow_cookbook_dir / "caps"
+    git_repository = is_git_repository(repo_path)
 
     # Check directory exists
     if not workflow_cookbook_dir.exists():
@@ -299,7 +345,10 @@ def check_freshness(repo_path: Path) -> dict[str, Any]:
             result["missing_caps"].append(node_id)
             continue
 
-        # Check freshness: compare file mtime with caps last_verified
+        # Check freshness against Git history for tracked files. GitHub Actions
+        # assigns checkout time as mtime to every file, so mtime alone is not a
+        # reliable change signal in CI. Non-Git fixture repositories retain the
+        # original mtime fallback for standalone use.
         caps_data = load_json(caps_file)
         if caps_data is None:
             result["passed"] = False
@@ -308,25 +357,37 @@ def check_freshness(repo_path: Path) -> dict[str, Any]:
             )
             continue
 
-        file_mtime = get_file_mtime_date(file_path)
+        change_source = "mtime"
+        if git_repository and is_git_tracked(repo_path, file_path):
+            file_change_date = get_git_last_change_date(repo_path, file_path)
+            change_source = "git"
+            if file_change_date is None:
+                result["passed"] = False
+                result["errors"].append(
+                    f"Git history unavailable for tracked file: {node_id}"
+                )
+                continue
+        else:
+            file_change_date = get_file_mtime_date(file_path)
         last_verified = caps_data.get("last_verified", "")
 
-        if file_mtime and last_verified:
+        if file_change_date and last_verified:
             # Compare dates
             try:
-                file_date = datetime.strptime(file_mtime, "%Y-%m-%d")
+                file_date = datetime.strptime(file_change_date, "%Y-%m-%d")
                 verified_date = datetime.strptime(last_verified, "%Y-%m-%d")
 
                 if file_date > verified_date:
                     result["stale_caps"].append({
                         "node_id": node_id,
-                        "file_mtime": file_mtime,
+                        "file_change_date": file_change_date,
+                        "change_source": change_source,
                         "last_verified": last_verified,
                     })
                     # Note: stale doesn't cause failure unless --strict
-            except ValueError:
+            except (TypeError, ValueError):
                 msg = f"Invalid date format for {node_id}: "
-                msg += f"mtime={file_mtime}, verified={last_verified}"
+                msg += f"changed={file_change_date}, verified={last_verified}"
                 result["errors"].append(msg)
 
     # Check for orphan caps files (caps without corresponding nodes)
@@ -397,10 +458,13 @@ def format_text_output(result: dict[str, Any], strict: bool = False) -> str:
 
     # Stale caps
     if result["stale_caps"]:
-        lines.append("Stale Capsules (file modified after last_verified):")
+        lines.append("Stale Capsules (file changed after last_verified):")
         for stale in result["stale_caps"]:
             stale_msg = f"  [STALE] {stale['node_id']}: "
-            stale_msg += f"mtime={stale['file_mtime']}, verified={stale['last_verified']}"
+            stale_msg += (
+                f"changed={stale['file_change_date']} ({stale['change_source']}), "
+                f"verified={stale['last_verified']}"
+            )
             lines.append(stale_msg)
         if strict:
             lines.append("  (Strict mode: treating as FAIL)")
@@ -476,7 +540,7 @@ Exit codes:
     parser.add_argument(
         "--strict",
         action="store_true",
-        help="Treat stale capsules as failures (file modified after last_verified)",
+        help="Treat stale capsules as failures (file changed after last_verified)",
     )
 
     args = parser.parse_args()

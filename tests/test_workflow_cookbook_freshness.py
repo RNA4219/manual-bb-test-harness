@@ -4,6 +4,8 @@ from __future__ import annotations
 
 import importlib.util
 import json
+import os
+import subprocess
 import sys
 from pathlib import Path
 
@@ -31,6 +33,68 @@ get_short_caps_name = FRESHNESS_MODULE.get_short_caps_name
 load_json = FRESHNESS_MODULE.load_json
 find_caps_file = FRESHNESS_MODULE.find_caps_file
 check_freshness = FRESHNESS_MODULE.check_freshness
+
+
+def create_git_freshness_fixture(
+    repo_path: Path,
+    *,
+    commit_date: str,
+    last_verified: str,
+) -> Path:
+    """Create a minimal tracked workflow-cookbook repository for CLI tests."""
+    workflow_dir = repo_path / "docs" / "workflow-cookbook"
+    caps_dir = workflow_dir / "caps"
+    caps_dir.mkdir(parents=True)
+    readme = repo_path / "README.md"
+    readme.write_text(
+        "index.json (1 nodes, 0 edges)\n検証済みテスト: **1件**\n",
+        encoding="utf-8",
+    )
+    index = {
+        "generated_at": "2026-05-01T00:00:00+00:00",
+        "metadata": {
+            "last_updated": "2026-05-01T00:00:00+00:00",
+            "total_nodes": 1,
+            "total_edges": 0,
+            "total_capsules": 1,
+        },
+        "nodes": [{"id": "README.md", "path": "./README.md"}],
+        "edges": [],
+    }
+    (workflow_dir / "index.json").write_text(json.dumps(index), encoding="utf-8")
+    hot = {
+        "generated_at": "2026-05-01T00:00:00+00:00",
+        "project_status": {
+            "last_updated": "2026-05-01T00:00:00+00:00",
+            "total_capsules": 1,
+            "test_count": 1,
+        },
+        "hot_nodes": [{"id": "README.md", "path": "./README.md"}],
+    }
+    (workflow_dir / "hot.json").write_text(json.dumps(hot), encoding="utf-8")
+    (caps_dir / "README.md.json").write_text(
+        json.dumps({"last_verified": last_verified}), encoding="utf-8"
+    )
+
+    for command in (
+        ["git", "init"],
+        ["git", "config", "user.email", "ci@example.invalid"],
+        ["git", "config", "user.name", "CI Test"],
+        ["git", "add", "."],
+    ):
+        subprocess.run(command, cwd=repo_path, check=True, capture_output=True)
+    environment = os.environ | {
+        "GIT_AUTHOR_DATE": commit_date,
+        "GIT_COMMITTER_DATE": commit_date,
+    }
+    subprocess.run(
+        ["git", "commit", "-m", "fixture"],
+        cwd=repo_path,
+        check=True,
+        capture_output=True,
+        env=environment,
+    )
+    return readme
 
 
 class TestNormalizeNodeIdToCapsName:
@@ -365,18 +429,39 @@ class TestCliIntegration:
         data = json.loads(result.stdout)
         assert data["passed"] is True
 
-    def test_cli_strict_mode(self) -> None:
-        """CLI strict mode."""
-        import subprocess
-
+    def test_cli_strict_mode(self, tmp_path: Path) -> None:
+        """Strict mode uses Git history rather than checkout-time mtimes."""
         result = subprocess.run(
             [sys.executable, "tools/ci/check_workflow_cookbook_freshness.py", "--repo", str(REPO_ROOT), "--strict"],
             capture_output=True,
             text=True,
             cwd=REPO_ROOT,
         )
-        # Should pass since no stale caps (files not modified after last_verified)
         assert result.returncode == 0
+
+        fixture = tmp_path / "git-fixture"
+        fixture.mkdir()
+        readme = create_git_freshness_fixture(
+            fixture,
+            commit_date="2026-05-01T12:00:00+00:00",
+            last_verified="2026-05-30",
+        )
+        # GitHub Actions assigns checkout time as the mtime of every file.
+        # A tracked file must still be compared with its committed change date.
+        os.utime(readme, (1_800_000_000, 1_800_000_000))
+        fixture_result = subprocess.run(
+            [
+                sys.executable,
+                str(REPO_ROOT / "tools" / "ci" / "check_workflow_cookbook_freshness.py"),
+                "--repo",
+                str(fixture),
+                "--strict",
+            ],
+            capture_output=True,
+            text=True,
+            cwd=REPO_ROOT,
+        )
+        assert fixture_result.returncode == 0, fixture_result.stdout + fixture_result.stderr
 
     def test_hot_test_count_mismatch_is_rejected(self, tmp_path: Path) -> None:
         """README test count and hot.json test_count must stay synchronized."""

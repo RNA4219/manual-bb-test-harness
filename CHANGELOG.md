@@ -7,7 +7,7 @@
 - Gate 2.0の入力artifactをpackage resource schemaで事前検証し、不正入力を終了コード1で拒否。
 - P0非pass、automation不足、重大open defect、critical assumptionをwaiver不可の`no_go`へ固定。
 - P1/mandatory observation/残余riskのwaiverをrisk traceability付きに限定し、適用waiverだけをgate decisionへ保存。
-- wheel/sdist隔離smoke、全725テスト、coverage 86.40%、Workflow Cookbook 33 nodes / 45 edges / 33 capsulesを現状へ同期。
+- wheel/sdist隔離smoke、全726テスト、coverage 86.40%、Workflow Cookbook 33 nodes / 45 edges / 33 capsulesを現状へ同期。
 
 
 ## [1.0.0] - 2026-05-30
