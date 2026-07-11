@@ -1,0 +1,15 @@
+{
+  "feature_id": "ORD-CANCEL-01",
+  "build_id": "web-1.42.0+1289",
+  "waivers": [
+    {
+      "id": "WAIVER-001",
+      "risk_ids": ["RISK-03"],
+      "reason": "Coupon restoration is manually verified for this release",
+      "owner": "qa-lead",
+      "expires_at": "2027-01-31T23:59:59+09:00",
+      "containment": "Monitor coupon restoration failures",
+      "rollback": "Disable order cancellation for coupon orders"
+    }
+  ]
+}

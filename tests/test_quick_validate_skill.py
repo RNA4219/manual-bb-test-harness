@@ -309,4 +309,4 @@ class TestVersionSubprocess:
             [sys.executable, str(script), "--version"], capture_output=True, text=True, timeout=30
         )
         assert result.returncode == 0
-        assert "0.1.1" in result.stdout
+        assert "2.0.0" in result.stdout

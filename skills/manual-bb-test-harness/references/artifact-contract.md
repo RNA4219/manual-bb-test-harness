@@ -35,7 +35,9 @@ Use these artifacts in order.
 | `effort_plan` | 実行順、担当、工数、buffer を表す | `estimate_effort` |
 | `gate_decision` | go/conditional_go/no_go と理由を表す | `evaluate_gates` |
 | `release_brief` | ステークホルダー向け判断材料を表す | `assemble_release_brief` |
-| `execution_evidence` | 実行結果、expected/actual、添付、incident を表す | `ingest_execution_evidence` |
+| `execution_evidence` | feature/buildに紐づく手動実行結果とdefectを表す | `ingest_execution_evidence` |
+| `automation_evidence` | coverage scope、coverage率、新規issue、hotspot review、source refsを表す | `ingest_automation_evidence` |
+| `waiver_set` | owner・期限・containment・rollbackを持つ明示的なrisk受容を表す | `approve_waivers` |
 
 ## Shared Fields
 
@@ -203,10 +205,58 @@ Use this reduced schema when the user asks for machine-readable output.
   ],
   "gate_decision": {
     "feature_id": "string",
+    "build_id": "string",
     "status": "go",
-    "reasons": ["string"],
-    "blocking_risks": [],
-    "waivers": []
+    "profile": "standard",
+    "reasons": ["all profile conditions met"],
+    "evidence_summary": {
+      "manual_by_priority": {},
+      "mandatory_observation_rate": 100
+    },
+    "unmet_conditions": []
+  }
+}
+```
+
+## Gate Artifacts 2.0
+
+2.0では旧artifactの読み取り互換を提供しない。schemaを正本とし、以下を必須とする。
+
+- `execution_evidence`: `run_id / feature_id / build_id / timestamp / result`と、`tc_id`または`charter_id`のどちらか一方。defectは`severity`と`open / resolved / accepted`のstatusを持つ。
+- `automation_evidence`: `feature_id / build_id / coverage_scope / coverage_percent / new_issues / source_refs`。strict profileでは`hotspot_review_percent`も判定に使う。
+- `waiver_set`: `feature_id / build_id / waivers`。各waiverに`id / risk_ids / reason / owner / expires_at / containment / rollback`を要求する。Gateがwaiverを自動生成してはならない。 P1/mandatory observation/残余riskに適用する場合は、未達artifactの`trace_to`から導出されるrisk IDを全て`risk_ids`で覆う。P0、重大defect、critical assumption、automation failureはwaiver不可で、全Gate入力は評価前にschema検証する。
+- `gate_decision`: `feature_id / build_id / status / profile / reasons / evidence_summary`を必須とし、`waivers / unmet_conditions / residual_risks / blocking_risks`を必要に応じて記録する。`reasons`が0件のGoは禁止する。
+
+```json
+{
+  "execution_evidence": {
+    "run_id": "RUN-42",
+    "tc_id": "TC-001",
+    "feature_id": "order-cancel",
+    "build_id": "build-20260711.1",
+    "timestamp": "2026-07-11T10:00:00+09:00",
+    "result": "pass"
+  },
+  "automation_evidence": {
+    "feature_id": "order-cancel",
+    "build_id": "build-20260711.1",
+    "coverage_scope": "changed_code",
+    "coverage_percent": 78,
+    "new_issues": {"blocker": 0, "critical": 0},
+    "source_refs": [{"id": "CI-42", "kind": "auto_test"}]
+  },
+  "waiver_set": {
+    "feature_id": "order-cancel",
+    "build_id": "build-20260711.1",
+    "waivers": [{
+      "id": "W-1",
+      "risk_ids": ["RISK-12"],
+      "reason": "限定的な表示差分",
+      "owner": "qa-lead",
+      "expires_at": "2026-08-11T00:00:00+09:00",
+      "containment": "監視を追加",
+      "rollback": "feature flagを無効化"
+    }]
   }
 }
 ```

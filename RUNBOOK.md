@@ -1,9 +1,12 @@
 ---
 intent_id: INT-MBB-001
 owner: manual-bb-test-harness
+release_version: 2.0.0
+test_count: 725
+knowledge_map: 33 nodes, 45 edges, 33 capsules
+next_review_due: 2026-10-11
 status: active
 last_reviewed_at: 2026-05-16
-next_review_due: 2026-06-16
 ---
 
 # Runbook
@@ -316,3 +319,25 @@ uv run bb-harness import testrail --project 12 --run 1234 --output execution_evi
 ```
 
 **重要**: Secret は `.env` ファイルや CI secrets に保存し、repo に commit しない。
+
+## Gate 2.0 Operation
+
+1. execution evidenceの`feature_id / build_id / timestamp`と、`tc_id`または`charter_id`の一方を確認する。
+2. 対象buildと一致する`automation_evidence`を用意する。
+3. waiverが必要なら、承認済み`waiver_set`へowner、期限、containment、rollbackを明記する。Gateはwaiverを自動生成しない。
+4. `bb-harness gate --input <artifact-dir> --build-id <build>`を実行する。
+5. `gate_decision`の`evidence_summary / waivers / unmet_conditions`をrelease evidenceへ保存する。
+
+P0非pass、open blocker/critical/high defect、未解決critical assumptionはwaiverできません。同一case/buildに同時刻の証跡が複数ある場合は入力を修正し、任意に選択しないでください。 automation証跡不足/閾値未達もwaiverできず、P1/mandatory observationのwaiverは未達からtraceできるrisk IDを全て覆う必要があります。
+
+## Release 2.0 Validation
+
+```powershell
+uv run ruff check src scripts tests tools
+uv run pytest --durations=20
+uv run python tools/ci/check_workflow_cookbook_freshness.py --repo . --strict
+uv run python tools/ci/package_smoke.py
+uv run python scripts/validate-release-bundle.py --dry-run --package-smoke
+```
+
+Actionは完全なcommit SHAへ固定し、Dependabotで更新します。version tagだけへのpinへ戻してはいけません。

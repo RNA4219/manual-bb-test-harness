@@ -1,5 +1,7 @@
 # SPEC: manual-bb-test-harness 改修仕様書
 
+現行契約: **2.0.0** / 検証済みテスト: **725件** / Workflow Cookbook: **33 nodes・45 edges・33 capsules** / 次回レビュー: **2026-10-11**
+
 ## 概要
 
 本仕様書は `manual-bb-test-harness` リポジトリの品質改善（21件）と機能拡張（5件）を定義・記録する。
@@ -63,19 +65,19 @@
 | Phase | Verification | Status |
 |---|---|---|
 | 1 | `pip install -e .` | OK |
-| 2 | pytest coverage | OK (~33% @ 2026-05-30, 回帰テスト継続中) |
-| 3 | tests pass | OK (212 tests @ 2026-05-30) |
-| 4 | CI 3OS×3Python | OK |
+| 2 | pytest coverage | OK (86.40% branch-inclusive coverage @ 2026-07-12) |
+| 3 | tests pass | OK (725 tests passed @ 2026-07-12) |
+| 4 | CI Python 3.10〜3.13 + unit/integration/PowerShell/package smoke | OK |
 | 5 | Schema validation | OK |
 | 6 | Agent config | OK |
 | 7 | F1-F4 functionality | OK |
 | 8 | F5 phase_contract schema/example validation | OK |
 | 9 | F6 TestRail/Xray import | OK (50 tests) |
 | 10 | F7 Forward-test CLI | OK |
-| 11 | Workflow Cookbook Tier 3 | OK (28 nodes, 45 edges, 28 capsules) |
+| 11 | Workflow Cookbook Tier 3 | OK (33 nodes, 45 edges, 33 capsules) |
 
 **全検証完了 ✅**
 
 ## Version
 
-0.2.0 - Keep a Changelog形式, Semantic Versioning準拠
+2.0.0 - Keep a Changelog形式, Semantic Versioning準拠

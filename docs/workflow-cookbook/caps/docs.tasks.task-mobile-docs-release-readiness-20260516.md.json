@@ -3,9 +3,19 @@
   "role": "task",
   "title": "Task Seed: Mobile Docs Release Readiness",
   "summary": "Task ID: 20260516-01, Status: done。背景: Web 前提から iOS/Android 対応へ拡張、workflow-cookbook 準拠 docs と検収導線が不足。ゴール: mobile 対応を artifact/Skill/golden/ingest に一貫反映、README → HUB → BLUEPRINT/RUNBOOK/GUARDRAILS/EVALUATION の読み筋整備、repo 自体を self-review で検収。実施対象: mobile_contexts/platform_matrix 追加, mobile platform pack/golden 追加, workflow-cookbook docs 追加, docs/tasks と docs/acceptance 運用導線追加。",
-  "deps_out": ["skills/manual-bb-test-harness/references/platform-pack-mobile.md", "goldens/mobile-session-resume.input.md"],
-  "deps_in": ["docs/acceptance/AC-20260516-01.md", "BLUEPRINT.md", "RUNBOOK.md", "docs/release-review-20260516.md"],
+  "deps_out": [
+    "skills/manual-bb-test-harness/references/platform-pack-mobile.md",
+    "goldens/mobile-session-resume.input.md"
+  ],
+  "deps_in": [
+    "docs/acceptance/AC-20260516-01.md",
+    "BLUEPRINT.md",
+    "RUNBOOK.md",
+    "docs/release-review-20260516.md"
+  ],
   "risks": [],
-  "tests": ["uv run pytest"],
-  "last_verified": "2026-05-30"
+  "tests": [
+    "uv run pytest"
+  ],
+  "last_verified": "2026-07-11"
 }

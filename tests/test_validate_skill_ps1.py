@@ -100,9 +100,9 @@ class TestPowershellParameters:
 
     def test_version_flag(self) -> None:
         """Test --version flag output."""
-        _result = run_powershell_script(["--version"])
-        # Should output version and exit successfully
-        pass
+        result = run_powershell_script(["--version"])
+        assert result.returncode == 0
+        assert "validate-skill.ps1 version 2.0.0" in result.stdout
 
     def test_skill_name_parameter(self) -> None:
         """Test -SkillName parameter customization."""

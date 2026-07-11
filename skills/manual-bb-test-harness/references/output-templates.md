@@ -135,6 +135,7 @@
   "tc_id": "TC-001",
   "feature_id": "FEATURE-001",
   "build_id": "web-1.42.0+1289",
+  "timestamp": "2026-07-11T10:00:00+09:00",
   "env": "stg",
   "device": "iPhone 15 / iOS 18.4",
   "network_profile": "4g-lossy",
@@ -148,7 +149,8 @@
   "anomaly_notes": ["出荷済み状態でも CTA が活性だった"],
   "defect_stub": {
     "title": "出荷済み注文がキャンセル可能",
-    "severity": "high"
+    "severity": "high",
+    "status": "open"
   }
 }
 ```

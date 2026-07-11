@@ -1,0 +1,116 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/RNA4219/manual-bb-test-harness/schemas/release_brief.schema.json",
+  "title": "ReleaseBrief",
+  "description": "Stakeholder-facing release decision summary. Produced by assemble_release_brief workflow step.",
+  "type": "object",
+  "required": ["feature_id", "decision", "summary"],
+  "properties": {
+    "feature_id": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Reference to the feature_spec feature_id."
+    },
+    "title": {
+      "type": "string",
+      "description": "Brief title for the release."
+    },
+    "decision": {
+      "enum": ["go", "conditional_go", "no_go"],
+      "description": "Gate decision: go (release ready), conditional_go (with conditions), no_go (blocked)."
+    },
+    "summary": {
+      "type": "string",
+      "minLength": 1,
+      "description": "One-paragraph summary of the decision and key factors."
+    },
+    "evidence": {
+      "type": "array",
+      "items": {"type": "string"},
+      "description": "Key evidence supporting the decision."
+    },
+    "residual_risks": {
+      "type": "array",
+      "items": {"type": "string"},
+      "description": "Remaining risks at release time."
+    },
+    "waivers": {
+      "type": "array",
+      "items": {"$ref": "#/$defs/Waiver"},
+      "description": "Accepted waivers for conditional_go."
+    },
+    "required_follow_up": {
+      "type": "array",
+      "items": {"type": "string"},
+      "description": "Post-release actions required."
+    },
+    "sign_off": {
+      "type": "array",
+      "items": {"$ref": "#/$defs/SignOff"},
+      "description": "Approval signatures."
+    },
+    "generated_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Timestamp when brief was generated."
+    }
+  },
+  "additionalProperties": false,
+  "$defs": {
+    "Waiver": {
+      "type": "object",
+      "required": ["id", "description", "owner"],
+      "description": "Accepted deviation from quality gate.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Waiver identifier, e.g., 'WVR-01'."
+        },
+        "description": {
+          "type": "string",
+          "minLength": 1,
+          "description": "What is being waived and why."
+        },
+        "owner": {
+          "type": "string",
+          "description": "Person approving the waiver."
+        },
+        "expires_at": {
+          "type": "string",
+          "format": "date",
+          "description": "Expiration date for the waiver."
+        },
+        "containment": {
+          "type": "string",
+          "description": "Mitigation or containment plan."
+        }
+      },
+      "additionalProperties": false
+    },
+    "SignOff": {
+      "type": "object",
+      "required": ["approver", "date"],
+      "description": "Approval signature.",
+      "properties": {
+        "approver": {
+          "type": "string",
+          "description": "Name or role of approver."
+        },
+        "date": {
+          "type": "string",
+          "format": "date",
+          "description": "Approval date."
+        },
+        "comment": {
+          "type": "string",
+          "description": "Optional approval comment."
+        },
+        "role": {
+          "type": "string",
+          "description": "Approver role, e.g., 'QA Lead', 'Product Owner'."
+        }
+      },
+      "additionalProperties": false
+    }
+  }
+}

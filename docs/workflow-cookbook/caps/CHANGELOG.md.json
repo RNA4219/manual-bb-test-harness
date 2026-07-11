@@ -4,8 +4,11 @@
   "title": "Changelog",
   "summary": "Keep a Changelog 形式の変更履歴。Unreleased セクションに AI-first README 再構成、artifact 検証の jsonschema 標準依存化、workflow-cookbook 準拠 docs 追加、F6/F7 機能追加、Tier 3 達成 (Birdseye 28 nodes, 45 edges) を記録。v0.2.0 (2026-05-03) で F1-F5 機能完成。",
   "deps_out": [],
-  "deps_in": ["README.md", "SPEC.md"],
+  "deps_in": [
+    "README.md",
+    "SPEC.md"
+  ],
   "risks": [],
   "tests": [],
-  "last_verified": "2026-05-30"
+  "last_verified": "2026-07-11"
 }

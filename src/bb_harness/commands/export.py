@@ -6,7 +6,10 @@ import argparse
 import sys
 from pathlib import Path
 
-from bb_harness.commands._shared import run_script
+from bb_harness.commands._invoke import invoke_tool
+from bb_harness.tools.export_notion import main as export_notion_main
+from bb_harness.tools.export_testrail import main as export_testrail_main
+from bb_harness.tools.export_xray import main as export_xray_main
 
 
 def add_subparser(subparsers: argparse._SubParsersAction) -> None:
@@ -116,7 +119,7 @@ def run(args: argparse.Namespace) -> int:
             "--output",
             str(args.output),
         ]
-        return run_script("export-testrail.py", extra_args, args)
+        return invoke_tool(export_testrail_main, extra_args, args)
     elif args.target == "xray":
         extra_args = [
             "--input",
@@ -124,7 +127,7 @@ def run(args: argparse.Namespace) -> int:
             "--output",
             str(args.output),
         ]
-        return run_script("export-xray.py", extra_args, args)
+        return invoke_tool(export_xray_main, extra_args, args)
     elif args.target == "notion":
         extra_args = []
         if args.input:
@@ -136,7 +139,7 @@ def run(args: argparse.Namespace) -> int:
             extra_args.extend(["--score", str(args.score)])
         if args.status:
             extra_args.extend(["--status", args.status])
-        return run_script("export-notion.py", extra_args, args)
+        return invoke_tool(export_notion_main, extra_args, args)
     else:
         print(f"Error: Unknown export target: {args.target}", file=sys.stderr)
         return 1

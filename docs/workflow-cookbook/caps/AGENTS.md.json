@@ -3,9 +3,20 @@
   "role": "policy",
   "title": "Agent Instructions",
   "summary": "AI エージェント向け作業手順。日本語記載。Default Workflow: README → HUB → BLUEPRINT/RUNBOOK/EVALUATION/GUARDRAILS → SKILL → references → docs/research → evaluation-rubric → validation。Editing Rules: SKILL.md は短く保つ、長い説明は references へ分離、artifact contract 変更時は schemas と examples を同時更新、golden は review anchor として扱う。",
-  "deps_out": ["BLUEPRINT.md", "RUNBOOK.md", "EVALUATION.md", "GUARDRAILS.md", "skills/manual-bb-test-harness/SKILL.md"],
-  "deps_in": ["README.md"],
+  "deps_out": [
+    "BLUEPRINT.md",
+    "RUNBOOK.md",
+    "EVALUATION.md",
+    "GUARDRAILS.md",
+    "skills/manual-bb-test-harness/SKILL.md"
+  ],
+  "deps_in": [
+    "README.md"
+  ],
   "risks": [],
-  "tests": ["scripts/quick-validate-skill.py", "scripts/validate-skill.ps1"],
-  "last_verified": "2026-05-30"
+  "tests": [
+    "scripts/quick-validate-skill.py",
+    "scripts/validate-skill.ps1"
+  ],
+  "last_verified": "2026-07-11"
 }

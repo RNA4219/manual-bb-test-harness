@@ -1,12 +1,14 @@
 # manual-bb-test-harness
 
 手動ブラックボックス QA 設計 Skill の配布・保守 repo。
+
+現行リリース系列: **2.0.0** / 検証済みテスト: **725件** / Workflow Cookbook: **33 nodes・45 edges・33 capsules** / 次回レビュー: **2026-10-11**
 人間向け概要は [docs/human-readme.md](docs/human-readme.md) を参照。
 
 <!-- LLM-BOOTSTRAP v1 -->
 **For AI Agents**: 読む順番:
 
-1. `docs/workflow-cookbook/index.json` — ノード一覧・隣接関係 (28 nodes, 45 edges)
+1. `docs/workflow-cookbook/index.json` — ノード一覧・隣接関係 (33 nodes, 45 edges)
 2. `docs/workflow-cookbook/hot.json` — 主要エントリポイント (6 hot nodes)
 3. `docs/workflow-cookbook/caps/<path>.json` — 必要ノードだけ point read
 
@@ -148,3 +150,23 @@ Use $manual-bb-test-harness at ./skills/manual-bb-test-harness to create a manua
 - 出力品質が変わる場合は `goldens/`、`docs/evaluation-rubric.md`、forward-test 記録を更新する。
 - repo の正本関係は `HUB.codex.md` に集約し、README は AI routing と最短導線を優先する。
 - 原典調査や長文メモは `docs/research/` に置き、Skill 本体へ直接詰め込まない。
+
+## Gate 2.0
+
+既定profileは`standard`です。Gateは`manual_case_set`全件を分母にし、証跡のないcaseを`untested`として評価します。`--input`へartifact directoryを渡すと規定名のrisk、case、feature、observation、automation、waiverを自動検出します。 P0非pass・hard automation failure・open blocker/critical/high・critical assumptionは常に`no_go`で、waiverはrisk IDへ追跡できるP1/mandatory observation/残余riskだけに適用されます。
+
+```powershell
+uv run bb-harness gate --input examples/artifacts --build-id build-20260711.1 --output gate.json
+uv run bb-harness gate --evidence evidence --risk risk.json --cases cases.json --feature feature.json --observations observations.json --automation automation.json --waivers waivers.json --build-id build-20260711.1 --output gate.json
+```
+
+`no_go`は正常な判定なのでexit code 0、schema不正・feature/build不一致・曖昧な重複証跡はexit code 1です。旧artifactは2.0では読み取りません。
+
+## Distribution Verification
+
+wheelとsdistはrepo外の一時directoryへ隔離installし、主要subcommandを実行して検証します。
+
+```powershell
+uv run python tools/ci/package_smoke.py
+uv run python scripts/validate-release-bundle.py --dry-run --package-smoke
+```

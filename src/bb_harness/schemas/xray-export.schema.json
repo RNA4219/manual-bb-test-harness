@@ -1,0 +1,54 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/RNA4219/manual-bb-test-harness/schemas/xray-export.schema.json",
+  "title": "XrayExport",
+  "description": "Xray JSON format for Jira import. Supports manual and exploratory tests.",
+  "type": "object",
+  "properties": {
+    "tests": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "summary": {"type": "string", "description": "Test summary/title"},
+          "steps": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "action": {"type": "string", "description": "Step action"},
+                "result": {"type": "string", "description": "Expected result"}
+              }
+            },
+            "description": "Test steps with expected results"
+          },
+          "labels": {
+            "type": "array",
+            "items": {"type": "string"},
+            "description": "Labels for categorization (feature_id, trace_to)"
+          },
+          "priority": {"type": "string", "enum": ["Highest", "High", "Medium", "Low", "Lowest"], "description": "Priority level"},
+          "testType": {"type": "string", "enum": ["Manual", "Exploratory"], "description": "Test type"},
+          "preconditions": {
+            "type": "array",
+            "items": {"type": "string"},
+            "description": "Precondition summaries"
+          },
+          "estimate": {"type": "string", "description": "Time estimate (optional, for exploratory)"}
+        }
+      },
+      "description": "Test issues"
+    },
+    "preconditions": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "summary": {"type": "string", "description": "Precondition description"},
+          "tests": {"type": "array", "description": "Linked tests (populated on import)"}
+        }
+      },
+      "description": "Precondition items"
+    }
+  }
+}

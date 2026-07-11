@@ -6,7 +6,8 @@ import argparse
 import sys
 from pathlib import Path
 
-from bb_harness.commands._shared import run_script
+from bb_harness.commands._invoke import invoke_tool
+from bb_harness.tools.spec_ingest import main as ingest_main
 
 
 def add_subparser(subparsers: argparse._SubParsersAction) -> None:
@@ -60,4 +61,4 @@ def run(args: argparse.Namespace) -> int:
     if getattr(args, "verbose", False):
         print(f"[verbose] Source: {args.source}", file=sys.stderr)
 
-    return run_script("spec-ingest.py", extra_args, args)
+    return invoke_tool(ingest_main, extra_args, args)

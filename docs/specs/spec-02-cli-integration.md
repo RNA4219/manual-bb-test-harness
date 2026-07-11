@@ -102,7 +102,7 @@ src/bb_harness/
 ```toml
 [project]
 name = "bb-harness"
-version = "0.2.0"
+version = "2.0.0"
 description = "Manual black-box test harness CLI"
 authors = [{name = "RNA4219"}]
 requires-python = ">=3.11"
@@ -113,7 +113,7 @@ dependencies = [
 
 [project.optional-dependencies]
 api = ["requests>=2.28"]
-notion = ["notion-client>=2.0"]
+notion = ["requests>=2.28"]
 all = ["bb-harness[api,notion]"]
 
 [project.scripts]

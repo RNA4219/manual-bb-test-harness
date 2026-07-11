@@ -1,9 +1,9 @@
 {
   "run_id": "RUN-2026-05-04-003",
   "charter_id": "CHARTER-001",
-  "tc_id": "",
   "feature_id": "ORD-CANCEL-01",
   "build_id": "web-1.42.0+1289",
+  "timestamp": "2026-05-04T10:30:00+09:00",
   "env": "stg",
   "device": "iPhone 15 / iOS 18.4",
   "network_profile": "4g-lossy",

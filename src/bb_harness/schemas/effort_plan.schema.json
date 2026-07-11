@@ -1,0 +1,82 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/RNA4219/manual-bb-test-harness/schemas/effort_plan.schema.json",
+  "title": "EffortPlan",
+  "description": "Execution effort estimation artifact. Produced by estimate_effort workflow step.",
+  "type": "object",
+  "required": ["feature_id", "phases", "total_estimate_hours"],
+  "properties": {
+    "feature_id": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Reference to the feature_spec feature_id."
+    },
+    "phases": {
+      "type": "array",
+      "items": {"$ref": "#/$defs/Phase"},
+      "minItems": 1,
+      "description": "Execution phases with effort breakdown."
+    },
+    "total_estimate_hours": {
+      "type": "number",
+      "minimum": 0,
+      "description": "Total estimated effort in hours."
+    },
+    "retry_buffer_percent": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 50,
+      "default": 20,
+      "description": "Buffer percentage for re-runs and unexpected issues."
+    },
+    "execution_order": {
+      "type": "array",
+      "items": {"type": "string"},
+      "description": "Ordered list of case IDs or charter IDs for execution sequence."
+    },
+    "owners": {
+      "type": "array",
+      "items": {"type": "string"},
+      "description": "Assigned testers or team members."
+    }
+  },
+  "additionalProperties": false,
+  "$defs": {
+    "Phase": {
+      "type": "object",
+      "required": ["phase_name", "estimate_hours"],
+      "description": "Single execution phase.",
+      "properties": {
+        "phase_name": {
+          "enum": ["prep", "execution", "evidence", "review", "cleanup"],
+          "description": "Phase type name."
+        },
+        "activities": {
+          "type": "array",
+          "items": {"type": "string"},
+          "description": "Specific activities in this phase."
+        },
+        "estimate_hours": {
+          "type": "number",
+          "minimum": 0,
+          "description": "Estimated hours for this phase."
+        },
+        "owner": {
+          "type": "string",
+          "description": "Primary owner for this phase."
+        },
+        "dependencies": {
+          "type": "array",
+          "items": {"type": "string"},
+          "description": "Dependencies on other phases or external items."
+        },
+        "parallelizable": {
+          "type": "boolean",
+          "default": false,
+          "description": "Whether this phase can run in parallel with others."
+        }
+      },
+      "additionalProperties": false
+    }
+  }
+}

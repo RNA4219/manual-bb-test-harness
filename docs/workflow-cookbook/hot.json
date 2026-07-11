@@ -1,14 +1,14 @@
 {
-  "version": "1.0.0",
-  "generated_at": "00002",
+  "version": "2.0.0",
+  "generated_at": "2026-07-11T15:12:57.518101+00:00",
   "description": "manual-bb-test-harness Workflow Cookbook Hot List - Primary entry points",
   "project_status": {
     "tier": 3,
     "cli_status": "complete",
     "import_status": "complete",
-    "test_count": 212,
-    "total_capsules": 28,
-    "last_updated": "2026-05-30"
+    "test_count": 725,
+    "total_capsules": 33,
+    "last_updated": "2026-07-12"
   },
   "hot_nodes": [
     {
@@ -77,11 +77,11 @@
       ]
     },
     {
-      "id": "docs/birdseye/index.json",
-      "path": "./docs/birdseye/index.json",
+      "id": "docs/human-readme.md",
+      "path": "./docs/human-readme.md",
       "role": "navigation",
-      "title": "Birdseye Knowledge Map",
-      "summary": "Complete node listings and edges for documentation navigation. Use to discover document relationships",
+      "title": "Human Guide",
+      "summary": "User-facing overview and operating guide",
       "priority": 6,
       "use_cases": [
         "Navigating documentation",

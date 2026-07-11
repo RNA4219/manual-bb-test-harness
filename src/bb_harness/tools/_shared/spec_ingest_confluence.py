@@ -89,9 +89,7 @@ def _confluence_error(
         "title": title,
         "acceptance_criteria": [acceptance_text],
         "source_refs": [{"id": "CONFLUENCE-URL", "kind": "spec", "excerpt": url}],
-        "assumptions": [
-            {"id": assumption_id, "text": assumption_text, "severity": "critical"}
-        ],
+        "assumptions": [{"id": assumption_id, "text": assumption_text, "severity": "critical"}],
     }
 
 

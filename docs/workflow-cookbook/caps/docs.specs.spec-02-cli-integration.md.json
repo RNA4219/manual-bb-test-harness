@@ -3,10 +3,21 @@
   "role": "specification",
   "title": "Spec: CLI Integration",
   "summary": "Defines bb-harness CLI with subcommands: validate, ingest, state-diagram, regression-graph, heatmap, gate, export (testrail/xray/notion), import (testrail/xray), run (forward-test). Documents PLAN-CLI-01 (verbose), PLAN-CLI-02 (import integration), PLAN-CLI-03 (forward-test wrapper), PLAN-CLI-04 (docs/tests). All plans completed 2026-05-30.",
-  "public_api": ["bb-harness CLI"],
-  "deps_out": ["RUNBOOK.md", "src/bb_harness/cli.py", "src/bb_harness/commands/"],
-  "deps_in": ["SPEC.md", "RUNBOOK.md"],
+  "public_api": [
+    "bb-harness CLI"
+  ],
+  "deps_out": [
+    "RUNBOOK.md",
+    "src/bb_harness/cli.py",
+    "src/bb_harness/commands/"
+  ],
+  "deps_in": [
+    "SPEC.md",
+    "RUNBOOK.md"
+  ],
   "risks": [],
-  "tests": ["tests/test_cli_dryrun.py"],
-  "last_verified": "2026-05-30"
+  "tests": [
+    "tests/test_cli_dryrun.py"
+  ],
+  "last_verified": "2026-07-11"
 }

@@ -1,0 +1,39 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/RNA4219/manual-bb-test-harness/schemas/testrail-export.schema.json",
+  "title": "TestRailExport",
+  "description": "TestRail import format for manual test cases. Supports CSV and JSON export.",
+  "type": "object",
+  "properties": {
+    "sections": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {"type": "integer", "description": "Section ID"},
+          "name": {"type": "string", "description": "Section name (feature_id)"},
+          "description": {"type": "string", "description": "Section description"}
+        }
+      },
+      "description": "TestRail sections (grouped by feature)"
+    },
+    "cases": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {"type": "integer", "description": "Case ID"},
+          "section_id": {"type": "integer", "description": "Parent section ID"},
+          "title": {"type": "string", "description": "Test case title"},
+          "priority_id": {"type": "integer", "minimum": 1, "maximum": 5, "description": "Priority (5=Highest, 1=Lowest)"},
+          "estimate": {"type": "string", "description": "Time estimate (e.g., '10m')"},
+          "custom_steps": {"type": "string", "description": "Test steps as numbered list"},
+          "custom_expected": {"type": "string", "description": "Expected results"},
+          "custom_preconds": {"type": "string", "description": "Preconditions"},
+          "refs": {"type": "string", "description": "Trace references (comma-separated)"}
+        }
+      },
+      "description": "Test cases"
+    }
+  }
+}

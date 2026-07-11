@@ -4,7 +4,7 @@ intent_id: INT-___
 owner: your-handle
 status: planned
 last_reviewed_at: 2026-05-16
-next_review_due: 2026-06-16
+next_review_due: 2026-10-11
 ---
 
 # Task Seed: Title

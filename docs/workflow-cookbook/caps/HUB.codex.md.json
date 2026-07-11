@@ -4,9 +4,17 @@
   "title": "AI Navigation Hub",
   "summary": "Central routing table for AI agents. Lists all core documents (BLUEPRINT, RUNBOOK, GUARDRAILS, EVALUATION, SPEC) with their roles. Defines reading order for different use cases: skill execution, repo maintenance, artifact changes, mobile testing. Collects canonical document relationships to prevent duplication.",
   "public_api": [],
-  "deps_out": ["BLUEPRINT.md", "RUNBOOK.md", "GUARDRAILS.md", "EVALUATION.md", "SPEC.md"],
-  "deps_in": ["README.md"],
+  "deps_out": [
+    "BLUEPRINT.md",
+    "RUNBOOK.md",
+    "GUARDRAILS.md",
+    "EVALUATION.md",
+    "SPEC.md"
+  ],
+  "deps_in": [
+    "README.md"
+  ],
   "risks": [],
   "tests": [],
-  "last_verified": "2026-05-30"
+  "last_verified": "2026-07-11"
 }

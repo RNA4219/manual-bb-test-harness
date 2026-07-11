@@ -6,7 +6,8 @@ import argparse
 import sys
 from pathlib import Path
 
-from bb_harness.commands._shared import run_script
+from bb_harness.commands._invoke import invoke_tool
+from bb_harness.tools.regression_graph import main as regression_graph_main
 
 
 def add_subparser(subparsers: argparse._SubParsersAction) -> None:
@@ -50,4 +51,4 @@ def run(args: argparse.Namespace) -> int:
     if getattr(args, "verbose", False):
         print(f"[verbose] Input: {args.input}, Format: {args.format}", file=sys.stderr)
 
-    return run_script("regression-graph.py", extra_args, args)
+    return invoke_tool(regression_graph_main, extra_args, args)

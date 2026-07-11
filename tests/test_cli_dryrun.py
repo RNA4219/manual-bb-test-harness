@@ -289,7 +289,7 @@ class TestVerboseOutput:
             cwd=PROJECT_ROOT,
         )
         assert "[verbose]" in result.stderr
-        assert "Running:" in result.stderr
+        assert "Profile:" in result.stderr
         assert "Profile:" in result.stderr
 
 

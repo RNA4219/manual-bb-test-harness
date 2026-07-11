@@ -74,9 +74,7 @@ def _jira_error(
         "title": title,
         "acceptance_criteria": [acceptance_text],
         "source_refs": [{"id": issue_key, "kind": "spec", "excerpt": f"Jira issue {issue_key}"}],
-        "assumptions": [
-            {"id": assumption_id, "text": assumption_text, "severity": "critical"}
-        ],
+        "assumptions": [{"id": assumption_id, "text": assumption_text, "severity": "critical"}],
     }
 
 

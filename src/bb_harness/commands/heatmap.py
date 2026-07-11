@@ -6,7 +6,8 @@ import argparse
 import sys
 from pathlib import Path
 
-from bb_harness.commands._shared import run_script
+from bb_harness.commands._invoke import invoke_tool
+from bb_harness.tools.risk_heatmap import main as risk_heatmap_main
 
 
 def add_subparser(subparsers: argparse._SubParsersAction) -> None:
@@ -57,4 +58,4 @@ def run(args: argparse.Namespace) -> int:
     if getattr(args, "verbose", False):
         print(f"[verbose] Input: {args.input}", file=sys.stderr)
 
-    return run_script("risk-heatmap.py", extra_args, args)
+    return invoke_tool(risk_heatmap_main, extra_args, args)

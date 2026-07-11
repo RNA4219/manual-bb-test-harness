@@ -4,7 +4,7 @@ intent_id: INT-MBB-RELEASE-READINESS-001
 owner: manual-bb-test-harness
 status: ready
 last_reviewed_at: 2026-05-30
-next_review_due: 2026-06-06
+next_review_due: 2026-10-11
 ---
 
 # Agent Instructions: Release Readiness Training

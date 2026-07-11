@@ -3,7 +3,7 @@ intent_id: INT-XXX
 owner: your-handle
 status: active
 last_reviewed_at: 2026-05-30
-next_review_due: 2026-06-30
+next_review_due: 2026-10-11
 ---
 
 # HUB

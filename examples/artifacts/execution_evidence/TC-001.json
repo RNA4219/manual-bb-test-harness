@@ -3,6 +3,7 @@
   "tc_id": "TC-001",
   "feature_id": "ORD-CANCEL-01",
   "build_id": "web-1.42.0+1289",
+  "timestamp": "2026-05-04T10:00:00+09:00",
   "env": "stg",
   "device": "iPhone 15 / iOS 18.4",
   "network_profile": "4g-lossy",

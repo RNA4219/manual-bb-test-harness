@@ -264,6 +264,77 @@ class TestCheckFreshness:
         assert "README.md" in result["missing_caps"]
 
 
+    def test_readme_count_mismatch_is_rejected(self, tmp_path: Path) -> None:
+        """README and index counts must stay synchronized."""
+        workflow_dir = tmp_path / "docs" / "workflow-cookbook"
+        caps_dir = workflow_dir / "caps"
+        caps_dir.mkdir(parents=True)
+        (tmp_path / "README.md").write_text(
+            "index.json (2 nodes, 0 edges)", encoding="utf-8"
+        )
+        index = {
+            "generated_at": "2026-07-11T00:00:00+09:00",
+            "metadata": {
+                "last_updated": "2026-07-11",
+                "total_nodes": 1,
+                "total_edges": 0,
+                "total_capsules": 1,
+            },
+            "nodes": [{"id": "README.md", "path": "./README.md"}],
+            "edges": [],
+        }
+        (workflow_dir / "index.json").write_text(json.dumps(index), encoding="utf-8")
+        hot = {
+            "generated_at": "2026-07-11T00:00:00+09:00",
+            "project_status": {"last_updated": "2026-07-11", "total_capsules": 1},
+            "hot_nodes": [{"id": "README.md", "path": "./README.md"}],
+        }
+        (workflow_dir / "hot.json").write_text(json.dumps(hot), encoding="utf-8")
+        (caps_dir / "README.md.json").write_text(
+            json.dumps({"last_verified": "2999-01-01"}), encoding="utf-8"
+        )
+
+        result = check_freshness(tmp_path)
+
+        assert result["passed"] is False
+        assert any("README counts" in issue for issue in result["metadata_mismatch"])
+
+    def test_missing_hot_node_path_is_rejected(self, tmp_path: Path) -> None:
+        """A hot node must be indexed and resolve to an existing file."""
+        workflow_dir = tmp_path / "docs" / "workflow-cookbook"
+        caps_dir = workflow_dir / "caps"
+        caps_dir.mkdir(parents=True)
+        (tmp_path / "README.md").write_text(
+            "index.json (1 nodes, 0 edges)", encoding="utf-8"
+        )
+        index = {
+            "generated_at": "2026-07-11T00:00:00+09:00",
+            "metadata": {
+                "last_updated": "2026-07-11",
+                "total_nodes": 1,
+                "total_edges": 0,
+                "total_capsules": 1,
+            },
+            "nodes": [{"id": "README.md", "path": "./README.md"}],
+            "edges": [],
+        }
+        (workflow_dir / "index.json").write_text(json.dumps(index), encoding="utf-8")
+        hot = {
+            "generated_at": "2026-07-11T00:00:00+09:00",
+            "project_status": {"last_updated": "2026-07-11", "total_capsules": 1},
+            "hot_nodes": [{"id": "missing.md", "path": "./missing.md"}],
+        }
+        (workflow_dir / "hot.json").write_text(json.dumps(hot), encoding="utf-8")
+        (caps_dir / "README.md.json").write_text(
+            json.dumps({"last_verified": "2999-01-01"}), encoding="utf-8"
+        )
+
+        result = check_freshness(tmp_path)
+
+        assert result["passed"] is False
+        assert "hot node not in index: missing.md" in result["hot_node_issues"]
+        assert "hot node path missing: ./missing.md" in result["hot_node_issues"]
+
 class TestCliIntegration:
     """Integration tests for CLI."""
 
@@ -306,3 +377,43 @@ class TestCliIntegration:
         )
         # Should pass since no stale caps (files not modified after last_verified)
         assert result.returncode == 0
+
+    def test_hot_test_count_mismatch_is_rejected(self, tmp_path: Path) -> None:
+        """README test count and hot.json test_count must stay synchronized."""
+        workflow_dir = tmp_path / "docs" / "workflow-cookbook"
+        caps_dir = workflow_dir / "caps"
+        caps_dir.mkdir(parents=True)
+        (tmp_path / "README.md").write_text(
+            "index.json (1 nodes, 0 edges)\n現行リリース系列: **2.0.0** / 検証済みテスト: **1件**",
+            encoding="utf-8",
+        )
+        index = {
+            "generated_at": "2026-07-11T00:00:00+09:00",
+            "metadata": {
+                "last_updated": "2026-07-11",
+                "total_nodes": 1,
+                "total_edges": 0,
+                "total_capsules": 1,
+            },
+            "nodes": [{"id": "README.md", "path": "./README.md"}],
+            "edges": [],
+        }
+        (workflow_dir / "index.json").write_text(json.dumps(index), encoding="utf-8")
+        hot = {
+            "generated_at": "2026-07-11T00:00:00+09:00",
+            "project_status": {
+                "last_updated": "2026-07-11",
+                "total_capsules": 1,
+                "test_count": 2,
+            },
+            "hot_nodes": [{"id": "README.md", "path": "./README.md"}],
+        }
+        (workflow_dir / "hot.json").write_text(json.dumps(hot), encoding="utf-8")
+        (caps_dir / "README.md.json").write_text(
+            json.dumps({"last_verified": "2999-01-01"}), encoding="utf-8"
+        )
+
+        result = check_freshness(tmp_path)
+
+        assert result["passed"] is False
+        assert any("test_count mismatch" in issue for issue in result["metadata_mismatch"])

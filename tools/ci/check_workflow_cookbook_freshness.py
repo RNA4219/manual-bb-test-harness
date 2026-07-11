@@ -24,8 +24,9 @@ from __future__ import annotations
 
 import argparse
 import json
+import re
 import sys
-from datetime import datetime
+from datetime import date, datetime
 from pathlib import Path
 from typing import Any
 
@@ -107,6 +108,9 @@ def check_freshness(repo_path: Path) -> dict[str, Any]:
         "missing_files": [],
         "missing_caps": [],
         "stale_caps": [],
+        "hot_node_issues": [],
+        "date_issues": [],
+        "overdue_reviews": [],
         "metadata_mismatch": [],
         "errors": [],
     }
@@ -145,6 +149,19 @@ def check_freshness(repo_path: Path) -> dict[str, Any]:
         actual_caps_count = len(list(caps_dir.glob("*.json")))
     metadata_caps_count = metadata.get("total_capsules", 0)
 
+    def require_iso(label: str, value: object) -> None:
+        if not isinstance(value, str):
+            result["date_issues"].append(f"{label}: missing ISO 8601 value")
+            result["passed"] = False
+            return
+        try:
+            datetime.fromisoformat(value.replace("Z", "+00:00"))
+        except ValueError:
+            result["date_issues"].append(f"{label}: {value!r} is not ISO 8601")
+            result["passed"] = False
+
+    require_iso("index.generated_at", index_data.get("generated_at"))
+    require_iso("index.metadata.last_updated", metadata.get("last_updated"))
     result["checks"]["metadata"] = {
         "nodes": {
             "actual": actual_node_count,
@@ -175,6 +192,88 @@ def check_freshness(repo_path: Path) -> dict[str, Any]:
             f"total_capsules: metadata={metadata_caps_count}, actual={actual_caps_count}"
         )
 
+    readme_path = repo_path / "README.md"
+    readme_test_count: int | None = None
+    if readme_path.exists():
+        readme = readme_path.read_text(encoding="utf-8")
+        count_match = re.search(r"\((\d+) nodes,\s*(\d+) edges\)", readme)
+        if not count_match:
+            result["metadata_mismatch"].append("README knowledge-map counts not found")
+            result["passed"] = False
+        else:
+            readme_nodes, readme_edges = map(int, count_match.groups())
+            if (readme_nodes, readme_edges) != (actual_node_count, actual_edge_count):
+                result["metadata_mismatch"].append(
+                    "README counts: "
+                    f"nodes={readme_nodes}, edges={readme_edges}; "
+                    f"index nodes={actual_node_count}, edges={actual_edge_count}"
+                )
+                result["passed"] = False
+        test_count_match = re.search(r"検証済みテスト:\s*\*\*(\d+)件\*\*", readme)
+        if test_count_match:
+            readme_test_count = int(test_count_match.group(1))
+        else:
+            result["metadata_mismatch"].append("README test-count marker not found")
+            result["passed"] = False
+
+    hot_data = load_json(workflow_cookbook_dir / "hot.json")
+    hot_test_count: int | None = None
+    if hot_data is None:
+        result["hot_node_issues"].append("hot.json not found or invalid JSON")
+        result["passed"] = False
+    else:
+        require_iso("hot.generated_at", hot_data.get("generated_at"))
+        project_status = hot_data.get("project_status", {})
+        hot_test_count = project_status.get("test_count")
+        require_iso("hot.project_status.last_updated", project_status.get("last_updated"))
+        if project_status.get("total_capsules") != actual_caps_count:
+            result["metadata_mismatch"].append(
+                "hot total_capsules: "
+                f"metadata={project_status.get('total_capsules')}, actual={actual_caps_count}"
+            )
+            result["passed"] = False
+        if readme_test_count is None or project_status.get("test_count") != readme_test_count:
+            result["metadata_mismatch"].append(
+                "test_count mismatch: "
+                f"README={readme_test_count}, hot={project_status.get('test_count')}"
+            )
+            result["passed"] = False
+        node_ids = {node.get("id") for node in nodes}
+        for hot_node in hot_data.get("hot_nodes", []):
+            hot_id = hot_node.get("id", "")
+            hot_path = hot_node.get("path", "")
+            if hot_id not in node_ids:
+                result["hot_node_issues"].append(f"hot node not in index: {hot_id}")
+                result["passed"] = False
+            resolved = repo_path / hot_path.removeprefix("./")
+            if not resolved.exists():
+                result["hot_node_issues"].append(f"hot node path missing: {hot_path}")
+                result["passed"] = False
+
+    result["checks"]["metadata"]["test_count"] = {
+        "actual": readme_test_count,
+        "metadata": hot_test_count,
+        "match": readme_test_count is not None and readme_test_count == hot_test_count,
+    }
+
+    for document in repo_path.glob("*.md"):
+        content = document.read_text(encoding="utf-8")
+        for value in re.findall(
+            r"^next_review_due:\s*[\"']?([^\"'\s]+)", content, re.MULTILINE
+        ):
+            try:
+                due = date.fromisoformat(value)
+            except ValueError:
+                result["date_issues"].append(
+                    f"{document.name}.next_review_due: {value!r} is not ISO 8601"
+                )
+                result["passed"] = False
+                continue
+            if due < date.today():
+                result["overdue_reviews"].append(
+                    f"{document.name}: next_review_due={value}"
+                )
+                result["passed"] = False
     # Check each node
     for node in nodes:
         node_id = node.get("id", "")
@@ -273,7 +372,7 @@ def format_text_output(result: dict[str, Any], strict: bool = False) -> str:
         lines.append("Metadata Consistency:")
         meta = result["checks"]["metadata"]
 
-        for key in ["nodes", "edges", "capsules"]:
+        for key in ["nodes", "edges", "capsules", "test_count"]:
             data = meta.get(key, {})
             match = data.get("match", False)
             status = "[OK]" if match else "[!!]"
@@ -321,6 +420,16 @@ def format_text_output(result: dict[str, Any], strict: bool = False) -> str:
             lines.append(f"  [ERR] {error}")
         lines.append("")
 
+    for heading, key in (
+        ("Knowledge-map Metadata Issues", "metadata_mismatch"),
+        ("Hot Node Issues", "hot_node_issues"),
+        ("Date Issues", "date_issues"),
+        ("Overdue Reviews", "overdue_reviews"),
+    ):
+        if result.get(key):
+            lines.append(f"{heading}:")
+            lines.extend(f"  [!!] {item}" for item in result[key])
+            lines.append("")
     # Summary
     summary = result.get("checks", {}).get("summary", {})
     if summary:

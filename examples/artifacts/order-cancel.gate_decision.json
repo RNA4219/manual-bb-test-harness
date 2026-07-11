@@ -1,22 +1,19 @@
 {
   "feature_id": "ORD-CANCEL-01",
-  "status": "conditional_go",
+  "build_id": "web-1.42.0+1289",
+  "status": "no_go",
   "profile": "standard",
-  "reasons": [
-    "P0/P1 manual cases executed and passed",
-    "Coupon restoration integration test not automated (waiver)",
-    "Exploratory charter for recovery completed"
-  ],
-  "blocking_risks": [],
-  "waivers": [
-    "Coupon restoration integration test: manual verification sufficient for this release"
-  ],
-  "residual_risks": [
-    "Network interruption during cancellation may cause inconsistent state (low severity)",
-    "Mobile app cancellation flow not fully verified (P2 items deferred)"
-  ],
-  "required_follow_up": [
-    "Monitor cancellation error rate for 2 weeks post-release",
-    "Add coupon restoration to automated integration tests next sprint"
-  ]
+  "reasons": ["P1 case TC-003 is untested", "automation evidence is required"],
+  "evidence_summary": {
+    "manual_by_priority": {
+      "P0": {"pass": 1, "fail": 0, "skip": 0, "blocked": 0, "unknown": 0, "untested": 0, "total": 1},
+      "P1": {"pass": 1, "fail": 0, "skip": 1, "blocked": 0, "unknown": 0, "untested": 1, "total": 2},
+      "P2": {"pass": 1, "fail": 0, "skip": 0, "blocked": 0, "unknown": 0, "untested": 0, "total": 1},
+      "P3": {"pass": 0, "fail": 0, "skip": 0, "blocked": 0, "unknown": 0, "untested": 0, "total": 0}
+    },
+    "mandatory_observation_rate": 75
+  },
+  "blocking_risks": ["RISK-03"],
+  "unmet_conditions": ["P1 pass rate below standard threshold", "automation evidence missing"],
+  "required_follow_up": ["Execute TC-003 and attach automation evidence"]
 }

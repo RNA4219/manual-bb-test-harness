@@ -2,10 +2,15 @@
   "id": "skills/manual-bb-test-harness/references/risk-and-gate-policy.md",
   "role": "reference",
   "title": "Risk and Gate Policy",
-  "summary": "Risk Formula: raw = 4*(I*L) + 2*D + 2*C + 2*X + 2*P - 2*A, risk_score = round(min(100, raw * 100 / 124))。Priority: P0 (>=70), P1 (55-69), P2 (35-54), P3 (<35)。Gate Profiles: strict (changed-code coverage >=80%, P0/P1 100% pass), standard (>=75%, P0 100%, P1 >=95%), lean (>=60%, P0 100%)。",
-  "deps_out": ["schemas/risk_register.schema.json", "schemas/gate_decision.schema.json"],
-  "deps_in": ["skills/manual-bb-test-harness/SKILL.md"],
+  "summary": "Gate 2.0。manual case全件を分母にし、strict/standard/leanのautomation、P0/P1、mandatory observation、defect、assumption、risk、waiverを評価。",
+  "deps_out": [
+    "schemas/risk_register.schema.json",
+    "schemas/gate_decision.schema.json"
+  ],
+  "deps_in": [
+    "skills/manual-bb-test-harness/SKILL.md"
+  ],
   "risks": [],
   "tests": [],
-  "last_verified": "2026-05-30"
+  "last_verified": "2026-07-12"
 }

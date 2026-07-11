@@ -3,7 +3,10 @@ intent_id: INT-MBB-001
 owner: manual-bb-test-harness
 status: active
 last_reviewed_at: 2026-05-16
-next_review_due: 2026-06-16
+next_review_due: 2026-10-11
+release_version: 2.0.0
+test_count: 725
+knowledge_map: 33 nodes, 45 edges, 33 capsules
 ---
 
 # manual-bb-test-harness HUB

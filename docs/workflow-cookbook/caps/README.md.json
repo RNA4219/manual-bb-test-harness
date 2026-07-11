@@ -4,9 +4,13 @@
   "title": "Project Overview",
   "summary": "AI-first entry point for manual-bb-test-harness. Contains Quick Start commands for validation (pytest, ruff, validate-artifact, validate-spec) and CLI usage examples (import, export, run forward-test). Includes task classifier table routing to HUB.codex.md, BLUEPRINT.md, RUNBOOK.md, and SKILL.md. Links to human-readme.md for human readers.",
   "public_api": [],
-  "deps_out": ["HUB.codex.md", "docs/human-readme.md", "skills/manual-bb-test-harness/SKILL.md"],
+  "deps_out": [
+    "HUB.codex.md",
+    "docs/human-readme.md",
+    "skills/manual-bb-test-harness/SKILL.md"
+  ],
   "deps_in": [],
   "risks": [],
   "tests": [],
-  "last_verified": "2026-05-30"
+  "last_verified": "2026-07-12"
 }

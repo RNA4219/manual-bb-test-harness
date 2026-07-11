@@ -2,6 +2,14 @@
 
 ## Unreleased
 
+## [2.0.0] - 2026-07-11
+
+- Gate 2.0の入力artifactをpackage resource schemaで事前検証し、不正入力を終了コード1で拒否。
+- P0非pass、automation不足、重大open defect、critical assumptionをwaiver不可の`no_go`へ固定。
+- P1/mandatory observation/残余riskのwaiverをrisk traceability付きに限定し、適用waiverだけをgate decisionへ保存。
+- wheel/sdist隔離smoke、全725テスト、coverage 86.40%、Workflow Cookbook 33 nodes / 45 edges / 33 capsulesを現状へ同期。
+
+
 ## [1.0.0] - 2026-05-30
 
 - README を AI-first 入口へ再構成し、人間向け概要を `docs/human-readme.md` に分離。
@@ -35,7 +43,7 @@
   - Core Files テーブルに `docs/workflow-cookbook/` を追加
   - `tools/ci/check_workflow_cookbook_tier.py`: Tier チェックツール
   - `templates/tier1/`, `templates/tier2/`, `templates/tier3/`: テンプレート集
-  - `docs/birdseye/` → `docs/workflow-cookbook/` にリネーム（workflow-cookbook 標準準拠）
+  - `docs/workflow-cookbook/` → `docs/workflow-cookbook/` にリネーム（workflow-cookbook 標準準拠）
   - `check_adoption_tier.py` → `check_workflow_cookbook_tier.py` にリネーム
 - `--verbose` を全 subcommand (validate/ingest/gate/export/import/run/heatmap/state-diagram/regression-graph) に伝播。
 - `execution_evidence.schema.json` に `timestamp` フィールド追加。

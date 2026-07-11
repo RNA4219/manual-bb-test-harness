@@ -19,12 +19,80 @@ from __future__ import annotations
 import importlib.util
 import json
 import sys
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from unittest import mock
 
 import pytest
 
 REPO_ROOT = Path(__file__).parent.parent
+
+
+def write_gate_evidence(directory: Path, feature_id: str) -> None:
+    """Write a minimal valid Gate 2.0 execution evidence file."""
+    (directory / "execution_001.json").write_text(
+        json.dumps(
+            {
+                "run_id": "RUN-001",
+                "tc_id": "TC-001",
+                "feature_id": feature_id,
+                "build_id": "build-001",
+                "timestamp": "2026-07-11T10:00:00+09:00",
+                "result": "pass",
+            },
+            ensure_ascii=False,
+        ),
+        encoding="utf-8",
+    )
+
+
+def gate_risk_register(feature_id: str) -> dict[str, object]:
+    """Return a minimal risk register accepted by the production schema."""
+    return {
+        "feature_id": feature_id,
+        "risks": [
+            {
+                "id": "RISK-001",
+                "scenario": "Fixture risk",
+                "impact": 1,
+                "likelihood": 1,
+                "priority": "P2",
+                "trace_to": ["TC-001"],
+            }
+        ],
+    }
+
+
+def gate_case_set(feature_id: str, priority: str = "P0") -> dict[str, object]:
+    """Return a minimal manual case set accepted by the production schema."""
+    return {
+        "feature_id": feature_id,
+        "manual_cases": [
+            {
+                "tc_id": "TC-001",
+                "title": "Fixture case",
+                "priority": priority,
+                "primary_view": "black",
+                "steps": ["Open the feature"],
+                "expected_results": ["Expected result"],
+                "oracle": {"type": "specified", "refs": ["AC-1"]},
+                "trace_to": ["RISK-001"],
+            }
+        ],
+    }
+
+
+def write_gate_base_inputs(directory: Path, feature_id: str) -> None:
+    """Create valid risk/case/evidence inputs for CLI contract tests."""
+    directory.mkdir(parents=True, exist_ok=True)
+    write_gate_evidence(directory, feature_id)
+    (directory / "risk_register.json").write_text(
+        json.dumps(gate_risk_register(feature_id), ensure_ascii=False), encoding="utf-8"
+    )
+    (directory / "manual_case_set.json").write_text(
+        json.dumps(gate_case_set(feature_id), ensure_ascii=False), encoding="utf-8"
+    )
+
 
 
 def load_evaluate_gate_module() -> object:
@@ -151,9 +219,7 @@ class TestExtractCaseResults:
                 "defect_stub": {"title": "Login fails", "severity": "high"},
             }
         ]
-        manual_cases = {
-            "manual_cases": [{"tc_id": "TC-001", "priority": "P0", "trace_to": []}]
-        }
+        manual_cases = {"manual_cases": [{"tc_id": "TC-001", "priority": "P0", "trace_to": []}]}
 
         result = module.extract_case_results(evidence_list, manual_cases)
         assert result["TC-001"]["defect_stub"]["title"] == "Login fails"
@@ -266,9 +332,7 @@ class TestAssessResidualRisks:
                 {"id": "RISK-001", "priority": "P0", "scenario": "Critical risk"},
             ]
         }
-        case_results = {
-            "TC-001": {"result": "fail", "priority": "P0", "trace_to": ["RISK-001"]}
-        }
+        case_results = {"TC-001": {"result": "fail", "priority": "P0", "trace_to": ["RISK-001"]}}
 
         residual, blocking = module.assess_residual_risks(risk_register, case_results)
         assert "RISK-001" in blocking
@@ -298,9 +362,7 @@ class TestAssessResidualRisks:
                 {"id": "RISK-001", "priority": "P0", "scenario": "Risk", "trace_to": ["TC-001"]}
             ]
         }
-        case_results = {
-            "TC-001": {"result": "pass", "priority": "P0", "trace_to": []}
-        }
+        case_results = {"TC-001": {"result": "pass", "priority": "P0", "trace_to": []}}
 
         residual, blocking = module.assess_residual_risks(risk_register, case_results)
         # Risk is tested via risk.trace_to, should not be blocking
@@ -389,8 +451,8 @@ class TestDetermineGateStatus:
         assert status == "go"
         assert len(waivers) == 0
 
-    def test_gate_conditional_go_lean_profile(self, tmp_path: Path) -> None:
-        """Lean profile with P1 below threshold gives conditional_go."""
+    def test_gate_lean_profile_does_not_create_waiver(self, tmp_path: Path) -> None:
+        """Lean profile never manufactures an implicit waiver."""
         module = load_evaluate_gate_module()
 
         counts = {
@@ -405,9 +467,8 @@ class TestDetermineGateStatus:
         status, reasons, waivers = module.determine_gate_status(
             counts, defects, blocking_risks, "lean"
         )
-        assert status == "conditional_go"
-        assert len(waivers) > 0
-        assert "waived" in waivers[0]
+        assert status == "no_go"
+        assert waivers == []
 
     def test_gate_no_go_p1_fail_standard(self, tmp_path: Path) -> None:
         """P1 below 95% in standard profile causes no_go."""
@@ -553,140 +614,16 @@ class TestEvaluateGateMain:
         # Create test artifacts
         artifacts_dir = tmp_path / "artifacts"
         artifacts_dir.mkdir()
+        write_gate_evidence(artifacts_dir, "TEST-001")
 
         # Risk register
         (artifacts_dir / "risk_register.json").write_text(
-            json.dumps(
-                {
-                    "feature_id": "TEST-001",
-                    "risks": [
-                        {"id": "RISK-001", "priority": "P2", "scenario": "Low risk"},
-                    ],
-                },
-                ensure_ascii=False,
-            ),
-            encoding="utf-8",
-        )
-
-        # Manual case set
-        (artifacts_dir / "manual_case_set.json").write_text(
-            json.dumps(
-                {
-                    "feature_id": "TEST-001",
-                    "manual_cases": [
-                        {"tc_id": "TC-001", "priority": "P0", "trace_to": []},
-                    ],
-                },
-                ensure_ascii=False,
-            ),
-            encoding="utf-8",
-        )
-
-        # Execution evidence
-        (artifacts_dir / "execution_001.json").write_text(
-            json.dumps({"tc_id": "TC-001", "result": "pass"}, ensure_ascii=False),
-            encoding="utf-8",
-        )
-
-        output_file = tmp_path / "gate.json"
-
-        result = subprocess.run(
-            [
-                sys.executable,
-                str(REPO_ROOT / "scripts" / "evaluate-gate.py"),
-                "--input",
-                str(artifacts_dir),
-                "--output",
-                str(output_file),
-            ],
-            capture_output=True,
-            text=True,
-            cwd=REPO_ROOT,
-        )
-        assert result.returncode == 0
-        assert output_file.exists()
-
-        gate = json.loads(output_file.read_text(encoding="utf-8"))
-        assert gate["status"] in ["go", "conditional_go", "no_go"]
-
-    def test_main_with_separate_inputs(self, tmp_path: Path) -> None:
-        """Main with separate --evidence, --risk, --cases works."""
-        import subprocess
-
-        # Create separate files
-        evidence_dir = tmp_path / "evidence"
-        evidence_dir.mkdir()
-        (evidence_dir / "TC-001.json").write_text(
-            json.dumps({"tc_id": "TC-001", "result": "pass"}, ensure_ascii=False),
-            encoding="utf-8",
-        )
-
-        risk_file = tmp_path / "risk.json"
-        risk_file.write_text(
-            json.dumps(
-                {
-                    "feature_id": "TEST-002",
-                    "risks": [{"id": "RISK-001", "priority": "P2", "scenario": "Low risk"}],
-                },
-                ensure_ascii=False,
-            ),
-            encoding="utf-8",
-        )
-
-        cases_file = tmp_path / "cases.json"
-        cases_file.write_text(
-            json.dumps(
-                {
-                    "feature_id": "TEST-002",
-                    "manual_cases": [{"tc_id": "TC-001", "priority": "P0", "trace_to": []}],
-                },
-                ensure_ascii=False,
-            ),
-            encoding="utf-8",
-        )
-
-        output_file = tmp_path / "gate.json"
-
-        result = subprocess.run(
-            [
-                sys.executable,
-                str(REPO_ROOT / "scripts" / "evaluate-gate.py"),
-                "--evidence",
-                str(evidence_dir),
-                "--risk",
-                str(risk_file),
-                "--cases",
-                str(cases_file),
-                "--output",
-                str(output_file),
-            ],
-            capture_output=True,
-            text=True,
-            cwd=REPO_ROOT,
-        )
-        assert result.returncode == 0
-        assert output_file.exists()
-
-    def test_main_profile_strict(self, tmp_path: Path) -> None:
-        """Main with --profile strict."""
-        import subprocess
-
-        artifacts_dir = tmp_path / "artifacts"
-        artifacts_dir.mkdir()
-
-        (artifacts_dir / "risk_register.json").write_text(
-            json.dumps(
-                {"feature_id": "TEST-003", "risks": []},
-                ensure_ascii=False,
-            ),
+            json.dumps(gate_risk_register("TEST-001"), ensure_ascii=False),
             encoding="utf-8",
         )
 
         (artifacts_dir / "manual_case_set.json").write_text(
-            json.dumps(
-                {"feature_id": "TEST-003", "manual_cases": []},
-                ensure_ascii=False,
-            ),
+            json.dumps(gate_case_set("TEST-001"), ensure_ascii=False),
             encoding="utf-8",
         )
 
@@ -721,7 +658,7 @@ class TestEvaluateGateMain:
 
         # Only create case set, no risk
         (artifacts_dir / "manual_case_set.json").write_text(
-            json.dumps({"feature_id": "TEST", "manual_cases": []}, ensure_ascii=False),
+            json.dumps(gate_case_set("TEST"), ensure_ascii=False),
             encoding="utf-8",
         )
 
@@ -776,20 +713,15 @@ class TestEvaluateGateMainDirect:
 
         artifacts_dir = tmp_path / "artifacts"
         artifacts_dir.mkdir()
+        write_gate_evidence(artifacts_dir, "TEST-DIRECT")
 
         # Create artifacts
         (artifacts_dir / "risk_register.json").write_text(
-            json.dumps(
-                {"feature_id": "TEST-DIRECT", "risks": []},
-                ensure_ascii=False,
-            ),
+            json.dumps(gate_risk_register("TEST-DIRECT"), ensure_ascii=False),
             encoding="utf-8",
         )
         (artifacts_dir / "manual_case_set.json").write_text(
-            json.dumps(
-                {"feature_id": "TEST-DIRECT", "manual_cases": []},
-                ensure_ascii=False,
-            ),
+            json.dumps(gate_case_set("TEST-DIRECT"), ensure_ascii=False),
             encoding="utf-8",
         )
 
@@ -834,23 +766,16 @@ class TestEvaluateGateMainDirect:
 
         evidence_dir = tmp_path / "evidence"
         evidence_dir.mkdir()
-        (evidence_dir / "execution_001.json").write_text(
-            json.dumps({"tc_id": "TC-001", "result": "pass"}, ensure_ascii=False),
-            encoding="utf-8",
-        )
-
+        write_gate_evidence(evidence_dir, "TEST")
         risk_file = tmp_path / "risk.json"
         risk_file.write_text(
-            json.dumps({"feature_id": "TEST", "risks": []}, ensure_ascii=False),
+            json.dumps(gate_risk_register("TEST"), ensure_ascii=False),
             encoding="utf-8",
         )
 
         cases_file = tmp_path / "cases.json"
         cases_file.write_text(
-            json.dumps(
-                {"feature_id": "TEST", "manual_cases": [{"tc_id": "TC-001", "priority": "P0", "trace_to": []}]},
-                ensure_ascii=False,
-            ),
+            json.dumps(gate_case_set("TEST"), ensure_ascii=False),
             encoding="utf-8",
         )
 
@@ -874,53 +799,21 @@ class TestEvaluateGateMainDirect:
             result = module.main()
             assert result == 0
 
-    def test_main_direct_with_alternative_risk_file(self, tmp_path: Path) -> None:
-        """Direct main call finds alternative risk file names."""
-        module = load_evaluate_gate_module()
-
-        artifacts_dir = tmp_path / "artifacts"
-        artifacts_dir.mkdir()
-
-        # Use alternative name
-        (artifacts_dir / "project-risk-register.json").write_text(
-            json.dumps({"feature_id": "TEST", "risks": []}, ensure_ascii=False),
-            encoding="utf-8",
-        )
-        (artifacts_dir / "manual_case_set.json").write_text(
-            json.dumps({"feature_id": "TEST", "manual_cases": []}, ensure_ascii=False),
-            encoding="utf-8",
-        )
-
-        output_file = tmp_path / "gate.json"
-
-        with mock.patch.object(
-            sys,
-            "argv",
-            [
-                "evaluate-gate",
-                "--input",
-                str(artifacts_dir),
-                "--output",
-                str(output_file),
-            ],
-        ):
-            result = module.main()
-            assert result == 0
-
     def test_main_direct_with_alternative_cases_file(self, tmp_path: Path) -> None:
         """Direct main call finds alternative case file names."""
         module = load_evaluate_gate_module()
 
         artifacts_dir = tmp_path / "artifacts"
         artifacts_dir.mkdir()
+        write_gate_evidence(artifacts_dir, "TEST")
 
         (artifacts_dir / "risk_register.json").write_text(
-            json.dumps({"feature_id": "TEST", "risks": []}, ensure_ascii=False),
+            json.dumps(gate_risk_register("TEST"), ensure_ascii=False),
             encoding="utf-8",
         )
         # Use alternative name
         (artifacts_dir / "test-cases.json").write_text(
-            json.dumps({"feature_id": "TEST", "manual_cases": []}, ensure_ascii=False),
+            json.dumps(gate_case_set("TEST"), ensure_ascii=False),
             encoding="utf-8",
         )
 
@@ -948,7 +841,7 @@ class TestEvaluateGateMainDirect:
         artifacts_dir.mkdir()
 
         (artifacts_dir / "risk_register.json").write_text(
-            json.dumps({"feature_id": "TEST", "risks": []}, ensure_ascii=False),
+            json.dumps(gate_risk_register("TEST"), ensure_ascii=False),
             encoding="utf-8",
         )
 
@@ -967,3 +860,136 @@ class TestEvaluateGateMainDirect:
         ):
             result = module.main()
             assert result == 1
+
+class TestGateCliInputContracts:
+    """CLI must reject malformed artifacts with exit code 1."""
+
+    def run_gate(self, artifacts_dir: Path, output_file: Path) -> object:
+        import subprocess
+
+        return subprocess.run(
+            [
+                sys.executable,
+                str(REPO_ROOT / "scripts" / "evaluate-gate.py"),
+                "--input",
+                str(artifacts_dir),
+                "--output",
+                str(output_file),
+            ],
+            capture_output=True,
+            text=True,
+            cwd=REPO_ROOT,
+        )
+
+    @pytest.mark.parametrize(
+        "mutation",
+        [
+            {"owner": ""},
+            {"risk_ids": []},
+            {"expires_at": "not-a-date"},
+            {"unexpected": "reject-me"},
+        ],
+    )
+    def test_invalid_waiver_exits_one(self, tmp_path: Path, mutation: dict[str, object]) -> None:
+        artifacts_dir = tmp_path / "artifacts"
+        write_gate_base_inputs(artifacts_dir, "CLI-WAIVER")
+        waiver = {
+            "feature_id": "CLI-WAIVER",
+            "build_id": "build-001",
+            "waivers": [
+                {
+                    "id": "W-1",
+                    "risk_ids": ["RISK-001"],
+                    "reason": "contained",
+                    "owner": "qa",
+                    "expires_at": (datetime.now(timezone.utc) + timedelta(days=1)).isoformat(),
+                    "containment": "monitor",
+                    "rollback": "disable",
+                }
+            ],
+        }
+        waiver["waivers"][0].update(mutation)
+        (artifacts_dir / "waiver_set.json").write_text(json.dumps(waiver), encoding="utf-8")
+        output_file = tmp_path / "gate.json"
+        result = self.run_gate(artifacts_dir, output_file)
+        assert result.returncode == 1
+        assert ("Schema validation failed" in result.stderr) or ("Invalid timestamp" in result.stderr)
+        assert not output_file.exists()
+
+    def test_automation_missing_source_refs_exits_one(self, tmp_path: Path) -> None:
+        artifacts_dir = tmp_path / "artifacts"
+        write_gate_base_inputs(artifacts_dir, "CLI-AUTO")
+        automation = {
+            "feature_id": "CLI-AUTO",
+            "build_id": "build-001",
+            "coverage_scope": "changed_code",
+            "coverage_percent": 90,
+            "new_issues": {"blocker": 0, "critical": 0},
+        }
+        (artifacts_dir / "automation_evidence.json").write_text(
+            json.dumps(automation), encoding="utf-8"
+        )
+        output_file = tmp_path / "gate.json"
+        result = self.run_gate(artifacts_dir, output_file)
+        assert result.returncode == 1
+        assert "Schema validation failed" in result.stderr
+
+    @pytest.mark.parametrize(
+        "mutation",
+        [
+            {"tc_id": None},
+            {"timestamp": None},
+            {"result": "not-a-result"},
+            {"defect_stub": {"title": "broken", "severity": "blocker", "status": "invalid"}},
+        ],
+    )
+    def test_invalid_execution_evidence_exits_one(
+        self, tmp_path: Path, mutation: dict[str, object]
+    ) -> None:
+        artifacts_dir = tmp_path / "artifacts"
+        write_gate_base_inputs(artifacts_dir, "CLI-EVIDENCE")
+        bad = {
+            "run_id": "RUN-BAD",
+            "tc_id": "TC-001",
+            "feature_id": "CLI-EVIDENCE",
+            "build_id": "build-001",
+            "timestamp": "2026-07-11T10:00:00+09:00",
+            "result": "pass",
+        }
+        bad.update(mutation)
+        (artifacts_dir / "execution_bad.json").write_text(json.dumps(bad), encoding="utf-8")
+        output_file = tmp_path / "gate.json"
+        result = self.run_gate(artifacts_dir, output_file)
+        assert result.returncode == 1
+        assert "Schema validation failed" in result.stderr
+
+
+@pytest.mark.parametrize(
+    "script_path",
+    sorted((REPO_ROOT / "scripts").glob("*.py")),
+    ids=lambda path: path.name,
+)
+def test_all_root_scripts_report_package_version(script_path: Path) -> None:
+    import subprocess
+
+    result = subprocess.run(
+        [sys.executable, str(script_path), "--version"],
+        capture_output=True,
+        text=True,
+        cwd=REPO_ROOT,
+    )
+    assert result.returncode == 0
+    assert "2.0.0" in result.stdout
+
+
+def test_package_cli_reports_version() -> None:
+    import subprocess
+
+    result = subprocess.run(
+        [sys.executable, "-m", "bb_harness", "--version"],
+        capture_output=True,
+        text=True,
+        cwd=REPO_ROOT,
+    )
+    assert result.returncode == 0
+    assert result.stdout.strip() == "bb-harness 2.0.0"

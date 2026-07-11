@@ -1,15 +1,21 @@
 {
   "feature_id": "ORD-CANCEL-01",
+  "build_id": "web-1.42.0+1289",
   "status": "go",
   "profile": "standard",
   "reasons": [
-    "P0 pass rate: 100.0% (1/1)",
-    "P1 pass rate: 100.0% (1/1)"
+    "P0 pass rate: 100.0%",
+    "P1 pass rate: 100.0%",
+    "mandatory observation execution: 100.0%",
+    "automation evidence meets profile thresholds"
   ],
-  "residual_risks": [
-    "RISK-03: クーポン残数が復元されない"
-  ],
-  "required_follow_up": [
-    "Review residual risks in next sprint"
-  ]
+  "evidence_summary": {
+    "manual_by_priority": {
+      "P0": {"pass": 1, "fail": 0, "skip": 0, "blocked": 0, "unknown": 0, "untested": 0, "total": 1},
+      "P1": {"pass": 2, "fail": 0, "skip": 0, "blocked": 0, "unknown": 0, "untested": 0, "total": 2},
+      "P2": {"pass": 1, "fail": 0, "skip": 0, "blocked": 0, "unknown": 0, "untested": 0, "total": 1},
+      "P3": {"pass": 0, "fail": 0, "skip": 0, "blocked": 0, "unknown": 0, "untested": 0, "total": 0}
+    },
+    "mandatory_observation_rate": 100
+  }
 }

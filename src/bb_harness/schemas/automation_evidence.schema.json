@@ -1,0 +1,29 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/RNA4219/manual-bb-test-harness/schemas/automation_evidence.schema.json",
+  "title": "AutomationEvidence",
+  "type": "object",
+  "required": ["feature_id", "build_id", "coverage_scope", "coverage_percent", "new_issues", "source_refs"],
+  "properties": {
+    "feature_id": {"type": "string", "minLength": 1},
+    "build_id": {"type": "string", "minLength": 1},
+    "coverage_scope": {"enum": ["changed_code", "impacted_module"]},
+    "coverage_percent": {"type": "number", "minimum": 0, "maximum": 100},
+    "hotspot_review_percent": {"type": "number", "minimum": 0, "maximum": 100},
+    "new_issues": {
+      "type": "object",
+      "required": ["blocker", "critical"],
+      "properties": {
+        "blocker": {"type": "integer", "minimum": 0},
+        "critical": {"type": "integer", "minimum": 0}
+      },
+      "additionalProperties": false
+    },
+    "source_refs": {
+      "type": "array",
+      "minItems": 1,
+      "items": {"$ref": "shared_defs.schema.json#/$defs/SourceRef"}
+    }
+  },
+  "additionalProperties": false
+}

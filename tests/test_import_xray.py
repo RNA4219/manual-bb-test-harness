@@ -23,16 +23,10 @@ REPO_ROOT = Path(__file__).parent.parent
 
 
 def load_import_xray_module() -> object:
-    """Load import-xray.py module dynamically."""
-    spec = importlib.util.spec_from_file_location(
-        "import_xray", REPO_ROOT / "scripts" / "import-xray.py"
-    )
-    if spec is None or spec.loader is None:
-        pytest.skip("Cannot load import-xray.py")
-    module = importlib.util.module_from_spec(spec)
-    sys.modules["import_xray"] = module
-    spec.loader.exec_module(module)
-    return module
+    """Load the package-native Xray implementation."""
+    from bb_harness.tools import import_xray
+
+    return importlib.reload(import_xray)
 
 
 class TestXrayStatusMap:
@@ -386,7 +380,7 @@ class TestTimestampHandling:
 
         assert evidence["time_spent_minutes"] == 5.0
 
-    def test_no_timestamp(self) -> None:
+    def test_missing_source_timestamp_gets_import_timestamp(self) -> None:
         """No timestamp when missing."""
         module = load_import_xray_module()
 
@@ -397,7 +391,7 @@ class TestTimestampHandling:
         }
         evidence = module.convert_to_execution_evidence(testrun, "PROJ-TE-123", "PROJ-TC-001")
 
-        assert "timestamp" not in evidence
+        assert evidence["timestamp"]
 
 
 class TestAttachmentsHandling:
@@ -511,15 +505,18 @@ class TestImportXrayResultsMocked:
         mock_exec_data = {
             "tests": [
                 {"testKey": "PROJ-TC-001", "status": "PASS", "executedBy": "tester1"},
-                {"testKey": "PROJ-TC-002", "status": "FAIL", "executedBy": "tester2", "defects": ["BUG-1"]},
+                {
+                    "testKey": "PROJ-TC-002",
+                    "status": "FAIL",
+                    "executedBy": "tester2",
+                    "defects": ["BUG-1"],
+                },
             ]
         }
 
         with mock.patch.object(module, "get_jira_client", return_value=mock_client):
             with mock.patch.object(module, "fetch_test_execution", return_value=mock_exec_data):
-                results, stats = module.import_xray_results(
-                    exec_key="PROJ-TE-123", dry_run=False
-                )
+                results, stats = module.import_xray_results(exec_key="PROJ-TE-123", dry_run=False)
 
                 assert len(results) == 2
                 assert stats["imported_count"] == 2
@@ -549,9 +546,7 @@ class TestImportXrayResultsErrorPaths:
 
         with mock.patch.object(module, "get_jira_client", return_value=mock_client):
             with mock.patch.object(module, "fetch_test_execution", return_value=mock_exec_data):
-                results, stats = module.import_xray_results(
-                    exec_key="PROJ-TE-123", dry_run=False
-                )
+                results, stats = module.import_xray_results(exec_key="PROJ-TE-123", dry_run=False)
 
                 assert len(results) == 0
                 assert stats["imported_count"] == 0
@@ -576,9 +571,7 @@ class TestImportXrayResultsErrorPaths:
 
         with mock.patch.object(module, "get_jira_client", return_value=mock_client):
             with mock.patch.object(module, "fetch_test_execution", return_value=mock_exec_data):
-                results, stats = module.import_xray_results(
-                    exec_key="PROJ-TE-123", dry_run=False
-                )
+                results, stats = module.import_xray_results(exec_key="PROJ-TE-123", dry_run=False)
 
                 # Should skip test without testKey
                 assert len(results) == 0
@@ -603,9 +596,7 @@ class TestImportXrayResultsErrorPaths:
 
         with mock.patch.object(module, "get_jira_client", return_value=mock_client):
             with mock.patch.object(module, "fetch_test_execution", return_value=mock_exec_data):
-                results, stats = module.import_xray_results(
-                    exec_key="PROJ-TE-123", dry_run=False
-                )
+                results, stats = module.import_xray_results(exec_key="PROJ-TE-123", dry_run=False)
 
                 assert stats["skip_count"] == 1
 
@@ -629,9 +620,7 @@ class TestImportXrayResultsErrorPaths:
 
         with mock.patch.object(module, "get_jira_client", return_value=mock_client):
             with mock.patch.object(module, "fetch_test_execution", return_value=mock_exec_data):
-                results, stats = module.import_xray_results(
-                    exec_key="PROJ-TE-123", dry_run=False
-                )
+                results, stats = module.import_xray_results(exec_key="PROJ-TE-123", dry_run=False)
 
                 assert stats["blocked_count"] == 1
 
@@ -756,9 +745,7 @@ class TestImportXrayResultsAllStatuses:
 
         with mock.patch.object(module, "get_jira_client", return_value=mock_client):
             with mock.patch.object(module, "fetch_test_execution", return_value=mock_exec_data):
-                results, stats = module.import_xray_results(
-                    exec_key="PROJ-TE-123", dry_run=False
-                )
+                results, stats = module.import_xray_results(exec_key="PROJ-TE-123", dry_run=False)
 
                 assert stats["pass_count"] == 1
                 assert stats["fail_count"] == 1
@@ -785,9 +772,7 @@ class TestImportXrayResultsAllStatuses:
 
         with mock.patch.object(module, "get_jira_client", return_value=mock_client):
             with mock.patch.object(module, "fetch_test_execution", return_value=mock_exec_data):
-                results, stats = module.import_xray_results(
-                    exec_key="PROJ-TE-123", dry_run=False
-                )
+                results, stats = module.import_xray_results(exec_key="PROJ-TE-123", dry_run=False)
 
                 assert len(results) == 1
                 assert results[0]["tc_id"] == "PROJ-TC-001"
@@ -812,8 +797,10 @@ class TestImportXrayMainErrorPaths:
             "argv",
             [
                 "import-xray",
-                "--exec", "PROJ-TE-123",
-                "--output", str(output_dir),
+                "--exec",
+                "PROJ-TE-123",
+                "--output",
+                str(output_dir),
             ],
         ):
             with mock.patch.object(

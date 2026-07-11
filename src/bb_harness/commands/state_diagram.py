@@ -6,7 +6,8 @@ import argparse
 import sys
 from pathlib import Path
 
-from bb_harness.commands._shared import run_script
+from bb_harness.commands._invoke import invoke_tool
+from bb_harness.tools.state_diagram import main as state_diagram_main
 
 
 def add_subparser(subparsers: argparse._SubParsersAction) -> None:
@@ -42,4 +43,4 @@ def run(args: argparse.Namespace) -> int:
     if getattr(args, "verbose", False):
         print(f"[verbose] Input: {args.input}", file=sys.stderr)
 
-    return run_script("state-diagram.py", extra_args, args)
+    return invoke_tool(state_diagram_main, extra_args, args)

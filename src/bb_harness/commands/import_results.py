@@ -6,7 +6,9 @@ import argparse
 import sys
 from pathlib import Path
 
-from bb_harness.commands._shared import run_script
+from bb_harness.commands._invoke import invoke_tool
+from bb_harness.tools.import_testrail import main as import_testrail_main
+from bb_harness.tools.import_xray import main as import_xray_main
 
 
 def add_subparser(subparsers: argparse._SubParsersAction) -> None:
@@ -52,6 +54,11 @@ def add_subparser(subparsers: argparse._SubParsersAction) -> None:
         help="Prefix for test case IDs (default: TC)",
     )
     testrail_parser.add_argument(
+        "--feature-id",
+        default="IMPORTED",
+        help="Feature ID attached to imported evidence",
+    )
+    testrail_parser.add_argument(
         "--dry-run",
         action="store_true",
         help="Print results without writing files",
@@ -74,6 +81,11 @@ def add_subparser(subparsers: argparse._SubParsersAction) -> None:
         help="Output directory for execution_evidence files",
     )
     xray_parser.add_argument(
+        "--feature-id",
+        default="IMPORTED",
+        help="Feature ID attached to imported evidence",
+    )
+    xray_parser.add_argument(
         "--dry-run",
         action="store_true",
         help="Print results without writing files",
@@ -94,18 +106,22 @@ def run(args: argparse.Namespace) -> int:
             str(args.run),
             "--output",
             str(args.output),
+            "--feature-id",
+            args.feature_id,
         ]
         if args.tc_prefix != "TC":
             extra_args.extend(["--tc-prefix", args.tc_prefix])
-        return run_script("import-testrail.py", extra_args, args)
+        return invoke_tool(import_testrail_main, extra_args, args)
     elif args.source == "xray":
         extra_args = [
             "--exec",
             args.exec,
             "--output",
             str(args.output),
+            "--feature-id",
+            args.feature_id,
         ]
-        return run_script("import-xray.py", extra_args, args)
+        return invoke_tool(import_xray_main, extra_args, args)
     else:
         print(f"Error: Unknown import source: {args.source}", file=sys.stderr)
         return 1

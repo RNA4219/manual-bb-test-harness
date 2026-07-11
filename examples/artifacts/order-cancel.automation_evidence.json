@@ -1,0 +1,11 @@
+{
+  "feature_id": "ORD-CANCEL-01",
+  "build_id": "web-1.42.0+1289",
+  "coverage_scope": "changed_code",
+  "coverage_percent": 82,
+  "hotspot_review_percent": 100,
+  "new_issues": {"blocker": 0, "critical": 0},
+  "source_refs": [
+    {"id": "CI-2026-05-04-1289", "kind": "auto_test", "excerpt": "changed-code coverage 82%"}
+  ]
+}
