@@ -1,0 +1,46 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://manual-bb-test-harness.example/contracts/HATE-bridge/v1/request.consumer.schema.json",
+  "type": "object",
+  "additionalProperties": true,
+  "required": [
+    "schema_version",
+    "record_type",
+    "bridge_id",
+    "original_command",
+    "owner",
+    "canonical_contract",
+    "status",
+    "input_refs",
+    "expected_output_types",
+    "sourceRefs"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "HATE-bridge/v1"
+    },
+    "record_type": {
+      "const": "bridge_request"
+    },
+    "bridge_id": {
+      "type": "string",
+      "pattern": "^hate-bridge-[a-f0-9]{24}$"
+    },
+    "owner": {
+      "const": "manual-bb-test-harness"
+    },
+    "status": {
+      "const": "handoff_required"
+    },
+    "input_refs": {
+      "type": "array"
+    },
+    "expected_output_types": {
+      "type": "array",
+      "minItems": 1
+    },
+    "sourceRefs": {
+      "type": "array"
+    }
+  }
+}
