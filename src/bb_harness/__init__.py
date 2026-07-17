@@ -1,3 +1,3 @@
 """Manual black-box test harness CLI tool."""
 
-__version__ = "2.0.0"
+__version__ = "3.0.0"

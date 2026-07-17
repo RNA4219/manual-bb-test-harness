@@ -1,8 +1,35 @@
 # manual-bb-test-harness
 
+[![license: RNA-TPSAL-1.0](https://img.shields.io/badge/license-RNA--TPSAL--1.0-blue.svg)](LICENSE)
+[![source-available](https://img.shields.io/badge/source--available-yes-orange.svg)](LICENSE)
+
+## ライセンス
+
+このバージョンは、RNA Third-Party Service Attribution License 1.0に基づくsource-availableソフトウェアです。
+
+個人利用、研究、教育、オープンソース活動、および企業による自社内利用は無償です。
+
+第三者向けの有償QA、テスト、開発支援、コンサルティング等で利用する場合は、顧客の技術担当者が確認できる文書に、ツール名、原開発者、公式リポジトリ、使用versionまたはcommit、改変の有無を案件単位で一度記載してください。
+
+帰属表示を省略するホワイトラベル利用には、別途書面による商用ライセンスが必要です。
+
+過去のMIT版は、引き続きMIT Licenseの条件で利用できます。詳細は[LICENSING.md](LICENSING.md)を参照してください。
+
+## License
+
+This version is source-available under the RNA Third-Party Service Attribution License 1.0.
+
+Personal use, research, education, open-source activities, and internal business use are permitted without charge.
+
+When the software is used to provide a paid QA, testing, development, consulting, managed, outsourced, or similar service to a third party, a one-time attribution notice must be provided in project documentation reasonably accessible to the Customer technical team.
+
+Attribution-free white-label use requires a separate written commercial license.
+
+Previously released MIT-licensed versions remain available under their original MIT terms. See [LICENSING.md](LICENSING.md).
+
 手動ブラックボックス QA 設計 Skill の配布・保守 repo。
 
-現行リリース系列: **2.0.0** / 検証済みテスト: **726件** / Workflow Cookbook: **33 nodes・45 edges・33 capsules** / 次回レビュー: **2026-10-11**
+現行リリース系列: **3.0.0** / 検証済みテスト: **726件** / Workflow Cookbook: **33 nodes・45 edges・33 capsules** / 次回レビュー: **2026-10-11**
 人間向け概要は [docs/human-readme.md](docs/human-readme.md) を参照。
 
 <!-- LLM-BOOTSTRAP v1 -->

@@ -2,6 +2,13 @@
 
 ## Unreleased
 
+## [3.0.0] - Unreleased
+
+- ライセンスをRNA Third-Party Service Attribution License 1.0へ変更し、第三者向け有償サービス利用を顧客向け帰属表示付きで許可。
+- 帰属表示なしのホワイトラベル利用向けに、別途書面による商用ライセンス導線を追加。
+- 過去のMIT版の権利を維持し、v2.0.0 / 2ee85a0e8a62fc423feed1a23e0fdc8f4fa69631を最後のMIT境界として記録。
+- wheel、sdist、release bundleへ必須ライセンス文書を同梱して検証するようpackaging checksを更新。
+
 ## [2.0.0] - 2026-07-11
 
 - Gate 2.0の入力artifactをpackage resource schemaで事前検証し、不正入力を終了コード1で拒否。

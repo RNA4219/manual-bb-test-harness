@@ -264,6 +264,12 @@ class ReleaseBundleValidator:
 
             # Key docs
             docs_files = [
+                "LICENSE",
+                "LICENSE.ja.md",
+                "NOTICE",
+                "LICENSING.md",
+                "COMMERCIAL-LICENSE.md",
+                "THIRD_PARTY_NOTICES.md",
                 "README.md",
                 "CHANGELOG.md",
                 "BLUEPRINT.md",

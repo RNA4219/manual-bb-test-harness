@@ -48,7 +48,7 @@ param(
 )
 
 $ErrorActionPreference = "Stop"
-$ScriptVersion = "2.0.0"
+$ScriptVersion = "3.0.0"
 
 # Handle --version flag
 if ($Version) {

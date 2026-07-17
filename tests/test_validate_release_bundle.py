@@ -146,6 +146,25 @@ class TestCreateDryRunBundle:
             names = zf.namelist()
             assert any(".schema.json" in name for name in names)
 
+    def test_bundle_contains_license_documents(self, tmp_path: Path) -> None:
+        """Bundle contains all required license documents."""
+        import zipfile
+
+        module = load_validate_release_bundle_module()
+        validator = module.ReleaseBundleValidator(REPO_ROOT)
+        bundle_path = validator.create_dry_run_bundle(tmp_path)
+
+        required = {
+            "LICENSE",
+            "LICENSE.ja.md",
+            "NOTICE",
+            "LICENSING.md",
+            "COMMERCIAL-LICENSE.md",
+            "THIRD_PARTY_NOTICES.md",
+        }
+        with zipfile.ZipFile(bundle_path, "r") as zf:
+            assert required <= set(zf.namelist())
+
 
 class TestValidateReleaseBundleMain:
     """Tests for main function."""

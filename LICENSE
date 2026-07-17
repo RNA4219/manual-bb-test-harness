@@ -1,21 +1,207 @@
-MIT License
+RNA Third-Party Service Attribution License 1.0
+Short name: RNA-TPSAL-1.0
+SPDX custom identifier: LicenseRef-RNA-TPSAL-1.0
 
 Copyright (c) 2026 R_N_A
+Original developer: RNA4219
 
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
+1. License Name and Version
 
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
+This license is the RNA Third-Party Service Attribution License 1.0
+("License"). It is a source-available license that requires attribution for
+paid third-party service use.
 
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
+2. Copyright Holder
+
+The copyright holder is R_N_A. The original developer is RNA4219
+(collectively, the "Licensor" for purposes of this License).
+
+3. Definitions
+
+"Covered Materials" means the materials distributed under this License,
+including source code, command-line interfaces, executable components, skill
+definitions, prompts and operational instructions, reference documents,
+templates, schemas, golden examples, evaluation rubrics, workflow definitions,
+associated documentation, and substantial modified copies of any of the
+foregoing. Covered Materials do not include abstract concepts, general ideas,
+or general quality-assurance techniques as such, and this License does not
+claim exclusive rights in them.
+
+"Internal Use" means use by an individual, an organization, or an Affiliate
+controlled by that organization for products or systems that the individual,
+organization, or Affiliate owns, operates, or provides on its own behalf. A
+paid product or software-as-a-service offering remains Internal Use when the
+Covered Materials are used internally and are not themselves provided as a
+quality-assurance, testing, development-support, consulting, managed, or
+similar service for a third party.
+
+"Paid Third-Party Service Use" means using all or part of the Covered
+Materials, directly or indirectly for compensation, for a third party's
+product, system, code, release, quality decision, or deliverable. It includes
+paid quality assurance, software testing, acceptance verification, release
+assessment, development support, consulting, managed services, outsourcing,
+delegated or quasi-mandate services, staff augmentation, subcontracting, and
+similar services. Compensation includes a separate fee, monthly fee,
+person-month or staffing fee, delegated-service fee, consulting fee,
+subscription, a fee bundled into another service, subcontracting fee, or other
+commercial consideration.
+
+"Customer" means both a direct contractual customer and an organization that
+actually owns or operates the relevant product or system and is the ultimate
+beneficiary of the service. In a subcontracting chain, notice need not be sent
+by direct contact outside normal contractual channels, but it must reach the
+ultimate beneficiary's technical team through the ordinary contractual chain
+or a customer-facing deliverable.
+
+"Attribution Notice" means a notice containing: (a) the tool name; (b)
+"Original developer: RNA4219"; (c) the official repository URL; (d) the
+version or commit SHA used; and (e) "Modified: yes" or "Modified: no".
+
+"Modified Version" means Covered Materials that have been changed. A
+configuration file, Customer data, input data, or execution result alone does
+not make the Covered Materials a Modified Version.
+
+"Commercial License" means a separate written agreement with the Licensor
+that expressly permits use without the Customer-facing Attribution Notice.
+
+This License does not claim ownership of a user's or Customer's input data,
+Customer data, code under test, specification under test, independently
+created deliverable, or a general report merely generated through use of the
+Covered Materials. A template, document, schema, rubric, skill definition, or
+other material substantially copied from the Covered Materials remains Covered
+Materials.
+
+4. General License Grant
+
+Subject to compliance with this License, the Licensor grants you a worldwide,
+non-exclusive, royalty-free right to use, execute, copy, internally modify,
+create derivative works from, redistribute, and make commercial use of the
+Covered Materials. Commercial use is not prohibited. Paid Third-Party Service
+Use is subject to Sections 6 and 7.
+
+5. Internal and Community Use
+
+Personal use, research, education, open-source activities, and Internal Use
+are permitted without charge and do not require a Customer Attribution Notice.
+This includes internal quality assurance and continuous integration for an
+organization's own paid product or software-as-a-service offering, provided
+the Covered Materials are not used to provide a paid service for a third party.
+
+6. Paid Third-Party Service Use
+
+Paid Third-Party Service Use is permitted without an additional license fee if
+an Attribution Notice is provided for the engagement. The notice must be
+provided by the earlier of: (a) delivery of the first Customer-facing
+deliverable; or (b) 30 days after use of the Covered Materials begins for that
+engagement. If the Covered Materials are introduced into an existing
+engagement, the 30-day period begins on introduction.
+
+One notice per engagement is sufficient. This License does not require a
+notice on every screen, a permanent banner, or a notice in every test case.
+For subcontracted work, the notice must reach the ultimate beneficiary's
+technical team through the ordinary contractual chain or a deliverable.
+
+7. Customer Attribution Notice
+
+The Attribution Notice must be placed where it is reasonably accessible to at
+least one of the Customer's technical contact, development team, quality
+assurance team, product team, or designated project lead. Suitable locations
+include a project README, test plan, first test report, Go/No-Go brief,
+third-party software list, tools-used list, contract schedule, or other
+Customer-accessible project document.
+
+An entry only in the service provider's internal register, package metadata
+not delivered to the Customer, an unrelated general website, or a location
+not reasonably accessible to the Customer's technical team is insufficient.
+The Customer name and engagement name need not be made public. A private
+Customer-facing document is sufficient. No Customer confidential information
+must be sent to the Licensor.
+
+8. Attribution-Free Commercial License
+
+White-label Paid Third-Party Service Use that omits the Customer-facing
+Attribution Notice requires a separate written Commercial License. Such an
+agreement waives only the attribution duties that it expressly identifies. It
+does not grant a right to claim false authorship, and it does not automatically
+include support, a service-level agreement, implementation assistance,
+customization, or a quality warranty.
+
+9. Redistribution and Modified Versions
+
+Redistribution of the Covered Materials or a Modified Version is permitted
+only if the distribution: (a) includes this LICENSE; (b) includes the NOTICE;
+(c) preserves the original copyright and authorship notices; (d) clearly
+states when the distributed materials are modified; (e) does not represent
+the distributor or another person as the original developer; and (f) preserves
+the original licenses and notices for Third-Party Materials.
+
+10. Embedded Notices and Provenance
+
+License information, copyright notices, authorship notices, and provenance
+information already embedded in the Covered Materials or a distribution must
+not be removed, falsified, or materially obscured on redistribution. This
+condition does not require adding machine-readable fields to an existing
+artifact or runtime-output schema.
+
+11. No False Authorship
+
+Neither this License nor a Commercial License permits you to state or imply
+that you are the original developer, replace the original developer's name
+with another name, cause a third party to be mistaken for the original
+developer, falsify a copyright notice, or present a Modified Version as the
+unmodified original.
+
+12. No Trademark or Endorsement Rights
+
+This License grants no right to use a project name, logo, trademark, or trade
+name in a way that states or implies official partnership, sponsorship,
+certification, or endorsement. Truthful identification in an Attribution
+Notice is permitted.
+
+13. Third-Party Materials
+
+Materials identified as third-party, vendored, copied, or separately licensed
+are governed by their original license terms and notices, not by this License.
+You must retain those terms and notices. Dependency lockfiles and package
+metadata remain the authoritative records for ordinary external dependencies.
+
+14. Termination and Cure
+
+Your rights under this License terminate when you fail to comply with it. For
+a first or unintentional violation, if you receive written notice describing
+the violation and cure it within 30 days after receipt, your rights continue
+or, if already terminated, are automatically reinstated upon cure. Cure may
+include providing the Customer Attribution Notice, restoring NOTICE, correcting
+an inaccurate original-developer statement, identifying a Modified Version, or
+adding LICENSE to a distribution. The treatment of continuing, repeated, or
+intentional violations is not expanded by this draft beyond rights and
+remedies available under applicable law.
+
+15. No Warranty
+
+THE COVERED MATERIALS ARE PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE, TITLE, AND NON-INFRINGEMENT. YOU BEAR THE
+RISK OF USING THE COVERED MATERIALS AND OF ANY QUALITY OR RELEASE DECISION.
+
+16. Limitation of Liability
+
+TO THE MAXIMUM EXTENT PERMITTED BY APPLICABLE LAW, THE LICENSOR SHALL NOT BE
+LIABLE FOR ANY CLAIM, DAMAGES, OR OTHER LIABILITY, WHETHER IN CONTRACT, TORT,
+OR OTHERWISE, ARISING FROM, OUT OF, OR IN CONNECTION WITH THE COVERED
+MATERIALS OR THEIR USE OR OTHER DEALINGS.
+
+17. No Support or SLA
+
+This License does not require the Licensor to provide maintenance, support,
+updates, security fixes, implementation assistance, service levels, or any
+quality assurance.
+
+18. Entire License and Severability
+
+This License states the complete public license terms for the Covered
+Materials, except for a separate written agreement signed by the Licensor. If
+any provision is held unenforceable, it shall be limited or severed to the
+minimum extent necessary, and the remaining provisions shall continue in
+effect. No governing-law, exclusive-jurisdiction, arbitration, audit-right,
+penalty, or minimum-fee term is created by this License.

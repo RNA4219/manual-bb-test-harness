@@ -102,7 +102,7 @@ src/bb_harness/
 ```toml
 [project]
 name = "bb-harness"
-version = "2.0.0"
+version = "3.0.0"
 description = "Manual black-box test harness CLI"
 authors = [{name = "RNA4219"}]
 requires-python = ">=3.11"

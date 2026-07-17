@@ -979,7 +979,7 @@ def test_all_root_scripts_report_package_version(script_path: Path) -> None:
         cwd=REPO_ROOT,
     )
     assert result.returncode == 0
-    assert "2.0.0" in result.stdout
+    assert "3.0.0" in result.stdout
 
 
 def test_package_cli_reports_version() -> None:
@@ -992,4 +992,4 @@ def test_package_cli_reports_version() -> None:
         cwd=REPO_ROOT,
     )
     assert result.returncode == 0
-    assert result.stdout.strip() == "bb-harness 2.0.0"
+    assert result.stdout.strip() == "bb-harness 3.0.0"

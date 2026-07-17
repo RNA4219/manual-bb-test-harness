@@ -6,10 +6,33 @@ import argparse
 import os
 import subprocess
 import sys
+import tarfile
 import tempfile
-from pathlib import Path
+import zipfile
+from pathlib import Path, PurePosixPath
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
+LICENSE_DOCUMENTS = {
+    "LICENSE",
+    "LICENSE.ja.md",
+    "NOTICE",
+    "LICENSING.md",
+    "COMMERCIAL-LICENSE.md",
+    "THIRD_PARTY_NOTICES.md",
+}
+
+
+def verify_license_documents(artifact: Path) -> None:
+    if artifact.suffix == ".whl":
+        with zipfile.ZipFile(artifact) as archive:
+            names = archive.namelist()
+    else:
+        with tarfile.open(artifact, "r:gz") as archive:
+            names = archive.getnames()
+    basenames = {PurePosixPath(name).name for name in names}
+    missing = sorted(LICENSE_DOCUMENTS - basenames)
+    if missing:
+        raise RuntimeError(f"{artifact.name} is missing license documents: {missing}")
 
 
 def run(command: list[str], cwd: Path) -> None:
@@ -171,6 +194,7 @@ def main() -> int:
         run(["uv", "build", "--wheel", "--sdist", "--out-dir", str(dist)], REPO_ROOT)
         artifacts = [next(dist.glob("*.whl")), next(dist.glob("*.tar.gz"))]
         for artifact in artifacts:
+            verify_license_documents(artifact)
             smoke_artifact(artifact, root)
         names = ", ".join(item.name for item in artifacts)
         print(f"Package smoke passed: {names}")

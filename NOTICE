@@ -1,0 +1,29 @@
+# NOTICE
+
+manual-bb-test-harness
+
+Copyright (c) 2026 R_N_A
+Original developer: RNA4219
+Official repository: https://github.com/RNA4219/manual-bb-test-harness
+
+Licensed under the RNA Third-Party Service Attribution License 1.0
+(RNA-TPSAL-1.0). This is source-available software; attribution is required
+for paid third-party service use.
+
+## Customer attribution template / 顧客向け帰属表示テンプレート
+
+This engagement uses manual-bb-test-harness, originally developed by RNA4219.
+Official source: https://github.com/RNA4219/manual-bb-test-harness
+Version or commit: <VERSION_OR_COMMIT>
+Modified: <YES_OR_NO>
+
+本案件では、RNA4219が原開発者であるmanual-bb-test-harnessを使用しています。
+公式リポジトリ:
+https://github.com/RNA4219/manual-bb-test-harness
+使用バージョンまたはcommit:
+<VERSION_OR_COMMIT>
+改変:
+<あり・なし>
+
+When both domain-lakda-runner and manual-bb-test-harness are used, their two
+entries may be included together in one customer-facing tools-used list.
