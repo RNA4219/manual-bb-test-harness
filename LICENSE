@@ -13,8 +13,9 @@ paid third-party service use.
 
 2. Copyright Holder
 
-The copyright holder is R_N_A. The original developer is RNA4219
-(collectively, the "Licensor" for purposes of this License).
+The copyright holder and Licensor is R_N_A, publicly identified through the
+GitHub account RNA4219. "RNA4219" is the Licensor's public developer and
+repository identifier.
 
 3. Definitions
 
@@ -26,6 +27,11 @@ associated documentation, and substantial modified copies of any of the
 foregoing. Covered Materials do not include abstract concepts, general ideas,
 or general quality-assurance techniques as such, and this License does not
 claim exclusive rights in them.
+
+"Affiliate" means an entity that directly or indirectly controls, is
+controlled by, or is under common control with an organization. "Control"
+means the power to direct the management or policies of an entity, whether
+through ownership, agreement, or otherwise.
 
 "Internal Use" means use by an individual, an organization, or an Affiliate
 controlled by that organization for products or systems that the individual,
@@ -86,6 +92,10 @@ are permitted without charge and do not require a Customer Attribution Notice.
 This includes internal quality assurance and continuous integration for an
 organization's own paid product or software-as-a-service offering, provided
 the Covered Materials are not used to provide a paid service for a third party.
+
+For the avoidance of doubt, if an activity constitutes Paid Third-Party
+Service Use, Sections 6 and 7 apply even if the same activity may also be
+described as personal use, research, education, or an open-source activity.
 
 6. Paid Third-Party Service Use
 

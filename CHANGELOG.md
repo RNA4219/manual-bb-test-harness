@@ -6,8 +6,9 @@
 
 - ライセンスをRNA Third-Party Service Attribution License 1.0へ変更し、第三者向け有償サービス利用を顧客向け帰属表示付きで許可。
 - 帰属表示なしのホワイトラベル利用向けに、別途書面による商用ライセンス導線を追加。
-- 過去のMIT版の権利を維持し、v2.0.0 / 2ee85a0e8a62fc423feed1a23e0fdc8f4fa69631を最後のMIT境界として記録。
+- 過去のMIT版の権利を維持し、v2.0.0 / 2ee85a0e8a62fc423feed1a23e0fdc8f4fa69631を最後のMIT tag付きrelease、1d8619b2067421938d2474485dd36abcf86af634を最後にMITで公開されたcommitとして記録。
 - wheel、sdist、release bundleへ必須ライセンス文書を同梱して検証するようpackaging checksを更新。
+- package/release検証で、商用問い合わせ先プレースホルダーの残存とREADME・pyproject・package version定数の不一致を拒否。
 
 ## [2.0.0] - 2026-07-11
 

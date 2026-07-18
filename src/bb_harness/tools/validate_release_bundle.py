@@ -20,6 +20,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import re
 import subprocess
 import sys
 import zipfile
@@ -215,6 +216,53 @@ class ReleaseBundleValidator:
 
         return True
 
+    def validate_release_metadata(self) -> bool:
+        """Validate commercial contact resolution and release version consistency."""
+        commercial_path = self.repo_root / "COMMERCIAL-LICENSE.md"
+        if not commercial_path.exists():
+            self.errors.append("Missing COMMERCIAL-LICENSE.md")
+            return False
+        commercial = commercial_path.read_text(encoding="utf-8")
+        if "[COMMERCIAL_CONTACT]" in commercial:
+            self.errors.append("COMMERCIAL-LICENSE.md still contains [COMMERCIAL_CONTACT]")
+        if "https://licensing.rna4219.com/" not in commercial:
+            self.errors.append(
+                "COMMERCIAL-LICENSE.md is missing the official application portal"
+            )
+
+        sources = {
+            "pyproject.toml": (
+                self.repo_root / "pyproject.toml",
+                r'^version\s*=\s*"([^"]+)"$',
+            ),
+            "README.md": (
+                self.repo_root / "README.md",
+                r"現行リリース系列:\s*\*\*([^*]+)\*\*",
+            ),
+            "src/bb_harness/__init__.py": (
+                self.repo_root / "src" / "bb_harness" / "__init__.py",
+                r'^__version__\s*=\s*"([^"]+)"$',
+            ),
+        }
+        versions: dict[str, str] = {}
+        for label, (path, pattern) in sources.items():
+            if not path.exists():
+                self.errors.append(f"Missing version source: {label}")
+                continue
+            match = re.search(pattern, path.read_text(encoding="utf-8"), re.MULTILINE)
+            if match is None:
+                self.errors.append(f"{label} is missing its release version")
+                continue
+            versions[label] = match.group(1)
+        expected = versions.get("pyproject.toml")
+        if expected is not None:
+            for label, value in versions.items():
+                if value != expected:
+                    self.errors.append(
+                        f"{label} version mismatch: expected {expected}, got {value}"
+                    )
+        return len(self.errors) == 0
+
     def validate_package_distribution(self) -> bool:
         """Build and smoke-test installed wheel and sdist."""
         result = subprocess.run(
@@ -294,6 +342,7 @@ class ReleaseBundleValidator:
             "goldens": self.validate_goldens(),
             "utf8_encoding": self.validate_utf8_encoding(),
             "readme_references": self.validate_readme_references(),
+            "release_metadata": self.validate_release_metadata(),
             "errors": self.errors,
             "warnings": self.warnings,
         }

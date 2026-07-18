@@ -11,7 +11,7 @@
 
 第三者向けの有償QA、テスト、開発支援、コンサルティング等で利用する場合は、顧客の技術担当者が確認できる文書に、ツール名、原開発者、公式リポジトリ、使用versionまたはcommit、改変の有無を案件単位で一度記載してください。
 
-帰属表示を省略するホワイトラベル利用には、別途書面による商用ライセンスが必要です。
+帰属表示を省略するホワイトラベル利用には、[別途書面による商用ライセンス](COMMERCIAL-LICENSE.md)が必要です。
 
 過去のMIT版は、引き続きMIT Licenseの条件で利用できます。詳細は[LICENSING.md](LICENSING.md)を参照してください。
 
@@ -23,7 +23,7 @@ Personal use, research, education, open-source activities, and internal business
 
 When the software is used to provide a paid QA, testing, development, consulting, managed, outsourced, or similar service to a third party, a one-time attribution notice must be provided in project documentation reasonably accessible to the Customer technical team.
 
-Attribution-free white-label use requires a separate written commercial license.
+Attribution-free white-label use requires a [separate written commercial license](COMMERCIAL-LICENSE.md).
 
 Previously released MIT-licensed versions remain available under their original MIT terms. See [LICENSING.md](LICENSING.md).
 
