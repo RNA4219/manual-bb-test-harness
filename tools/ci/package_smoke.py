@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import argparse
 import os
+import re
 import subprocess
 import sys
 import tarfile
@@ -20,6 +21,41 @@ LICENSE_DOCUMENTS = {
     "COMMERCIAL-LICENSE.md",
     "THIRD_PARTY_NOTICES.md",
 }
+
+
+def verify_release_metadata(repo_root: Path) -> str:
+    """Reject unresolved contact placeholders and version drift before building."""
+    commercial = (repo_root / "COMMERCIAL-LICENSE.md").read_text(encoding="utf-8")
+    if "[COMMERCIAL_CONTACT]" in commercial:
+        raise RuntimeError("COMMERCIAL-LICENSE.md still contains [COMMERCIAL_CONTACT]")
+    if "https://licensing.rna4219.com/" not in commercial:
+        raise RuntimeError("COMMERCIAL-LICENSE.md is missing the official application portal")
+
+    sources = {
+        "pyproject.toml": (
+            (repo_root / "pyproject.toml").read_text(encoding="utf-8"),
+            r'^version\s*=\s*"([^"]+)"$',
+        ),
+        "README.md": (
+            (repo_root / "README.md").read_text(encoding="utf-8"),
+            r"現行リリース系列:\s*\*\*([^*]+)\*\*",
+        ),
+        "src/bb_harness/__init__.py": (
+            (repo_root / "src" / "bb_harness" / "__init__.py").read_text(encoding="utf-8"),
+            r'^__version__\s*=\s*"([^"]+)"$',
+        ),
+    }
+    versions: dict[str, str] = {}
+    for label, (content, pattern) in sources.items():
+        match = re.search(pattern, content, re.MULTILINE)
+        if match is None:
+            raise RuntimeError(f"{label} is missing its release version")
+        versions[label] = match.group(1)
+    expected = versions["pyproject.toml"]
+    mismatches = {label: value for label, value in versions.items() if value != expected}
+    if mismatches:
+        raise RuntimeError(f"release version mismatch: expected {expected}, got {mismatches}")
+    return expected
 
 
 def verify_license_documents(artifact: Path) -> None:
@@ -183,6 +219,7 @@ def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--keep", action="store_true", help="Keep temporary output")
     args = parser.parse_args()
+    verify_release_metadata(REPO_ROOT)
     if args.keep:
         root = Path(tempfile.mkdtemp(prefix="bb-harness-package-smoke-"))
         cleanup = None

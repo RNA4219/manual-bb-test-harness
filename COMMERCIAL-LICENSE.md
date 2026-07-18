@@ -1,4 +1,4 @@
-# Attribution-Free Commercial License
+# Attribution-Free Commercial Licensing
 
 The standard RNA Third-Party Service Attribution License 1.0 requires a
 Customer-facing Attribution Notice for Paid Third-Party Service Use.
@@ -11,4 +11,4 @@ Support, SLA, implementation assistance, customization, and quality assurance
 are not included automatically. Contract terms and fees are provided
 individually.
 
-Contact: [COMMERCIAL_CONTACT]
+Application and contact portal: https://licensing.rna4219.com/
