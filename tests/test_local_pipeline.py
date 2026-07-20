@@ -17,7 +17,7 @@ from bb_harness.local_pipeline import (
     lint_design,
     normalize_feature_spec,
 )
-from bb_harness.local_runtime import CompletionResult, LocalRuntimeConfig
+from bb_harness.local_runtime import CompletionResult, LocalRuntimeConfig, LocalRuntimeError
 from bb_harness.schema_validation import validate_artifact
 
 
@@ -273,6 +273,107 @@ def test_second_invalid_artifact_fails_and_records_diagnostic(tmp_path: Path) ->
         }
     ]
     assert client.calls == 2
+
+
+@pytest.mark.parametrize(
+    ("stage_name", "target_index", "invalid_kind", "artifact_name"),
+    [
+        ("test_model", 0, "structured_flow", "test_model"),
+        ("observation_set", 1, "observation_alias", "observation_set"),
+        ("risk_candidates", 2, "risk_alias", "risk_register"),
+        ("manual_case_set", 3, "case_collection_alias", "manual_case_set"),
+        ("manual_case_set", 3, "case_field_aliases", "manual_case_set"),
+    ],
+    ids=[
+        "structured-test-model-flow",
+        "observation-candidates-alias",
+        "risk-candidates-alias",
+        "case-collection-alias",
+        "case-description-and-oracle-aliases",
+    ],
+)
+def test_noncanonical_output_is_not_auto_corrected_and_stops_after_one_repair(
+    tmp_path: Path,
+    stage_name: str,
+    target_index: int,
+    invalid_kind: str,
+    artifact_name: str,
+) -> None:
+    input_path = tmp_path / "order-cancel.input.md"
+    output = tmp_path / "out"
+    _feature_input(input_path)
+    responses = _responses()
+    invalid = copy.deepcopy(responses[target_index])
+    if invalid_kind == "structured_flow":
+        invalid["flows"] = [{"name": "buyer cancellation"}]
+    elif invalid_kind == "observation_alias":
+        invalid["candidates"] = invalid.pop("observations")
+    elif invalid_kind == "risk_alias":
+        invalid["candidates"] = invalid.pop("risks")
+    elif invalid_kind == "case_collection_alias":
+        invalid["cases"] = invalid.pop("manual_cases")
+    elif invalid_kind == "case_field_aliases":
+        case = invalid["manual_cases"][0]
+        case["description"] = case.pop("title")
+        case["oracle_refs"] = case.pop("oracle")["refs"]
+    else:
+        raise AssertionError(f"unknown invalid kind: {invalid_kind}")
+    responses = responses[:target_index] + [invalid, copy.deepcopy(invalid)]
+    config = LocalRuntimeConfig(
+        profile="generic",
+        base_url="http://127.0.0.1:8080/v1",
+        model="fake-local-model",
+        timeout_seconds=10,
+        temperature=0.1,
+        max_tokens=1000,
+    )
+    client = FakeClient(responses)
+
+    with pytest.raises(ValueError):
+        LocalDesignPipeline(config, client=client).run(input_path, output)
+
+    manifest = json.loads((output / "run_manifest.json").read_text(encoding="utf-8"))
+    failed_stage = manifest["stages"][-1]
+    assert manifest["status"] == "failed"
+    assert failed_stage["name"] == stage_name
+    assert failed_stage["repairs"] == 1
+    assert failed_stage["schema_valid"] is False
+    assert client.calls == target_index + 2
+    assert not (output / f"{artifact_name}.json").exists()
+
+
+def test_runtime_failure_writes_valid_failed_manifest(tmp_path: Path) -> None:
+    class RuntimeFailureClient:
+        def discover_model(self) -> str:
+            return "fake-local-model"
+
+        def complete_json(self, **_: Any) -> CompletionResult:
+            raise LocalRuntimeError("server unavailable")
+
+    input_path = tmp_path / "order-cancel.input.md"
+    output = tmp_path / "out"
+    _feature_input(input_path)
+    config = LocalRuntimeConfig(
+        profile="generic",
+        base_url="http://127.0.0.1:8080/v1",
+        model=None,
+        timeout_seconds=10,
+        temperature=0.1,
+        max_tokens=1000,
+    )
+
+    with pytest.raises(LocalRuntimeError, match="server unavailable"):
+        LocalDesignPipeline(config, client=RuntimeFailureClient()).run(input_path, output)
+
+    manifest = json.loads((output / "run_manifest.json").read_text(encoding="utf-8"))
+    validate_artifact(manifest, "local_run_manifest.schema.json")
+    assert manifest["status"] == "failed"
+    assert manifest["model"] == "fake-local-model"
+    assert manifest["error"] == "LocalRuntimeError: server unavailable"
+    assert manifest["stages"] == []
+    assert set(manifest["artifacts"]) == {"feature_spec"}
+    assert "messages" not in json.dumps(manifest)
+    assert "api_key" not in json.dumps(manifest)
 
 
 def test_lint_detects_oracle_trace_state_and_ownership_gaps(tmp_path: Path) -> None:

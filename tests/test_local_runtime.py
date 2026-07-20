@@ -29,6 +29,47 @@ def test_resolve_config_precedence(monkeypatch: pytest.MonkeyPatch) -> None:
     assert config.model == "cli-model"
 
 
+def test_qwen36_profile_uses_expected_endpoint_model_and_disables_thinking(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    config = resolve_config("qwen36")
+    assert config.base_url == "http://127.0.0.1:8084/v1"
+    assert config.model == "qwen3.6-27b"
+
+    client = OpenAICompatibleClient(config)
+    captured: list[dict[str, object]] = []
+
+    def respond(_method: str, _path: str, body: dict[str, object]) -> dict[str, object]:
+        captured.append(body)
+        return {
+            "model": "qwen3.6-27b",
+            "choices": [{"message": {"content": "{}"}}],
+        }
+
+    monkeypatch.setattr(client, "_request", respond)
+    for stage in (
+        "test_model",
+        "observation_set",
+        "risk_candidates",
+        "manual_case_set",
+        "manual_case_remainder",
+        "manual_case_review",
+        "manual_case_set_repair",
+    ):
+        client.complete_json(system="system", user="user", schema_name=stage, schema={"type": "object"})
+
+    assert len(captured) == 7
+    assert all(body["model"] == "qwen3.6-27b" for body in captured)
+    assert all(
+        body["chat_template_kwargs"] == {"enable_thinking": False} for body in captured
+    )
+
+
+def test_removed_gemma4a4b_profile_is_rejected() -> None:
+    with pytest.raises(LocalRuntimeError, match="Unknown local profile: gemma4a4b"):
+        resolve_config("gemma4a4b")
+
+
 def test_non_loopback_is_rejected_by_default() -> None:
     with pytest.raises(LocalRuntimeError, match="Non-loopback"):
         resolve_config("generic", base_url="http://example.test/v1")

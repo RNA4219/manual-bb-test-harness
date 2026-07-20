@@ -1,6 +1,6 @@
 # SPEC: manual-bb-test-harness 改修仕様書
 
-現行契約: **3.0.0** / 検証済みテスト: **756件** / Workflow Cookbook: **33 nodes・45 edges・33 capsules** / 次回レビュー: **2026-10-11**
+現行契約: **3.0.0** / 検証済みテスト: **765件** / Workflow Cookbook: **33 nodes・45 edges・33 capsules** / 次回レビュー: **2026-10-11**
 
 ## 概要
 
@@ -66,8 +66,8 @@
 | Phase | Verification | Status |
 |---|---|---|
 | 1 | `pip install -e .` | OK |
-| 2 | pytest coverage | OK (85.42% branch-inclusive coverage @ 2026-07-20) |
-| 3 | tests pass | OK (756 tests passed @ 2026-07-20) |
+| 2 | pytest coverage | OK (86.00% branch-inclusive coverage @ 2026-07-21) |
+| 3 | tests pass | OK (765 tests passed @ 2026-07-21) |
 | 4 | CI Python 3.10〜3.13 + unit/integration/PowerShell/package smoke | OK |
 | 5 | Schema validation | OK |
 | 6 | Agent config | OK |

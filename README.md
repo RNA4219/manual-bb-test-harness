@@ -3,6 +3,44 @@
 [![license: RNA-TPSAL-1.0](https://img.shields.io/badge/license-RNA--TPSAL--1.0-blue.svg)](LICENSE)
 [![source-available](https://img.shields.io/badge/source--available-yes-orange.svg)](LICENSE)
 
+手動ブラックボックステスト設計を、根拠付きartifactと決定的な品質Gateで支援する。
+
+## Local Mode
+
+Local Modeは、provider障害時にもOpenAI互換のローカルLLMでテスト設計を継続するための明示的な実行モード。LLMを候補生成器に限定し、schema、risk・工数計算、lint、Gateはホスト側で制御する。
+
+### Qwen3.6 27Bで実行
+
+llama.cppまたはLM Studioで `qwen3.6-27b` をOpenAI互換APIとして起動し、次を実行する。`qwen36` profileは既定で `http://127.0.0.1:8084/v1` を使う。
+
+```powershell
+uv sync
+uv run bb-harness run local-design `
+  --input goldens/order-cancel.input.md `
+  --output tmp/order-cancel-local `
+  --profile qwen36
+```
+
+### LM Studio・任意のllama.cpp serverで実行
+
+`generic` profileへendpointとmodel IDを明示する。
+
+```powershell
+uv run bb-harness run local-design `
+  --input goldens/order-cancel.input.md `
+  --output tmp/order-cancel-local `
+  --profile generic `
+  --base-url http://127.0.0.1:1234/v1 `
+  --model local-model-id
+```
+
+出力先には `manual-test-design.md`、schema検証済みartifact群、`lint_report.json`、`quality_report.json`、`run_manifest.json` が生成される。実行証跡がない場合、Gateは常に `no_go` になる。
+
+Local Modeは本リポジトリに統合済みで、別リポジトリの導入は不要。設定、成果物、fail closed条件の詳細は [Local Mode guide](docs/local-model-guide.md) を参照。
+
+現行リリース系列: **3.0.0** / 検証済みテスト: **765件** / Workflow Cookbook: **33 nodes・45 edges・33 capsules** / 次回レビュー: **2026-10-11**
+人間向け概要は [docs/human-readme.md](docs/human-readme.md) を参照。
+
 ## ライセンス
 
 このバージョンは、RNA Third-Party Service Attribution License 1.0に基づくsource-availableソフトウェアです。
@@ -26,28 +64,6 @@ When the software is used to provide a paid QA, testing, development, consulting
 Attribution-free white-label use requires a [separate written commercial license](COMMERCIAL-LICENSE.md).
 
 Previously released MIT-licensed versions remain available under their original MIT terms. See [LICENSING.md](LICENSING.md).
-
-手動ブラックボックステスト設計を、根拠付きartifactと決定的な品質Gateで支援する。
-Local Modeではprovider障害時にもテスト設計を継続できるよう、OpenAI互換のローカルLLMを候補生成器に限定し、schema、算術、lint、Gateをホスト側で制御する。
-
-### Local Mode quick start
-
-llama.cppまたはLM StudioでOpenAI互換APIを起動した後に実行する。
-
-```powershell
-uv sync
-uv run bb-harness run local-design `
-  --input goldens/order-cancel.input.md `
-  --output tmp/order-cancel-local `
-  --profile qwen36
-```
-
-`qwen36` は既定で `http://127.0.0.1:8084/v1` / `qwen3.6-27b` を使う。
-一般的なlocal serverには `generic` profileを使い、`--base-url` と `--model` で上書きできる。
-詳細は [docs/local-model-guide.md](docs/local-model-guide.md) を参照。
-
-現行リリース系列: **3.0.0** / 検証済みテスト: **756件** / Workflow Cookbook: **33 nodes・45 edges・33 capsules** / 次回レビュー: **2026-10-11**
-人間向け概要は [docs/human-readme.md](docs/human-readme.md) を参照。
 
 <!-- LLM-BOOTSTRAP v1 -->
 **For AI Agents**: 読む順番:
