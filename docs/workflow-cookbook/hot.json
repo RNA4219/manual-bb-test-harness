@@ -6,9 +6,9 @@
     "tier": 3,
     "cli_status": "complete",
     "import_status": "complete",
-    "test_count": 726,
+    "test_count": 756,
     "total_capsules": 33,
-    "last_updated": "2026-07-12"
+    "last_updated": "2026-07-20"
   },
   "hot_nodes": [
     {
@@ -16,7 +16,7 @@
       "path": "./README.md",
       "role": "overview",
       "title": "Project Overview",
-      "summary": "AI-first entry point with Quick Start commands and task classifier table",
+      "summary": "Canonical entry point with Local Mode quick start and task classifier",
       "priority": 1,
       "use_cases": [
         "Getting started with the repo",

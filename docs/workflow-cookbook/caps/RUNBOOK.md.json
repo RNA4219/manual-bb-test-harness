@@ -2,7 +2,7 @@
   "id": "RUNBOOK.md",
   "role": "operations",
   "title": "Runbook",
-  "summary": "Execution procedures for skill validation, artifact changes, spec ingestion, and full repo validation. Section 6 documents CLI import/export/run commands with dry-run examples. Includes verbose flag usage. Defines update rules for SKILL.md, artifact contracts, and output quality changes. References spec-02 (CLI) and spec-04 (import) for detailed implementation.",
+  "summary": "Execution procedures for validation, artifact changes, import/export, and local-design. Documents OpenAI-compatible model probe, qwen36 and generic invocation, manifest/lint triage, and the expected no_go behavior when execution evidence is absent.",
   "public_api": [],
   "deps_out": [
     "BLUEPRINT.md",
@@ -17,5 +17,5 @@
   "tests": [
     "tests/test_cli_dryrun.py"
   ],
-  "last_verified": "2026-07-18"
+  "last_verified": "2026-07-20"
 }

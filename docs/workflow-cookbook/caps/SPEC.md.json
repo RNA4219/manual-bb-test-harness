@@ -2,7 +2,7 @@
   "id": "SPEC.md",
   "role": "specification",
   "title": "Specification",
-  "summary": "Implementation specification and feature history. Documents 7 features: F1 (spec ingest), F2 (regression graph), F3 (state diagram), F4 (TestRail/Xray export), F5 (phase contract), F6 (TestRail/Xray import), F7 (forward-test CLI). Lists 21 quality improvements and validation phases. References CHANGELOG.md for detailed history.",
+  "summary": "Implementation specification and feature history. Documents 8 features: F1 (spec ingest), F2 (regression graph), F3 (state diagram), F4 (TestRail/Xray export), F5 (phase contract), F6 (TestRail/Xray import), F7 (forward-test CLI), and F8 (Local Mode). Lists 21 quality improvements and validation phases. References CHANGELOG.md for detailed history.",
   "public_api": [],
   "deps_out": [
     "CHANGELOG.md",
@@ -13,5 +13,5 @@
   ],
   "risks": [],
   "tests": [],
-  "last_verified": "2026-07-18"
+  "last_verified": "2026-07-20"
 }

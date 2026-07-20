@@ -27,9 +27,26 @@ Attribution-free white-label use requires a [separate written commercial license
 
 Previously released MIT-licensed versions remain available under their original MIT terms. See [LICENSING.md](LICENSING.md).
 
-手動ブラックボックス QA 設計 Skill の配布・保守 repo。
+手動ブラックボックステスト設計を、根拠付きartifactと決定的な品質Gateで支援する。
+Local Modeではprovider障害時にもテスト設計を継続できるよう、OpenAI互換のローカルLLMを候補生成器に限定し、schema、算術、lint、Gateをホスト側で制御する。
 
-現行リリース系列: **3.0.0** / 検証済みテスト: **726件** / Workflow Cookbook: **33 nodes・45 edges・33 capsules** / 次回レビュー: **2026-10-11**
+### Local Mode quick start
+
+llama.cppまたはLM StudioでOpenAI互換APIを起動した後に実行する。
+
+```powershell
+uv sync
+uv run bb-harness run local-design `
+  --input goldens/order-cancel.input.md `
+  --output tmp/order-cancel-local `
+  --profile qwen36
+```
+
+`qwen36` は既定で `http://127.0.0.1:8084/v1` / `qwen3.6-27b` を使う。
+一般的なlocal serverには `generic` profileを使い、`--base-url` と `--model` で上書きできる。
+詳細は [docs/local-model-guide.md](docs/local-model-guide.md) を参照。
+
+現行リリース系列: **3.0.0** / 検証済みテスト: **756件** / Workflow Cookbook: **33 nodes・45 edges・33 capsules** / 次回レビュー: **2026-10-11**
 人間向け概要は [docs/human-readme.md](docs/human-readme.md) を参照。
 
 <!-- LLM-BOOTSTRAP v1 -->
@@ -104,7 +121,8 @@ uv run bb-harness --help
 
 ## For AI Agents
 
-この repo は、手動ブラックボックス前提の QA 設計 Skill `manual-bb-test-harness` を配布・保守する正本 repo。
+この repo は、手動ブラックボックス前提の QA 設計 Skillと、そのLocal Modeを管理する正本。
+Local Modeは `run local-design` で明示的に選択し、固有部分は `docs/local-model-guide.md` を入口にする。
 
 ### Task Classifier
 

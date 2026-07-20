@@ -104,6 +104,7 @@ class ReleaseBundleValidator:
             "execution_evidence.schema.json",
             "automation_evidence.schema.json",
             "waiver_set.schema.json",
+            "local_run_manifest.schema.json",
         ]
 
         for schema_name in required_schemas:

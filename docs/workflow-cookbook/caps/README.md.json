@@ -2,7 +2,7 @@
   "id": "README.md",
   "role": "overview",
   "title": "Project Overview",
-  "summary": "AI-first entry point for manual-bb-test-harness. Contains Quick Start commands for validation (pytest, ruff, validate-artifact, validate-spec) and CLI usage examples (import, export, run forward-test). Includes task classifier table routing to HUB.codex.md, BLUEPRINT.md, RUNBOOK.md, and SKILL.md. Links to human-readme.md for human readers.",
+  "summary": "Canonical entry point for the harness and its optional Local Mode. Contains the local-design quick start for OpenAI-compatible llama.cpp/LM Studio, validation commands, CLI examples, and routing to HUB.codex.md, local-model-guide.md, RUNBOOK.md, and SKILL.md.",
   "public_api": [],
   "deps_out": [
     "HUB.codex.md",
@@ -12,5 +12,5 @@
   "deps_in": [],
   "risks": [],
   "tests": [],
-  "last_verified": "2026-07-18"
+  "last_verified": "2026-07-20"
 }

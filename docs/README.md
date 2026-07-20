@@ -8,6 +8,7 @@
 |---|---|
 | `human-readme.md` | 人間向け概要、利用説明 |
 | `evaluation-rubric.md` | forward-test の採点基準 |
+| `local-model-guide.md` | Local Modeの設定・実行・fail closed境界 |
 | `release-policy.md` | gate と release 判断の補助方針 |
 | `notion-report-guide.md` | Notion への forward-test 記録手順 |
 | `notion-forward-test-template.md` | Notion 記録テンプレート |

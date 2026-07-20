@@ -1,0 +1,70 @@
+{
+  "scorer": "Codex GPT-5.6 Sol",
+  "scoring_basis": "docs/evaluation-rubric.md and each golden expected review anchor",
+  "structural_preflight_used_as_score": false,
+  "runs": [
+    {
+      "fixture": "order-cancel",
+      "run": 1,
+      "score": 86,
+      "categories": {"coverage_model": 18, "observation_quality": 13, "risk_quality": 12, "manual_cases": 15, "exploratory_charters": 8, "gate_decision": 15, "communication": 5},
+      "notes": ["主要state/rule/role/regressionを網羅", "P0が多くrisk尺度は過大", "在庫数0境界と一部expectedの観測性が弱い"]
+    },
+    {
+      "fixture": "order-cancel",
+      "run": 2,
+      "score": 85,
+      "categories": {"coverage_model": 17, "observation_quality": 13, "risk_quality": 12, "manual_cases": 14, "exploratory_charters": 9, "gate_decision": 15, "communication": 5},
+      "notes": ["在庫・coupon・二重実行の主要riskはP0/P1", "他者注文の推測caseが重複", "出荷済みriskはP2でanchorより低い"]
+    },
+    {
+      "fixture": "order-cancel",
+      "run": 3,
+      "score": 86,
+      "categories": {"coverage_model": 18, "observation_quality": 13, "risk_quality": 11, "manual_cases": 15, "exploratory_charters": 9, "gate_decision": 15, "communication": 5},
+      "notes": ["state境界とrole差分は明確", "出荷済み・決済失敗riskがP3で過小", "human oracleへの降格で推測を分離"]
+    },
+    {
+      "fixture": "admin-role-change",
+      "run": 1,
+      "score": 78,
+      "categories": {"coverage_model": 16, "observation_quality": 13, "risk_quality": 10, "manual_cases": 13, "exploratory_charters": 6, "gate_decision": 15, "communication": 5},
+      "notes": ["最後のowner・不正昇格・自己降格はP0/P1", "audit riskが欠落", "normal caseへのrisk traceが過剰でmobile charterは対象外寄り"]
+    },
+    {
+      "fixture": "admin-role-change",
+      "run": 2,
+      "score": 82,
+      "categories": {"coverage_model": 16, "observation_quality": 13, "risk_quality": 10, "manual_cases": 14, "exploratory_charters": 9, "gate_decision": 15, "communication": 5},
+      "notes": ["role/last-owner/invited/immediate反映をcase化", "audit riskは欠落し存在しないuser riskを追加", "audit charterは有用"]
+    },
+    {
+      "fixture": "admin-role-change",
+      "run": 3,
+      "score": 83,
+      "categories": {"coverage_model": 17, "observation_quality": 13, "risk_quality": 11, "manual_cases": 15, "exploratory_charters": 7, "gate_decision": 15, "communication": 5},
+      "notes": ["主要権限遷移と即時反映を網羅", "audit riskはP3でanchorより低い", "mobile charterは対象featureへの寄与が弱い"]
+    },
+    {
+      "fixture": "mobile-session-resume",
+      "run": 1,
+      "score": 93,
+      "categories": {"coverage_model": 19, "observation_quality": 14, "risk_quality": 14, "manual_cases": 17, "exploratory_charters": 9, "gate_decision": 15, "communication": 5},
+      "notes": ["lifecycle/network/permission/push/重複を網羅", "重複送信と1件境界がP0", "一部expectedの観測表現が弱い"]
+    },
+    {
+      "fixture": "mobile-session-resume",
+      "run": 2,
+      "score": 95,
+      "categories": {"coverage_model": 19, "observation_quality": 14, "risk_quality": 14, "manual_cases": 18, "exploratory_charters": 10, "gate_decision": 15, "communication": 5},
+      "notes": ["background resumeと通信断retryを具体的境界で分解", "oracle/trace/priorityが安定", "platform差分をmatrixとcharterで扱う"]
+    },
+    {
+      "fixture": "mobile-session-resume",
+      "run": 3,
+      "score": 92,
+      "categories": {"coverage_model": 18, "observation_quality": 14, "risk_quality": 14, "manual_cases": 17, "exploratory_charters": 9, "gate_decision": 15, "communication": 5},
+      "notes": ["重複・復帰・push・permissionを網羅", "強制終了はhuman oracleへ分離", "platform差分はcharter中心でscripted coverageがやや薄い"]
+    }
+  ]
+}
