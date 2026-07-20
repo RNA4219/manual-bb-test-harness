@@ -1,10 +1,10 @@
 # SPEC: manual-bb-test-harness 改修仕様書
 
-現行契約: **3.0.0** / 検証済みテスト: **726件** / Workflow Cookbook: **33 nodes・45 edges・33 capsules** / 次回レビュー: **2026-10-11**
+現行契約: **3.0.0** / 検証済みテスト: **756件** / Workflow Cookbook: **33 nodes・45 edges・33 capsules** / 次回レビュー: **2026-10-11**
 
 ## 概要
 
-本仕様書は `manual-bb-test-harness` リポジトリの品質改善（21件）と機能拡張（5件）を定義・記録する。
+本仕様書は `manual-bb-test-harness` リポジトリの品質改善（21件）と機能拡張（8件）を定義・記録する。
 
 ## 改修項目 (21件)
 
@@ -17,7 +17,7 @@
 
 詳細は CHANGELOG.md を参照。
 
-## 機能拡張 (7件 - HIGH Impact)
+## 機能拡張 (8件 - HIGH Impact)
 
 | Feature | Status | Description |
 |---|---|---|
@@ -28,6 +28,7 @@
 | F5: Ready Phase Contract | OK | 企画・モック・要件メモ → Definition of Ready / Phase 1 契約 |
 | F6: TestRail/Xray Import | OK | TestRail/Xray → execution_evidence.json, dry-run preview, status変換テスト付き |
 | F7: Forward Test CLI | OK | `bb-harness run forward-test` wrapper, Skill 評価プロンプト出力 |
+| F8: Local Mode | OK | `bb-harness run local-design`、OpenAI互換endpoint、Qwen 27B profile、schema repair、host管理Gate |
 
 ## F5: Ready Phase Contract
 
@@ -65,8 +66,8 @@
 | Phase | Verification | Status |
 |---|---|---|
 | 1 | `pip install -e .` | OK |
-| 2 | pytest coverage | OK (86.40% branch-inclusive coverage @ 2026-07-12) |
-| 3 | tests pass | OK (726 tests passed @ 2026-07-12) |
+| 2 | pytest coverage | OK (85.42% branch-inclusive coverage @ 2026-07-20) |
+| 3 | tests pass | OK (756 tests passed @ 2026-07-20) |
 | 4 | CI Python 3.10〜3.13 + unit/integration/PowerShell/package smoke | OK |
 | 5 | Schema validation | OK |
 | 6 | Agent config | OK |
@@ -75,6 +76,7 @@
 | 9 | F6 TestRail/Xray import | OK (50 tests) |
 | 10 | F7 Forward-test CLI | OK |
 | 11 | Workflow Cookbook Tier 3 | OK (33 nodes, 45 edges, 33 capsules) |
+| 12 | F8 Local Mode CLI / schema / package smoke | OK |
 
 **全検証完了 ✅**
 

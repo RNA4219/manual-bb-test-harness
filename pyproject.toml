@@ -5,7 +5,7 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "bb-harness"
 version = "3.0.0"
-description = "Manual black-box test harness CLI tool"
+description = "Manual black-box test harness with an optional OpenAI-compatible Local Mode"
 readme = "README.md"
 license = "LicenseRef-RNA-TPSAL-1.0"
 license-files = [
@@ -55,7 +55,7 @@ Repository = "https://github.com/RNA4219/manual-bb-test-harness"
 [tool.setuptools.packages.find]
 where = ["src"]
 [tool.setuptools.package-data]
-bb_harness = ["schemas/*.json"]
+bb_harness = ["schemas/*.json", "local_profiles.yaml"]
 
 
 [tool.pytest.ini_options]
@@ -79,6 +79,7 @@ ignore = ["BLE001"]
 "scripts/*.py" = ["E501"]  # Long docstrings with usage examples
 "tests/*.py" = ["E501"]    # Long test assertions
 "src/bb_harness/tools/*.py" = ["E501"]  # Compatibility tool implementations
+"src/bb_harness/local_pipeline.py" = ["E501"]  # Japanese prompts and compact render rows
 
 [tool.coverage.run]
 source = ["scripts", "src/bb_harness"]

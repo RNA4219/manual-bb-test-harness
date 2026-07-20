@@ -25,11 +25,14 @@ Web だけでなく iOS / Android も対象に含めるため、mobile 固有の
   - schema / example / golden / evaluation rubric の同期
   - Web / API / iOS / Android をまたぐ対象環境差分
   - TestRail / Xray / Notion 連携用の export / import 補助
+  - OpenAI互換のllama.cpp / LM Studioを使う明示的なlocal-design経路
 - Out:
   - 実機クラウドや MDM など mobile 実行基盤の構築
   - 自動テストフレームワークそのものの実装
   - 外部 SaaS の本番運用設定
   - 各プロダクト固有の業務ルール正本
+  - cloud providerからlocal modelへの自動failover
+  - Ollama native API
 
 ## 3. Constraints / Assumptions
 
@@ -39,6 +42,8 @@ Web だけでなく iOS / Android も対象に含めるため、mobile 固有の
 - artifact contract を変えるときは `schemas/`、`examples/artifacts/`、`goldens/` を同時更新する。
 - mobile 対象では `platform_matrix` を必須 lens として扱う。
 - golden は厳密 snapshot ではなく review anchor として扱う。
+- local modelは意味候補の生成器であり、risk/effort算術とGate権限はhostが持つ。
+- local endpointは既定でloopbackに限定し、artifact repairは1段階につき最大1回とする。
 
 ## 4. I/O Contract
 
@@ -56,6 +61,7 @@ Web だけでなく iOS / Android も対象に含めるため、mobile 固有の
   - `gate_decision`
   - `release_brief`
   - `execution_evidence`
+  - `local_run_manifest`
 
 ## 5. Minimal Flow
 
@@ -70,6 +76,26 @@ flowchart LR
   G --> H["gate_decision"]
   H --> I["release_brief"]
 ```
+
+### Local model flow
+
+```mermaid
+flowchart LR
+  S["Markdown spec"] --> I["deterministic intake"]
+  I --> M["local LLM: coverage"]
+  M --> O["local LLM: observations"]
+  O --> R["local LLM: risk factors"]
+  R --> RC["host: score / priority"]
+  RC --> C["local LLM: cases + self-review"]
+  C --> V["host: schema / lint / effort"]
+  V --> G{"execution evidence?"}
+  G -->|yes| GE["existing Gate engine"]
+  G -->|no| NG["deterministic no_go"]
+  GE --> B["release brief + manifest"]
+  NG --> B
+```
+
+LLM応答は既存artifact schemaで拘束する。失敗artifactだけを1回repairし、再失敗時は部分成果物とfailed manifestを残して非ゼロ終了する。raw promptとAPI keyはmanifestへ保存しない。
 
 ## 6. Interfaces
 
@@ -87,3 +113,8 @@ flowchart LR
   - `scripts/evaluate-gate.py`
   - `scripts/export-testrail.py`
   - `scripts/export-xray.py`
+- Local runtime:
+  - `src/bb_harness/local_runtime.py`
+  - `src/bb_harness/local_pipeline.py`
+  - `src/bb_harness/local_profiles.yaml`
+  - `docs/local-model-guide.md`

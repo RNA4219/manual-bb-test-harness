@@ -2,7 +2,7 @@
 intent_id: INT-MBB-001
 owner: manual-bb-test-harness
 release_version: 3.0.0
-test_count: 726
+test_count: 756
 knowledge_map: 33 nodes, 45 edges, 33 capsules
 next_review_due: 2026-10-11
 status: active
@@ -21,6 +21,7 @@ last_reviewed_at: 2026-05-16
 - `goldens/` が review anchor として主要な抜けを検知できる。
 - task seed と acceptance record が変更単位を追跡できる。
 - validator と test suite が通る。
+- local-designの9-run benchmarkがschema、automatic fail、70点、時間、決定的算術の条件を満たす。
 
 ## Quality Gates
 
@@ -32,6 +33,7 @@ last_reviewed_at: 2026-05-16
 | Skill | `SKILL.md` と references の責務分離が保たれる |
 | Mobile | mobile 対象で lifecycle / network / permission / entrypoint が欠けない |
 | Regression | 既存 golden と validator が通る |
+| Local model | 3 fixtures x 3 runsの中央値70以上、最低65以上、各10分以内 |
 
 ## Test Outline
 
@@ -47,6 +49,21 @@ last_reviewed_at: 2026-05-16
 - artifact:
   - `uv run python .\scripts\validate-artifact.py --artifact .\examples\artifacts\order-cancel.feature_spec.json --type feature_spec`
   - `uv run python .\scripts\validate-artifact.py --artifact .\examples\artifacts\order-cancel.test_model.json --type test_model`
+- local model:
+  - `uv run pytest tests\test_local_runtime.py tests\test_local_pipeline.py`
+  - `uv run bb-harness run local-design --input goldens\order-cancel.input.md --output tmp\local-order --profile qwen36`
+
+## Local 70-point benchmark
+
+`order-cancel`、`admin-role-change`、`mobile-session-resume`を各3回実行し、補正後artifactを `docs/evaluation-rubric.md` で生成主体とは別に採点する。`quality_report.json` は構造preflightであり、独立採点の代用にしない。
+
+合格条件:
+
+- 9/9 runがschema validでautomatic fail 0。
+- fixture別中央値70以上、全体中央値70以上、最低65以上。
+- 9/9 runが10分以内。
+- risk score/priority、effort合計、evidenceなしGateの決定的検算が100%。
+- 未達時はgoldenを変更せず、profile、stage prompt、validator、repair単位を修正する。
 
 ## Verification Checklist
 
@@ -54,9 +71,9 @@ last_reviewed_at: 2026-05-16
 - [x] `HUB.codex.md` の読み順が repo 実態と一致する
 - [x] artifact contract / schema / example / golden が同期している
 - [x] mobile golden が追加観点を検知できる（`mobile-session-resume`: lifecycle/permission/network/push_entry観点あり @ 2026-05-30）
-- [x] `uv run pytest` が成功する（726 tests passed @ 2026-07-12）
+- [x] `uv run pytest` が成功する（756 tests passed @ 2026-07-20）
 - [x] validator が成功する（quick-validate-skill, validate-skill.ps1, validate-artifact --all --strict）
-- [x] branch coverage が 85% 以上（86.40% @ 2026-07-12）
+- [x] branch coverage が 85% 以上（85.42% @ 2026-07-20）
 - [x] Gate branch coverage 90% 以上（gate_engine: 92.76% @ 2026-07-12）
 - [x] Black-box Fidelity Gate PASS（P0/P1 scripted case 100% source_ref/oracle/trace_to、user-visible behavior で説明できない scripted case 0件 @ 2026-05-30）
   - order-cancel: TC-001(P1), TC-002(P0), TC-003(P1) 全て source_ref/oracle/trace_to 明示済み

@@ -41,6 +41,7 @@ ARTIFACT_SCHEMA_MAP = {
     "automation_evidence": "automation_evidence.schema.json",
     "waiver_set": "waiver_set.schema.json",
     "forward_test_report": "forward_test_report.schema.json",
+    "local_run_manifest": "local_run_manifest.schema.json",
 }
 
 # Try to import jsonschema
@@ -134,6 +135,7 @@ def validate_artifact_basic(artifact: dict[str, Any], schema_type: str) -> list[
         "execution_evidence": ["run_id", "result"],
         "automation_evidence": ["feature_id", "build_id", "coverage_scope", "coverage_percent"],
         "waiver_set": ["feature_id", "build_id", "waivers"],
+        "local_run_manifest": ["run_id", "status", "profile", "model", "stages"],
     }
 
     required = required_fields.get(schema_type, [])

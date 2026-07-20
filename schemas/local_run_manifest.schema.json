@@ -1,0 +1,49 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/RNA4219/manual-bb-test-harness/schemas/local_run_manifest.schema.json",
+  "title": "LocalRunManifest",
+  "type": "object",
+  "required": ["run_id", "status", "profile", "base_url", "model", "config_hash", "input_sha256", "started_at", "finished_at", "elapsed_seconds", "stages", "artifacts"],
+  "properties": {
+    "run_id": {"type": "string", "minLength": 1},
+    "status": {"enum": ["succeeded", "failed"]},
+    "profile": {"type": "string", "minLength": 1},
+    "base_url": {"type": "string", "format": "uri"},
+    "model": {"type": "string", "minLength": 1},
+    "config_hash": {"type": "string", "pattern": "^[a-f0-9]{64}$"},
+    "input_sha256": {"type": "string", "pattern": "^[a-f0-9]{64}$"},
+    "started_at": {"type": "string", "format": "date-time"},
+    "finished_at": {"type": "string", "format": "date-time"},
+    "elapsed_seconds": {"type": "number", "minimum": 0},
+    "stages": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["name", "elapsed_seconds", "repairs", "schema_valid", "usage"],
+        "properties": {
+          "name": {"type": "string", "minLength": 1},
+          "elapsed_seconds": {"type": "number", "minimum": 0},
+          "repairs": {"type": "integer", "minimum": 0, "maximum": 1},
+          "schema_valid": {"type": "boolean"},
+          "usage": {"type": "object"}
+        },
+        "additionalProperties": false
+      }
+    },
+    "artifacts": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "object",
+        "required": ["path", "sha256", "schema_valid"],
+        "properties": {
+          "path": {"type": "string", "minLength": 1},
+          "sha256": {"type": "string", "pattern": "^[a-f0-9]{64}$"},
+          "schema_valid": {"type": "boolean"}
+        },
+        "additionalProperties": false
+      }
+    },
+    "error": {"type": "string"}
+  },
+  "additionalProperties": false
+}

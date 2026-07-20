@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+- OpenAI互換のllama.cpp / LM Studioを明示的に選択するLocal Modeとして、`run local-design` と `generic` / `qwen36` profileを追加。
+- LLMをcoverage・observation・risk候補・case候補の生成に限定し、schema repair、risk/effort算術、lint、Gateをhost側でfail closed化。
+- Qwen向けセルフレビュー、loopback既定、secret/raw promptを残さないrun manifest、70点台受入計画を追加。
+- Qwen3.6のthinking有効時にJSON contentが空になる実測結果を受け、qwen36 profileをthinking offへ固定し、段階生成とself-reviewで補強。
+
 ## [3.0.0] - Unreleased
 
 - ライセンスをRNA Third-Party Service Attribution License 1.0へ変更し、第三者向け有償サービス利用を顧客向け帰属表示付きで許可。

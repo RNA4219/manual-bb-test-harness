@@ -2,7 +2,7 @@
 intent_id: INT-MBB-001
 owner: manual-bb-test-harness
 release_version: 3.0.0
-test_count: 726
+test_count: 756
 knowledge_map: 33 nodes, 45 edges, 33 capsules
 next_review_due: 2026-10-11
 status: active
@@ -90,6 +90,29 @@ uv run bb-harness --verbose ingest --source markdown --input spec.md --output fe
 uv run bb-harness --verbose gate --input artifacts --output gate.json
 ```
 
+### 7. ローカルモデルで設計する
+
+llama.cppまたはLM StudioでOpenAI互換serverを起動し、先にmodel一覧を確認する。
+
+```powershell
+Invoke-RestMethod http://127.0.0.1:8084/v1/models
+
+uv run bb-harness run local-design `
+  --input .\goldens\order-cancel.input.md `
+  --output .\tmp\order-cancel-local `
+  --profile qwen36
+```
+
+任意serverでは `generic --base-url http://127.0.0.1:1234/v1 --model MODEL_ID` を使う。設定優先順位、環境変数、成果物は `docs/local-model-guide.md` を参照する。
+
+失敗時は次の順に確認する。
+
+1. `/v1/models` に対象modelが1件または明示IDで存在する。
+2. `run_manifest.json` の `status`、stage、repair回数を確認する。
+3. `lint_report.json` のautomatic fail相当項目を確認する。
+4. schema repair後も失敗した場合はpromptを広げず、該当stageの入力projectionを確認する。
+5. 証跡なしの `no_go` は正常動作であり、生成失敗ではない。
+
 ## Confirm
 
 - `README.md`、`HUB.codex.md`、`BLUEPRINT.md`、`RUNBOOK.md`、`GUARDRAILS.md`、`EVALUATION.md` の役割が重複しすぎていない。
@@ -97,6 +120,7 @@ uv run bb-harness --verbose gate --input artifacts --output gate.json
 - Skill の振る舞い変更が schema / example / golden / rubric に追随している。
 - mobile 対象では `mobile_contexts` と `platform_matrix` が artifact と docs に反映されている。
 - `uv run pytest` と Skill validator が通る。
+- local runではraw prompt / secretがmanifestに残らず、10分以内に完了する。
 
 ## Rollback / Retry
 

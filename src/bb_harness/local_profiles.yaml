@@ -1,0 +1,46 @@
+generic:
+  base_url: http://127.0.0.1:8080/v1
+  model: null
+  timeout_seconds: 240
+  temperature: 0.2
+  max_tokens: 6000
+  extra_body: {}
+  stages: {}
+
+qwen36:
+  base_url: http://127.0.0.1:8084/v1
+  model: qwen3.6-27b
+  timeout_seconds: 240
+  temperature: 0.15
+  max_tokens: 6000
+  extra_body:
+    chat_template_kwargs:
+      enable_thinking: false
+  stages:
+    test_model:
+      temperature: 0.2
+      max_tokens: 3500
+      extra_body:
+        chat_template_kwargs:
+          enable_thinking: false
+    observation_set:
+      temperature: 0.15
+      max_tokens: 4500
+      extra_body:
+        chat_template_kwargs:
+          enable_thinking: false
+    risk_candidates:
+      temperature: 0.1
+      max_tokens: 3000
+      extra_body:
+        chat_template_kwargs:
+          enable_thinking: false
+    manual_case_set:
+      temperature: 0.1
+      max_tokens: 4000
+    manual_case_remainder:
+      temperature: 0.1
+      max_tokens: 3500
+    manual_case_review:
+      temperature: 0.05
+      max_tokens: 5000
