@@ -2,7 +2,7 @@
 intent_id: INT-MBB-001
 owner: manual-bb-test-harness
 release_version: 3.0.0
-test_count: 756
+test_count: 765
 knowledge_map: 33 nodes, 45 edges, 33 capsules
 next_review_due: 2026-10-11
 status: active
@@ -71,9 +71,9 @@ last_reviewed_at: 2026-05-16
 - [x] `HUB.codex.md` の読み順が repo 実態と一致する
 - [x] artifact contract / schema / example / golden が同期している
 - [x] mobile golden が追加観点を検知できる（`mobile-session-resume`: lifecycle/permission/network/push_entry観点あり @ 2026-05-30）
-- [x] `uv run pytest` が成功する（756 tests passed @ 2026-07-20）
+- [x] `uv run pytest` が成功する（765 tests passed @ 2026-07-21）
 - [x] validator が成功する（quick-validate-skill, validate-skill.ps1, validate-artifact --all --strict）
-- [x] branch coverage が 85% 以上（85.42% @ 2026-07-20）
+- [x] branch coverage が 85% 以上（86.00% @ 2026-07-21）
 - [x] Gate branch coverage 90% 以上（gate_engine: 92.76% @ 2026-07-12）
 - [x] Black-box Fidelity Gate PASS（P0/P1 scripted case 100% source_ref/oracle/trace_to、user-visible behavior で説明できない scripted case 0件 @ 2026-05-30）
   - order-cancel: TC-001(P1), TC-002(P0), TC-003(P1) 全て source_ref/oracle/trace_to 明示済み

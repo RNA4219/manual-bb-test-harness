@@ -2,9 +2,13 @@
 
 from __future__ import annotations
 
+from pathlib import Path
+
 import pytest
 
 from bb_harness.cli import create_parser, main
+from bb_harness.commands import run as run_command
+from bb_harness.local_runtime import LocalRuntimeConfig
 
 
 class TestCreateParser:
@@ -121,6 +125,112 @@ class TestMainFunction:
         parser = create_parser()
         args = parser.parse_args(["export", "notion", "--dry-run"])
         assert args.dry_run is True
+
+    def test_local_mode_cli_propagates_arguments(
+        self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str]
+    ) -> None:
+        input_path = tmp_path / "input.md"
+        evidence_path = tmp_path / "evidence.json"
+        output_path = tmp_path / "out"
+        input_path.write_text("# input", encoding="utf-8")
+        evidence_path.write_text("{}", encoding="utf-8")
+        config = LocalRuntimeConfig(
+            profile="qwen36",
+            base_url="http://127.0.0.1:8084/v1",
+            model="qwen3.6-27b",
+            timeout_seconds=12.5,
+            temperature=0.1,
+            max_tokens=1000,
+        )
+        captured: dict[str, object] = {}
+
+        def fake_resolve_config(
+            profile: str,
+            *,
+            base_url: str | None = None,
+            model: str | None = None,
+            timeout_seconds: float | None = None,
+            allow_non_loopback: bool = False,
+        ) -> LocalRuntimeConfig:
+            captured["resolve"] = {
+                "profile": profile,
+                "base_url": base_url,
+                "model": model,
+                "timeout_seconds": timeout_seconds,
+                "allow_non_loopback": allow_non_loopback,
+            }
+            return config
+
+        class FakePipeline:
+            def __init__(self, received_config: LocalRuntimeConfig) -> None:
+                captured["config"] = received_config
+
+            def run(
+                self,
+                input_file: Path,
+                output_dir: Path,
+                *,
+                evidence_path: Path | None = None,
+                build_id: str = "",
+                gate_profile: str = "",
+            ) -> dict[str, object]:
+                captured["run"] = {
+                    "input": input_file,
+                    "output": output_dir,
+                    "evidence": evidence_path,
+                    "build_id": build_id,
+                    "gate_profile": gate_profile,
+                }
+                return {"model": "qwen3.6-27b", "elapsed_seconds": 0.01}
+
+        monkeypatch.setattr(run_command, "resolve_config", fake_resolve_config)
+        monkeypatch.setattr(run_command, "LocalDesignPipeline", FakePipeline)
+
+        result = main(
+            [
+                "run",
+                "local-design",
+                "--input",
+                str(input_path),
+                "--output",
+                str(output_path),
+                "--profile",
+                "qwen36",
+                "--base-url",
+                "http://trusted.example.test/v1",
+                "--model",
+                "override-model",
+                "--timeout",
+                "12.5",
+                "--max-repairs",
+                "1",
+                "--evidence",
+                str(evidence_path),
+                "--build-id",
+                "build-123",
+                "--gate-profile",
+                "strict",
+                "--allow-non-loopback",
+            ]
+        )
+
+        assert result == 0
+        assert captured["resolve"] == {
+            "profile": "qwen36",
+            "base_url": "http://trusted.example.test/v1",
+            "model": "override-model",
+            "timeout_seconds": 12.5,
+            "allow_non_loopback": True,
+        }
+        assert captured["config"] is config
+        assert captured["run"] == {
+            "input": input_path,
+            "output": output_path,
+            "evidence": evidence_path,
+            "build_id": "build-123",
+            "gate_profile": "strict",
+        }
+        assert "Generated Local Mode design" in capsys.readouterr().out
 
 
 class TestSubcommandHelp:

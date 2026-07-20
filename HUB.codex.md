@@ -5,7 +5,7 @@ status: active
 last_reviewed_at: 2026-05-16
 next_review_due: 2026-10-11
 release_version: 3.0.0
-test_count: 756
+test_count: 765
 knowledge_map: 33 nodes, 45 edges, 33 capsules
 ---
 

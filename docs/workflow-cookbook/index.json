@@ -1,11 +1,11 @@
 {
   "version": "3.0.0",
-  "generated_at": "2026-07-11T15:12:57.518101+00:00",
+  "generated_at": "2026-07-20T15:56:22.621968+00:00",
   "description": "manual-bb-test-harness Workflow Cookbook Knowledge Map",
   "metadata": {
     "repo": "manual-bb-test-harness",
     "tier": 3,
-    "last_updated": "2026-07-12",
+    "last_updated": "2026-07-21",
     "total_nodes": 33,
     "total_edges": 45,
     "total_capsules": 33
