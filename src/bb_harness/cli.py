@@ -7,6 +7,8 @@ import sys
 
 from bb_harness import __version__
 from bb_harness.commands import (
+    coverage,
+    evaluate,
     export,
     gate,
     heatmap,
@@ -65,6 +67,8 @@ def create_parser() -> argparse.ArgumentParser:
     export.add_subparser(subparsers)
     import_results.add_subparser(subparsers)
     run.add_subparser(subparsers)
+    coverage.add_subparser(subparsers)
+    evaluate.add_subparser(subparsers)
 
     return parser
 
@@ -94,6 +98,10 @@ def main(argv: list[str] | None = None) -> int:
         "export": export.run,
         "import": import_results.run,
         "run": run.run,
+        "coverage": coverage.run,
+        "evaluate": evaluate.run,
+        "migrate": coverage.run,
+        "bind-cases": coverage.run,
     }
 
     handler = dispatch_map.get(args.command)

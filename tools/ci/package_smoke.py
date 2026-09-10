@@ -211,6 +211,77 @@ def smoke_artifact(artifact: Path, root: Path) -> None:
             ],
         ]
     )
+    coverage_example = examples / "techniques" / "discount-domain"
+    commands.append(
+        [
+            cli, "evaluate", "requirements", "--input",
+            str(examples / "order-cancel.feature_spec.json"),
+            "--phase-contract", str(examples / "order-cancel.phase_contract.json"),
+            "--output", str(work / "requirements-confidence"),
+        ]
+    )
+    commands.append(
+        [
+            cli,
+            "coverage",
+            "--feature",
+            str(coverage_example / "discount.feature_spec.json"),
+            "--test-model",
+            str(coverage_example / "discount.test_model.json"),
+            "--observations",
+            str(coverage_example / "discount.observation_set.json"),
+            "--risk",
+            str(coverage_example / "discount.risk_register.json"),
+            "--cases",
+            str(coverage_example / "discount.manual_case_set.json"),
+            "--evidence",
+            str(REPO_ROOT / "examples/coverage-evidence/discount-domain"),
+            "--build-id",
+            "demo-1",
+            "--output",
+            str(work / "coverage"),
+        ]
+    )
+    commands.append(
+        [
+            cli,
+            "migrate",
+            "--input",
+            str(examples / "order-cancel.manual_case_set.json"),
+            "--output",
+            str(work / "migrated-cases.json"),
+            "--type",
+            "manual_case_set",
+        ]
+    )
+    commands.extend(
+        [
+            [
+                cli,
+                "bind-cases",
+                "--input",
+                str(examples / "order-cancel.manual_case_set.json"),
+                "--test-model",
+                str(examples / "order-cancel.test_model.json"),
+                "--output",
+                str(work / "bound-cases.json"),
+            ],
+            [
+                cli,
+                "run",
+                "local-design",
+                "--input",
+                str(REPO_ROOT / "goldens/order-cancel.input.md"),
+                "--output",
+                str(work / "estimate-unused"),
+                "--estimate-only",
+                "--generation-mode",
+                "batched",
+                "--token-budget",
+                "1",
+            ],
+        ]
+    )
     for command in commands:
         run(command, work)
 

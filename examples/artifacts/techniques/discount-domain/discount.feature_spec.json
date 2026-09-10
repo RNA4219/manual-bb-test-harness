@@ -1,0 +1,14 @@
+{
+  "feature_id": "DISCOUNT-01",
+  "title": "割引後金額と送料",
+  "acceptance_criteria": [
+    "割引後金額P-Dが10000円以上なら送料0円、未満なら500円。PとDは0以上の整数円。"
+  ],
+  "source_refs": [
+    {
+      "id": "AC-1",
+      "kind": "ac",
+      "excerpt": "割引後金額P-Dが10000円以上なら送料0円、未満なら500円。PとDは0以上の整数円。"
+    }
+  ]
+}

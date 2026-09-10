@@ -1,10 +1,10 @@
 # SPEC: manual-bb-test-harness 改修仕様書
 
-現行契約: **3.0.0** / 検証済みテスト: **765件** / Workflow Cookbook: **33 nodes・45 edges・33 capsules** / 次回レビュー: **2026-10-11**
+現行契約: **3.0.0** / テスト: **1026件** / Workflow Cookbook: **33 nodes・45 edges・33 capsules** / 次回レビュー: **2026-10-11**
 
 ## 概要
 
-本仕様書は `manual-bb-test-harness` リポジトリの品質改善（21件）と機能拡張（8件）を定義・記録する。
+本仕様書は `manual-bb-test-harness` リポジトリの品質改善と機能拡張の仕様・検証履歴を記録する。
 
 ## 改修項目 (21件)
 
@@ -17,7 +17,7 @@
 
 詳細は CHANGELOG.md を参照。
 
-## 機能拡張 (8件 - HIGH Impact)
+## 機能一覧
 
 | Feature | Status | Description |
 |---|---|---|
@@ -29,6 +29,10 @@
 | F6: TestRail/Xray Import | OK | TestRail/Xray → execution_evidence.json, dry-run preview, status変換テスト付き |
 | F7: Forward Test CLI | OK | `bb-harness run forward-test` wrapper, Skill 評価プロンプト出力 |
 | F8: Local Mode | OK | `bb-harness run local-design`、OpenAI互換endpoint、Qwen 27B profile、schema repair、host管理Gate |
+| F9: 技法被覆 | OK（有限モデル） | `coverage / migrate`、technique_plan、設計・実施・合格分離、Gate shadow。契約・上限は技法被覆ガイドを参照 |
+| F10: 生成効率・証跡版 | 実装済み・実LLM比較は不成立（spec-05検収記録参照） | [spec-05](docs/specs/spec-05-efficient-generation-evidence-revisions.md)。重複送信削減、差分レビュー、予算・usage、case/model版照合、実LLM比較 |
+| F11: 分割生成・完了判定 | 実装済み・実LLMの全段完走は未達 | [spec-06](docs/specs/spec-06-bounded-generation-readiness.md)。batched、終了理由、出力保護、設計状態、比較の実ファイル再検証 |
+| F12: 要件定義信頼度 | 実装済み・運用policyによる評価 | [spec-07](docs/specs/spec-07-requirements-confidence.md)。要確認件数・重大度・密度・レビュー率、根拠付き解決、JSON／Markdown出力 |
 
 ## F5: Ready Phase Contract
 
@@ -78,8 +82,12 @@
 | 11 | Workflow Cookbook Tier 3 | OK (33 nodes, 45 edges, 33 capsules) |
 | 12 | F8 Local Mode CLI / schema / package smoke | OK |
 
-**全検証完了 ✅**
+上表は既存機能の検証履歴。追加変更の検証状況は対応するspecと検収記録を参照する。
 
 ## Version
 
 3.0.0 - Keep a Changelog形式, Semantic Versioning準拠
+
+## 分割生成・完了判定（2026-09-10）
+
+追加仕様[spec-06](docs/specs/spec-06-bounded-generation-readiness.md)に基づき、batched生成、終了理由の判定、既存出力保護、design_status、実ファイルに基づく比較検証を追加。実LLMの結果は[検収記録](docs/acceptance/AC-20260910-batched.md)へ記録する。

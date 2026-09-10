@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import argparse
+import json
 import sys
 from pathlib import Path
 
@@ -80,6 +81,13 @@ def add_subparser(subparsers: argparse._SubParsersAction) -> None:
     local_parser.add_argument("--base-url", help="OpenAI-compatible /v1 base URL")
     local_parser.add_argument("--model", help="Model ID; omit only when /models has one item")
     local_parser.add_argument("--timeout", type=float, help="Per-request timeout in seconds")
+    local_parser.add_argument(
+        "--generation-mode", choices=["compact", "full", "batched"], default="compact"
+    )
+    local_parser.add_argument("--token-budget", type=int, help="1 runで共有する推定予約のtoken予算")
+    local_parser.add_argument(
+        "--estimate-only", action="store_true", help="LLMを呼ばず初段だけ見積もる"
+    )
     local_parser.add_argument(
         "--max-repairs",
         type=int,
@@ -185,8 +193,13 @@ def _run_local_design(args: argparse.Namespace) -> int:
             model=args.model,
             timeout_seconds=args.timeout,
             allow_non_loopback=args.allow_non_loopback,
+            generation_mode=getattr(args, "generation_mode", "compact"),
+            token_budget=getattr(args, "token_budget", None),
         )
         pipeline = LocalDesignPipeline(config)
+        if getattr(args, "estimate_only", False):
+            print(json.dumps(pipeline.estimate(args.input), ensure_ascii=False, indent=2))
+            return 0
         manifest = pipeline.run(
             args.input,
             args.output,
@@ -201,4 +214,9 @@ def _run_local_design(args: argparse.Namespace) -> int:
     print(f"  Model: {manifest['model']}")
     print(f"  Elapsed: {manifest['elapsed_seconds']} seconds")
     print(f"  Manifest: {args.output / 'run_manifest.json'}")
-    return 0
+    usage = manifest.get("usage_summary", {})
+    print(f"  Tokens: {usage.get('total_tokens')} (未報告呼出: {usage.get('unreported_calls')})")
+    design_status = manifest.get("design_status")
+    if design_status:
+        print(f"  Design: {design_status}")
+    return 2 if design_status in {"degraded", "blocked"} else 0

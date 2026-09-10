@@ -3,33 +3,148 @@
   "$id": "https://github.com/RNA4219/manual-bb-test-harness/schemas/gate_decision.schema.json",
   "title": "GateDecision",
   "type": "object",
-  "required": ["feature_id", "build_id", "status", "profile", "reasons", "evidence_summary"],
+  "required": [
+    "feature_id",
+    "build_id",
+    "status",
+    "profile",
+    "reasons",
+    "evidence_summary"
+  ],
   "properties": {
-    "feature_id": {"type": "string", "minLength": 1},
-    "build_id": {"type": "string", "minLength": 1},
-    "status": {"enum": ["go", "conditional_go", "no_go"]},
-    "profile": {"enum": ["strict", "standard", "lean"]},
-    "reasons": {"type": "array", "minItems": 1, "items": {"type": "string"}},
+    "feature_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "build_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "status": {
+      "enum": [
+        "go",
+        "conditional_go",
+        "no_go"
+      ]
+    },
+    "profile": {
+      "enum": [
+        "strict",
+        "standard",
+        "lean"
+      ]
+    },
+    "reasons": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "string"
+      }
+    },
     "evidence_summary": {
       "type": "object",
-      "required": ["manual_by_priority", "mandatory_observation_rate"],
+      "required": [
+        "manual_by_priority",
+        "mandatory_observation_rate"
+      ],
       "properties": {
-        "manual_by_priority": {"type": "object"},
-        "mandatory_observation_rate": {"type": "number", "minimum": 0, "maximum": 100}
+        "manual_by_priority": {
+          "type": "object"
+        },
+        "mandatory_observation_rate": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 100
+        },
+        "required_obligation_design_rate": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "minimum": 0,
+          "maximum": 100
+        },
+        "required_obligation_execution_rate": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "minimum": 0,
+          "maximum": 100
+        },
+        "coverage_exit_criteria_met": {
+          "type": "boolean"
+        },
+        "coverage_report_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "coverage_mode": {
+          "enum": [
+            "shadow"
+          ]
+        },
+        "coverage_unknown_count": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "evidence_binding_mode": {
+          "enum": [
+            "case_revision",
+            "legacy_unverified"
+          ]
+        }
       },
       "additionalProperties": false
     },
-    "blocking_risks": {"type": "array", "items": {"type": "string"}},
+    "blocking_risks": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
     "waivers": {
       "type": "array",
       "items": {
         "type": "object",
-        "required": ["id", "risk_ids", "reason", "owner", "expires_at", "containment", "rollback"]
+        "required": [
+          "id",
+          "risk_ids",
+          "reason",
+          "owner",
+          "expires_at",
+          "containment",
+          "rollback"
+        ]
       }
     },
-    "residual_risks": {"type": "array", "items": {"type": "string"}},
-    "unmet_conditions": {"type": "array", "items": {"type": "string"}},
-    "required_follow_up": {"type": "array", "items": {"type": "string"}}
+    "residual_risks": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "unmet_conditions": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "required_follow_up": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "schema_version": {
+      "const": "1.1.0"
+    },
+    "migration": {
+      "$ref": "shared_defs.schema.json#/$defs/Migration"
+    },
+    "generation": {
+      "$ref": "shared_defs.schema.json#/$defs/Generation"
+    }
   },
   "additionalProperties": false
 }

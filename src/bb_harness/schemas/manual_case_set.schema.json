@@ -4,7 +4,10 @@
   "title": "ManualCaseSet",
   "description": "Executable manual test cases and exploratory charters artifact. Produced by synthesize_manual_cases workflow step.",
   "type": "object",
-  "required": ["feature_id", "manual_cases"],
+  "required": [
+    "feature_id",
+    "manual_cases"
+  ],
   "properties": {
     "feature_id": {
       "type": "string",
@@ -13,30 +16,73 @@
     },
     "manual_cases": {
       "type": "array",
-      "items": {"$ref": "#/$defs/ManualTestCase"},
+      "items": {
+        "$ref": "#/$defs/ManualTestCase"
+      },
       "description": "Scripted manual test cases with steps, expected results, and oracle references."
     },
     "exploratory_charters": {
       "type": "array",
-      "items": {"$ref": "#/$defs/ExploratoryCharter"},
+      "items": {
+        "$ref": "#/$defs/ExploratoryCharter"
+      },
       "description": "Exploratory testing charters for areas with weak oracles or high uncertainty."
     },
     "platform_matrix": {
       "type": "array",
-      "items": {"$ref": "#/$defs/PlatformMatrixEntry"},
+      "items": {
+        "$ref": "#/$defs/PlatformMatrixEntry"
+      },
       "description": "Platform coverage matrix for mobile testing: OS x lifecycle x network combinations."
     },
     "role_matrix": {
       "type": "array",
-      "items": {"$ref": "#/$defs/RoleMatrixEntry"},
+      "items": {
+        "$ref": "#/$defs/RoleMatrixEntry"
+      },
       "description": "Role-based access matrix: actor_role x target_role x action combinations."
+    },
+    "schema_version": {
+      "const": "1.1.0"
+    },
+    "migration": {
+      "$ref": "shared_defs.schema.json#/$defs/Migration"
+    },
+    "generation": {
+      "$ref": "shared_defs.schema.json#/$defs/Generation"
+    },
+    "evidence_binding": {
+      "type": "object",
+      "properties": {
+        "mode": {
+          "const": "case_revision"
+        },
+        "model_hash": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        }
+      },
+      "required": [
+        "mode",
+        "model_hash"
+      ],
+      "additionalProperties": false
     }
   },
   "additionalProperties": false,
   "$defs": {
     "ManualTestCase": {
       "type": "object",
-      "required": ["tc_id", "title", "priority", "primary_view", "steps", "expected_results", "oracle", "trace_to"],
+      "required": [
+        "tc_id",
+        "title",
+        "priority",
+        "primary_view",
+        "steps",
+        "expected_results",
+        "oracle",
+        "trace_to"
+      ],
       "description": "Single scripted manual test case with complete execution instructions.",
       "properties": {
         "tc_id": {
@@ -50,47 +96,74 @@
           "description": "Short descriptive title for the test case."
         },
         "priority": {
-          "enum": ["P0", "P1", "P2", "P3"],
+          "enum": [
+            "P0",
+            "P1",
+            "P2",
+            "P3"
+          ],
           "description": "Risk-based priority: P0 (critical), P1 (high), P2 (medium), P3 (low)."
         },
         "primary_view": {
-          "enum": ["black", "gray", "white"],
+          "enum": [
+            "black",
+            "gray",
+            "white"
+          ],
           "description": "Testing view: black (external UI), gray (limited diagnostic signals), white (implementation-level)."
         },
         "techniques": {
           "type": "array",
-          "items": {"type": "string"},
+          "items": {
+            "type": "string"
+          },
           "description": "Test techniques used, e.g., 'state_transition', 'boundary_value', 'decision_table'."
         },
         "preconditions": {
           "type": "array",
-          "items": {"type": "string"},
+          "items": {
+            "type": "string"
+          },
           "description": "Setup conditions required before execution, e.g., '注文状態=pending'."
         },
         "steps": {
           "type": "array",
-          "items": {"type": "string"},
+          "items": {
+            "type": "string"
+          },
           "minItems": 1,
           "description": "Sequential execution steps. Each should be actionable and specific."
         },
         "expected_results": {
           "type": "array",
-          "items": {"type": "string"},
+          "items": {
+            "type": "string"
+          },
           "minItems": 1,
           "description": "Observable expected outcomes after each step or at end."
         },
         "oracle": {
           "type": "object",
-          "required": ["type", "refs"],
+          "required": [
+            "type",
+            "refs"
+          ],
           "description": "Oracle definition: how expected results are determined.",
           "properties": {
             "type": {
-              "enum": ["specified", "derived", "implicit", "human"],
+              "enum": [
+                "specified",
+                "derived",
+                "implicit",
+                "human"
+              ],
               "description": "Oracle type: specified (in spec), derived (from rules), implicit (standard), human (judgment)."
             },
             "refs": {
               "type": "array",
-              "items": {"type": "string"},
+              "items": {
+                "type": "string"
+              },
               "minItems": 1,
               "description": "References to source for oracle, e.g., ['AC-1', 'BR-2']."
             }
@@ -99,16 +172,27 @@
         },
         "source_ref": {
           "type": "object",
-          "required": ["type", "refs"],
+          "required": [
+            "type",
+            "refs"
+          ],
           "description": "Source reference: where the test case requirement comes from.",
           "properties": {
             "type": {
-              "enum": ["spec", "requirement", "acceptance", "risk", "user_request"],
+              "enum": [
+                "spec",
+                "requirement",
+                "acceptance",
+                "risk",
+                "user_request"
+              ],
               "description": "Source type: spec, requirement, acceptance criteria, risk, or user request."
             },
             "refs": {
               "type": "array",
-              "items": {"type": "string"},
+              "items": {
+                "type": "string"
+              },
               "minItems": 1,
               "description": "References to source documents, e.g., ['SPEC-ORD-CANCEL-01', 'AC-1']."
             }
@@ -122,16 +206,80 @@
         },
         "trace_to": {
           "type": "array",
-          "items": {"type": "string"},
+          "items": {
+            "type": "string"
+          },
           "minItems": 1,
           "description": "Traceability to observations and risks, e.g., ['OBS-STATE-01', 'RISK-01']."
+        },
+        "technique_refs": {
+          "type": "array",
+          "items": {
+            "$ref": "shared_defs.schema.json#/$defs/TechniqueRef"
+          },
+          "minItems": 0
+        },
+        "coverage_obligation_ids": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "minItems": 0
+        },
+        "coverage_inputs": {
+          "type": "array",
+          "items": {
+            "$ref": "shared_defs.schema.json#/$defs/CoverageInput"
+          },
+          "minItems": 0
+        },
+        "test_data": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "parameter_id": {
+                "type": "string",
+                "minLength": 1
+              },
+              "value": {
+                "type": [
+                  "string",
+                  "number",
+                  "boolean",
+                  "null"
+                ]
+              },
+              "unit": {
+                "type": "string",
+                "minLength": 1
+              }
+            },
+            "required": [
+              "parameter_id",
+              "value"
+            ],
+            "additionalProperties": false
+          },
+          "minItems": 0
+        },
+        "case_revision": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
         }
       },
       "additionalProperties": false
     },
     "ExploratoryCharter": {
       "type": "object",
-      "required": ["id", "title", "scope", "questions", "trace_to"],
+      "required": [
+        "id",
+        "title",
+        "scope",
+        "questions",
+        "trace_to"
+      ],
       "description": "Exploratory testing charter for areas requiring investigation rather than scripted steps.",
       "properties": {
         "id": {
@@ -145,7 +293,12 @@
           "description": "Short descriptive title for the charter's focus area."
         },
         "priority": {
-          "enum": ["P0", "P1", "P2", "P3"],
+          "enum": [
+            "P0",
+            "P1",
+            "P2",
+            "P3"
+          ],
           "description": "Risk-based priority for charter allocation."
         },
         "scope": {
@@ -155,7 +308,9 @@
         },
         "questions": {
           "type": "array",
-          "items": {"type": "string"},
+          "items": {
+            "type": "string"
+          },
           "minItems": 1,
           "description": "Specific questions to answer during exploration."
         },
@@ -166,36 +321,125 @@
         },
         "trace_to": {
           "type": "array",
-          "items": {"type": "string"},
+          "items": {
+            "type": "string"
+          },
           "minItems": 1,
           "description": "Traceability to observations, e.g., ['OBS-RECOVERY-01']."
+        },
+        "technique_refs": {
+          "type": "array",
+          "items": {
+            "$ref": "shared_defs.schema.json#/$defs/TechniqueRef"
+          },
+          "minItems": 0
+        },
+        "basis_refs": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "minItems": 0
+        },
+        "mission": {
+          "type": "string",
+          "minLength": 1
+        },
+        "resources": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "minItems": 0
+        },
+        "entry_criteria": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "minItems": 0
+        },
+        "exit_criteria": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "minItems": 0
+        },
+        "environment": {
+          "type": "string",
+          "minLength": 1
+        },
+        "limitations": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "minItems": 0
+        },
+        "history_refs": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "minItems": 0
+        },
+        "case_revision": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
         }
       },
       "additionalProperties": false
     },
     "PlatformMatrixEntry": {
       "type": "object",
-      "required": ["platform", "lifecycle", "network"],
+      "required": [
+        "platform",
+        "lifecycle",
+        "network"
+      ],
       "description": "Platform coverage entry for mobile testing: OS, lifecycle state, and network condition.",
       "properties": {
         "platform": {
           "type": "string",
-          "enum": ["iOS", "Android"],
+          "enum": [
+            "iOS",
+            "Android"
+          ],
           "description": "Mobile platform: iOS or Android."
         },
         "lifecycle": {
           "type": "string",
-          "enum": ["foreground", "background", "background_resume", "terminated"],
+          "enum": [
+            "foreground",
+            "background",
+            "background_resume",
+            "terminated"
+          ],
           "description": "App lifecycle state: foreground, background, background_resume, or terminated."
         },
         "network": {
           "type": "string",
-          "enum": ["online", "offline", "slow"],
+          "enum": [
+            "online",
+            "offline",
+            "slow"
+          ],
           "description": "Network condition: online, offline, or slow."
         },
         "permission": {
           "type": "string",
-          "enum": ["granted", "denied", "not_requested"],
+          "enum": [
+            "granted",
+            "denied",
+            "not_requested"
+          ],
           "description": "Optional permission state for permission-related tests."
         }
       },
@@ -203,27 +447,53 @@
     },
     "RoleMatrixEntry": {
       "type": "object",
-      "required": ["actor_role", "target_role", "action"],
+      "required": [
+        "actor_role",
+        "target_role",
+        "action"
+      ],
       "description": "Role-based access matrix entry: what action an actor can perform on a target.",
       "properties": {
         "actor_role": {
           "type": "string",
-          "enum": ["owner", "admin", "editor", "viewer", "member", "invited"],
+          "enum": [
+            "owner",
+            "admin",
+            "editor",
+            "viewer",
+            "member",
+            "invited"
+          ],
           "description": "Role of the user performing the action."
         },
         "target_role": {
           "type": "string",
-          "enum": ["owner", "admin", "editor", "viewer", "member", "invited"],
+          "enum": [
+            "owner",
+            "admin",
+            "editor",
+            "viewer",
+            "member",
+            "invited"
+          ],
           "description": "Role of the target user being acted upon."
         },
         "action": {
           "type": "string",
-          "enum": ["can_change", "cannot_change", "cannot_change_last", "invite_only"],
+          "enum": [
+            "can_change",
+            "cannot_change",
+            "cannot_change_last",
+            "invite_only"
+          ],
           "description": "Permitted action: can_change, cannot_change, cannot_change_last (boundary), or invite_only."
         },
         "ownership_context": {
           "type": "string",
-          "enum": ["own_workspace", "other_workspace"],
+          "enum": [
+            "own_workspace",
+            "other_workspace"
+          ],
           "description": "Optional ownership context for multi-workspace scenarios."
         }
       },

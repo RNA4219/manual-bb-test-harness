@@ -2,11 +2,13 @@
   "id": "EVALUATION.md",
   "role": "acceptance",
   "title": "Evaluation",
-  "summary": "Defines repository validation and the local 70-point benchmark: three fixtures by three runs, independent rubric scoring, no automatic fails, median at least 70, minimum 65, under ten minutes, and deterministic risk/effort/Gate checks.",
+  "summary": "Defines repository validation and the local 70-point benchmark: three fixtures by three runs, independent rubric scoring, no automatic fails, median at least 70, minimum 65, under ten minutes, and deterministic risk/effort/Gate checks. compact生成、予算・usage、証跡版の契約はefficient-generation.mdを参照。 batched生成・設計状態・比較再検証はspec-06とAC-20260910-batched.mdを参照。 要件定義信頼度・要確認集計・根拠付き再評価はrequirements-confidence.mdとspec-07を参照。",
   "public_api": [],
   "deps_out": [
     "docs/evaluation-rubric.md",
-    "docs/acceptance/"
+    "docs/acceptance/",
+    "skills/manual-bb-test-harness/references/efficient-generation.md",
+    "skills/manual-bb-test-harness/references/requirements-confidence.md"
   ],
   "deps_in": [
     "HUB.codex.md",
@@ -18,5 +20,5 @@
     "scripts/validate-spec.py",
     "scripts/validate-artifact.py"
   ],
-  "last_verified": "2026-07-21"
+  "last_verified": "2026-09-11"
 }

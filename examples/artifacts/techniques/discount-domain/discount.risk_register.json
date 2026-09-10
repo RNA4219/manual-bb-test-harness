@@ -1,0 +1,17 @@
+{
+  "feature_id": "DISCOUNT-01",
+  "risks": [
+    {
+      "id": "RISK-01",
+      "scenario": "割引前金額で判定し送料を誤る",
+      "impact": 4,
+      "likelihood": 2,
+      "score": 58,
+      "priority": "P1",
+      "rationale": "料金の誤請求につながる",
+      "trace_to": [
+        "OBS-DATA-01"
+      ]
+    }
+  ]
+}

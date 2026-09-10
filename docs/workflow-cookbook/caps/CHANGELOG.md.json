@@ -2,13 +2,15 @@
   "id": "CHANGELOG.md",
   "role": "history",
   "title": "Changelog",
-  "summary": "Keep a Changelog 形式の変更履歴。Unreleased セクションに AI-first README 再構成、artifact 検証の jsonschema 標準依存化、workflow-cookbook 準拠 docs 追加、F6/F7 機能追加、Tier 3 達成 (Birdseye 28 nodes, 45 edges) を記録。v0.2.0 (2026-05-03) で F1-F5 機能完成。",
-  "deps_out": [],
+  "summary": "Keep a Changelog 形式の変更履歴。Unreleased セクションに AI-first README 再構成、artifact 検証の jsonschema 標準依存化、workflow-cookbook 準拠 docs 追加、F6/F7 機能追加、Tier 3 達成 (Birdseye 28 nodes, 45 edges) を記録。v0.2.0 (2026-05-03) で F1-F5 機能完成。 batched生成・設計状態・比較再検証はspec-06とAC-20260910-batched.mdを参照。 要件定義信頼度・要確認集計・根拠付き再評価はrequirements-confidence.mdとspec-07を参照。",
+  "deps_out": [
+    "skills/manual-bb-test-harness/references/requirements-confidence.md"
+  ],
   "deps_in": [
     "README.md",
     "SPEC.md"
   ],
   "risks": [],
   "tests": [],
-  "last_verified": "2026-07-21"
+  "last_verified": "2026-09-11"
 }

@@ -1,0 +1,118 @@
+{
+  "runs": {
+    "full": {
+      "status": "failed",
+      "error": "LocalRuntimeError: model output is invalid JSON: Expecting ',' delimiter: line 365 column 8 (char 9857)",
+      "elapsed_seconds": 499.987,
+      "usage": {
+        "calls": 6,
+        "repair_calls": 2,
+        "unreported_calls": 0,
+        "prompt_tokens": 15337,
+        "completion_tokens": 13342,
+        "total_tokens": 28679,
+        "reported_total_tokens": 28679,
+        "accounted_tokens": 28679,
+        "budget_tokens": null,
+        "remaining_tokens": null,
+        "budget_exhausted": false,
+        "estimation_method": "utf8_bytes_plus_256_v1"
+      },
+      "schema_valid": false,
+      "structure_valid": false,
+      "automatic_fails": null,
+      "coverage_valid": false,
+      "design_coverage": null,
+      "eligible_for_expanded_benchmark": false,
+      "independent_quality_score": null
+    },
+    "compact": {
+      "status": "failed",
+      "error": "LocalRuntimeError: model output is invalid JSON: Expecting ',' delimiter: line 253 column 12 (char 5665)",
+      "elapsed_seconds": 107.923,
+      "usage": {
+        "calls": 1,
+        "repair_calls": 0,
+        "unreported_calls": 0,
+        "prompt_tokens": 836,
+        "completion_tokens": 3500,
+        "total_tokens": 4336,
+        "reported_total_tokens": 4336,
+        "accounted_tokens": 4336,
+        "budget_tokens": null,
+        "remaining_tokens": null,
+        "budget_exhausted": false,
+        "estimation_method": "utf8_bytes_plus_256_v1"
+      },
+      "schema_valid": false,
+      "structure_valid": false,
+      "automatic_fails": null,
+      "coverage_valid": false,
+      "design_coverage": null,
+      "eligible_for_expanded_benchmark": false,
+      "independent_quality_score": null
+    }
+  },
+  "comparable": false,
+  "token_reduction_percent": null,
+  "expanded_benchmark_allowed": false,
+  "note": "構造・被覆の成立は独立した意味的品質採点ではない。失敗と欠測を0消費にしない。",
+  "input_sha256": "6a49d0ab3fa58896cbe2c79c909e6f7b95390573ffdc88d5e63235b213eb56a9",
+  "common_config": {
+    "profile": "qwen36",
+    "base_url": "http://127.0.0.1:8084/v1",
+    "model": "qwen3.6-27b",
+    "timeout_seconds": 600.0,
+    "temperature": 0.15,
+    "max_tokens": 6000,
+    "extra_body": {
+      "chat_template_kwargs": {
+        "enable_thinking": false
+      }
+    },
+    "stage_overrides": {
+      "test_model": {
+        "temperature": 0.2,
+        "max_tokens": 3500,
+        "extra_body": {
+          "chat_template_kwargs": {
+            "enable_thinking": false
+          }
+        }
+      },
+      "observation_set": {
+        "temperature": 0.15,
+        "max_tokens": 4500,
+        "extra_body": {
+          "chat_template_kwargs": {
+            "enable_thinking": false
+          }
+        }
+      },
+      "risk_candidates": {
+        "temperature": 0.1,
+        "max_tokens": 3000,
+        "extra_body": {
+          "chat_template_kwargs": {
+            "enable_thinking": false
+          }
+        }
+      },
+      "manual_case_set": {
+        "temperature": 0.1,
+        "max_tokens": 4000
+      },
+      "manual_case_remainder": {
+        "temperature": 0.1,
+        "max_tokens": 3500
+      },
+      "manual_case_review": {
+        "temperature": 0.05,
+        "max_tokens": 5000
+      }
+    },
+    "token_budget": null
+  },
+  "common_config_hash": "ce4cb575588c0d2787ce87061a6cf670f4d3ddbd31d22009369042771f876280",
+  "measurement_note": "実測manifestを保持。比較サマリは失敗runのschema_validをfalseとして再集計。試行時のJSON不正はruntime_errorに含まれる。現実装はjson_parse_errorとして区別し、回帰テストで確認。"
+}

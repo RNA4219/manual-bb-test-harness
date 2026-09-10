@@ -1,0 +1,157 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "CaseReviewPatch",
+  "type": "object",
+  "properties": {
+    "case_updates": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "tc_id": {
+            "type": "string",
+            "minLength": 1,
+            "description": "Unique test case identifier, e.g., 'TC-001'. Should be sequential within feature."
+          },
+          "changes": {
+            "type": "object",
+            "properties": {
+              "oracle": {
+                "type": "object",
+                "required": [
+                  "type",
+                  "refs"
+                ],
+                "description": "Oracle definition: how expected results are determined.",
+                "properties": {
+                  "type": {
+                    "enum": [
+                      "specified",
+                      "derived",
+                      "implicit",
+                      "human"
+                    ],
+                    "description": "Oracle type: specified (in spec), derived (from rules), implicit (standard), human (judgment)."
+                  },
+                  "refs": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    },
+                    "minItems": 1,
+                    "description": "References to source for oracle, e.g., ['AC-1', 'BR-2']."
+                  }
+                },
+                "additionalProperties": false
+              },
+              "source_ref": {
+                "type": "object",
+                "required": [
+                  "type",
+                  "refs"
+                ],
+                "description": "Source reference: where the test case requirement comes from.",
+                "properties": {
+                  "type": {
+                    "enum": [
+                      "spec",
+                      "requirement",
+                      "acceptance",
+                      "risk",
+                      "user_request"
+                    ],
+                    "description": "Source type: spec, requirement, acceptance criteria, risk, or user request."
+                  },
+                  "refs": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    },
+                    "minItems": 1,
+                    "description": "References to source documents, e.g., ['SPEC-ORD-CANCEL-01', 'AC-1']."
+                  }
+                },
+                "additionalProperties": false
+              },
+              "expected_results": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                },
+                "minItems": 1,
+                "description": "Observable expected outcomes after each step or at end."
+              },
+              "priority": {
+                "enum": [
+                  "P0",
+                  "P1",
+                  "P2",
+                  "P3"
+                ],
+                "description": "Risk-based priority: P0 (critical), P1 (high), P2 (medium), P3 (low)."
+              },
+              "estimate_minutes": {
+                "type": "number",
+                "minimum": 0,
+                "description": "Estimated execution time in minutes. Used for effort planning."
+              }
+            },
+            "required": [],
+            "additionalProperties": false,
+            "minProperties": 1
+          }
+        },
+        "required": [
+          "tc_id",
+          "changes"
+        ],
+        "additionalProperties": false
+      }
+    },
+    "charter_updates": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "minLength": 1,
+            "description": "Unique charter identifier, e.g., 'CHARTER-001'."
+          },
+          "changes": {
+            "type": "object",
+            "properties": {
+              "priority": {
+                "enum": [
+                  "P0",
+                  "P1",
+                  "P2",
+                  "P3"
+                ],
+                "description": "Risk-based priority for charter allocation."
+              },
+              "estimate_minutes": {
+                "type": "number",
+                "minimum": 0,
+                "description": "Timebox for charter exploration in minutes."
+              }
+            },
+            "required": [],
+            "additionalProperties": false,
+            "minProperties": 1
+          }
+        },
+        "required": [
+          "id",
+          "changes"
+        ],
+        "additionalProperties": false
+      }
+    }
+  },
+  "required": [
+    "case_updates",
+    "charter_updates"
+  ],
+  "additionalProperties": false
+}

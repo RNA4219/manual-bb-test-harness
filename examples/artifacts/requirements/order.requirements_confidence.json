@@ -1,0 +1,249 @@
+{
+  "schema_version": "1.0.0",
+  "policy_version": "requirements-confidence-1",
+  "feature_id": "ORD-CANCEL-01",
+  "input_sha256": "f042e9d727330c81fd426c1ef1e410f733ceceb259bcf31a946200cec337c787",
+  "score": 35.0,
+  "band": "low",
+  "status": "blocked",
+  "provisional": true,
+  "counts": {
+    "requirements": 6,
+    "raw_requirements": 6,
+    "duplicate_requirements": 0,
+    "reviewed_requirements": 0,
+    "unreviewed_requirements": 6,
+    "raw_findings": 2,
+    "unique_findings": 2,
+    "open_confirmations": 2,
+    "resolved_confirmations": 0,
+    "by_severity": {
+      "critical": 1,
+      "high": 1,
+      "medium": 0,
+      "low": 0
+    },
+    "technical_risks": 1
+  },
+  "metrics": {
+    "review_coverage_percent": 0.0,
+    "open_items_per_requirement": 0.333,
+    "uncertainty_weight": 12,
+    "normalization_capacity": 24,
+    "uncertainty_points": 35.0,
+    "review_points": 0.0,
+    "base_score": 35.0
+  },
+  "score_caps": [
+    {
+      "reason": "重大な未解決事項または着手を妨げる確認事項が残っています",
+      "maximum": 39
+    },
+    {
+      "reason": "highの未解決事項が残っています",
+      "maximum": 69
+    },
+    {
+      "reason": "要確認事項が残っています",
+      "maximum": 84
+    },
+    {
+      "reason": "未レビューの要件があります",
+      "maximum": 84
+    },
+    {
+      "reason": "レビュー済み要件がありません",
+      "maximum": 69
+    }
+  ],
+  "requirements": [
+    {
+      "requirement_id": "REQ-2d8dcb856092f076",
+      "text": "出荷前の注文のみキャンセルできる",
+      "locations": [
+        "feature/acceptance_criteria/0"
+      ],
+      "reviewed": false
+    },
+    {
+      "requirement_id": "REQ-7c1a82ac5c30cb4c",
+      "text": "二重キャンセルは不可",
+      "locations": [
+        "feature/business_rules/1"
+      ],
+      "reviewed": false
+    },
+    {
+      "requirement_id": "REQ-860549f4cb057dc3",
+      "text": "クーポン利用注文ではクーポン残数を復元する",
+      "locations": [
+        "feature/acceptance_criteria/3"
+      ],
+      "reviewed": false
+    },
+    {
+      "requirement_id": "REQ-93111f47844acdba",
+      "text": "決済失敗注文はキャンセル済み扱いにしない",
+      "locations": [
+        "feature/business_rules/0"
+      ],
+      "reviewed": false
+    },
+    {
+      "requirement_id": "REQ-d1df98333ebbeca0",
+      "text": "キャンセル成功時は在庫を戻す",
+      "locations": [
+        "feature/acceptance_criteria/2"
+      ],
+      "reviewed": false
+    },
+    {
+      "requirement_id": "REQ-fb9c9ae292f2a164",
+      "text": "出荷済み注文はキャンセル不可メッセージを表示する",
+      "locations": [
+        "feature/acceptance_criteria/1"
+      ],
+      "reviewed": false
+    }
+  ],
+  "issues": [
+    {
+      "issue_id": "phase:GAP-1",
+      "ids": [
+        "phase:GAP-1"
+      ],
+      "kind": "gap",
+      "severity": "high",
+      "text": "キャンセル可能状態とキャンセル不可状態の一覧がない",
+      "requirement_ids": [],
+      "source_refs": [
+        "MOCK-1"
+      ],
+      "locations": [
+        "phase/spec_gaps/GAP-1"
+      ],
+      "owner": null,
+      "due": null,
+      "blocks_ready": false,
+      "status": "open",
+      "resolution": null
+    },
+    {
+      "issue_id": "phase:Q-1",
+      "ids": [
+        "phase:Q-1"
+      ],
+      "kind": "question",
+      "severity": "critical",
+      "text": "決済確定後キャンセル時の返金責務は注文サービスと決済サービスのどちらが持つか",
+      "requirement_ids": [],
+      "source_refs": [
+        "MEMO-1"
+      ],
+      "locations": [
+        "phase/open_questions/Q-1"
+      ],
+      "owner": "PM",
+      "due": null,
+      "blocks_ready": true,
+      "status": "open",
+      "resolution": null
+    }
+  ],
+  "next_actions": [
+    {
+      "priority": "critical",
+      "target_id": "phase:Q-1",
+      "text": "確認・根拠の記録: 決済確定後キャンセル時の返金責務は注文サービスと決済サービスのどちらが持つか",
+      "owner": "PM",
+      "due": null
+    },
+    {
+      "priority": "high",
+      "target_id": "phase:GAP-1",
+      "text": "確認・根拠の記録: キャンセル可能状態とキャンセル不可状態の一覧がない",
+      "owner": null,
+      "due": null
+    },
+    {
+      "priority": "medium",
+      "target_id": "REQ-2d8dcb856092f076",
+      "text": "根拠・oracle・曖昧さ・矛盾をレビュー: 出荷前の注文のみキャンセルできる",
+      "owner": null,
+      "due": null
+    },
+    {
+      "priority": "medium",
+      "target_id": "REQ-7c1a82ac5c30cb4c",
+      "text": "根拠・oracle・曖昧さ・矛盾をレビュー: 二重キャンセルは不可",
+      "owner": null,
+      "due": null
+    },
+    {
+      "priority": "medium",
+      "target_id": "REQ-860549f4cb057dc3",
+      "text": "根拠・oracle・曖昧さ・矛盾をレビュー: クーポン利用注文ではクーポン残数を復元する",
+      "owner": null,
+      "due": null
+    },
+    {
+      "priority": "medium",
+      "target_id": "REQ-93111f47844acdba",
+      "text": "根拠・oracle・曖昧さ・矛盾をレビュー: 決済失敗注文はキャンセル済み扱いにしない",
+      "owner": null,
+      "due": null
+    },
+    {
+      "priority": "medium",
+      "target_id": "REQ-d1df98333ebbeca0",
+      "text": "根拠・oracle・曖昧さ・矛盾をレビュー: キャンセル成功時は在庫を戻す",
+      "owner": null,
+      "due": null
+    },
+    {
+      "priority": "medium",
+      "target_id": "REQ-fb9c9ae292f2a164",
+      "text": "根拠・oracle・曖昧さ・矛盾をレビュー: 出荷済み注文はキャンセル不可メッセージを表示する",
+      "owner": null,
+      "due": null
+    }
+  ],
+  "source_refs": [
+    {
+      "id": "AC-1",
+      "kind": "ac",
+      "excerpt": "出荷前の注文のみキャンセルできる"
+    },
+    {
+      "id": "AC-2",
+      "kind": "ac",
+      "excerpt": "出荷済み注文はキャンセル不可メッセージを表示する"
+    },
+    {
+      "id": "BR-1",
+      "kind": "rule",
+      "excerpt": "決済失敗注文はキャンセル済み扱いにしない"
+    },
+    {
+      "id": "MEMO-1",
+      "kind": "memo",
+      "excerpt": "Phase 1 は問い合わせ削減を目的に出荷前キャンセルだけを扱う"
+    },
+    {
+      "id": "MOCK-1",
+      "kind": "mock",
+      "excerpt": "注文詳細画面にキャンセルボタンと確認モーダルがある"
+    }
+  ],
+  "review": {
+    "reviewer": null,
+    "reviewed_at": null,
+    "requirements": []
+  },
+  "limitations": [
+    "点数は記録された不確実性とレビューのルール評価であり、正しさの確率ではありません。",
+    "タグのない曖昧さ・矛盾・未記載要件は自動発見しません。意味レビューで登録してください。",
+    "根拠の内容とoracleの意味的正しさは自動保証しません。高得点もReadyやリリースGoではありません。",
+    "重み・閾値は初期policyであり、実案件データによる統計的な校正は未実施です。"
+  ]
+}

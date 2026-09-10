@@ -1,0 +1,10 @@
+{
+  "run_id": "DEMO-1",
+  "feature_id": "DISCOUNT-01",
+  "build_id": "demo-1",
+  "timestamp": "2026-09-10T00:01:00Z",
+  "tc_id": "TC-001",
+  "result": "pass",
+  "case_revision": "5d88868fbcae7da4f7e3cd5a66a82dbe57779de25e5a885a3f0dbb071f636e91",
+  "model_hash": "318d0e7a17cc30958cdb52f863989d4320add284a852f027861a9f3b5041ce83"
+}

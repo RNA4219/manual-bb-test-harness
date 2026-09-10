@@ -144,6 +144,19 @@ class TestReleaseBundleValidator:
 class TestCreateDryRunBundle:
     """Tests for dry-run bundle creation."""
 
+    def test_coverage_example_paths_and_evidence_remain_distinct(self, tmp_path: Path) -> None:
+        """異なるfeatureの同名証跡を配布時に混在・上書きさせない。"""
+        import zipfile
+
+        module = load_validate_release_bundle_module()
+        bundle = module.ReleaseBundleValidator(REPO_ROOT).create_dry_run_bundle(tmp_path)
+        with zipfile.ZipFile(bundle) as archive:
+            names = archive.namelist()
+            assert len(names) == len(set(names))
+            assert "examples/artifacts/execution_evidence/TC-001.json" in names
+            assert "examples/coverage-evidence/discount-domain/TC-001.execution_evidence.json" in names
+            assert "examples/artifacts/techniques/discount-domain/discount.technique_plan.json" in names
+
     def test_create_bundle(self, tmp_path: Path) -> None:
         """Create dry-run bundle."""
         module = load_validate_release_bundle_module()

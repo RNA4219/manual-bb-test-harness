@@ -1,0 +1,69 @@
+{
+  "schema_version": "1.1.0",
+  "id": "COVREPORT-922090612a7da6cd13aa",
+  "feature_id": "DISCOUNT-01",
+  "build_id": "demo-1",
+  "model_hash": "318d0e7a17cc30958cdb52f863989d4320add284a852f027861a9f3b5041ce83",
+  "case_hash": "aa3e1db620d786d6e83bb38181336852a1dfa19a99a423a11028de083e8c68f6",
+  "evidence_binding_mode": "case_revision",
+  "plan_hash": "c675bcc92cfebfd35a4168b8ba3f0698e5fbdc5c09b6663aed9a111ae4ad42f0",
+  "mode": "shadow",
+  "design": {
+    "required_feasible": 4,
+    "covered_by_cases": 4,
+    "rate": 100.0,
+    "uncovered_ids": []
+  },
+  "execution": {
+    "required_feasible": 4,
+    "executed": 3,
+    "passed": 2,
+    "rate": 75.0,
+    "unexecuted_ids": [
+      "COV-DOMAIN-SHIPPING-8bb2dfcd7580f6a853cb"
+    ]
+  },
+  "results": [
+    {
+      "id": "COV-DOMAIN-SHIPPING-43b7661297b1271a8b43",
+      "design": "covered",
+      "case_ids": [
+        "TC-001"
+      ],
+      "executed": true,
+      "passed": true
+    },
+    {
+      "id": "COV-DOMAIN-SHIPPING-6f6d0d1981beaa3b9f3a",
+      "design": "covered",
+      "case_ids": [
+        "TC-002"
+      ],
+      "executed": true,
+      "passed": false
+    },
+    {
+      "id": "COV-DOMAIN-SHIPPING-d18403dc92aec569fe95",
+      "design": "covered",
+      "case_ids": [
+        "TC-003"
+      ],
+      "executed": true,
+      "passed": true
+    },
+    {
+      "id": "COV-DOMAIN-SHIPPING-8bb2dfcd7580f6a853cb",
+      "design": "covered",
+      "case_ids": [
+        "TC-004"
+      ],
+      "executed": false,
+      "passed": false
+    }
+  ],
+  "unknown_ids": [],
+  "infeasible_ids": [],
+  "errors": [],
+  "exit_criteria": [],
+  "blocked_selections": []
+}

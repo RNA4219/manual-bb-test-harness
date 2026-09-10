@@ -76,6 +76,8 @@ No-Go:
 
 coverage単独でrelease readinessを決めてはならない。
 
+追加契約1.1.0の `coverage_report` は設計済み・実施済み・合格を分離する。failも実施率へ計数し、unknownとblockedは別表示する。現在はshadowとしてevidence_summaryへ添え、上記profileの閾値・waiver条件・Go/No-Go判断は変えない。ケース更新時はreportを再生成する。詳細は [technique-coverage.md](technique-coverage.md) を参照。
+
 ## Stakeholder Alignment
 
 profile、coverage閾値、P0/P1、残余risk、waiver承認者、rollback/containmentをTech Lead・QA Lead・PM間で合意し、Go/No-Go briefには判定build、未充足条件、適用waiver、残余risk、rollbackを明記する。

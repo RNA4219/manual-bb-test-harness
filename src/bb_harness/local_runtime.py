@@ -19,6 +19,13 @@ import yaml
 class LocalRuntimeError(RuntimeError):
     """ローカル推論の設定・通信・応答が不正な場合。"""
 
+    def __init__(self, message: str, *, usage: dict | None = None, elapsed_seconds: float = 0.0):
+        super().__init__(message)
+        self.usage = usage or {}
+        self.elapsed_seconds = elapsed_seconds
+        self.failure_kind = "runtime_error"
+        self.finish_reason = None
+
 
 @dataclass(frozen=True)
 class LocalRuntimeConfig:
@@ -33,6 +40,8 @@ class LocalRuntimeConfig:
     extra_body: dict[str, Any] = field(default_factory=dict)
     stage_overrides: dict[str, dict[str, Any]] = field(default_factory=dict)
     api_key: str | None = field(default=None, repr=False)
+    generation_mode: str = "compact"
+    token_budget: int | None = None
 
 
 @dataclass(frozen=True)
@@ -43,6 +52,7 @@ class CompletionResult:
     elapsed_seconds: float
     usage: dict[str, Any]
     model: str
+    finish_reason: str | None = None
 
 
 def load_profiles() -> dict[str, dict[str, Any]]:
@@ -61,11 +71,17 @@ def resolve_config(
     model: str | None = None,
     timeout_seconds: float | None = None,
     allow_non_loopback: bool = False,
+    generation_mode: str = "compact",
+    token_budget: int | None = None,
 ) -> LocalRuntimeConfig:
     """CLI > 環境変数 > profileの順で設定を解決する。"""
     profiles = load_profiles()
     if profile not in profiles:
         raise LocalRuntimeError(f"Unknown local profile: {profile}")
+    if generation_mode not in {"compact", "full", "batched"}:
+        raise LocalRuntimeError("generation_mode must be compact, full or batched")
+    if token_budget is not None and (type(token_budget) is not int or token_budget <= 0):
+        raise LocalRuntimeError("token_budget must be a positive integer")
     raw = profiles[profile]
     resolved_url = (
         base_url or os.getenv("BB_HARNESS_LOCAL_BASE_URL") or str(raw.get("base_url", ""))
@@ -94,6 +110,8 @@ def resolve_config(
         extra_body=dict(raw.get("extra_body") or {}),
         stage_overrides=dict(raw.get("stages") or {}),
         api_key=os.getenv("BB_HARNESS_LOCAL_API_KEY"),
+        generation_mode=generation_mode,
+        token_budget=token_budget,
     )
 
 
@@ -146,7 +164,7 @@ class OpenAICompatibleClient:
     ) -> CompletionResult:
         """JSON Schema制約付きchat completionを行う。"""
         model = self.discover_model()
-        stage = schema_name.removesuffix("_repair")
+        stage = schema_name.removesuffix("_repair").split("__", 1)[0]
         stage_config = self.config.stage_overrides.get(stage, {})
         temperature = float(stage_config.get("temperature", self.config.temperature))
         max_tokens = int(stage_config.get("max_tokens", self.config.max_tokens))
@@ -171,22 +189,56 @@ class OpenAICompatibleClient:
         }
         body.update(extra_body)
         started = time.monotonic()
-        response = self._request("POST", "/chat/completions", body)
-        elapsed = time.monotonic() - started
         try:
-            message = response["choices"][0]["message"]
-            content = message.get("content")
-        except (KeyError, IndexError, TypeError) as exc:
-            raise LocalRuntimeError("chat completion response has no message content") from exc
-        text = _content_text(content)
-        value = _parse_json_object(text)
+            response = self._request("POST", "/chat/completions", body)
+        except LocalRuntimeError as exc:
+            exc.elapsed_seconds = time.monotonic() - started
+            raise
+        elapsed = time.monotonic() - started
         usage = response.get("usage") if isinstance(response.get("usage"), dict) else {}
+        try:
+            choice = response["choices"][0]
+            reason = choice.get("finish_reason")
+            message = choice["message"]
+            content = message.get("content")
+        except (KeyError, IndexError, TypeError, AttributeError) as exc:
+            raise LocalRuntimeError(
+                "chat completion response has no message content",
+                usage=usage,
+                elapsed_seconds=elapsed,
+            ) from exc
+        if reason is not None and reason != "stop":
+            exc = LocalRuntimeError(
+                f"incomplete model response: finish_reason={str(reason)[:80]}",
+                usage=usage,
+                elapsed_seconds=elapsed,
+            )
+            exc.failure_kind = "output_truncated" if reason == "length" else "incomplete_response"
+            exc.finish_reason = str(reason)[:80]
+            exc.model = str(response.get("model") or model)
+            raise exc
+        try:
+            text = _content_text(content)
+        except LocalRuntimeError as exc:
+            exc.usage = usage
+            exc.elapsed_seconds = elapsed
+            exc.finish_reason = reason
+            raise
+        try:
+            value = _parse_json_object(text)
+        except LocalRuntimeError as exc:
+            exc.usage = usage
+            exc.elapsed_seconds = elapsed
+            exc.failure_kind = "json_parse_error"
+            exc.finish_reason = reason
+            raise
         response_model = response.get("model")
         return CompletionResult(
             value=value,
             elapsed_seconds=elapsed,
             usage=usage,
             model=str(response_model or model),
+            finish_reason=reason,
         )
 
     def _request(

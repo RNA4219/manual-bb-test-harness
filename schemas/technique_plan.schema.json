@@ -1,0 +1,133 @@
+{
+  "type": "object",
+  "properties": {
+    "schema_version": {
+      "const": "1.1.0"
+    },
+    "feature_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "model_hash": {
+      "type": "string",
+      "minLength": 1
+    },
+    "generator_version": {
+      "type": "string",
+      "minLength": 1
+    },
+    "selections": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "technique": {
+            "$ref": "shared_defs.schema.json#/$defs/TechniqueRef"
+          },
+          "status": {
+            "enum": [
+              "selected",
+              "not_applicable",
+              "deferred",
+              "blocked_by_missing_information"
+            ]
+          },
+          "rationale": {
+            "type": "string",
+            "minLength": 1
+          },
+          "model_refs": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1
+            },
+            "minItems": 0
+          },
+          "risk_ids": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1
+            },
+            "minItems": 0
+          },
+          "observation_ids": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1
+            },
+            "minItems": 0
+          }
+        },
+        "required": [
+          "id",
+          "technique",
+          "status",
+          "rationale",
+          "model_refs",
+          "risk_ids",
+          "observation_ids"
+        ],
+        "additionalProperties": false
+      },
+      "minItems": 0
+    },
+    "obligation_sets": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "representation": {
+            "enum": [
+              "explicit"
+            ]
+          },
+          "obligations": {
+            "type": "array",
+            "items": {
+              "$ref": "shared_defs.schema.json#/$defs/CoverageObligation"
+            },
+            "minItems": 0
+          }
+        },
+        "required": [
+          "id",
+          "representation",
+          "obligations"
+        ],
+        "additionalProperties": false
+      },
+      "minItems": 0
+    },
+    "exit_models": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      },
+      "minItems": 0
+    }
+  },
+  "required": [
+    "feature_id",
+    "model_hash",
+    "generator_version",
+    "selections",
+    "obligation_sets",
+    "exit_models"
+  ],
+  "additionalProperties": false,
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/RNA4219/manual-bb-test-harness/schemas/technique_plan.schema.json",
+  "title": "technique_plan"
+}

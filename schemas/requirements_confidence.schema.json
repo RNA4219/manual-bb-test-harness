@@ -1,0 +1,500 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/RNA4219/manual-bb-test-harness/schemas/requirements_confidence.schema.json",
+  "title": "requirements_confidence",
+  "type": "object",
+  "properties": {
+    "schema_version": {
+      "const": "1.0.0"
+    },
+    "policy_version": {
+      "const": "requirements-confidence-1"
+    },
+    "feature_id": {
+      "type": "string",
+      "pattern": "\\S"
+    },
+    "input_sha256": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "score": {
+      "type": [
+        "number",
+        "null"
+      ],
+      "minimum": 0,
+      "maximum": 100
+    },
+    "band": {
+      "enum": [
+        "unknown",
+        "low",
+        "medium",
+        "high"
+      ]
+    },
+    "status": {
+      "enum": [
+        "insufficient_data",
+        "blocked",
+        "needs_confirmation",
+        "reviewed"
+      ]
+    },
+    "provisional": {
+      "type": "boolean"
+    },
+    "counts": {
+      "type": "object",
+      "properties": {
+        "requirements": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "raw_requirements": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "duplicate_requirements": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "reviewed_requirements": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "unreviewed_requirements": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "raw_findings": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "unique_findings": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "open_confirmations": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "resolved_confirmations": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "by_severity": {
+          "type": "object",
+          "properties": {
+            "critical": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "high": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "medium": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "low": {
+              "type": "integer",
+              "minimum": 0
+            }
+          },
+          "required": [
+            "critical",
+            "high",
+            "medium",
+            "low"
+          ],
+          "additionalProperties": false
+        },
+        "technical_risks": {
+          "type": "integer",
+          "minimum": 0
+        }
+      },
+      "required": [
+        "requirements",
+        "raw_requirements",
+        "duplicate_requirements",
+        "reviewed_requirements",
+        "unreviewed_requirements",
+        "raw_findings",
+        "unique_findings",
+        "open_confirmations",
+        "resolved_confirmations",
+        "by_severity",
+        "technical_risks"
+      ],
+      "additionalProperties": false
+    },
+    "metrics": {
+      "type": "object",
+      "properties": {
+        "review_coverage_percent": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "minimum": 0,
+          "maximum": 100
+        },
+        "open_items_per_requirement": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "minimum": 0
+        },
+        "uncertainty_weight": {
+          "type": "number",
+          "minimum": 0
+        },
+        "normalization_capacity": {
+          "type": "number",
+          "minimum": 0
+        },
+        "uncertainty_points": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "minimum": 0,
+          "maximum": 100
+        },
+        "review_points": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "minimum": 0,
+          "maximum": 100
+        },
+        "base_score": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "minimum": 0,
+          "maximum": 100
+        }
+      },
+      "required": [
+        "review_coverage_percent",
+        "open_items_per_requirement",
+        "uncertainty_weight",
+        "normalization_capacity",
+        "uncertainty_points",
+        "review_points",
+        "base_score"
+      ],
+      "additionalProperties": false
+    },
+    "score_caps": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "reason": {
+            "type": "string",
+            "pattern": "\\S"
+          },
+          "maximum": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 100
+          }
+        },
+        "required": [
+          "reason",
+          "maximum"
+        ],
+        "additionalProperties": false
+      }
+    },
+    "requirements": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "requirement_id": {
+            "type": "string",
+            "pattern": "\\S"
+          },
+          "text": {
+            "type": "string",
+            "pattern": "\\S"
+          },
+          "locations": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "pattern": "\\S"
+            },
+            "uniqueItems": true
+          },
+          "reviewed": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "requirement_id",
+          "text",
+          "locations",
+          "reviewed"
+        ],
+        "additionalProperties": false
+      }
+    },
+    "issues": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "issue_id": {
+            "type": "string",
+            "pattern": "\\S"
+          },
+          "ids": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "pattern": "\\S"
+            },
+            "uniqueItems": true
+          },
+          "kind": {
+            "type": "string",
+            "pattern": "\\S"
+          },
+          "severity": {
+            "enum": [
+              "critical",
+              "high",
+              "medium",
+              "low"
+            ]
+          },
+          "text": {
+            "type": "string",
+            "pattern": "\\S"
+          },
+          "requirement_ids": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "pattern": "\\S"
+            },
+            "uniqueItems": true
+          },
+          "source_refs": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "pattern": "\\S"
+            },
+            "uniqueItems": true
+          },
+          "locations": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "pattern": "\\S"
+            },
+            "uniqueItems": true
+          },
+          "owner": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "due": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "blocks_ready": {
+            "type": "boolean"
+          },
+          "status": {
+            "enum": [
+              "open",
+              "resolved"
+            ]
+          },
+          "resolution": {
+            "anyOf": [
+              {
+                "type": "null"
+              },
+              {
+                "type": "object",
+                "properties": {
+                  "issue_id": {
+                    "type": "string",
+                    "pattern": "\\S"
+                  },
+                  "decision": {
+                    "type": "string",
+                    "pattern": "\\S"
+                  },
+                  "source_refs": {
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "pattern": "\\S"
+                    },
+                    "uniqueItems": true
+                  }
+                },
+                "required": [
+                  "issue_id",
+                  "decision",
+                  "source_refs"
+                ],
+                "additionalProperties": false
+              }
+            ]
+          }
+        },
+        "required": [
+          "issue_id",
+          "ids",
+          "kind",
+          "severity",
+          "text",
+          "requirement_ids",
+          "source_refs",
+          "locations",
+          "owner",
+          "due",
+          "blocks_ready",
+          "status",
+          "resolution"
+        ],
+        "additionalProperties": false
+      }
+    },
+    "next_actions": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "priority": {
+            "enum": [
+              "critical",
+              "high",
+              "medium",
+              "low"
+            ]
+          },
+          "target_id": {
+            "type": "string",
+            "pattern": "\\S"
+          },
+          "text": {
+            "type": "string",
+            "pattern": "\\S"
+          },
+          "owner": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "due": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        },
+        "required": [
+          "priority",
+          "target_id",
+          "text",
+          "owner",
+          "due"
+        ],
+        "additionalProperties": false
+      }
+    },
+    "source_refs": {
+      "type": "array",
+      "items": {
+        "$ref": "shared_defs.schema.json#/$defs/SourceRef"
+      }
+    },
+    "review": {
+      "type": "object",
+      "properties": {
+        "reviewer": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "reviewed_at": {
+          "anyOf": [
+            {"type": "null"},
+            {"type": "string", "format": "date-time"}
+          ]
+        },
+        "requirements": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["requirement_id", "reviewed", "oracle", "source_refs"],
+            "properties": {
+              "requirement_id": {"type": "string", "pattern": "\\S"},
+              "reviewed": {"type": "boolean"},
+              "oracle": {"type": "string"},
+              "source_refs": {"type": "array", "items": {"type": "string", "pattern": "\\S"}}
+            },
+            "additionalProperties": false
+          }
+        }
+      },
+      "required": [
+        "reviewer",
+        "reviewed_at",
+        "requirements"
+      ],
+      "additionalProperties": false
+    },
+    "limitations": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "pattern": "\\S"
+      },
+      "uniqueItems": true
+    }
+  },
+  "required": [
+    "schema_version",
+    "policy_version",
+    "feature_id",
+    "input_sha256",
+    "score",
+    "band",
+    "status",
+    "provisional",
+    "counts",
+    "metrics",
+    "score_caps",
+    "requirements",
+    "issues",
+    "next_actions",
+    "source_refs",
+    "review",
+    "limitations"
+  ],
+  "additionalProperties": false
+}

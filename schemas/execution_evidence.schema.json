@@ -3,41 +3,218 @@
   "$id": "https://github.com/RNA4219/manual-bb-test-harness/schemas/execution_evidence.schema.json",
   "title": "ExecutionEvidence",
   "type": "object",
-  "required": ["run_id", "feature_id", "build_id", "timestamp", "result"],
+  "required": [
+    "run_id",
+    "feature_id",
+    "build_id",
+    "timestamp",
+    "result"
+  ],
   "oneOf": [
-    {"required": ["tc_id"], "not": {"required": ["charter_id"]}},
-    {"required": ["charter_id"], "not": {"required": ["tc_id"]}}
+    {
+      "required": [
+        "tc_id"
+      ],
+      "not": {
+        "required": [
+          "charter_id"
+        ]
+      }
+    },
+    {
+      "required": [
+        "charter_id"
+      ],
+      "not": {
+        "required": [
+          "tc_id"
+        ]
+      }
+    }
   ],
   "properties": {
-    "run_id": {"type": "string", "minLength": 1},
-    "tc_id": {"type": "string", "minLength": 1},
-    "charter_id": {"type": "string", "minLength": 1},
-    "feature_id": {"type": "string", "minLength": 1},
-    "build_id": {"type": "string", "minLength": 1},
-    "timestamp": {"type": "string", "format": "date-time"},
-    "env": {"type": "string"},
-    "device": {"type": "string"},
-    "network_profile": {"type": "string"},
-    "tester": {"type": "string"},
-    "oracle_type": {"enum": ["specified", "derived", "implicit", "human"]},
-    "oracle_refs": {"type": "array", "items": {"type": "string"}},
-    "expected": {"type": "array", "items": {"type": "string"}},
-    "actual": {"type": "array", "items": {"type": "string"}},
-    "result": {"enum": ["pass", "fail", "skip", "blocked", "unknown"]},
-    "attachments": {"type": "array", "items": {"type": "string"}},
-    "anomaly_notes": {"type": "array", "items": {"type": "string"}},
+    "run_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "tc_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "charter_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "feature_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "build_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "timestamp": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "env": {
+      "type": "string"
+    },
+    "device": {
+      "type": "string"
+    },
+    "network_profile": {
+      "type": "string"
+    },
+    "tester": {
+      "type": "string"
+    },
+    "oracle_type": {
+      "enum": [
+        "specified",
+        "derived",
+        "implicit",
+        "human"
+      ]
+    },
+    "oracle_refs": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "expected": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "actual": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "result": {
+      "enum": [
+        "pass",
+        "fail",
+        "skip",
+        "blocked",
+        "unknown"
+      ]
+    },
+    "attachments": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "anomaly_notes": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
     "defect_stub": {
       "type": "object",
-      "required": ["title", "severity", "status"],
+      "required": [
+        "title",
+        "severity",
+        "status"
+      ],
       "properties": {
-        "title": {"type": "string", "minLength": 1},
-        "severity": {"enum": ["blocker", "critical", "high", "medium", "low"]},
-        "status": {"enum": ["open", "resolved", "accepted"]}
+        "title": {
+          "type": "string",
+          "minLength": 1
+        },
+        "severity": {
+          "enum": [
+            "blocker",
+            "critical",
+            "high",
+            "medium",
+            "low"
+          ]
+        },
+        "status": {
+          "enum": [
+            "open",
+            "resolved",
+            "accepted"
+          ]
+        }
       },
       "additionalProperties": false
     },
-    "findings": {"type": "array", "items": {"type": "string"}},
-    "time_spent_minutes": {"type": "number", "minimum": 0}
+    "findings": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "time_spent_minutes": {
+      "type": "number",
+      "minimum": 0
+    },
+    "coverage_obligation_ids": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      },
+      "minItems": 0
+    },
+    "relation_evaluation": {
+      "$ref": "shared_defs.schema.json#/$defs/RelationEvaluation"
+    },
+    "session_log": {
+      "$ref": "shared_defs.schema.json#/$defs/SessionLog"
+    },
+    "model_ref": {
+      "type": "string",
+      "minLength": 1
+    },
+    "sample_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "observed_inputs": {
+      "type": "object",
+      "additionalProperties": {
+        "type": [
+          "string",
+          "number",
+          "boolean",
+          "null"
+        ]
+      }
+    },
+    "schema_version": {
+      "const": "1.1.0"
+    },
+    "migration": {
+      "$ref": "shared_defs.schema.json#/$defs/Migration"
+    },
+    "observed_outputs": {
+      "type": "object",
+      "additionalProperties": {
+        "type": [
+          "string",
+          "number",
+          "boolean",
+          "null"
+        ]
+      }
+    },
+    "case_revision": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "model_hash": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    }
   },
   "additionalProperties": false
 }

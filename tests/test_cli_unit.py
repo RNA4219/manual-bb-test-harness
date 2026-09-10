@@ -151,7 +151,11 @@ class TestMainFunction:
             model: str | None = None,
             timeout_seconds: float | None = None,
             allow_non_loopback: bool = False,
+            generation_mode: str = "compact",
+            token_budget: int | None = None,
         ) -> LocalRuntimeConfig:
+            assert generation_mode == "compact"
+            assert token_budget is None
             captured["resolve"] = {
                 "profile": profile,
                 "base_url": base_url,

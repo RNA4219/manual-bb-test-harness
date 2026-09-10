@@ -1,9 +1,23 @@
 # manual-bb-test-harness
 
+CIでは実pytest結果をHATEで正規化し、QEGで証跡のhash・実行対象・合否を検証します。全体85%・Gate90%のcoverage基準を維持します。[CI連携仕様](docs/specs/spec-08-hate-qeg-ci.md)を参照してください。
+
+要件定義の信頼度は`bb-harness evaluate requirements --input spec.md --output tmp/requirements`で評価できます。要確認件数・重大度・レビュー済み率から点数と次の確認事項を出し、LLM呼出は増やしません。[利用手順](skills/manual-bb-test-harness/references/requirements-confidence.md)を参照してください。
+
+Local Modeは必要な補完と差分レビューを行う`compact`が既定です。`--estimate-only`で通信せず見積もり、`--token-budget`で修復を含む1 runの予算を管理できます。新しいケースと実行証跡は版を照合します。[追加仕様](docs/specs/spec-05-efficient-generation-evidence-revisions.md)・[運用ガイド](skills/manual-bb-test-harness/references/efficient-generation.md)を参照してください。
+
+長い出力には`--generation-mode batched`で分割生成を利用できます。既存出力は上書きせず、設計に不足があれば`design_status`と終了コード2で明示します。[分割生成・完了判定の仕様](docs/specs/spec-06-bounded-generation-readiness.md)を参照してください。
+
 [![license: RNA-TPSAL-1.0](https://img.shields.io/badge/license-RNA--TPSAL--1.0-blue.svg)](LICENSE)
 [![source-available](https://img.shields.io/badge/source--available-yes-orange.svg)](LICENSE)
 
 手動ブラックボックステスト設計を、根拠付きartifactと決定的な品質Gateで支援する。
+
+## 技法別の被覆検証
+
+Domain、組み合わせ、状態経路、決定表、CRUD等を型付きモデルで表し、必要な入力点・条件・経路をケースへ対応させる。Local Modeは `technique_plan.json` と `coverage_report.json` を追加出力する。設計済み・実施済み・合格を分け、新指標はGateの参考値として報告する。
+
+既存JSONにも `bb-harness coverage` と非破壊の `bb-harness migrate` を利用できる。[手順・対応技法・制約](skills/manual-bb-test-harness/references/technique-coverage.md)、[実行可能なサンプル](examples/artifacts/techniques/discount-domain/README.md)、[調査の採用範囲](docs/research/istqb-extension-adoption.md) を参照。
 
 ## Local Mode
 
@@ -38,7 +52,7 @@ uv run bb-harness run local-design `
 
 Local Modeは本リポジトリに統合済みで、別リポジトリの導入は不要。設定、成果物、fail closed条件の詳細は [Local Mode guide](docs/local-model-guide.md) を参照。
 
-現行リリース系列: **3.0.0** / 検証済みテスト: **765件** / Workflow Cookbook: **33 nodes・45 edges・33 capsules** / 次回レビュー: **2026-10-11**
+現行リリース系列: **3.0.0** / テスト: **1026件** / Workflow Cookbook: **33 nodes・45 edges・33 capsules** / 次回レビュー: **2026-10-11**
 人間向け概要は [docs/human-readme.md](docs/human-readme.md) を参照。
 
 ## ライセンス
@@ -102,10 +116,10 @@ uv run ruff check .
 # Skill 構造検証
 uv run python .\scripts\quick-validate-skill.py .\skills\manual-bb-test-harness
 
-# Artifact 検証 (14 files)
+# Artifact 検証
 uv run python .\scripts\validate-artifact.py --all examples\artifacts --strict
 
-# Spec 検証 (4 specs)
+# Spec 検証
 uv run python .\scripts\validate-spec.py --all
 
 # Workflow Cookbook Tier チェック

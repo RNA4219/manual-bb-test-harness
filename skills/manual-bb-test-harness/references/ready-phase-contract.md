@@ -29,6 +29,8 @@
 
 ## Ready 判定
 
+要件の不確実性を点数・件数で評価する場合は[requirements-confidence.md](requirements-confidence.md)を使う。信頼度の点数は以下のReady判断を置き換えない。
+
 `readiness.status` は `ok / degraded / blocked` のいずれかにする。
 
 - `ok`: Phase 1 の対象ユーザー、成功条件、in/out、主要 oracle、未決事項の owner が揃っている。

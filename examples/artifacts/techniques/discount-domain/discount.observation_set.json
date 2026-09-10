@@ -1,0 +1,24 @@
+{
+  "feature_id": "DISCOUNT-01",
+  "observations": [
+    {
+      "id": "OBS-DATA-01",
+      "title": "割引後金額の境界で送料が切り替わる",
+      "view": "black",
+      "mandatory": true,
+      "techniques": [
+        "domain_testing"
+      ],
+      "model_refs": [
+        "DOMAIN-SHIPPING"
+      ],
+      "source_refs": [
+        {
+          "id": "AC-1",
+          "kind": "ac",
+          "excerpt": "割引後金額P-Dが10000円以上なら送料0円、未満なら500円。PとDは0以上の整数円。"
+        }
+      ]
+    }
+  ]
+}
