@@ -52,7 +52,7 @@ uv run bb-harness run local-design `
 
 Local Modeは本リポジトリに統合済みで、別リポジトリの導入は不要。設定、成果物、fail closed条件の詳細は [Local Mode guide](docs/local-model-guide.md) を参照。
 
-現行リリース系列: **3.0.0** / テスト: **1026件** / Workflow Cookbook: **33 nodes・45 edges・33 capsules** / 次回レビュー: **2026-10-11**
+現行リリース系列: **3.0.0** / 検証済みテスト: **1026件** / Workflow Cookbook: **33 nodes・45 edges・33 capsules** / 次回レビュー: **2026-10-11**
 人間向け概要は [docs/human-readme.md](docs/human-readme.md) を参照。
 
 ## ライセンス

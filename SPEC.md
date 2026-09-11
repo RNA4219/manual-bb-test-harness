@@ -1,6 +1,6 @@
 # SPEC: manual-bb-test-harness 改修仕様書
 
-現行契約: **3.0.0** / テスト: **1026件** / Workflow Cookbook: **33 nodes・45 edges・33 capsules** / 次回レビュー: **2026-10-11**
+現行契約: **3.0.0** / 検証済みテスト: **1026件** / Workflow Cookbook: **33 nodes・45 edges・33 capsules** / 次回レビュー: **2026-10-11**
 
 ## 概要
 
