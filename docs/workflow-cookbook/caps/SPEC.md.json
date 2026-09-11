@@ -2,7 +2,7 @@
   "id": "SPEC.md",
   "role": "specification",
   "title": "Specification",
-  "summary": "Implementation specification and feature history. Documents 8 features: F1 (spec ingest), F2 (regression graph), F3 (state diagram), F4 (TestRail/Xray export), F5 (phase contract), F6 (TestRail/Xray import), F7 (forward-test CLI), and F8 (Local Mode). Lists 21 quality improvements and validation phases. References CHANGELOG.md for detailed history. compact生成、予算・usage、証跡版の契約はefficient-generation.mdを参照。 batched生成・設計状態・比較再検証はspec-06とAC-20260910-batched.mdを参照。 要件定義信頼度・要確認集計・根拠付き再評価はrequirements-confidence.mdとspec-07を参照。",
+  "summary": "4.0.0の改修仕様と機能・検証履歴。F1〜F13を一覧化し、Local Mode、技法被覆、生成効率・証跡版、分割生成、要件定義信頼度、HATE・QEG CIの仕様と未達事項へ案内する。package・CLI・ドキュメントのversion同期、更新後のPRとmainのCI成功確認、v4.0.0タグ作成を定める。",
   "public_api": [],
   "deps_out": [
     "CHANGELOG.md",

@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+## [4.0.0] - 2026-09-11
+
+- artifact契約拡張をmajorとするrelease policyに従い、package・CLI・PowerShell validator・現行ドキュメントを4.0.0へ更新。
+- 要確認件数・重大度・密度・レビュー済み率による要件定義信頼度評価とJSON／Markdownレポートを追加。入力hashと解決根拠を照合し、LLM呼出なしで再評価できる。
+- compact生成を既定にし、通信しない見積もり、run単位のトークン予算、batched分割生成、出力上書き防止、設計状態、ケース・モデルと実行証跡の版照合を追加。
+- 実LLMによるトークン削減率の比較とbatched全段完走は未達。制約と実測結果はspec-05／06の検収記録に保存。
 - 実pytestの証跡を固定版HATEで正規化し、QEGのhash検証・実行対象照合・Gate判定へ渡すCIジョブを追加。全体85%・Gate90%を維持し、失敗時も証跡を保存する。CI範囲のgoと実LLM・手動受入・リリース承認を区別する。
 
 - Deep Researchの拡張要件から、型付き技法モデル、technique_plan、独立したcoverage_report、非破壊migrateコマンドを追加。追加artifact契約は1.1.0、既存入力は互換維持。
@@ -13,7 +19,9 @@
 - Qwen向けセルフレビュー、loopback既定、secret/raw promptを残さないrun manifest、70点台受入計画を追加。
 - Qwen3.6のthinking有効時にJSON contentが空になる実測結果を受け、qwen36 profileをthinking offへ固定し、段階生成とself-reviewで補強。
 
-## [3.0.0] - Unreleased
+## [3.0.0] - タグ未発行
+
+以下はmainへ反映済みの3.0.0準備履歴で、4.0.0にも含まれる。
 
 - ライセンスをRNA Third-Party Service Attribution License 1.0へ変更し、第三者向け有償サービス利用を顧客向け帰属表示付きで許可。
 - 帰属表示なしのホワイトラベル利用向けに、別途書面による商用ライセンス導線を追加。

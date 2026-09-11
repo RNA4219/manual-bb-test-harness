@@ -1,6 +1,6 @@
 # SPEC: manual-bb-test-harness 改修仕様書
 
-現行契約: **3.0.0** / 検証済みテスト: **1026件** / Workflow Cookbook: **33 nodes・45 edges・33 capsules** / 次回レビュー: **2026-10-11**
+現行契約: **4.0.0** / 検証済みテスト: **1026件** / Workflow Cookbook: **33 nodes・45 edges・33 capsules** / 次回レビュー: **2026-10-11**
 
 ## 概要
 
@@ -33,6 +33,7 @@
 | F10: 生成効率・証跡版 | 実装済み・実LLM比較は不成立（spec-05検収記録参照） | [spec-05](docs/specs/spec-05-efficient-generation-evidence-revisions.md)。重複送信削減、差分レビュー、予算・usage、case/model版照合、実LLM比較 |
 | F11: 分割生成・完了判定 | 実装済み・実LLMの全段完走は未達 | [spec-06](docs/specs/spec-06-bounded-generation-readiness.md)。batched、終了理由、出力保護、設計状態、比較の実ファイル再検証 |
 | F12: 要件定義信頼度 | 実装済み・運用policyによる評価 | [spec-07](docs/specs/spec-07-requirements-confidence.md)。要確認件数・重大度・密度・レビュー率、根拠付き解決、JSON／Markdown出力 |
+| F13: HATE・QEG CI | 実装済み・GitHub CI成功 | [spec-08](docs/specs/spec-08-hate-qeg-ci.md)。実pytest証跡の正規化、hash・実行対象・合否検証、失敗時もartifact保存 |
 
 ## F5: Ready Phase Contract
 
@@ -86,7 +87,9 @@
 
 ## Version
 
-3.0.0 - Keep a Changelog形式, Semantic Versioning準拠
+4.0.0 - Keep a Changelog形式、[release policy](docs/release-policy.md)に準拠。
+
+artifact契約の拡張を含むためmajorを更新する。追加artifactの契約versionは1.1.0を維持し、package、CLI、PowerShell validator、README、Workflow Cookbookの現行versionを4.0.0へ揃える。既存入力との互換性と、実LLM比較・batched全段完走の未達記録を保持する。更新後のPR CI成功を確認してmainへマージし、mainのCI成功コミットへv4.0.0タグを付ける。
 
 ## 分割生成・完了判定（2026-09-10）
 
