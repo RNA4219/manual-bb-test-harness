@@ -16,6 +16,7 @@ last_reviewed_at: 2026-05-16
 - Local: repo 内で Skill / schema / script を編集して検証する
 - CI: `.github/workflows/validate.yml` で repo 構造と Skill を検証する。`HATE and QEG evidence gate`では、同一run/attemptの実pytest結果から証跡を検証する。`ci-raw-evidence-*`と`hate-qeg-evidence-*`を失敗時も14日間保存する。QEGのgoはCI範囲だけに適用する。[仕様・ローカル実行手順](docs/specs/spec-08-hate-qeg-ci.md)を参照。
 - Consumer: Codex Skill として利用し、Markdown または JSON artifact を生成する
+- PyPI: `publish-pypi.yml`をmainから手動起動する。GitHub Releaseの既存配布物を検証して公開する。[公開仕様・初回設定](docs/release-policy.md#pypi公開仕様)を参照。
 
 ## Execute
 
