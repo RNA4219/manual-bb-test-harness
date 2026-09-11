@@ -1,0 +1,149 @@
+{
+  "feature_id": "MINIMAL-CANCEL",
+  "observations": [
+    {
+      "id": "OBS-STATE-01",
+      "title": "pending状態の注文取消し成功と在庫戻し",
+      "view": "black",
+      "mandatory": true,
+      "techniques": [
+        "state_transition_testing",
+        "decision_table_testing"
+      ],
+      "rationale": "AC-1およびBR-1に基づき、pending状態からの取消しは有効な遷移であり、在庫が戻されることを検証する必要がある。",
+      "source_refs": [
+        {
+          "id": "AC-1",
+          "kind": "ac",
+          "excerpt": "pending状態の注文は取消後にcancelledと表示される。"
+        },
+        {
+          "id": "BR-1",
+          "kind": "rule",
+          "excerpt": "pendingからcancelledへの取消成功時だけ在庫を注文数量分戻す。再取消で在庫を追加しない。"
+        }
+      ],
+      "confidence": "high",
+      "model_refs": [
+        "sm_order_cancel",
+        "dt_cancel_logic"
+      ],
+      "coverage_obligation_ids": [
+        "t_pending_to_cancelled",
+        "r1"
+      ]
+    },
+    {
+      "id": "OBS-STATE-02",
+      "title": "shipped状態の注文取消し不可と状態維持",
+      "view": "black",
+      "mandatory": true,
+      "techniques": [
+        "state_transition_testing",
+        "decision_table_testing"
+      ],
+      "rationale": "AC-2およびBR-1に基づき、shipped状態からの取消しは不正遷移であり、エラー表示され状態が維持されることを検証する必要がある。",
+      "source_refs": [
+        {
+          "id": "AC-2",
+          "kind": "ac",
+          "excerpt": "shipped状態の注文は取消不可と表示され、状態はshippedのまま維持される。"
+        },
+        {
+          "id": "BR-1",
+          "kind": "rule",
+          "excerpt": "pendingからcancelledへの取消成功時だけ在庫を注文数量分戻す。再取消で在庫を追加しない。"
+        }
+      ],
+      "confidence": "high",
+      "model_refs": [
+        "sm_order_cancel",
+        "dt_cancel_logic"
+      ],
+      "coverage_obligation_ids": [
+        "t_shipped_to_cancelled",
+        "r2"
+      ]
+    },
+    {
+      "id": "OBS-STATE-03",
+      "title": "cancelled状態の注文再取消しと冪等性",
+      "view": "black",
+      "mandatory": true,
+      "techniques": [
+        "state_transition_testing",
+        "decision_table_testing"
+      ],
+      "rationale": "AC-3およびBR-1に基づき、cancelled状態からの再取消しは状態変化せず、在庫も追加されない（冪等性）ことを検証する必要がある。",
+      "source_refs": [
+        {
+          "id": "AC-3",
+          "kind": "ac",
+          "excerpt": "cancelled状態の注文を再度取り消しても状態は変わらない。"
+        },
+        {
+          "id": "BR-1",
+          "kind": "rule",
+          "excerpt": "pendingからcancelledへの取消成功時だけ在庫を注文数量分戻す。再取消で在庫を追加しない。"
+        }
+      ],
+      "confidence": "high",
+      "model_refs": [
+        "sm_order_cancel",
+        "dt_cancel_logic"
+      ],
+      "coverage_obligation_ids": [
+        "t_cancelled_to_cancelled",
+        "r3"
+      ]
+    },
+    {
+      "id": "OBS-INTEG-04",
+      "title": "在庫サービスとの同期整合性",
+      "view": "gray",
+      "mandatory": true,
+      "techniques": [
+        "state_transition_testing",
+        "metamorphic_testing"
+      ],
+      "rationale": "BR-1およびip_inventory_syncに基づき、pending->cancelled遷移時のみ在庫サービスが更新され、他の遷移では更新されないことを検証する必要がある。",
+      "source_refs": [
+        {
+          "id": "BR-1",
+          "kind": "rule",
+          "excerpt": "pendingからcancelledへの取消成功時だけ在庫を注文数量分戻す。再取消で在庫を追加しない。"
+        }
+      ],
+      "confidence": "high",
+      "model_refs": [
+        "ip_inventory_sync"
+      ],
+      "coverage_obligation_ids": [
+        "ip_inventory_sync"
+      ]
+    }
+  ],
+  "schema_version": "1.1.0",
+  "migration": {
+    "status": "migrated",
+    "reason": "Initial generation from feature_spec"
+  },
+  "generation": {
+    "generation_run_id": "gen-minimal-cancel-001",
+    "prompt_template_id": "tpl-coverage-model-v1",
+    "prompt_template_version": "1.0.0",
+    "input_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+    "output_schema_id": "test_model.schema.json",
+    "model": {
+      "provider": "manual-bb",
+      "name": "worker",
+      "version": "1.0.0"
+    },
+    "parameters": {
+      "temperature": 0.1,
+      "seed": 42
+    },
+    "generated_at": "2023-10-27T10:00:00Z",
+    "review_status": "pending"
+  }
+}

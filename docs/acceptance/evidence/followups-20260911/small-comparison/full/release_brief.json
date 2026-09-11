@@ -1,0 +1,21 @@
+{
+  "feature_id": "MINIMAL-CANCEL",
+  "title": "注文取消の小規模比較仕様 Go/No-Go brief",
+  "decision": "no_go",
+  "summary": "実行証跡に基づくGate結果はno_go。手動実行証跡が未指定のためrelease判断はfail closed",
+  "evidence": [
+    "manual evidence: {'P0': {'pass': 0, 'fail': 0, 'skip': 0, 'blocked': 0, 'unknown': 0, 'untested': 4, 'total': 4}, 'P1': {'pass': 0, 'fail': 0, 'skip': 0, 'blocked': 0, 'unknown': 0, 'untested': 0, 'total': 0}, 'P2': {'pass': 0, 'fail': 0, 'skip': 0, 'blocked': 0, 'unknown': 0, 'untested': 1, 'total': 1}, 'P3': {'pass': 0, 'fail': 0, 'skip': 0, 'blocked': 0, 'unknown': 0, 'untested': 0, 'total': 0}}",
+    "mandatory observation rate: 0%"
+  ],
+  "residual_risks": [
+    "RISK-01",
+    "RISK-02",
+    "RISK-03",
+    "RISK-04",
+    "RISK-05"
+  ],
+  "required_follow_up": [
+    "bb-harness gateで実行証跡を再評価する"
+  ],
+  "generated_at": "2026-09-11T07:06:32.122123Z"
+}

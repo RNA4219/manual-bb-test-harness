@@ -56,8 +56,18 @@ action_checksの不足を順に確認した。リスクは観点単位で分割�
 
 11試行の報告済み消費は**274,428 local tokens**。通信失敗の未報告応答を含まない下限であり、
 会話側Codexの消費や外部APIの課金額ではない。各runの予算を増額せず、根拠のない反復は行わない。
-fullは76,095 tokens・665.413秒で全段生成したが、設計被覆0%かつ600秒条件超過により不合格。
-compactとの比較は実行中で、完了後に失敗も含む比較記録を保存する。
+同一入力・profile・モデル・共通設定のfull/compact比較は以下の結果となった。
+
+| モード | 結果 | 総tokens | 秒 |
+|---|---|---:|---:|
+| full | 全段生成したが設計被覆0%、600秒条件超過で不合格 | 76,095 | 665.413 |
+| compact | 手順・期待値の参照不整合と未検証の被覆主張で停止 | 62,184 | 551.473 |
+
+両方の品質条件が揃わないため`comparable=false`、`token_reduction_percent=null`、
+`expanded_benchmark_allowed=false`。成功・失敗を含む[比較記録とartifact](evidence/followups-20260911/small-comparison/comparison.json)を保存した。
+13試行全体の報告済み消費は**412,707 local tokens**。これ以上の試行や9-runへの拡大は行わない。
+残課題は、モデル生成直後の決定表参照の整合確認と、caseレビュー後の手順・期待値参照の維持、
+仕様に根拠がある期待値だけを記載すること。実LLM品質の受入を完了とはしない。
 
 生成結果を仕様と照合したところ、TC-003に仕様未確定のエラー表示の扱いが混ざり、在庫の
 観測手段にも追加確認が必要だった。構造評価94点は独立rubric採点ではなく、実務投入の合格点として
@@ -79,5 +89,7 @@ wheel/sdistの隔離インストールsmokeが成功した。
 全体**1096件成功**（107.99秒）、分岐を含むcoverage **88.37%**（閾値85%）。
 Gate専用107件・91.01%（閾値90%）も成功した。
 仕様書8件の検証とgit diff --checkも成功した。HATE/QEGを含むCIの結果は対象commitのrunで確認する。
+
+実装commit `832be8cb91480f88a96638c62a4bcf928296e637`の[PR CI](https://github.com/RNA4219/manual-bb-test-harness/actions/runs/34573025265)は9ジョブ全て成功した。実測証跡の追記後も最終commitのCIを確認してから統合する。
 
 hash付きartifactを保存する今回の証跡には`.gitattributes`で改行変換の除外を指定し、OS間でバイト列を保持する。

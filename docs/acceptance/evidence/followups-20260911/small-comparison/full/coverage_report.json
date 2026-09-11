@@ -1,0 +1,62 @@
+{
+  "schema_version": "1.1.0",
+  "id": "COVREPORT-29b85a8c03aa6e857e98",
+  "feature_id": "MINIMAL-CANCEL",
+  "build_id": "local-design-unexecuted",
+  "model_hash": "b0a01f0443f45a6f37d409ca42d3bbc0046cd44ebe289f92830b6d08edeac033",
+  "case_hash": "95baacf4088e824bfdb2acee384ace86143838496a25d36fcac5562a003ffc87",
+  "evidence_binding_mode": "case_revision",
+  "plan_hash": "98826e4d57ffffb5777115cd9a01016c5aa20eead1cccc0602ad9ceee8aa2ecc",
+  "mode": "shadow",
+  "design": {
+    "required_feasible": 3,
+    "covered_by_cases": 0,
+    "rate": 0.0,
+    "uncovered_ids": [
+      "COV-order_lifecycle-34cc632be6a147444f43",
+      "COV-order_lifecycle-54712f9aa8323f86da95",
+      "COV-order_lifecycle-6e35546be3e42f1c02c5"
+    ]
+  },
+  "execution": {
+    "required_feasible": 3,
+    "executed": 0,
+    "passed": 0,
+    "rate": 0.0,
+    "unexecuted_ids": [
+      "COV-order_lifecycle-34cc632be6a147444f43",
+      "COV-order_lifecycle-54712f9aa8323f86da95",
+      "COV-order_lifecycle-6e35546be3e42f1c02c5"
+    ]
+  },
+  "results": [
+    {
+      "id": "COV-order_lifecycle-6e35546be3e42f1c02c5",
+      "design": "uncovered",
+      "case_ids": [],
+      "executed": false,
+      "passed": false
+    },
+    {
+      "id": "COV-order_lifecycle-54712f9aa8323f86da95",
+      "design": "uncovered",
+      "case_ids": [],
+      "executed": false,
+      "passed": false
+    },
+    {
+      "id": "COV-order_lifecycle-34cc632be6a147444f43",
+      "design": "uncovered",
+      "case_ids": [],
+      "executed": false,
+      "passed": false
+    }
+  ],
+  "unknown_ids": [],
+  "infeasible_ids": [],
+  "errors": [],
+  "exit_criteria": [],
+  "blocked_selections": [
+    "TECH-cancel_decision"
+  ]
+}
