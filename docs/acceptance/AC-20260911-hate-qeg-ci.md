@@ -17,7 +17,9 @@
 
 ## CI確認
 
-GitHub Actionsでの確認はpush承認待ち。自動承認レビューが、既存改修を含む153ファイルの外部送信について明示承認がないことを理由にpushを拒否したため、リモートには未反映。全体85%・Gate90%、既存のPython matrix／integration／PowerShell／package smokeを保持し、新しいHATE/QEGジョブも成功を必須とする。
+[PR #13](https://github.com/RNA4219/manual-bb-test-harness/pull/13)で検証中。全体85%・Gate90%、既存のPython matrix／integration／PowerShell／package smokeを保持し、新しいHATE/QEGジョブも成功を必須とする。
+
+初回[run 34548238938](https://github.com/RNA4219/manual-bb-test-harness/actions/runs/34548238938)は既存8ジョブが成功したが、QEGがLinuxでskipされたCRLFテスト1件をDQ-05として拒否した。CRLF入力の検証はOS固有APIを使わないため、全OSで実行するよう変更し、必要ファイルのあるSkill入力と終了コード・成功出力のassertionを追加した。QEGのskip拒否は維持。修正後のローカル関連69件は成功。
 
 原本は`ci-raw-evidence-<attempt>`、HATE・QEG出力は`hate-qeg-evidence-<attempt>`として、失敗時も14日間保存する。
 

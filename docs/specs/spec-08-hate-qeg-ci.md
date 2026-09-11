@@ -47,6 +47,8 @@ captureはpytestの終了コード、convertは正常0・入力不正/HATE失敗
 
 元ファイルの欠落・改変、run/attempt/コミット不一致、空または重複identity、HATEのstatus変更、未知version、pytest非0、coverage 85%の境界、skip、出力先の再利用を検証する。正常fixtureだけでなく、実pytest出力を両consumerへ通す。
 
+CRLF形式のSkillを読むPowerShellテストは、Windows・Linuxの両方で実行する。必要ファイルを持つ一時Skillを入力にし、実際のvalidator終了コード0と成功出力を確認する。改行形式の検証をOS名だけでskipせず、QEGの未実行拒否も維持する。
+
 ## 受入基準
 
 以下は受入基準の定義確認であり、実行完了の記録ではない。実行結果は検収記録と対象コミットのGitHub Actions runで確認する。
