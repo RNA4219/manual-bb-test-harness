@@ -2,12 +2,14 @@
   "id": "BLUEPRINT.md",
   "role": "specification",
   "title": "Blueprint",
-  "summary": "Defines the manual black-box artifact chain and the optional Local Mode boundary. The local LLM generates typed coverage, observations, risk factors, and cases while host code owns validation, arithmetic, lint, effort, and Gate. Documents loopback, one-repair, manifest, and no automatic cloud failover constraints.",
+  "summary": "Defines the manual black-box artifact chain and the optional Local Mode boundary. The local LLM generates typed coverage, observations, risk factors, and cases while host code owns validation, arithmetic, lint, effort, and Gate. Documents loopback, one-repair, manifest, and no automatic cloud failover constraints. compact生成、予算・usage、証跡版の契約はefficient-generation.mdを参照。 batched生成・設計状態・比較再検証はspec-06とAC-20260910-batched.mdを参照。 要件定義信頼度・要確認集計・根拠付き再評価はrequirements-confidence.mdとspec-07を参照。",
   "public_api": [],
   "deps_out": [
     "skills/manual-bb-test-harness/references/artifact-contract.md",
     "schemas/",
-    "goldens/"
+    "goldens/",
+    "skills/manual-bb-test-harness/references/efficient-generation.md",
+    "skills/manual-bb-test-harness/references/requirements-confidence.md"
   ],
   "deps_in": [
     "HUB.codex.md",
@@ -15,5 +17,5 @@
   ],
   "risks": [],
   "tests": [],
-  "last_verified": "2026-07-21"
+  "last_verified": "2026-09-11"
 }

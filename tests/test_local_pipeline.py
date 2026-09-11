@@ -174,6 +174,7 @@ def test_pipeline_writes_valid_artifacts_and_no_go_without_evidence(tmp_path: Pa
     output = tmp_path / "out"
     _feature_input(input_path)
     config = LocalRuntimeConfig(
+        generation_mode="full",
         profile="qwen36",
         base_url="http://127.0.0.1:8084/v1",
         model="fake-local-model",
@@ -214,6 +215,7 @@ def test_one_repair_is_recorded(tmp_path: Path) -> None:
     invalid = dict(responses[0], data_partitions=[])
     responses.insert(0, invalid)
     config = LocalRuntimeConfig(
+        generation_mode="full",
         profile="generic",
         base_url="http://127.0.0.1:8080/v1",
         model="fake-local-model",
@@ -252,6 +254,7 @@ def test_second_invalid_artifact_fails_and_records_diagnostic(tmp_path: Path) ->
     invalid = dict(_responses()[0], data_partitions=[])
     client = FakeClient([invalid, copy.deepcopy(invalid)])
     config = LocalRuntimeConfig(
+        generation_mode="full",
         profile="generic",
         base_url="http://127.0.0.1:8080/v1",
         model="fake-local-model",
@@ -320,6 +323,7 @@ def test_noncanonical_output_is_not_auto_corrected_and_stops_after_one_repair(
         raise AssertionError(f"unknown invalid kind: {invalid_kind}")
     responses = responses[:target_index] + [invalid, copy.deepcopy(invalid)]
     config = LocalRuntimeConfig(
+        generation_mode="full",
         profile="generic",
         base_url="http://127.0.0.1:8080/v1",
         model="fake-local-model",
@@ -354,6 +358,7 @@ def test_runtime_failure_writes_valid_failed_manifest(tmp_path: Path) -> None:
     output = tmp_path / "out"
     _feature_input(input_path)
     config = LocalRuntimeConfig(
+        generation_mode="full",
         profile="generic",
         base_url="http://127.0.0.1:8080/v1",
         model=None,
@@ -381,6 +386,7 @@ def test_lint_detects_oracle_trace_state_and_ownership_gaps(tmp_path: Path) -> N
     output = tmp_path / "out"
     _feature_input(input_path)
     config = LocalRuntimeConfig(
+        generation_mode="full",
         profile="generic",
         base_url="http://127.0.0.1:8080/v1",
         model="fake-local-model",
@@ -428,6 +434,7 @@ def test_execution_evidence_uses_existing_gate_engine(tmp_path: Path) -> None:
     evidence_dir.mkdir()
     _feature_input(input_path)
     config = LocalRuntimeConfig(
+        generation_mode="full",
         profile="generic",
         base_url="http://127.0.0.1:8080/v1",
         model="fake-local-model",
@@ -446,6 +453,12 @@ def test_execution_evidence_uses_existing_gate_engine(tmp_path: Path) -> None:
             id_field: item_id,
             "feature_id": cases["feature_id"],
             "build_id": "build-evidence-1",
+            "model_hash": cases["evidence_binding"]["model_hash"],
+            "case_revision": next(
+                item["case_revision"]
+                for item in cases["manual_cases"] + cases.get("exploratory_charters", [])
+                if (item.get("tc_id") or item.get("id")) == item_id
+            ),
             "timestamp": "2026-07-20T00:00:00Z",
             "result": "pass",
         }
@@ -474,7 +487,8 @@ def test_linker_preserves_optional_observation_trace() -> None:
         "exploratory_charters": [],
     }
     _link_risks_and_cases(risks, cases)
-    assert cases["manual_cases"][0]["trace_to"] == ["OBS-OPTIONAL-02", "RISK-01"]
+    assert cases["manual_cases"][0]["trace_to"] == ["OBS-OPTIONAL-02"]
+    assert risks["risks"][0]["trace_to"] == ["OBS-MANDATORY-01"]
 
 
 def test_lint_detects_missing_race_coverage(tmp_path: Path) -> None:
@@ -482,6 +496,7 @@ def test_lint_detects_missing_race_coverage(tmp_path: Path) -> None:
     output = tmp_path / "out"
     _feature_input(input_path)
     config = LocalRuntimeConfig(
+        generation_mode="full",
         profile="generic",
         base_url="http://127.0.0.1:8080/v1",
         model="fake-local-model",

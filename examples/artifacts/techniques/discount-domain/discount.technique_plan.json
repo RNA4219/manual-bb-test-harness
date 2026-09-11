@@ -1,0 +1,153 @@
+{
+  "schema_version": "1.1.0",
+  "feature_id": "DISCOUNT-01",
+  "model_hash": "318d0e7a17cc30958cdb52f863989d4320add284a852f027861a9f3b5041ce83",
+  "generator_version": "finite-coverage-1",
+  "selections": [
+    {
+      "id": "TECH-DOMAIN-SHIPPING",
+      "technique": {
+        "key": "domain_testing",
+        "standard": "ISTQB CTAL-TA v4.0",
+        "reference": "TA-3.1.1",
+        "criterion": "reliable_domain"
+      },
+      "status": "selected",
+      "rationale": "割引後金額の境界で送料が変わるため、割引を固定して境界と内外を確認する",
+      "model_refs": [
+        "DOMAIN-SHIPPING"
+      ],
+      "risk_ids": [
+        "RISK-01"
+      ],
+      "observation_ids": [
+        "OBS-DATA-01"
+      ]
+    }
+  ],
+  "obligation_sets": [
+    {
+      "id": "COVSET-DOMAIN-SHIPPING",
+      "representation": "explicit",
+      "obligations": [
+        {
+          "id": "COV-DOMAIN-SHIPPING-43b7661297b1271a8b43",
+          "technique_key": "domain_testing",
+          "model_ref": "DOMAIN-SHIPPING",
+          "criterion": "reliable_domain",
+          "selector": {
+            "border_id": "BORDER-10000",
+            "point_role": "ON",
+            "data": {
+              "P": 12000,
+              "D": 2000
+            }
+          },
+          "required": true,
+          "feasibility": "feasible",
+          "observation_ids": [
+            "OBS-DATA-01"
+          ],
+          "risk_ids": [
+            "RISK-01"
+          ],
+          "source_refs": [
+            {
+              "id": "AC-1",
+              "kind": "ac",
+              "excerpt": "割引後金額P-Dが10000円以上なら送料0円、未満なら500円。PとDは0以上の整数円。"
+            }
+          ]
+        },
+        {
+          "id": "COV-DOMAIN-SHIPPING-6f6d0d1981beaa3b9f3a",
+          "technique_key": "domain_testing",
+          "model_ref": "DOMAIN-SHIPPING",
+          "criterion": "reliable_domain",
+          "selector": {
+            "border_id": "BORDER-10000",
+            "point_role": "OFF",
+            "data": {
+              "P": 11999,
+              "D": 2000
+            }
+          },
+          "required": true,
+          "feasibility": "feasible",
+          "observation_ids": [
+            "OBS-DATA-01"
+          ],
+          "risk_ids": [
+            "RISK-01"
+          ],
+          "source_refs": [
+            {
+              "id": "AC-1",
+              "kind": "ac",
+              "excerpt": "割引後金額P-Dが10000円以上なら送料0円、未満なら500円。PとDは0以上の整数円。"
+            }
+          ]
+        },
+        {
+          "id": "COV-DOMAIN-SHIPPING-d18403dc92aec569fe95",
+          "technique_key": "domain_testing",
+          "model_ref": "DOMAIN-SHIPPING",
+          "criterion": "reliable_domain",
+          "selector": {
+            "border_id": "BORDER-10000",
+            "point_role": "IN",
+            "data": {
+              "P": 12002,
+              "D": 2000
+            }
+          },
+          "required": true,
+          "feasibility": "feasible",
+          "observation_ids": [
+            "OBS-DATA-01"
+          ],
+          "risk_ids": [
+            "RISK-01"
+          ],
+          "source_refs": [
+            {
+              "id": "AC-1",
+              "kind": "ac",
+              "excerpt": "割引後金額P-Dが10000円以上なら送料0円、未満なら500円。PとDは0以上の整数円。"
+            }
+          ]
+        },
+        {
+          "id": "COV-DOMAIN-SHIPPING-8bb2dfcd7580f6a853cb",
+          "technique_key": "domain_testing",
+          "model_ref": "DOMAIN-SHIPPING",
+          "criterion": "reliable_domain",
+          "selector": {
+            "border_id": "BORDER-10000",
+            "point_role": "OUT",
+            "data": {
+              "P": 11997,
+              "D": 2000
+            }
+          },
+          "required": true,
+          "feasibility": "feasible",
+          "observation_ids": [
+            "OBS-DATA-01"
+          ],
+          "risk_ids": [
+            "RISK-01"
+          ],
+          "source_refs": [
+            {
+              "id": "AC-1",
+              "kind": "ac",
+              "excerpt": "割引後金額P-Dが10000円以上なら送料0円、未満なら500円。PとDは0以上の整数円。"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "exit_models": []
+}

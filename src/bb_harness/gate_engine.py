@@ -66,6 +66,11 @@ def load_evidence_files(path: Path) -> list[dict[str, Any]]:
     evidence = []
     for candidate in sorted(path.rglob("*.json")):
         value = load_json(candidate)
+        if {"run_id", "stages", "artifacts"} <= value.keys() and not (
+            {"result", "tc_id", "charter_id"} & value.keys()
+        ):
+            validate_schema(value, "local_run_manifest.schema.json")
+            continue
         if {"run_id", "result", "tc_id", "charter_id"} & value.keys():
             value["_source_path"] = str(candidate)
             evidence.append(value)
@@ -180,10 +185,7 @@ def extract_open_defects(evidence: list[dict[str, Any]]) -> list[dict[str, Any]]
     defects = []
     for item in evidence:
         defect = item.get("defect_stub")
-        if (
-            isinstance(defect, dict)
-            and defect.get("status", "open") == "open"
-        ):
+        if isinstance(defect, dict) and defect.get("status", "open") == "open":
             defects.append(
                 {
                     "tc_id": item.get("tc_id", item.get("charter_id", "")),
@@ -379,8 +381,7 @@ def derive_waivable_conditions(
     conditions: dict[str, set[str]] = {}
     hard_failures: list[str] = []
     priorities = {
-        str(risk.get("id")): str(risk.get("priority"))
-        for risk in risk_register.get("risks", [])
+        str(risk.get("id")): str(risk.get("priority")) for risk in risk_register.get("risks", [])
     }
 
     if p1_rate < limits["p1_pass"]:
@@ -389,13 +390,15 @@ def derive_waivable_conditions(
             for case_id, result in results.items()
             if result.get("priority") == "P1" and result.get("result") != "pass"
         ]
-        risk_ids = set().union(
-            *(risk_ids_for_case(case_id, results, risk_register) for case_id in failed_cases)
-        ) if failed_cases else set()
+        risk_ids = (
+            set().union(
+                *(risk_ids_for_case(case_id, results, risk_register) for case_id in failed_cases)
+            )
+            if failed_cases
+            else set()
+        )
         if risk_ids:
-            conditions[
-                f"P1 pass rate {p1_rate:.1f}% < {limits['p1_pass']}%"
-            ] = risk_ids
+            conditions[f"P1 pass rate {p1_rate:.1f}% < {limits['p1_pass']}%"] = risk_ids
         else:
             hard_failures.append("P1 failure has no traceable risk for a waiver")
 
@@ -409,9 +412,13 @@ def derive_waivable_conditions(
                 for case_id, result in results.items()
                 if observation_id in {str(ref) for ref in result.get("trace_to", [])}
             ]
-            observation_risks = set().union(
-                *(risk_ids_for_case(case_id, results, risk_register) for case_id in case_ids)
-            ) if case_ids else set()
+            observation_risks = (
+                set().union(
+                    *(risk_ids_for_case(case_id, results, risk_register) for case_id in case_ids)
+                )
+                if case_ids
+                else set()
+            )
             if observation_risks:
                 risk_ids.update(observation_risks)
             else:
@@ -426,15 +433,11 @@ def derive_waivable_conditions(
                 f"< {limits['high_risk_obs']}%"
             ] = risk_ids
 
-    p0_blocking = [
-        risk_id for risk_id in blocking_risks if priorities.get(risk_id) == "P0"
-    ]
+    p0_blocking = [risk_id for risk_id in blocking_risks if priorities.get(risk_id) == "P0"]
     if p0_blocking:
         hard_failures.append("P0 blocking risks unresolved: " + ", ".join(p0_blocking))
 
-    p1_blocking = {
-        risk_id for risk_id in blocking_risks if priorities.get(risk_id) == "P1"
-    }
+    p1_blocking = {risk_id for risk_id in blocking_risks if priorities.get(risk_id) == "P1"}
     unknown_blocking = {
         risk_id for risk_id in blocking_risks if priorities.get(risk_id) not in ("P0", "P1")
     }
@@ -461,9 +464,7 @@ def applied_waivers(
         for waiver in waivers
         if required_risk_ids & {str(risk) for risk in waiver["risk_ids"]}
     ]
-    covered = {
-        str(risk) for waiver in applied for risk in waiver["risk_ids"]
-    } & required_risk_ids
+    covered = {str(risk) for waiver in applied for risk in waiver["risk_ids"]} & required_risk_ids
     return applied, covered
 
 
@@ -639,6 +640,7 @@ def create_parser() -> argparse.ArgumentParser:
     parser.add_argument("--observations", type=Path)
     parser.add_argument("--automation", type=Path)
     parser.add_argument("--waivers", type=Path)
+    parser.add_argument("--coverage-report", type=Path, help="参考値として追加する被覆レポート")
     parser.add_argument("--build-id")
     parser.add_argument("--input", type=Path)
     parser.add_argument("--output", type=Path, required=True)
@@ -669,9 +671,12 @@ def main(argv: list[str] | None = None) -> int:
         if cases_path is None or not cases_path.exists():
             raise GateInputError("Manual case set file required")
 
+        from bb_harness.evidence_revisions import verify_case_set, verify_execution_revision
+
         risks, cases = load_json(risk_path), load_json(cases_path)
         validate_schema(risks, "risk_register.schema.json")
         validate_schema(cases, "manual_case_set.schema.json")
+        binding_mode = verify_case_set(cases)
         feature_id = str(cases.get("feature_id") or risks.get("feature_id") or "")
         if not feature_id or risks.get("feature_id") != feature_id:
             raise GateInputError("risk/case feature_id mismatch")
@@ -709,9 +714,9 @@ def main(argv: list[str] | None = None) -> int:
                 {key: value for key, value in item.items() if key != "_source_path"},
                 "execution_evidence.schema.json",
             )
-        evidence, build_id = validate_and_select_evidence(
-            raw_evidence, feature_id, args.build_id
-        )
+        evidence, build_id = validate_and_select_evidence(raw_evidence, feature_id, args.build_id)
+        for item in evidence:
+            verify_execution_revision(item, cases)
         results = extract_case_results(evidence, cases)
         counts = count_results_by_priority(results)
         defects = extract_open_defects(evidence)
@@ -742,11 +747,30 @@ def main(argv: list[str] | None = None) -> int:
             defects,
             build_id=build_id,
             evidence_summary={
+                "evidence_binding_mode": binding_mode,
                 "manual_by_priority": counts,
                 "mandatory_observation_rate": obs_rate,
             },
             unmet_conditions=unmet,
         )
+        coverage_path = args.coverage_report
+        if coverage_path is None and directory is not None:
+            coverage_path = artifact_for_feature(directory, ("*coverage_report*.json",), feature_id)
+        if coverage_path is not None:
+            from bb_harness.coverage_engine import coverage_summary
+            from bb_harness.techniques.common import digest
+
+            coverage = load_json(coverage_path)
+            if (
+                binding_mode == "case_revision"
+                and coverage.get("model_hash") != cases["evidence_binding"]["model_hash"]
+            ):
+                raise GateInputError("coverage report model hash mismatch")
+            if coverage.get("case_hash") != digest(cases):
+                raise GateInputError("coverage report case hash mismatch")
+            gate["evidence_summary"].update(
+                coverage_summary(coverage, feature_id=feature_id, build_id=build_id)
+            )
         validate_schema(gate, "gate_decision.schema.json")
         args.output.parent.mkdir(parents=True, exist_ok=True)
         args.output.write_text(json.dumps(gate, indent=2, ensure_ascii=False), encoding="utf-8")

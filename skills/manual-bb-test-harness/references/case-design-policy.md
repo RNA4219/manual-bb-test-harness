@@ -71,12 +71,14 @@ Use these data layers.
 |---|---|
 | `canonical_valid` | 標準的に成功するデータ |
 | `invalid_single_fault` | 1 要因だけ壊したデータ |
-| `boundary3` | min-1, min, min+1 / max-1, max, max+1 |
+| `boundary3` | min-step, min, min+step / max-step, max, max+step。stepは仕様の精度・入力刻みを使う |
 | `rule_combo` | business rule の重要組合せ |
 | `state_seed` | lifecycle の初期状態 |
 | `history_seed` | 過去注文、期限切れ、既使用、再実行など履歴依存 |
 
-For multiple data dimensions, start with pairwise. Promote high-risk pairs to full combination only when the risk rationale is explicit.
+複数次元では選択理由を残してbase-choice、pairwise、n-wise、全組み合わせを選ぶ。実行可能な完全割当から制約を満たすtupleを列挙し、ケース数だけでpairwise達成と判断しない。
+
+形式的な被覆を報告する場合は [technique-coverage.md](technique-coverage.md) を適用する。DomainのON/OFFとIN/OUT、状態の単独遷移とn-switch、決定表の元ルールを統合後も保持する。タイトル、共通観点、ケース数の帳尻合わせでriskを接続しない。
 
 ## Case Quality Bar
 

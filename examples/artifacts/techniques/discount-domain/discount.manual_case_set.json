@@ -1,0 +1,225 @@
+{
+  "feature_id": "DISCOUNT-01",
+  "manual_cases": [
+    {
+      "tc_id": "TC-001",
+      "title": "割引後金額の送料判定",
+      "priority": "P1",
+      "primary_view": "black",
+      "techniques": [
+        "domain_testing"
+      ],
+      "preconditions": [
+        "送料確認画面を開く"
+      ],
+      "steps": [
+        "注文金額P=12000円、割引D=2000円を入力し計算する"
+      ],
+      "expected_results": [
+        "送料0円と表示される"
+      ],
+      "oracle": {
+        "type": "specified",
+        "refs": [
+          "AC-1"
+        ]
+      },
+      "source_ref": {
+        "type": "acceptance",
+        "refs": [
+          "AC-1"
+        ]
+      },
+      "trace_to": [
+        "OBS-DATA-01",
+        "RISK-01"
+      ],
+      "estimate_minutes": 3,
+      "coverage_obligation_ids": [
+        "COV-DOMAIN-SHIPPING-43b7661297b1271a8b43"
+      ],
+      "coverage_inputs": [
+        {
+          "model_ref": "DOMAIN-SHIPPING",
+          "data": {
+            "P": 12000,
+            "D": 2000
+          },
+          "step_refs": [
+            1
+          ],
+          "expected_result_refs": [
+            1
+          ]
+        }
+      ],
+      "case_revision": "5d88868fbcae7da4f7e3cd5a66a82dbe57779de25e5a885a3f0dbb071f636e91"
+    },
+    {
+      "tc_id": "TC-002",
+      "title": "割引後金額の送料判定",
+      "priority": "P1",
+      "primary_view": "black",
+      "techniques": [
+        "domain_testing"
+      ],
+      "preconditions": [
+        "送料確認画面を開く"
+      ],
+      "steps": [
+        "注文金額P=11999円、割引D=2000円を入力し計算する"
+      ],
+      "expected_results": [
+        "送料500円と表示される"
+      ],
+      "oracle": {
+        "type": "specified",
+        "refs": [
+          "AC-1"
+        ]
+      },
+      "source_ref": {
+        "type": "acceptance",
+        "refs": [
+          "AC-1"
+        ]
+      },
+      "trace_to": [
+        "OBS-DATA-01",
+        "RISK-01"
+      ],
+      "estimate_minutes": 3,
+      "coverage_obligation_ids": [
+        "COV-DOMAIN-SHIPPING-6f6d0d1981beaa3b9f3a"
+      ],
+      "coverage_inputs": [
+        {
+          "model_ref": "DOMAIN-SHIPPING",
+          "data": {
+            "P": 11999,
+            "D": 2000
+          },
+          "step_refs": [
+            1
+          ],
+          "expected_result_refs": [
+            1
+          ]
+        }
+      ],
+      "case_revision": "87066132dd647141c8c310cfb5a3e82e3bb87b965b81d196757461f789963fea"
+    },
+    {
+      "tc_id": "TC-003",
+      "title": "割引後金額の送料判定",
+      "priority": "P1",
+      "primary_view": "black",
+      "techniques": [
+        "domain_testing"
+      ],
+      "preconditions": [
+        "送料確認画面を開く"
+      ],
+      "steps": [
+        "注文金額P=12002円、割引D=2000円を入力し計算する"
+      ],
+      "expected_results": [
+        "送料0円と表示される"
+      ],
+      "oracle": {
+        "type": "specified",
+        "refs": [
+          "AC-1"
+        ]
+      },
+      "source_ref": {
+        "type": "acceptance",
+        "refs": [
+          "AC-1"
+        ]
+      },
+      "trace_to": [
+        "OBS-DATA-01",
+        "RISK-01"
+      ],
+      "estimate_minutes": 3,
+      "coverage_obligation_ids": [
+        "COV-DOMAIN-SHIPPING-d18403dc92aec569fe95"
+      ],
+      "coverage_inputs": [
+        {
+          "model_ref": "DOMAIN-SHIPPING",
+          "data": {
+            "P": 12002,
+            "D": 2000
+          },
+          "step_refs": [
+            1
+          ],
+          "expected_result_refs": [
+            1
+          ]
+        }
+      ],
+      "case_revision": "a56e86eb77bacc8cc592d856741f75435b7ceae511f8e735a5ed32aeacc43a2c"
+    },
+    {
+      "tc_id": "TC-004",
+      "title": "割引後金額の送料判定",
+      "priority": "P1",
+      "primary_view": "black",
+      "techniques": [
+        "domain_testing"
+      ],
+      "preconditions": [
+        "送料確認画面を開く"
+      ],
+      "steps": [
+        "注文金額P=11997円、割引D=2000円を入力し計算する"
+      ],
+      "expected_results": [
+        "送料500円と表示される"
+      ],
+      "oracle": {
+        "type": "specified",
+        "refs": [
+          "AC-1"
+        ]
+      },
+      "source_ref": {
+        "type": "acceptance",
+        "refs": [
+          "AC-1"
+        ]
+      },
+      "trace_to": [
+        "OBS-DATA-01",
+        "RISK-01"
+      ],
+      "estimate_minutes": 3,
+      "coverage_obligation_ids": [
+        "COV-DOMAIN-SHIPPING-8bb2dfcd7580f6a853cb"
+      ],
+      "coverage_inputs": [
+        {
+          "model_ref": "DOMAIN-SHIPPING",
+          "data": {
+            "P": 11997,
+            "D": 2000
+          },
+          "step_refs": [
+            1
+          ],
+          "expected_result_refs": [
+            1
+          ]
+        }
+      ],
+      "case_revision": "9f87f9425e50b711d03fe96b9002e4e43617dc5e5893f96d7bfd319319da772e"
+    }
+  ],
+  "evidence_binding": {
+    "mode": "case_revision",
+    "model_hash": "318d0e7a17cc30958cdb52f863989d4320add284a852f027861a9f3b5041ce83"
+  }
+}

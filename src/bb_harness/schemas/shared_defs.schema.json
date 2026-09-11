@@ -6,7 +6,10 @@
   "$defs": {
     "SourceRef": {
       "type": "object",
-      "required": ["id", "kind"],
+      "required": [
+        "id",
+        "kind"
+      ],
       "description": "Reference to a source document that provides basis for artifact content.",
       "properties": {
         "id": {
@@ -15,7 +18,21 @@
           "description": "Identifier of the source item, e.g., 'AC-1', 'BR-2', 'BUG-123'."
         },
         "kind": {
-          "enum": ["spec", "ac", "rule", "bug", "auto_test", "code_review", "ops", "confluence", "jira", "mock", "memo", "interview", "metric"],
+          "enum": [
+            "spec",
+            "ac",
+            "rule",
+            "bug",
+            "auto_test",
+            "code_review",
+            "ops",
+            "confluence",
+            "jira",
+            "mock",
+            "memo",
+            "interview",
+            "metric"
+          ],
           "description": "Kind of source: spec (specification), ac (acceptance criteria), rule (business rule), bug (defect), auto_test (automated test), code_review (review comment), ops (operational data), confluence (Confluence page), jira (Jira issue), mock (mockup), memo (planning note), interview (user or stakeholder interview), metric (measurement or KPI)."
         },
         "excerpt": {
@@ -32,7 +49,11 @@
     },
     "Assumption": {
       "type": "object",
-      "required": ["id", "text", "severity"],
+      "required": [
+        "id",
+        "text",
+        "severity"
+      ],
       "description": "Assumption made when information is incomplete. Must be tracked for risk assessment.",
       "properties": {
         "id": {
@@ -46,7 +67,12 @@
           "description": "Description of the assumption made."
         },
         "severity": {
-          "enum": ["low", "medium", "high", "critical"],
+          "enum": [
+            "low",
+            "medium",
+            "high",
+            "critical"
+          ],
           "description": "Severity level: low (minor impact), medium (some impact), high (significant impact), critical (blocking if wrong)."
         },
         "impact_on_coverage": {
@@ -54,7 +80,11 @@
           "description": "How this assumption affects test coverage or approach."
         },
         "resolution_status": {
-          "enum": ["open", "resolved", "accepted"],
+          "enum": [
+            "open",
+            "resolved",
+            "accepted"
+          ],
           "default": "open",
           "description": "Current status of the assumption."
         }
@@ -63,16 +93,26 @@
     },
     "Oracle": {
       "type": "object",
-      "required": ["type", "refs"],
+      "required": [
+        "type",
+        "refs"
+      ],
       "description": "Oracle definition: how expected results are determined.",
       "properties": {
         "type": {
-          "enum": ["specified", "derived", "implicit", "human"],
+          "enum": [
+            "specified",
+            "derived",
+            "implicit",
+            "human"
+          ],
           "description": "Oracle type: specified (in spec/AC), derived (from rules/old system), implicit (standard expectations), human (judgment needed)."
         },
         "refs": {
           "type": "array",
-          "items": {"type": "string"},
+          "items": {
+            "type": "string"
+          },
           "minItems": 1,
           "description": "References to source for oracle, e.g., ['AC-1', 'BR-2']."
         },
@@ -85,23 +125,1819 @@
     },
     "ConfidenceLevel": {
       "type": "string",
-      "enum": ["high", "medium", "low"],
+      "enum": [
+        "high",
+        "medium",
+        "low"
+      ],
       "description": "Confidence in correctness: high (well-established), medium (reasonable basis), low (uncertain)."
     },
     "Priority": {
       "type": "string",
-      "enum": ["P0", "P1", "P2", "P3"],
+      "enum": [
+        "P0",
+        "P1",
+        "P2",
+        "P3"
+      ],
       "description": "Risk-based priority: P0 (critical), P1 (high), P2 (medium), P3 (low)."
     },
     "TestView": {
       "type": "string",
-      "enum": ["black", "gray", "white"],
+      "enum": [
+        "black",
+        "gray",
+        "white"
+      ],
       "description": "Testing view: black (external UI), gray (limited diagnostic signals), white (implementation-level)."
     },
     "GateStatus": {
       "type": "string",
-      "enum": ["go", "conditional_go", "no_go"],
+      "enum": [
+        "go",
+        "conditional_go",
+        "no_go"
+      ],
       "description": "Gate decision: go (release ready), conditional_go (with conditions), no_go (blocked)."
+    },
+    "TechniqueRef": {
+      "type": "object",
+      "properties": {
+        "key": {
+          "enum": [
+            "equivalence_partitioning",
+            "boundary_value_analysis",
+            "domain_testing",
+            "combinatorial_testing",
+            "random_testing",
+            "crud_testing",
+            "state_transition_testing",
+            "scenario_based_testing",
+            "decision_table_testing",
+            "metamorphic_testing",
+            "exploratory_testing",
+            "error_guessing",
+            "checklist_based_testing",
+            "crowd_testing"
+          ]
+        },
+        "standard": {
+          "type": "string",
+          "minLength": 1
+        },
+        "reference": {
+          "type": "string",
+          "minLength": 1
+        },
+        "criterion": {
+          "type": "string",
+          "minLength": 1
+        },
+        "legacy_alias": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "required": [
+        "key",
+        "standard",
+        "reference"
+      ],
+      "additionalProperties": false
+    },
+    "ExprNode": {
+      "oneOf": [
+        {
+          "type": "object",
+          "properties": {
+            "var": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          "required": [
+            "var"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "const": {
+              "type": [
+                "string",
+                "number",
+                "boolean",
+                "null"
+              ]
+            }
+          },
+          "required": [
+            "const"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "op": {
+              "enum": [
+                "and",
+                "or",
+                "not",
+                "eq",
+                "neq",
+                "lt",
+                "lte",
+                "gt",
+                "gte",
+                "add",
+                "sub",
+                "mul",
+                "div"
+              ]
+            },
+            "args": {
+              "type": "array",
+              "items": {
+                "$ref": "shared_defs.schema.json#/$defs/ExprNode"
+              },
+              "minItems": 1,
+              "maxItems": 16
+            }
+          },
+          "required": [
+            "op",
+            "args"
+          ],
+          "additionalProperties": false
+        }
+      ]
+    },
+    "Generation": {
+      "type": "object",
+      "properties": {
+        "generation_run_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "prompt_template_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "prompt_template_version": {
+          "type": "string",
+          "minLength": 1
+        },
+        "input_sha256": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        },
+        "output_schema_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "model": {
+          "type": "object",
+          "properties": {
+            "provider": {
+              "type": "string",
+              "minLength": 1
+            },
+            "name": {
+              "type": "string",
+              "minLength": 1
+            },
+            "version": {
+              "type": [
+                "string",
+                "null"
+              ]
+            }
+          },
+          "required": [
+            "provider",
+            "name",
+            "version"
+          ],
+          "additionalProperties": false
+        },
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "temperature": {
+              "type": [
+                "number",
+                "null"
+              ]
+            },
+            "seed": {
+              "type": [
+                "integer",
+                "null"
+              ]
+            }
+          },
+          "required": [
+            "temperature",
+            "seed"
+          ],
+          "additionalProperties": false
+        },
+        "generated_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "review_status": {
+          "enum": [
+            "pending",
+            "self_reviewed",
+            "reviewed",
+            "rejected"
+          ]
+        }
+      },
+      "required": [
+        "generation_run_id",
+        "prompt_template_id",
+        "prompt_template_version",
+        "input_sha256",
+        "output_schema_id",
+        "model",
+        "parameters",
+        "generated_at",
+        "review_status"
+      ],
+      "additionalProperties": false
+    },
+    "Parameter": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "name": {
+          "type": "string",
+          "minLength": 1
+        },
+        "type": {
+          "enum": [
+            "integer",
+            "decimal",
+            "number",
+            "string",
+            "boolean",
+            "enum",
+            "date",
+            "datetime"
+          ]
+        },
+        "unit": {
+          "type": "string",
+          "minLength": 1
+        },
+        "precision": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "step": {
+          "oneOf": [
+            {
+              "type": "number",
+              "exclusiveMinimum": 0
+            },
+            {
+              "type": "string",
+              "minLength": 1
+            }
+          ]
+        },
+        "values": {
+          "type": "array",
+          "items": {
+            "type": [
+              "string",
+              "number",
+              "boolean",
+              "null"
+            ]
+          },
+          "minItems": 1
+        },
+        "minimum": {
+          "type": "number"
+        },
+        "maximum": {
+          "type": "number"
+        },
+        "source_refs": {
+          "type": "array",
+          "items": {
+            "$ref": "shared_defs.schema.json#/$defs/SourceRef"
+          },
+          "minItems": 0
+        }
+      },
+      "required": [
+        "id",
+        "name",
+        "type"
+      ],
+      "additionalProperties": false
+    },
+    "DomainModel": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "source_refs": {
+          "type": "array",
+          "items": {
+            "$ref": "shared_defs.schema.json#/$defs/SourceRef"
+          },
+          "minItems": 1
+        },
+        "observation_ids": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "minItems": 0
+        },
+        "risk_ids": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "minItems": 0
+        },
+        "rationale": {
+          "type": "string",
+          "minLength": 1
+        },
+        "required": {
+          "type": "boolean"
+        },
+        "variable_ids": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "minItems": 1
+        },
+        "partition_predicate": {
+          "$ref": "shared_defs.schema.json#/$defs/ExprNode"
+        },
+        "constraints": {
+          "type": "array",
+          "items": {
+            "$ref": "shared_defs.schema.json#/$defs/ExprNode"
+          },
+          "minItems": 0
+        },
+        "coverage_criterion": {
+          "enum": [
+            "simplified_domain",
+            "reliable_domain"
+          ]
+        },
+        "borders": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "minLength": 1
+              },
+              "operator": {
+                "enum": [
+                  "<",
+                  "<=",
+                  "=",
+                  "!=",
+                  ">=",
+                  ">"
+                ]
+              },
+              "closed": {
+                "type": "boolean"
+              },
+              "predicate": {
+                "$ref": "shared_defs.schema.json#/$defs/ExprNode"
+              },
+              "axis": {
+                "type": "string",
+                "minLength": 1
+              },
+              "anchor": {
+                "type": "object",
+                "additionalProperties": {
+                  "type": [
+                    "string",
+                    "number",
+                    "boolean",
+                    "null"
+                  ]
+                }
+              }
+            },
+            "required": [
+              "id",
+              "operator",
+              "predicate",
+              "axis",
+              "anchor"
+            ],
+            "additionalProperties": false
+          },
+          "minItems": 1
+        }
+      },
+      "required": [
+        "id",
+        "source_refs",
+        "variable_ids",
+        "partition_predicate",
+        "borders",
+        "coverage_criterion"
+      ],
+      "additionalProperties": false
+    },
+    "CombinationModel": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "source_refs": {
+          "type": "array",
+          "items": {
+            "$ref": "shared_defs.schema.json#/$defs/SourceRef"
+          },
+          "minItems": 1
+        },
+        "observation_ids": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "minItems": 0
+        },
+        "risk_ids": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "minItems": 0
+        },
+        "rationale": {
+          "type": "string",
+          "minLength": 1
+        },
+        "required": {
+          "type": "boolean"
+        },
+        "parameter_ids": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "minItems": 1
+        },
+        "constraints": {
+          "type": "array",
+          "items": {
+            "$ref": "shared_defs.schema.json#/$defs/ExprNode"
+          },
+          "minItems": 0
+        },
+        "coverage_criterion": {
+          "enum": [
+            "base_choice",
+            "pairwise",
+            "n_wise",
+            "all"
+          ]
+        },
+        "strength": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 6
+        },
+        "base_choice": {
+          "type": "object",
+          "additionalProperties": {
+            "type": [
+              "string",
+              "number",
+              "boolean",
+              "null"
+            ]
+          }
+        }
+      },
+      "required": [
+        "id",
+        "source_refs",
+        "parameter_ids",
+        "coverage_criterion"
+      ],
+      "additionalProperties": false
+    },
+    "Transition": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "from": {
+          "type": "string",
+          "minLength": 1
+        },
+        "to": {
+          "type": "string",
+          "minLength": 1
+        },
+        "event": {
+          "type": "string",
+          "minLength": 1
+        },
+        "guard": {
+          "$ref": "shared_defs.schema.json#/$defs/ExprNode"
+        },
+        "actions": {
+          "type": "object",
+          "additionalProperties": {
+            "$ref": "shared_defs.schema.json#/$defs/ExprNode"
+          }
+        },
+        "valid": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "id",
+        "from",
+        "to",
+        "event",
+        "valid"
+      ],
+      "additionalProperties": false
+    },
+    "StateModel": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "source_refs": {
+          "type": "array",
+          "items": {
+            "$ref": "shared_defs.schema.json#/$defs/SourceRef"
+          },
+          "minItems": 1
+        },
+        "observation_ids": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "minItems": 0
+        },
+        "risk_ids": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "minItems": 0
+        },
+        "rationale": {
+          "type": "string",
+          "minLength": 1
+        },
+        "required": {
+          "type": "boolean"
+        },
+        "states": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "minItems": 1
+        },
+        "transitions": {
+          "type": "array",
+          "items": {
+            "$ref": "shared_defs.schema.json#/$defs/Transition"
+          },
+          "minItems": 1
+        },
+        "contexts": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": {
+              "type": [
+                "string",
+                "number",
+                "boolean",
+                "null"
+              ]
+            }
+          },
+          "minItems": 1
+        },
+        "coverage_criterion": {
+          "enum": [
+            "all_states",
+            "valid_transitions",
+            "all_transitions",
+            "n_switch",
+            "round_trip"
+          ]
+        },
+        "n": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 5
+        }
+      },
+      "required": [
+        "id",
+        "source_refs",
+        "states",
+        "transitions",
+        "coverage_criterion"
+      ],
+      "additionalProperties": false
+    },
+    "DecisionTable": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "source_refs": {
+          "type": "array",
+          "items": {
+            "$ref": "shared_defs.schema.json#/$defs/SourceRef"
+          },
+          "minItems": 1
+        },
+        "observation_ids": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "minItems": 0
+        },
+        "risk_ids": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "minItems": 0
+        },
+        "rationale": {
+          "type": "string",
+          "minLength": 1
+        },
+        "required": {
+          "type": "boolean"
+        },
+        "parameter_ids": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "minItems": 1
+        },
+        "constraints": {
+          "type": "array",
+          "items": {
+            "$ref": "shared_defs.schema.json#/$defs/ExprNode"
+          },
+          "minItems": 0
+        },
+        "rules": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "minLength": 1
+              },
+              "conditions": {
+                "type": "object",
+                "additionalProperties": {
+                  "type": "array",
+                  "items": {
+                    "type": [
+                      "string",
+                      "number",
+                      "boolean",
+                      "null"
+                    ]
+                  },
+                  "minItems": 1
+                }
+              },
+              "actions": {
+                "type": "object",
+                "additionalProperties": {
+                  "type": [
+                    "string",
+                    "number",
+                    "boolean",
+                    "null"
+                  ]
+                }
+              },
+              "feasible": {
+                "type": "boolean"
+              },
+              "represented_rule_ids": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "minItems": 0
+              }
+            },
+            "required": [
+              "id",
+              "conditions",
+              "actions"
+            ],
+            "additionalProperties": false
+          },
+          "minItems": 1
+        },
+        "minimized_rules": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "minLength": 1
+              },
+              "conditions": {
+                "type": "object",
+                "additionalProperties": {
+                  "type": "array",
+                  "items": {
+                    "type": [
+                      "string",
+                      "number",
+                      "boolean",
+                      "null"
+                    ]
+                  },
+                  "minItems": 1
+                }
+              },
+              "actions": {
+                "type": "object",
+                "additionalProperties": {
+                  "type": [
+                    "string",
+                    "number",
+                    "boolean",
+                    "null"
+                  ]
+                }
+              },
+              "feasible": {
+                "type": "boolean"
+              },
+              "represented_rule_ids": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "minItems": 0
+              }
+            },
+            "required": [
+              "id",
+              "conditions",
+              "actions"
+            ],
+            "additionalProperties": false
+          },
+          "minItems": 1
+        },
+        "coverage_criterion": {
+          "enum": [
+            "feasible_rules"
+          ]
+        }
+      },
+      "required": [
+        "id",
+        "source_refs",
+        "parameter_ids",
+        "rules",
+        "coverage_criterion"
+      ],
+      "additionalProperties": false
+    },
+    "CrudModel": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "source_refs": {
+          "type": "array",
+          "items": {
+            "$ref": "shared_defs.schema.json#/$defs/SourceRef"
+          },
+          "minItems": 1
+        },
+        "observation_ids": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "minItems": 0
+        },
+        "risk_ids": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "minItems": 0
+        },
+        "rationale": {
+          "type": "string",
+          "minLength": 1
+        },
+        "required": {
+          "type": "boolean"
+        },
+        "entity": {
+          "type": "string",
+          "minLength": 1
+        },
+        "operations": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "operation": {
+                "enum": [
+                  "C",
+                  "R",
+                  "U",
+                  "D"
+                ]
+              },
+              "function": {
+                "type": "string",
+                "minLength": 1
+              },
+              "read_path": {
+                "type": "string",
+                "minLength": 1
+              }
+            },
+            "required": [
+              "operation",
+              "function"
+            ],
+            "additionalProperties": false
+          },
+          "minItems": 1
+        },
+        "read_paths": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "minItems": 1
+        },
+        "coverage_criterion": {
+          "enum": [
+            "completeness",
+            "consistency"
+          ]
+        }
+      },
+      "required": [
+        "id",
+        "source_refs",
+        "entity",
+        "operations",
+        "coverage_criterion"
+      ],
+      "additionalProperties": false
+    },
+    "ScenarioModel": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "source_refs": {
+          "type": "array",
+          "items": {
+            "$ref": "shared_defs.schema.json#/$defs/SourceRef"
+          },
+          "minItems": 1
+        },
+        "observation_ids": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "minItems": 0
+        },
+        "risk_ids": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "minItems": 0
+        },
+        "rationale": {
+          "type": "string",
+          "minLength": 1
+        },
+        "required": {
+          "type": "boolean"
+        },
+        "paths": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "minLength": 1
+              },
+              "kind": {
+                "enum": [
+                  "main",
+                  "extension",
+                  "exception"
+                ]
+              },
+              "nodes": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "minItems": 1
+              },
+              "feasible": {
+                "type": "boolean"
+              },
+              "reason": {
+                "type": "string",
+                "minLength": 1
+              }
+            },
+            "required": [
+              "id",
+              "kind",
+              "nodes"
+            ],
+            "additionalProperties": false
+          },
+          "minItems": 1
+        },
+        "loops": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "minLength": 1
+              },
+              "maximum": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 10000
+              }
+            },
+            "required": [
+              "id",
+              "maximum"
+            ],
+            "additionalProperties": false
+          },
+          "minItems": 0
+        },
+        "coverage_criterion": {
+          "enum": [
+            "paths_and_loops"
+          ]
+        }
+      },
+      "required": [
+        "id",
+        "source_refs",
+        "paths",
+        "coverage_criterion"
+      ],
+      "additionalProperties": false
+    },
+    "RandomModel": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "source_refs": {
+          "type": "array",
+          "items": {
+            "$ref": "shared_defs.schema.json#/$defs/SourceRef"
+          },
+          "minItems": 1
+        },
+        "observation_ids": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "minItems": 0
+        },
+        "risk_ids": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "minItems": 0
+        },
+        "rationale": {
+          "type": "string",
+          "minLength": 1
+        },
+        "required": {
+          "type": "boolean"
+        },
+        "parameter_ids": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "minItems": 1
+        },
+        "constraints": {
+          "type": "array",
+          "items": {
+            "$ref": "shared_defs.schema.json#/$defs/ExprNode"
+          },
+          "minItems": 0
+        },
+        "distribution": {
+          "enum": [
+            "uniform"
+          ]
+        },
+        "seed": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "sample_budget": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 10000
+        },
+        "time_budget_seconds": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "duplicate_policy": {
+          "enum": [
+            "allow",
+            "reject"
+          ]
+        },
+        "oracle_refs": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "minItems": 1
+        },
+        "coverage_criterion": {
+          "enum": [
+            "sample_budget"
+          ]
+        }
+      },
+      "required": [
+        "id",
+        "source_refs",
+        "parameter_ids",
+        "distribution",
+        "seed",
+        "sample_budget",
+        "duplicate_policy",
+        "oracle_refs",
+        "coverage_criterion"
+      ],
+      "additionalProperties": false
+    },
+    "MetamorphicModel": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "source_refs": {
+          "type": "array",
+          "items": {
+            "$ref": "shared_defs.schema.json#/$defs/SourceRef"
+          },
+          "minItems": 1
+        },
+        "observation_ids": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "minItems": 0
+        },
+        "risk_ids": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "minItems": 0
+        },
+        "rationale": {
+          "type": "string",
+          "minLength": 1
+        },
+        "required": {
+          "type": "boolean"
+        },
+        "source_data": {
+          "type": "object",
+          "additionalProperties": {
+            "type": [
+              "string",
+              "number",
+              "boolean",
+              "null"
+            ]
+          }
+        },
+        "transformations": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": {
+              "$ref": "shared_defs.schema.json#/$defs/ExprNode"
+            }
+          },
+          "minItems": 1
+        },
+        "expected_relation": {
+          "$ref": "shared_defs.schema.json#/$defs/ExprNode"
+        },
+        "trial_budget": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 10000
+        },
+        "coverage_criterion": {
+          "enum": [
+            "joint_trials"
+          ]
+        }
+      },
+      "required": [
+        "id",
+        "source_refs",
+        "source_data",
+        "transformations",
+        "expected_relation",
+        "trial_budget",
+        "coverage_criterion"
+      ],
+      "additionalProperties": false
+    },
+    "ChecklistModel": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "source_refs": {
+          "type": "array",
+          "items": {
+            "$ref": "shared_defs.schema.json#/$defs/SourceRef"
+          },
+          "minItems": 1
+        },
+        "observation_ids": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "minItems": 0
+        },
+        "risk_ids": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "minItems": 0
+        },
+        "rationale": {
+          "type": "string",
+          "minLength": 1
+        },
+        "required": {
+          "type": "boolean"
+        },
+        "version": {
+          "type": "string",
+          "minLength": 1
+        },
+        "scope": {
+          "type": "string",
+          "minLength": 1
+        },
+        "objective": {
+          "type": "string",
+          "minLength": 1
+        },
+        "revision_reason": {
+          "type": "string",
+          "minLength": 1
+        },
+        "items": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "minLength": 1
+              },
+              "question": {
+                "type": "string",
+                "minLength": 1
+              },
+              "applicable": {
+                "type": "boolean"
+              },
+              "reason": {
+                "type": "string",
+                "minLength": 1
+              },
+              "priority": {
+                "enum": [
+                  "P0",
+                  "P1",
+                  "P2",
+                  "P3"
+                ]
+              }
+            },
+            "required": [
+              "id",
+              "question",
+              "applicable",
+              "reason"
+            ],
+            "additionalProperties": false
+          },
+          "minItems": 1
+        },
+        "coverage_criterion": {
+          "enum": [
+            "applicable_items"
+          ]
+        }
+      },
+      "required": [
+        "id",
+        "source_refs",
+        "version",
+        "scope",
+        "objective",
+        "items",
+        "coverage_criterion"
+      ],
+      "additionalProperties": false
+    },
+    "IntegrationPath": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "endpoints": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "minItems": 2
+        },
+        "states": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "minItems": 0
+        },
+        "version_dimensions": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "minItems": 0
+        },
+        "environment_dimensions": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "minItems": 0
+        },
+        "failure_modes": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "minItems": 0
+        },
+        "recovery_requirements": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "minItems": 0
+        },
+        "source_refs": {
+          "type": "array",
+          "items": {
+            "$ref": "shared_defs.schema.json#/$defs/SourceRef"
+          },
+          "minItems": 1
+        }
+      },
+      "required": [
+        "id",
+        "endpoints",
+        "source_refs"
+      ],
+      "additionalProperties": false
+    },
+    "CoverageInput": {
+      "type": "object",
+      "properties": {
+        "model_ref": {
+          "type": "string",
+          "minLength": 1
+        },
+        "data": {
+          "type": "object",
+          "additionalProperties": {
+            "type": [
+              "string",
+              "number",
+              "boolean",
+              "null"
+            ]
+          }
+        },
+        "transition_ids": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "minItems": 0
+        },
+        "initial_state": {
+          "type": "string",
+          "minLength": 1
+        },
+        "action_checks": {
+          "type": "object",
+          "additionalProperties": {
+            "type": [
+              "string",
+              "number",
+              "boolean",
+              "null"
+            ]
+          }
+        },
+        "sequence": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "operation": {
+                "enum": [
+                  "C",
+                  "R",
+                  "U",
+                  "D"
+                ]
+              },
+              "function": {
+                "type": "string",
+                "minLength": 1
+              },
+              "read_path": {
+                "type": "string",
+                "minLength": 1
+              }
+            },
+            "required": [
+              "operation",
+              "function"
+            ],
+            "additionalProperties": false
+          },
+          "minItems": 0
+        },
+        "path_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "nodes": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "minItems": 0
+        },
+        "loop_counts": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "integer",
+            "minimum": 0
+          }
+        },
+        "checklist_item_ids": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "minItems": 0
+        },
+        "sample_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "step_refs": {
+          "type": "array",
+          "items": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "minItems": 1
+        },
+        "expected_result_refs": {
+          "type": "array",
+          "items": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "minItems": 1
+        },
+        "initial_entity_state": {
+          "enum": [
+            "absent",
+            "present"
+          ]
+        },
+        "checklist_version": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "required": [
+        "model_ref",
+        "step_refs",
+        "expected_result_refs"
+      ],
+      "additionalProperties": false
+    },
+    "CoverageObligation": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "technique_key": {
+          "enum": [
+            "equivalence_partitioning",
+            "boundary_value_analysis",
+            "domain_testing",
+            "combinatorial_testing",
+            "random_testing",
+            "crud_testing",
+            "state_transition_testing",
+            "scenario_based_testing",
+            "decision_table_testing",
+            "metamorphic_testing",
+            "exploratory_testing",
+            "error_guessing",
+            "checklist_based_testing",
+            "crowd_testing"
+          ]
+        },
+        "model_ref": {
+          "type": "string",
+          "minLength": 1
+        },
+        "criterion": {
+          "type": "string",
+          "minLength": 1
+        },
+        "selector": {
+          "type": "object"
+        },
+        "required": {
+          "type": "boolean"
+        },
+        "feasibility": {
+          "enum": [
+            "feasible",
+            "infeasible",
+            "unknown"
+          ]
+        },
+        "reason": {
+          "type": "string",
+          "minLength": 1
+        },
+        "observation_ids": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "minItems": 0
+        },
+        "risk_ids": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "minItems": 0
+        },
+        "source_refs": {
+          "type": "array",
+          "items": {
+            "$ref": "shared_defs.schema.json#/$defs/SourceRef"
+          },
+          "minItems": 0
+        }
+      },
+      "required": [
+        "id",
+        "technique_key",
+        "model_ref",
+        "criterion",
+        "selector",
+        "required",
+        "feasibility"
+      ],
+      "additionalProperties": false
+    },
+    "SessionLog": {
+      "type": "object",
+      "properties": {
+        "mission": {
+          "type": "string",
+          "minLength": 1
+        },
+        "resources": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "minItems": 0
+        },
+        "entry_criteria": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "minItems": 0
+        },
+        "exit_criteria": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "minItems": 0
+        },
+        "environment": {
+          "type": "string",
+          "minLength": 1
+        },
+        "limitations": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "minItems": 0
+        },
+        "history_refs": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "minItems": 0
+        },
+        "activities": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "minItems": 0
+        },
+        "questions": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "minItems": 0
+        },
+        "findings": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "minItems": 0
+        },
+        "unexplored": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "minItems": 0
+        },
+        "debrief": {
+          "type": "string",
+          "minLength": 1
+        },
+        "next_actions": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "minItems": 0
+        }
+      },
+      "required": [
+        "activities",
+        "findings",
+        "unexplored",
+        "debrief"
+      ],
+      "additionalProperties": false
+    },
+    "RelationEvaluation": {
+      "type": "object",
+      "properties": {
+        "relation_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "group_run_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "source_run_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "follow_up_run_ids": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "minItems": 1
+        },
+        "observed_values": {
+          "type": "object",
+          "additionalProperties": {
+            "type": [
+              "string",
+              "number",
+              "boolean",
+              "null"
+            ]
+          }
+        },
+        "result": {
+          "enum": [
+            "pass",
+            "fail",
+            "unknown"
+          ]
+        }
+      },
+      "required": [
+        "relation_id",
+        "group_run_id",
+        "source_run_id",
+        "follow_up_run_ids",
+        "observed_values",
+        "result"
+      ],
+      "additionalProperties": false
+    },
+    "Migration": {
+      "type": "object",
+      "properties": {
+        "status": {
+          "enum": [
+            "migrated",
+            "needs_review",
+            "unmapped"
+          ]
+        },
+        "reason": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "required": [
+        "status",
+        "reason"
+      ],
+      "additionalProperties": false
     }
   }
 }

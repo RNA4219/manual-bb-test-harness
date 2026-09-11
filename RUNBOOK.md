@@ -1,8 +1,8 @@
 ---
 intent_id: INT-MBB-001
 owner: manual-bb-test-harness
-release_version: 3.0.0
-test_count: 765
+release_version: 4.0.0
+test_count: 1026
 knowledge_map: 33 nodes, 45 edges, 33 capsules
 next_review_due: 2026-10-11
 status: active
@@ -14,10 +14,14 @@ last_reviewed_at: 2026-05-16
 ## Environments
 
 - Local: repo 内で Skill / schema / script を編集して検証する
-- CI: `.github/workflows/validate.yml` で repo 構造と Skill を検証する
+- CI: `.github/workflows/validate.yml` で repo 構造と Skill を検証する。`HATE and QEG evidence gate`では、同一run/attemptの実pytest結果から証跡を検証する。`ci-raw-evidence-*`と`hate-qeg-evidence-*`を失敗時も14日間保存する。QEGのgoはCI範囲だけに適用する。[仕様・ローカル実行手順](docs/specs/spec-08-hate-qeg-ci.md)を参照。
 - Consumer: Codex Skill として利用し、Markdown または JSON artifact を生成する
 
 ## Execute
+
+### 要件定義の信頼度を評価する
+
+`bb-harness evaluate requirements --input spec.md --output tmp/requirements-first`で、LLMを呼ばずに要確認・重大度・レビュー率を採点する。出力のレビュー雛形へ実際の確認結果を記入し、`--review reviewed.json`と新しい出力先で再評価する。`--fail-under 85`で閾値未達を終了コード2にできる。[契約・入力形式・採点式](skills/manual-bb-test-harness/references/requirements-confidence.md)を参照。
 
 ### 1. Skill 出力を確認する
 
@@ -365,3 +369,11 @@ uv run python scripts/validate-release-bundle.py --dry-run --package-smoke
 ```
 
 Actionは完全なcommit SHAへ固定し、Dependabotで更新します。version tagだけへのpinへ戻してはいけません。
+
+## 生成効率・証跡版（2026-09-10）
+
+生成前は `run local-design --estimate-only`、予算指定は `--token-budget`、従来モードの比較は `--generation-mode full` を使う。失敗・予算停止時は `run_manifest.json` の `stop_reason / usage_summary / call_records` を確認する。実行前にケースの版を控え、実行証跡へ `case_revision / model_hash` を保存する。旧版の証跡を後から現在の版で補わない。[運用契約](skills/manual-bb-test-harness/references/efficient-generation.md)と[追加仕様](docs/specs/spec-05-efficient-generation-evidence-revisions.md)を参照。
+
+## 分割生成・完了判定（2026-09-10）
+
+`--generation-mode batched`では完全JSON単位で分割し、checkpointを保存する。出力先は未存在のディレクトリとする。終了コード1は生成停止、2は設計に不足／エラー、0は構造と必須設計被覆の成立。途中JSONを連結せず、失敗理由とusageをmanifestで確認する。[詳細契約](skills/manual-bb-test-harness/references/efficient-generation.md)。

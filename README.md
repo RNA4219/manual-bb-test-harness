@@ -1,9 +1,31 @@
 # manual-bb-test-harness
 
+[![CI](https://github.com/RNA4219/manual-bb-test-harness/actions/workflows/validate.yml/badge.svg?branch=main)](https://github.com/RNA4219/manual-bb-test-harness/actions/workflows/validate.yml)
 [![license: RNA-TPSAL-1.0](https://img.shields.io/badge/license-RNA--TPSAL--1.0-blue.svg)](LICENSE)
 [![source-available](https://img.shields.io/badge/source--available-yes-orange.svg)](LICENSE)
 
 手動ブラックボックステスト設計を、根拠付きartifactと決定的な品質Gateで支援する。
+
+## 4.0.0の主な変更
+
+- **要件定義の信頼度評価**: 要確認件数・重大度・レビュー済み率から点数と次の確認事項を出します。評価処理のLLM呼出はありません。[利用手順](skills/manual-bb-test-harness/references/requirements-confidence.md)。
+- **技法別の被覆検証**: 型付き技法モデル、`technique_plan.json`、`coverage_report.json`と非破壊の移行コマンドを追加しました。[対応技法・制約](skills/manual-bb-test-harness/references/technique-coverage.md)。
+- **生成予算と完了判定**: Local Modeは`compact`が既定です。`--estimate-only`で通信せず見積もり、`--token-budget`で修復を含む1 runの予算を管理します。`--generation-mode batched`で分割生成でき、既存出力の上書きを防ぎ、設計不足を`design_status`と終了コード2で示します。[生成効率・証跡版](docs/specs/spec-05-efficient-generation-evidence-revisions.md)・[分割生成仕様](docs/specs/spec-06-bounded-generation-readiness.md)・[運用ガイド](skills/manual-bb-test-harness/references/efficient-generation.md)。
+- **HATE・QEGによるCI検証**: 実pytest結果をHATEで正規化し、QEGで証跡のhash・実行対象・合否を検証します。全体85%・Gate90%のcoverage基準を維持します。[CI連携仕様](docs/specs/spec-08-hate-qeg-ci.md)・[検収記録](docs/acceptance/AC-20260911-hate-qeg-ci.md)。
+
+```powershell
+uv run bb-harness evaluate requirements --input spec.md --output tmp/requirements
+```
+
+追加artifact契約は1.1.0で、既存入力との互換性を維持します。リポジトリの版は、artifact契約の変更をmajorとする[リリース規約](docs/release-policy.md)に従って4.0.0へ更新しています。変更履歴は[CHANGELOG](CHANGELOG.md)を参照してください。
+
+実LLMでのトークン削減率の比較とbatched生成の全段完走は未完了です。CIの成功とQEGのgoが示す範囲はリポジトリの自動検証です。[生成効率の検収記録](docs/acceptance/AC-20260910-efficiency.md)・[分割生成の検収記録](docs/acceptance/AC-20260910-batched.md)を参照してください。
+
+## 技法別の被覆検証
+
+Domain、組み合わせ、状態経路、決定表、CRUD等を型付きモデルで表し、必要な入力点・条件・経路をケースへ対応させる。Local Modeは `technique_plan.json` と `coverage_report.json` を追加出力する。設計済み・実施済み・合格を分け、新指標はGateの参考値として報告する。
+
+既存JSONにも `bb-harness coverage` と非破壊の `bb-harness migrate` を利用できる。[手順・対応技法・制約](skills/manual-bb-test-harness/references/technique-coverage.md)、[実行可能なサンプル](examples/artifacts/techniques/discount-domain/README.md)、[調査の採用範囲](docs/research/istqb-extension-adoption.md) を参照。
 
 ## Local Mode
 
@@ -38,7 +60,7 @@ uv run bb-harness run local-design `
 
 Local Modeは本リポジトリに統合済みで、別リポジトリの導入は不要。設定、成果物、fail closed条件の詳細は [Local Mode guide](docs/local-model-guide.md) を参照。
 
-現行リリース系列: **3.0.0** / 検証済みテスト: **765件** / Workflow Cookbook: **33 nodes・45 edges・33 capsules** / 次回レビュー: **2026-10-11**
+現行リリース系列: **4.0.0** / 検証済みテスト: **1026件** / Workflow Cookbook: **33 nodes・45 edges・33 capsules** / 次回レビュー: **2026-10-11**
 人間向け概要は [docs/human-readme.md](docs/human-readme.md) を参照。
 
 ## ライセンス
@@ -102,10 +124,10 @@ uv run ruff check .
 # Skill 構造検証
 uv run python .\scripts\quick-validate-skill.py .\skills\manual-bb-test-harness
 
-# Artifact 検証 (14 files)
+# Artifact 検証
 uv run python .\scripts\validate-artifact.py --all examples\artifacts --strict
 
-# Spec 検証 (4 specs)
+# Spec 検証
 uv run python .\scripts\validate-spec.py --all
 
 # Workflow Cookbook Tier チェック

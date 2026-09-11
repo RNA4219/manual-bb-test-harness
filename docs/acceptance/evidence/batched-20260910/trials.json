@@ -1,0 +1,88 @@
+{
+  "trials": [
+    {
+      "trial": "initial",
+      "status": "failed",
+      "design_status": "blocked",
+      "elapsed_seconds": 115.426,
+      "usage": {
+        "calls": 2,
+        "repair_calls": 1,
+        "unreported_calls": 0,
+        "prompt_tokens": 1547,
+        "completion_tokens": 1257,
+        "total_tokens": 2804,
+        "reported_total_tokens": 2804,
+        "accounted_tokens": 2804,
+        "budget_tokens": 150000,
+        "remaining_tokens": 147196,
+        "budget_exhausted": false,
+        "estimation_method": "utf8_bytes_plus_256_v1"
+      },
+      "error": "SchemaValidationError: boundaries must name concrete before/at/after values",
+      "finish_reasons": [
+        "stop",
+        "stop"
+      ]
+    },
+    {
+      "trial": "repair-context",
+      "status": "failed",
+      "design_status": "blocked",
+      "elapsed_seconds": 27.673,
+      "usage": {
+        "calls": 2,
+        "repair_calls": 1,
+        "unreported_calls": 0,
+        "prompt_tokens": 2268,
+        "completion_tokens": 882,
+        "total_tokens": 3150,
+        "reported_total_tokens": 3150,
+        "accounted_tokens": 3150,
+        "budget_tokens": 150000,
+        "remaining_tokens": 146850,
+        "budget_exhausted": false,
+        "estimation_method": "utf8_bytes_plus_256_v1"
+      },
+      "error": "SchemaValidationError: boundaries must name concrete before/at/after values",
+      "finish_reasons": [
+        "stop",
+        "stop"
+      ]
+    },
+    {
+      "trial": "schema-minima",
+      "status": "failed",
+      "design_status": "blocked",
+      "elapsed_seconds": 349.54,
+      "usage": {
+        "calls": 8,
+        "repair_calls": 2,
+        "unreported_calls": 0,
+        "prompt_tokens": 22387,
+        "completion_tokens": 11072,
+        "total_tokens": 33459,
+        "reported_total_tokens": 33459,
+        "accounted_tokens": 33459,
+        "budget_tokens": 150000,
+        "remaining_tokens": 116541,
+        "budget_exhausted": false,
+        "estimation_method": "utf8_bytes_plus_256_v1"
+      },
+      "error": "SchemaValidationError: mandatory observations missing from risk analysis: OBS-STATE-01, OBS-STATE-10",
+      "finish_reasons": [
+        "stop",
+        "stop",
+        "stop",
+        "stop",
+        "stop",
+        "stop",
+        "stop",
+        "stop"
+      ]
+    }
+  ],
+  "total_reported_tokens": 39413,
+  "expanded_benchmark_allowed": false,
+  "note": "ローカルQwenの実測。会話側のCodex使用量とは別。3回とも生成未達のため削減率と意味的品質は未判定。"
+}

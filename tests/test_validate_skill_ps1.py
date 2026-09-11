@@ -2,8 +2,8 @@
 
 from __future__ import annotations
 
+import shutil
 import subprocess
-import sys
 from pathlib import Path
 
 import pytest
@@ -102,7 +102,7 @@ class TestPowershellParameters:
         """Test --version flag output."""
         result = run_powershell_script(["--version"])
         assert result.returncode == 0
-        assert "validate-skill.ps1 version 3.0.0" in result.stdout
+        assert "validate-skill.ps1 version 4.0.0" in result.stdout
 
     def test_skill_name_parameter(self) -> None:
         """Test -SkillName parameter customization."""
@@ -128,16 +128,17 @@ class TestPowershellIntegration:
         assert "description:" in content
 
 
-@pytest.mark.skipif(
-    sys.platform != "win32",
-    reason="PowerShell tests primarily for Windows, pwsh available on other platforms",
-)
-class TestPowershellWindowsSpecific:
-    """Windows-specific PowerShell tests."""
+class TestPowershellLineEndings:
+    """PowerShellによるCRLF読み取りを、対応する全OSで検証する。"""
 
     def test_windows_line_endings(self, temp_skill_dir: Path) -> None:
         """Test handling of Windows CRLF line endings."""
+        shutil.copytree(
+            REPO_ROOT / "skills" / "manual-bb-test-harness", temp_skill_dir, dirs_exist_ok=True
+        )
         skill_md = temp_skill_dir / "SKILL.md"
         content = "---\r\nname: test-skill\r\ndescription: Test\r\n---\r\n"
         skill_md.write_bytes(content.encode("utf-8"))
-        _result = run_powershell_script(["-SkillPath", str(temp_skill_dir)], cwd=REPO_ROOT)
+        result = run_powershell_script(["-SkillPath", str(temp_skill_dir)], cwd=REPO_ROOT)
+        assert result.returncode == 0, result.stderr
+        assert "checks passed" in result.stdout

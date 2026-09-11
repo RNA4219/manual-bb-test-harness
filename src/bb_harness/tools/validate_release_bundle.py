@@ -96,6 +96,8 @@ class ReleaseBundleValidator:
         # Check required schemas
         required_schemas = [
             "phase_contract.schema.json",
+            "requirements_review.schema.json",
+            "requirements_confidence.schema.json",
             "feature_spec.schema.json",
             "test_model.schema.json",
             "risk_register.schema.json",
@@ -227,9 +229,7 @@ class ReleaseBundleValidator:
         if "[COMMERCIAL_CONTACT]" in commercial:
             self.errors.append("COMMERCIAL-LICENSE.md still contains [COMMERCIAL_CONTACT]")
         if "https://licensing.rna4219.com/" not in commercial:
-            self.errors.append(
-                "COMMERCIAL-LICENSE.md is missing the official application portal"
-            )
+            self.errors.append("COMMERCIAL-LICENSE.md is missing the official application portal")
 
         sources = {
             "pyproject.toml": (
@@ -299,12 +299,10 @@ class ReleaseBundleValidator:
                 zf.write(file, f"schemas/{file.name}")
 
             # Examples
-            examples_dir = self.repo_root / "examples" / "artifacts"
-            for file in examples_dir.glob("**/*.json"):
-                if file.parent.name == "execution_evidence":
-                    zf.write(file, f"examples/artifacts/execution_evidence/{file.name}")
-                else:
-                    zf.write(file, f"examples/artifacts/{file.name}")
+            examples_dir = self.repo_root / "examples"
+            for pattern in ("*.json", "README.md"):
+                for file in examples_dir.rglob(pattern):
+                    zf.write(file, file.relative_to(self.repo_root).as_posix())
 
             # Goldens
             goldens_dir = self.repo_root / "goldens"

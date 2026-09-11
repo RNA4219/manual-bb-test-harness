@@ -42,6 +42,11 @@ ARTIFACT_SCHEMA_MAP = {
     "waiver_set": "waiver_set.schema.json",
     "forward_test_report": "forward_test_report.schema.json",
     "local_run_manifest": "local_run_manifest.schema.json",
+    "technique_plan": "technique_plan.schema.json",
+    "coverage_report": "coverage_report.schema.json",
+    "case_review_patch": "case_review_patch.schema.json",
+    "requirements_review": "requirements_review.schema.json",
+    "requirements_confidence": "requirements_confidence.schema.json",
 }
 
 # Try to import jsonschema
@@ -136,6 +141,8 @@ def validate_artifact_basic(artifact: dict[str, Any], schema_type: str) -> list[
         "automation_evidence": ["feature_id", "build_id", "coverage_scope", "coverage_percent"],
         "waiver_set": ["feature_id", "build_id", "waivers"],
         "local_run_manifest": ["run_id", "status", "profile", "model", "stages"],
+        "requirements_review": ["feature_id", "input_sha256", "requirements", "findings", "resolutions"],
+        "requirements_confidence": ["feature_id", "input_sha256", "score", "counts", "metrics", "issues"],
     }
 
     required = required_fields.get(schema_type, [])
@@ -151,9 +158,7 @@ def validate_artifact_jsonschema(artifact: dict[str, Any], schema: dict[str, Any
     errors: list[str] = []
 
     try:
-        validator = jsonschema.Draft202012Validator(
-            schema, format_checker=build_format_checker()
-        )
+        validator = jsonschema.Draft202012Validator(schema, format_checker=build_format_checker())
         for error in validator.iter_errors(artifact):
             path = "/" + "/".join(str(p) for p in error.path) if error.path else "/"
             errors.append(f"{path}: {error.message}")

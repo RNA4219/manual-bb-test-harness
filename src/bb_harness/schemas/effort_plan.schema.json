@@ -4,7 +4,11 @@
   "title": "EffortPlan",
   "description": "Execution effort estimation artifact. Produced by estimate_effort workflow step.",
   "type": "object",
-  "required": ["feature_id", "phases", "total_estimate_hours"],
+  "required": [
+    "feature_id",
+    "phases",
+    "total_estimate_hours"
+  ],
   "properties": {
     "feature_id": {
       "type": "string",
@@ -13,7 +17,9 @@
     },
     "phases": {
       "type": "array",
-      "items": {"$ref": "#/$defs/Phase"},
+      "items": {
+        "$ref": "#/$defs/Phase"
+      },
       "minItems": 1,
       "description": "Execution phases with effort breakdown."
     },
@@ -31,29 +37,53 @@
     },
     "execution_order": {
       "type": "array",
-      "items": {"type": "string"},
+      "items": {
+        "type": "string"
+      },
       "description": "Ordered list of case IDs or charter IDs for execution sequence."
     },
     "owners": {
       "type": "array",
-      "items": {"type": "string"},
+      "items": {
+        "type": "string"
+      },
       "description": "Assigned testers or team members."
+    },
+    "schema_version": {
+      "const": "1.1.0"
+    },
+    "migration": {
+      "$ref": "shared_defs.schema.json#/$defs/Migration"
+    },
+    "generation": {
+      "$ref": "shared_defs.schema.json#/$defs/Generation"
     }
   },
   "additionalProperties": false,
   "$defs": {
     "Phase": {
       "type": "object",
-      "required": ["phase_name", "estimate_hours"],
+      "required": [
+        "phase_name",
+        "estimate_hours"
+      ],
       "description": "Single execution phase.",
       "properties": {
         "phase_name": {
-          "enum": ["prep", "execution", "evidence", "review", "cleanup"],
+          "enum": [
+            "prep",
+            "execution",
+            "evidence",
+            "review",
+            "cleanup"
+          ],
           "description": "Phase type name."
         },
         "activities": {
           "type": "array",
-          "items": {"type": "string"},
+          "items": {
+            "type": "string"
+          },
           "description": "Specific activities in this phase."
         },
         "estimate_hours": {
@@ -67,7 +97,9 @@
         },
         "dependencies": {
           "type": "array",
-          "items": {"type": "string"},
+          "items": {
+            "type": "string"
+          },
           "description": "Dependencies on other phases or external items."
         },
         "parallelizable": {

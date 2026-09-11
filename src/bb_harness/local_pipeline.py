@@ -16,6 +16,26 @@ from typing import Any
 
 from jsonschema import Draft202012Validator
 
+from bb_harness.batched_generation import (
+    design_status,
+    generate_cases,
+    generate_model,
+    review_cases,
+)
+from bb_harness.coverage_engine import (
+    build_coverage_report,
+    build_technique_plan,
+    coverage_summary,
+    validate_case_coverage,
+)
+from bb_harness.efficient_generation import (
+    apply_review_patch,
+    compact_case_prompt,
+    remaining_work,
+    review_patch_prompt,
+)
+from bb_harness.evidence_revisions import bind_case_set
+from bb_harness.gate_engine import load_evidence_files
 from bb_harness.gate_engine import main as evaluate_gate_main
 from bb_harness.local_runtime import LocalRuntimeConfig, OpenAICompatibleClient
 from bb_harness.schema_validation import (
@@ -23,6 +43,7 @@ from bb_harness.schema_validation import (
     load_schema,
     validate_artifact,
 )
+from bb_harness.token_budget import TokenBudgetExceeded, TokenMeter, estimate_input, output_limit
 from bb_harness.tools._shared.spec_ingest_markdown import (
     extract_markdown_sections,
     ingest_markdown_spec,
@@ -43,6 +64,8 @@ ARTIFACT_SCHEMAS = {
     "effort_plan": "effort_plan.schema.json",
     "gate_decision": "gate_decision.schema.json",
     "release_brief": "release_brief.schema.json",
+    "technique_plan": "technique_plan.schema.json",
+    "coverage_report": "coverage_report.schema.json",
 }
 
 RISK_CANDIDATE_SCHEMA: dict[str, Any] = {
@@ -105,6 +128,9 @@ class LocalDesignPipeline:
         self.config = config
         self.client = client or OpenAICompatibleClient(config)
         self.stage_records: list[dict[str, Any]] = []
+        self.source_ids: set[str] = set()
+        self.generation: dict[str, Any] | None = None
+        self.meter = TokenMeter(config.token_budget)
 
     def run(
         self,
@@ -116,26 +142,52 @@ class LocalDesignPipeline:
         gate_profile: str = "standard",
     ) -> dict[str, Any]:
         """1つの仕様から一式を生成する。"""
+        self.stage_records = []
+        self.source_ids = set()
+        self.generation = None
+        self.meter = TokenMeter(self.config.token_budget)
+        stop_reason = None
+        readiness = "blocked"
         started_monotonic = time.monotonic()
         started_at = _now()
         run_id = (
             f"local-{datetime.now(timezone.utc).strftime('%Y%m%dT%H%M%SZ')}-{uuid.uuid4().hex[:8]}"
         )
-        output_dir.mkdir(parents=True, exist_ok=True)
         input_bytes = input_path.read_bytes()
+        output_dir.mkdir(parents=True, exist_ok=False)
+        self.checkpoint_dir = output_dir / "checkpoints"
         model = self.config.model or "unresolved"
         artifacts: dict[str, dict[str, Any]] = {}
         try:
             model = self.client.discover_model()
             feature = normalize_feature_spec(input_path)
+            self.source_ids = {item["id"] for item in feature["source_refs"]}
+            self.generation = {
+                "generation_run_id": run_id,
+                "prompt_template_id": "local-design",
+                "prompt_template_version": "batched-1"
+                if self.config.generation_mode == "batched"
+                else "efficient-1"
+                if self.config.generation_mode == "compact"
+                else "coverage-1",
+                "input_sha256": hashlib.sha256(input_bytes).hexdigest(),
+                "output_schema_id": "local_run_manifest.schema.json",
+                "model": {"provider": "openai-compatible", "name": model, "version": None},
+                "parameters": {"temperature": self.config.temperature, "seed": None},
+                "generated_at": started_at,
+                "review_status": "pending",
+            }
             self._save_artifact(output_dir, "feature_spec", feature, artifacts)
 
-            test_model = self._generate_artifact(
-                "test_model",
-                "test_model.schema.json",
-                _test_model_prompt(feature),
-                normalize=lambda value: _normalize_test_model(value, feature),
-            )
+            if self.config.generation_mode == "batched":
+                test_model = generate_model(self, feature)
+            else:
+                test_model = self._generate_artifact(
+                    "test_model",
+                    "test_model.schema.json",
+                    _test_model_prompt(feature),
+                    normalize=lambda value: _normalize_test_model(value, feature),
+                )
             self._save_artifact(output_dir, "test_model", test_model, artifacts)
 
             observations = self._generate_artifact(
@@ -159,39 +211,81 @@ class LocalDesignPipeline:
             )
             risks = build_risk_register(feature["feature_id"], risk_candidates)
             self._save_artifact(output_dir, "risk_register", risks, artifacts)
+            technique_plan = build_technique_plan(feature, test_model, observations, risks)
+            self._save_artifact(output_dir, "technique_plan", technique_plan, artifacts)
+            self.technique_plan = technique_plan
+            self.coverage_model = test_model
 
-            cases = self._generate_artifact(
-                "manual_case_set",
-                "manual_case_set.schema.json",
-                _case_prompt(
-                    feature,
-                    test_model,
-                    observations,
-                    risks,
-                    focus="P0/P1 riskと主要な正常・拒否経路",
-                ),
-                normalize=lambda value: _normalize_cases(value, feature, observations, risks),
-            )
-            remainder = self._generate_artifact(
-                "manual_case_remainder",
-                "manual_case_set.schema.json",
-                _case_prompt(
-                    feature,
-                    test_model,
-                    observations,
-                    risks,
-                    focus="P2/P3 risk、未被覆の境界・platform・競合・弱いoracle",
-                    existing=cases,
-                ),
-                normalize=lambda value: _normalize_cases(value, feature, observations, risks),
-            )
-            cases = _merge_case_sets(cases, remainder, feature, observations, risks)
-            cases = self._generate_artifact(
-                "manual_case_review",
-                "manual_case_set.schema.json",
-                _case_review_prompt(feature, test_model, observations, risks, cases),
-                normalize=lambda value: _normalize_cases(value, feature, observations, risks),
-            )
+            if self.config.generation_mode == "batched":
+                cases = generate_cases(self, feature, test_model, observations, risks)
+            else:
+                cases = self._generate_artifact(
+                    "manual_case_set",
+                    "manual_case_set.schema.json",
+                    (
+                        compact_case_prompt(feature, test_model, observations, risks)
+                        if self.config.generation_mode == "compact"
+                        else _case_prompt(
+                            feature,
+                            test_model,
+                            observations,
+                            risks,
+                            focus="P0/P1 riskと主要な正常・拒否経路",
+                        )
+                    ),
+                    normalize=lambda value: _normalize_cases(value, feature, observations, risks),
+                )
+                pending = remaining_work(feature, test_model, observations, risks, cases)
+                if self.config.generation_mode == "full" or any(pending.values()):
+                    remainder = self._generate_artifact(
+                        "manual_case_remainder",
+                        "manual_case_set.schema.json",
+                        (
+                            compact_case_prompt(feature, test_model, observations, risks, cases)
+                            if self.config.generation_mode == "compact"
+                            else _case_prompt(
+                                feature,
+                                test_model,
+                                observations,
+                                risks,
+                                focus="P2/P3 risk、未被覆の境界・platform・競合・弱いoracle",
+                                existing=cases,
+                            )
+                        ),
+                        normalize=lambda value: _normalize_cases(
+                            value, feature, observations, risks
+                        ),
+                    )
+                    cases = _merge_case_sets(cases, remainder, feature, observations, risks)
+            draft = cases
+            if self.config.generation_mode == "batched":
+                cases = review_cases(self, feature, test_model, observations, risks, draft)
+            elif self.config.generation_mode == "compact":
+
+                def validate_review(patch: dict) -> None:
+                    revised = apply_review_patch(draft, patch)
+                    _validate_case_semantics(revised, compact=True)
+                    _validate_source_grounding(revised, self.source_ids)
+                    checked = validate_case_coverage(revised, test_model, technique_plan)
+                    if checked["errors"]:
+                        raise ValueError("; ".join(checked["errors"][:5]))
+
+                patch = self._generate_custom(
+                    "manual_case_review",
+                    portable_schema("case_review_patch.schema.json"),
+                    review_patch_prompt(feature, test_model, observations, risks, draft),
+                    semantic_validate=validate_review,
+                )
+                cases = apply_review_patch(draft, patch)
+            else:
+                reviewed = self._generate_artifact(
+                    "manual_case_review",
+                    "manual_case_set.schema.json",
+                    _case_review_prompt(feature, test_model, observations, risks, cases),
+                    normalize=lambda value: _normalize_cases(value, feature, observations, risks),
+                )
+                cases = _preserve_review_cases(draft, reviewed, feature, observations, risks)
+            cases = bind_case_set(cases, test_model)
             _link_risks_and_cases(risks, cases)
             validate_artifact(risks, "risk_register.schema.json")
             validate_artifact(cases, "manual_case_set.schema.json")
@@ -202,6 +296,24 @@ class LocalDesignPipeline:
             self._save_artifact(output_dir, "effort_plan", effort, artifacts)
 
             lint = lint_design(feature, test_model, observations, risks, cases, effort)
+            coverage = build_coverage_report(
+                test_model,
+                technique_plan,
+                cases,
+                load_evidence_files(evidence_path) if evidence_path is not None else [],
+                build_id=build_id,
+            )
+            self._save_artifact(output_dir, "coverage_report", coverage, artifacts)
+            lint["errors"].extend(coverage["errors"])
+            if (
+                coverage["design"]["uncovered_ids"]
+                or coverage["unknown_ids"]
+                or coverage["blocked_selections"]
+            ):
+                lint["warnings"].append(
+                    "形式的被覆に未設計・未解決の項目がある。coverage_reportを確認する"
+                )
+            lint["status"] = "fail" if lint["errors"] else "pass"
             _write_json(output_dir / "lint_report.json", lint)
 
             gate = self._build_gate(
@@ -214,6 +326,9 @@ class LocalDesignPipeline:
                 build_id=build_id,
                 gate_profile=gate_profile,
             )
+            gate["evidence_summary"].update(
+                coverage_summary(coverage, feature_id=feature["feature_id"], build_id=build_id)
+            )
             self._save_artifact(output_dir, "gate_decision", gate, artifacts)
             brief = build_release_brief(feature, gate, risks)
             self._save_artifact(output_dir, "release_brief", brief, artifacts)
@@ -222,13 +337,27 @@ class LocalDesignPipeline:
             _write_json(output_dir / "quality_report.json", quality)
             (output_dir / "manual-test-design.md").write_text(
                 render_markdown(
-                    feature, test_model, observations, risks, cases, effort, gate, brief
+                    feature,
+                    test_model,
+                    observations,
+                    risks,
+                    cases,
+                    effort,
+                    gate,
+                    brief,
+                    coverage=coverage,
                 ),
                 encoding="utf-8",
             )
+            readiness = design_status(lint, coverage)
             status, error = "succeeded", None
         except Exception as exc:
             status, error = "failed", f"{type(exc).__name__}: {exc}"
+            stop_reason = (
+                "token_budget"
+                if isinstance(exc, TokenBudgetExceeded)
+                else getattr(exc, "failure_kind", "generation_error")
+            )
             raise
         finally:
             manifest = {
@@ -238,29 +367,68 @@ class LocalDesignPipeline:
                 "base_url": self.config.base_url,
                 "model": model,
                 "config_hash": _config_hash(self.config),
+                "comparison_config_hash": _config_hash(self.config, comparison=True),
                 "input_sha256": hashlib.sha256(input_bytes).hexdigest(),
                 "started_at": started_at,
                 "finished_at": _now(),
                 "elapsed_seconds": round(time.monotonic() - started_monotonic, 3),
                 "stages": self.stage_records,
                 "artifacts": artifacts,
+                "generation_mode": self.config.generation_mode,
+                "design_status": readiness,
+                "call_records": self.meter.records,
+                "usage_summary": self.meter.summary(),
+                "stop_reason": stop_reason,
             }
             if error:
                 manifest["error"] = error[:1000]
+            if self.generation:
+                manifest["generation"] = self.generation
             _write_json(output_dir / "run_manifest.json", manifest)
             validate_artifact(manifest, "local_run_manifest.schema.json")
         return manifest
 
-    def _generate_artifact(
-        self,
-        stage_name: str,
-        schema_name: str,
-        prompt: str,
-        *,
-        normalize: Callable[[dict[str, Any]], dict[str, Any]],
-    ) -> dict[str, Any]:
+    def estimate(self, input_path: Path) -> dict:
+        """モデル探索・HTTP通信なしで、初段だけ見積もる。"""
+        feature = normalize_feature_spec(input_path)
+        schema = self._stage_schema("test_model", "test_model.schema.json")
+        prompt = _test_model_prompt(feature)
+        if self.config.generation_mode == "batched":
+            from bb_harness.batched_generation import model_core_request
+
+            schema, prompt = model_core_request(feature)
+        estimate = estimate_input(SYSTEM_PROMPT, prompt, schema)
+        caps = {
+            stage: output_limit(self.config, stage)
+            for stage in (
+                "test_model",
+                "observation_set",
+                "risk_candidates",
+                "manual_case_set",
+                "manual_case_remainder",
+                "manual_case_review",
+            )
+        }
+        reservation = estimate + caps["test_model"]
+        return {
+            "generation_mode": self.config.generation_mode,
+            "estimation_method": "utf8_bytes_plus_256_v1",
+            "first_stage_input_estimate": estimate,
+            "first_stage_reservation": reservation,
+            "stage_output_limits": caps,
+            "later_stage_input_estimate": None,
+            "total_tokens_estimate": None,
+            "token_budget": self.config.token_budget,
+            "first_stage_budget_fits": self.config.token_budget is None
+            or reservation <= self.config.token_budget,
+            "note": "入力は推定、出力値は上限。後段・修復の入力と実際の消費量は未確定。",
+        }
+
+    def _stage_schema(self, stage_name: str, schema_name: str) -> dict:
         schema = portable_schema(schema_name)
         if stage_name == "test_model":
+            for field in ("boundaries", "data_partitions", "invalid_transitions"):
+                schema["properties"][field]["minItems"] = 1
             schema["required"] = list(
                 dict.fromkeys(
                     schema["required"]
@@ -272,26 +440,40 @@ class LocalDesignPipeline:
                     ]
                 )
             )
-        if stage_name == "observation_set":
-            schema["properties"]["observations"]["maxItems"] = 10
         if stage_name in {
             "manual_case_set",
             "manual_case_remainder",
             "manual_case_review",
         }:
             schema["required"] = list(dict.fromkeys(schema["required"] + ["exploratory_charters"]))
-            schema["properties"]["manual_cases"]["minItems"] = 3
-            case_limits = {
-                "manual_case_set": 8,
-                "manual_case_remainder": 5,
-                "manual_case_review": 10,
-            }
-            schema["properties"]["manual_cases"]["maxItems"] = case_limits[stage_name]
-            schema["properties"]["exploratory_charters"]["minItems"] = 1
+            schema["properties"]["manual_cases"]["minItems"] = (
+                3
+                if self.config.generation_mode == "full"
+                else 0
+                if stage_name == "manual_case_remainder"
+                else 1
+            )
+            schema["properties"]["exploratory_charters"]["minItems"] = (
+                1 if self.config.generation_mode == "full" else 0
+            )
             schema["properties"]["exploratory_charters"]["maxItems"] = 2
+
+        return schema
+
+    def _generate_artifact(
+        self,
+        stage_name: str,
+        schema_name: str,
+        prompt: str,
+        *,
+        normalize: Callable[[dict[str, Any]], dict[str, Any]],
+    ) -> dict[str, Any]:
+        schema = self._stage_schema(stage_name, schema_name)
 
         def validate(value: dict[str, Any]) -> None:
             validate_artifact(value, schema_name)
+            if self.source_ids:
+                _validate_source_grounding(value, self.source_ids)
             if stage_name == "test_model":
                 _validate_test_model_semantics(value, feature=None)
             if stage_name in {
@@ -299,7 +481,20 @@ class LocalDesignPipeline:
                 "manual_case_remainder",
                 "manual_case_review",
             }:
-                _validate_case_semantics(value)
+                if (
+                    stage_name != "manual_case_remainder"
+                    or self.config.generation_mode == "full"
+                    or value["manual_cases"]
+                ):
+                    _validate_case_semantics(
+                        value, compact=self.config.generation_mode == "compact"
+                    )
+                if hasattr(self, "coverage_model"):
+                    coverage = validate_case_coverage(
+                        value, self.coverage_model, self.technique_plan
+                    )
+                    if coverage["errors"]:
+                        raise ValueError("; ".join(coverage["errors"][:5]))
 
         return self._generate(stage_name, schema, prompt, normalize, validate)
 
@@ -320,7 +515,9 @@ class LocalDesignPipeline:
             if semantic_validate:
                 semantic_validate(value)
 
-        return self._generate(stage_name, schema, prompt, normalize or (lambda value: value), validate)
+        return self._generate(
+            stage_name, schema, prompt, normalize or (lambda value: value), validate
+        )
 
     def _generate(
         self,
@@ -333,7 +530,7 @@ class LocalDesignPipeline:
         total_elapsed = 0.0
         usage: dict[str, int] = {}
         repairs = 0
-        result = self.client.complete_json(
+        result = self._complete(
             system=SYSTEM_PROMPT,
             user=prompt,
             schema_name=stage_name,
@@ -341,17 +538,21 @@ class LocalDesignPipeline:
         )
         total_elapsed += result.elapsed_seconds
         _merge_usage(usage, result.usage)
-        value = normalize(result.value)
+        value = result.value
         try:
+            value = normalize(value)
             validate(value)
-        except (SchemaValidationError, ValueError) as first_error:
+        except (SchemaValidationError, ValueError, TypeError, KeyError) as first_error:
+            self.meter.records[-1]["outcome"] = "invalid_artifact"
             repairs = 1
             repair_prompt = (
                 f"次の{stage_name}は検証に失敗しました。誤りだけを修正しJSONのみ返してください。\n"
                 f"検証エラー: {first_error}\n"
                 f"不正な成果物: {json.dumps(value, ensure_ascii=False)}"
             )
-            result = self.client.complete_json(
+            if self.config.generation_mode == "batched":
+                repair_prompt += f"\n元の分割依頼と根拠:\n{prompt}"
+            result = self._complete(
                 system=SYSTEM_PROMPT,
                 user=repair_prompt,
                 schema_name=f"{stage_name}_repair",
@@ -359,10 +560,12 @@ class LocalDesignPipeline:
             )
             total_elapsed += result.elapsed_seconds
             _merge_usage(usage, result.usage)
-            value = normalize(result.value)
+            value = result.value
             try:
+                value = normalize(value)
                 validate(value)
-            except (SchemaValidationError, ValueError):
+            except (SchemaValidationError, ValueError, TypeError, KeyError):
+                self.meter.records[-1]["outcome"] = "invalid_artifact"
                 self.stage_records.append(
                     {
                         "name": stage_name,
@@ -373,6 +576,7 @@ class LocalDesignPipeline:
                     }
                 )
                 raise
+        self.meter.records[-1]["outcome"] = "succeeded"
         self.stage_records.append(
             {
                 "name": stage_name,
@@ -383,6 +587,30 @@ class LocalDesignPipeline:
             }
         )
         return value
+
+    def _complete(self, *, system: str, user: str, schema_name: str, schema: dict) -> Any:
+        record = self.meter.prepare(
+            schema_name, system, user, schema, output_limit(self.config, schema_name)
+        )
+        started = time.monotonic()
+        try:
+            result = self.client.complete_json(
+                system=system, user=user, schema_name=schema_name, schema=schema
+            )
+        except Exception as exc:
+            record["finish_reason"] = getattr(exc, "finish_reason", None)
+            record["model"] = getattr(exc, "model", None)
+            self.meter.finish(
+                record,
+                getattr(exc, "usage", {}),
+                getattr(exc, "elapsed_seconds", time.monotonic() - started),
+                getattr(exc, "failure_kind", "runtime_error"),
+            )
+            raise
+        record["finish_reason"] = getattr(result, "finish_reason", None)
+        record["model"] = result.model
+        self.meter.finish(record, result.usage, result.elapsed_seconds, "returned")
+        return result
 
     def _save_artifact(
         self,
@@ -438,6 +666,7 @@ class LocalDesignPipeline:
                 "profile": gate_profile,
                 "reasons": ["手動実行証跡が未指定のためrelease判断はfail closed"],
                 "evidence_summary": {
+                    "evidence_binding_mode": "case_revision",
                     "manual_by_priority": counts,
                     "mandatory_observation_rate": 0,
                 },
@@ -517,7 +746,24 @@ def portable_schema(schema_name: str) -> dict[str, Any]:
     schema, _ = load_schema(schema_name)
     result = copy.deepcopy(schema)
     shared, _ = load_schema("shared_defs.schema.json")
-    result.setdefault("$defs", {})["shared"] = copy.deepcopy(shared.get("$defs", {}))
+    definitions = shared.get("$defs", {})
+    selected = {}
+
+    def include_refs(value: Any) -> None:
+        if isinstance(value, dict):
+            for item in value.values():
+                include_refs(item)
+        elif isinstance(value, list):
+            for item in value:
+                include_refs(item)
+        elif isinstance(value, str) and value.startswith("shared_defs.schema.json#/$defs/"):
+            key = value.rsplit("/", 1)[-1]
+            if key not in selected:
+                selected[key] = copy.deepcopy(definitions[key])
+                include_refs(selected[key])
+
+    include_refs(result)
+    result.setdefault("$defs", {})["shared"] = selected
 
     def replace(value: Any) -> Any:
         if isinstance(value, dict):
@@ -662,6 +908,10 @@ def lint_design(
             errors.append(f"{case['tc_id']}: risk trace missing")
         if any(re.search(r"正しく|適切に|問題なく", item) for item in case["expected_results"]):
             warnings.append(f"{case['tc_id']}: expected result may be non-observable")
+    case_ids = {case["tc_id"] for case in cases["manual_cases"]}
+    for risk in risks["risks"]:
+        if not set(risk.get("trace_to", [])) & case_ids:
+            warnings.append(f"{risk['id']}: uncovered risk; scripted case mapping missing")
     text = json.dumps(feature, ensure_ascii=False).lower()
     if _is_stateful(text) and not model.get("invalid_transitions"):
         errors.append("stateful feature: invalid transition missing")
@@ -785,6 +1035,8 @@ def render_markdown(
     effort: dict[str, Any],
     gate: dict[str, Any],
     brief: dict[str, Any],
+    *,
+    coverage: dict[str, Any] | None = None,
 ) -> str:
     lines = [f"# {feature['title']} 手動ブラックボックステスト設計", "", "## Coverage model", ""]
     for label, key in (
@@ -821,6 +1073,33 @@ def render_markdown(
                 f"- Estimate: {item.get('estimate_minutes', 0)} min",
                 "- Steps: " + " / ".join(item["steps"]),
                 "- Expected: " + " / ".join(item["expected_results"]),
+                "",
+            ]
+        )
+        if item.get("coverage_inputs"):
+            lines.extend(
+                [
+                    "入力と手順・期待結果の対応:",
+                    "",
+                    "```json",
+                    json.dumps(item["coverage_inputs"], ensure_ascii=False, indent=2),
+                    "```",
+                    "",
+                ]
+            )
+    if coverage is not None:
+        design = coverage["design"]
+        execution = coverage["execution"]
+        lines.extend(
+            [
+                "## 技法別被覆（shadow）",
+                "",
+                f"- 設計済み: {design['covered_by_cases']} / {design['required_feasible']}",
+                f"- 実施済み: {execution['executed']} / {execution['required_feasible']}",
+                f"- 合格: {execution['passed']}（失敗も実施済みに計上）",
+                f"- 未解決: {len(coverage['unknown_ids'])}、選択不能: {len(coverage['blocked_selections'])}",
+                "- [技法計画](technique_plan.json) / [被覆の詳細・不足項目](coverage_report.json)",
+                "- 型付きモデルの範囲に対する値。新しい被覆指標はGate判断の参考値です。",
                 "",
             ]
         )
@@ -933,9 +1212,7 @@ def _normalize_cases(
         if isinstance(source_ref, dict) and isinstance(source_ref.get("refs"), list):
             if source_ref["refs"] and all(ref.startswith("AC-") for ref in source_ref["refs"]):
                 source_ref["type"] = "acceptance"
-            elif source_ref["refs"] and all(
-                ref.startswith("BR-") for ref in source_ref["refs"]
-            ):
+            elif source_ref["refs"] and all(ref.startswith("BR-") for ref in source_ref["refs"]):
                 source_ref["type"] = "requirement"
     raw_charters = value.get("exploratory_charters")
     if isinstance(raw_charters, list):
@@ -994,23 +1271,31 @@ def _merge_case_sets(
     observations: dict[str, Any],
     risks: dict[str, Any],
 ) -> dict[str, Any]:
-    """優先caseと補完caseをtitle単位で決定的に統合する。"""
+    """IDと表示名以外が一致するケースだけを統合し、異なる被覆を保持する。"""
     result: dict[str, Any] = {
         "feature_id": feature["feature_id"],
         "manual_cases": [],
         "exploratory_charters": [],
     }
-    seen_titles: set[str] = set()
+    seen_cases: set[str] = set()
     for item in primary.get("manual_cases", []) + remainder.get("manual_cases", []):
-        title_key = re.sub(r"\s+", "", item.get("title", "")).lower()
-        if title_key and title_key not in seen_titles:
-            seen_titles.add(title_key)
+        key = json.dumps(
+            {k: v for k, v in item.items() if k not in {"tc_id", "title"}},
+            sort_keys=True,
+            ensure_ascii=False,
+        )
+        if key not in seen_cases:
+            seen_cases.add(key)
             result["manual_cases"].append(item)
     seen_charters: set[str] = set()
     for item in primary.get("exploratory_charters", []) + remainder.get("exploratory_charters", []):
-        title_key = re.sub(r"\s+", "", item.get("title", "")).lower()
-        if title_key and title_key not in seen_charters:
-            seen_charters.add(title_key)
+        key = json.dumps(
+            {k: v for k, v in item.items() if k not in {"id", "title"}},
+            sort_keys=True,
+            ensure_ascii=False,
+        )
+        if key not in seen_charters:
+            seen_charters.add(key)
             result["exploratory_charters"].append(item)
     for matrix_name in ("platform_matrix", "role_matrix"):
         unique: dict[str, dict[str, Any]] = {}
@@ -1021,34 +1306,72 @@ def _merge_case_sets(
     return _normalize_cases(result, feature, observations, risks)
 
 
+def _preserve_review_cases(
+    draft: dict, reviewed: dict, feature: dict, observations: dict, risks: dict
+) -> dict:
+    """レビューで消えた実行条件を保持し、oracle・期待結果の訂正は採用する。"""
+
+    def identity(case: dict) -> str:
+        return json.dumps(
+            {
+                key: value
+                for key, value in case.items()
+                if key
+                not in {
+                    "tc_id",
+                    "title",
+                    "oracle",
+                    "source_ref",
+                    "expected_results",
+                    "priority",
+                    "estimate_minutes",
+                }
+            },
+            sort_keys=True,
+            ensure_ascii=False,
+        )
+
+    reviewed_keys = {identity(case) for case in reviewed["manual_cases"]}
+    missing = {
+        **draft,
+        "manual_cases": [
+            case for case in draft["manual_cases"] if identity(case) not in reviewed_keys
+        ],
+    }
+    return _merge_case_sets(reviewed, missing, feature, observations, risks)
+
+
+def _validate_source_grounding(value: dict, source_ids: set[str]) -> None:
+    for observation in value.get("observations", []):
+        refs = {item["id"] for item in observation.get("source_refs", [])}
+        if refs - source_ids:
+            raise ValueError(f"unknown observation sources: {sorted(refs - source_ids)}")
+    for case in value.get("manual_cases", []):
+        refs = set(case.get("oracle", {}).get("refs", [])) | set(
+            case.get("source_ref", {}).get("refs", [])
+        )
+        if refs - source_ids:
+            raise ValueError(f"unknown oracle/source refs: {sorted(refs - source_ids)}")
+
+
 def _link_risks_and_cases(risks: dict[str, Any], cases: dict[str, Any]) -> None:
+    """明示されたrisk参照だけを逆引きする。観点の一致は被覆の証明にならない。"""
     risk_observations = {risk["id"]: set(risk.get("trace_to", [])) for risk in risks["risks"]}
     risk_ids = set(risk_observations)
     items = cases["manual_cases"] + cases.get("exploratory_charters", [])
-    ordered_risk_ids = list(risk_observations)
-    for index, item in enumerate(items):
-        trace = set(item.get("trace_to", []))
-        item_observations = {trace_id for trace_id in trace if trace_id.startswith("OBS-")}
-        grounded_risks = [
-            risk_id
-            for risk_id, linked_observations in risk_observations.items()
-            if item_observations & linked_observations
-        ]
-        explicit_risks = list(trace & risk_ids)
-        linked_risks = grounded_risks or explicit_risks
-        if not linked_risks:
-            linked_risks = [ordered_risk_ids[index % len(ordered_risk_ids)]]
-        item["trace_to"] = sorted(item_observations) + sorted(set(linked_risks))
-    for index, risk in enumerate(risks["risks"]):
+    for risk in risks["risks"]:
         linked = []
         for item in items:
             if risk["id"] in item.get("trace_to", []):
                 linked.append(item.get("tc_id") or item.get("id"))
-        if not linked:
-            target = cases["manual_cases"][index % len(cases["manual_cases"])]
-            target["trace_to"].append(risk["id"])
-            linked = [target["tc_id"]]
-        risk["trace_to"] = linked
+        risk["trace_to"] = (
+            sorted(
+                risk_observations[risk["id"]]
+                - risk_ids
+                - {item.get("tc_id") or item.get("id") for item in items}
+            )
+            + linked
+        )
     priority_order = {"P0": 0, "P1": 1, "P2": 2, "P3": 3}
     priority_by_risk = {risk["id"]: risk["priority"] for risk in risks["risks"]}
     for case in cases["manual_cases"]:
@@ -1065,6 +1388,10 @@ flowsは利用者の操作経路、data_partitionsは項目名ではなく有効
 rule_columnsは条件と結果の組合せ、boundariesは具体的な境界の直前/一致/直後として書きます。
 data/rule/boundary/state(valid/invalid)/role+ownership/regression/quality lensを分解してください。
 statefulなら競合・二重実行・終端後の不正遷移、mobileならOS/lifecycle/network/permissionを含めます。
+数値境界はparameters(type/unit/step)、domain_models(variable_ids/partition_predicate/borders)へ構造化します。
+各borderはid/operator/predicate/axis/anchorを持ち、anchorには全variableの具体値を置きます。式は許可されたASTだけを使います。
+有限選択値はcombination_models、状態はstate_models(event/guard/actions/context)、条件表はdecision_tablesへ分解します。
+各モデルに実在するsource_refsとcoverage_criterionを付けます。不明な精度・条件・oracleは発明せず未構造化のまま残します。
 根拠のない実装詳細は作らないでください。\nfeature_spec:\n""" + json.dumps(
         feature, ensure_ascii=False
     )
@@ -1072,7 +1399,7 @@ statefulなら競合・二重実行・終端後の不正遷移、mobileならOS/
 
 def _observation_prompt(feature: dict[str, Any], model: dict[str, Any]) -> str:
     return """feature_specとtest_modelから、根拠付き観点を作成してください。
-重複を統合して6〜10件に絞り、直積ではなく代表組合せを選びます。
+観点は表示上まとめても、異なる境界点・条件・連続遷移の被覆項目を保持します。件数の上限を理由に必須項目を削除しません。
 IDはOBS-STATE-01形式。P0/P1相当、境界、不正遷移、権限、競合、復旧はmandatoryにします。
 source_refsはfeature_specに実在するオブジェクトだけをそのまま使用してください。\n入力:\n""" + json.dumps(
         {"feature_spec": feature, "test_model": model}, ensure_ascii=False
@@ -1104,8 +1431,12 @@ def _case_prompt(
     focus: str,
     existing: dict[str, Any] | None = None,
 ) -> str:
+    plan = build_technique_plan(feature, model, observations, risks)
+    gaps = validate_case_coverage(existing, model, plan) if existing else None
     return f"""manual caseとexploratory charterを作成してください。
 今回のfocus: {focus}
+technique_planのobligationsを保持し、coverage_inputsにmodel_ref、具体的data/path/sequence、step_refsとexpected_result_refs（1始まり）を付けます。
+coverage_obligation_idsだけを申告しても被覆になりません。補完時は未被覆IDを優先し、予算超過なら未被覆を残します。
 focus対象のriskをscripted caseで覆い、各caseに実在するAC/BRのoracle refsとsource_ref、OBSとRISK両方のtrace_to、観測可能なexpected_results、estimate_minutesを付けます。
 正常系だけでなく境界、不正状態遷移、二重/同時操作、失敗時の副作用不発を含めます。
 優先度はtrace先riskの最高priorityに合わせ、根拠なくP0へ上げません。
@@ -1118,6 +1449,8 @@ focus対象のriskをscripted caseで覆い、各caseに実在するAC/BRのorac
             "observations": observations,
             "risks": risks,
             "already_selected_do_not_duplicate": existing,
+            "technique_plan": plan,
+            "coverage_validation": gaps,
         },
         ensure_ascii=False,
     )
@@ -1138,7 +1471,7 @@ def _case_review_prompt(
 4. expected_resultsは画面、状態、件数、副作用の有無として観測可能である。
 5. 正常、境界、不正遷移、二重/同時操作、部分失敗をriskに応じて覆う。
 6. 根拠が薄い競合・復旧はhuman oracleまたはtimebox付きcharterとして扱う。
-良いcaseは維持し、重複は統合してください。JSON以外は返しません。\n入力:\n""" + json.dumps(
+異なる入力・前提・経路・期待結果・被覆項目を持つcaseは同名でも保持してください。統合後も全被覆項目を実際に満たす必要があります。JSON以外は返しません。\n入力:\n""" + json.dumps(
         {
             "feature_spec": feature,
             "test_model": model,
@@ -1174,10 +1507,11 @@ def _validate_test_model_semantics(
             raise SchemaValidationError("authorization model must include ownership context")
 
 
-def _validate_case_semantics(value: dict[str, Any]) -> None:
-    if len(value.get("manual_cases", [])) < 3:
-        raise SchemaValidationError("at least three scripted cases are required")
-    if not value.get("exploratory_charters"):
+def _validate_case_semantics(value: dict[str, Any], *, compact: bool = False) -> None:
+    minimum = 1 if compact else 3
+    if len(value.get("manual_cases", [])) < minimum:
+        raise SchemaValidationError(f"at least {minimum} scripted cases are required")
+    if not compact and not value.get("exploratory_charters"):
         raise SchemaValidationError("at least one exploratory charter is required")
 
 
@@ -1230,9 +1564,11 @@ def _merge_usage(target: dict[str, int], usage: dict[str, Any]) -> None:
             target[key] = target.get(key, 0) + value
 
 
-def _config_hash(config: LocalRuntimeConfig) -> str:
+def _config_hash(config: LocalRuntimeConfig, *, comparison: bool = False) -> str:
     safe = asdict(config)
     safe.pop("api_key", None)
+    if comparison:
+        safe.pop("generation_mode", None)
     raw = json.dumps(safe, sort_keys=True, ensure_ascii=True).encode("utf-8")
     return hashlib.sha256(raw).hexdigest()
 

@@ -1,0 +1,50 @@
+{
+  "run_id": "EXAMPLE-BATCHED-BUDGET",
+  "status": "failed",
+  "profile": "generic",
+  "base_url": "http://127.0.0.1:8080/v1",
+  "model": "example-not-called",
+  "config_hash": "63e322e98a97adfbe58e8b4b077ae5cc1c76db557c4da1ecf903f0d22625535f",
+  "comparison_config_hash": "a99af6486965f6d0d21a7ff74224a6b63505a807c014981c88f11d4e23e076a1",
+  "input_sha256": "9126664289d0ac8749899bcbb3d4e4f02f4deff315a3dfade0cc21a481204a3d",
+  "started_at": "2026-09-10T00:00:00Z",
+  "finished_at": "2026-09-10T00:00:00Z",
+  "elapsed_seconds": 0,
+  "stages": [],
+  "artifacts": {},
+  "generation_mode": "batched",
+  "design_status": "blocked",
+  "call_records": [
+    {
+      "stage": "test_model__core",
+      "repair": false,
+      "estimated_input_tokens": 7085,
+      "max_output_tokens": 6000,
+      "outcome": "budget_blocked",
+      "elapsed_seconds": 0.0,
+      "prompt_tokens": null,
+      "completion_tokens": null,
+      "total_tokens": null,
+      "usage_status": "unknown",
+      "accounted_tokens": 0,
+      "finish_reason": null,
+      "model": null
+    }
+  ],
+  "usage_summary": {
+    "calls": 0,
+    "repair_calls": 0,
+    "unreported_calls": 0,
+    "prompt_tokens": 0,
+    "completion_tokens": 0,
+    "total_tokens": 0,
+    "reported_total_tokens": 0,
+    "accounted_tokens": 0,
+    "budget_tokens": 1,
+    "remaining_tokens": 1,
+    "budget_exhausted": true,
+    "estimation_method": "utf8_bytes_plus_256_v1"
+  },
+  "stop_reason": "token_budget",
+  "error": "TokenBudgetExceeded: test_model__core: estimated reservation 13085 exceeds remaining token budget 1"
+}

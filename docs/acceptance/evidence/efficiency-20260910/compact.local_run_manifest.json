@@ -1,0 +1,70 @@
+{
+  "run_id": "local-20260910T013050Z-6e8f1f2c",
+  "status": "failed",
+  "profile": "qwen36",
+  "base_url": "http://127.0.0.1:8084/v1",
+  "model": "qwen3.6-27b",
+  "config_hash": "2223e5b0d04655ec5987fc8c6fab226b5afb60e23c2aa1dbd4e0ee13aeef160e",
+  "input_sha256": "6a49d0ab3fa58896cbe2c79c909e6f7b95390573ffdc88d5e63235b213eb56a9",
+  "started_at": "2026-09-10T01:30:50.909808Z",
+  "finished_at": "2026-09-10T01:32:38.821763Z",
+  "elapsed_seconds": 107.923,
+  "stages": [],
+  "artifacts": {
+    "feature_spec": {
+      "path": "feature_spec.json",
+      "sha256": "33b78d9438fef631d80b3f763f669623d04eaa1bcbd33461b04c73dfa02097ee",
+      "schema_valid": true
+    }
+  },
+  "generation_mode": "compact",
+  "call_records": [
+    {
+      "stage": "test_model",
+      "repair": false,
+      "estimated_input_tokens": 24224,
+      "max_output_tokens": 3500,
+      "outcome": "runtime_error",
+      "elapsed_seconds": 107.886,
+      "prompt_tokens": 836,
+      "completion_tokens": 3500,
+      "total_tokens": 4336,
+      "usage_status": "reported",
+      "accounted_tokens": 4336
+    }
+  ],
+  "usage_summary": {
+    "calls": 1,
+    "repair_calls": 0,
+    "unreported_calls": 0,
+    "prompt_tokens": 836,
+    "completion_tokens": 3500,
+    "total_tokens": 4336,
+    "reported_total_tokens": 4336,
+    "accounted_tokens": 4336,
+    "budget_tokens": null,
+    "remaining_tokens": null,
+    "budget_exhausted": false,
+    "estimation_method": "utf8_bytes_plus_256_v1"
+  },
+  "stop_reason": "generation_error",
+  "error": "LocalRuntimeError: model output is invalid JSON: Expecting ',' delimiter: line 253 column 12 (char 5665)",
+  "generation": {
+    "generation_run_id": "local-20260910T013050Z-6e8f1f2c",
+    "prompt_template_id": "local-design",
+    "prompt_template_version": "efficient-1",
+    "input_sha256": "6a49d0ab3fa58896cbe2c79c909e6f7b95390573ffdc88d5e63235b213eb56a9",
+    "output_schema_id": "local_run_manifest.schema.json",
+    "model": {
+      "provider": "openai-compatible",
+      "name": "qwen3.6-27b",
+      "version": null
+    },
+    "parameters": {
+      "temperature": 0.15,
+      "seed": null
+    },
+    "generated_at": "2026-09-10T01:30:50.909808Z",
+    "review_status": "pending"
+  }
+}

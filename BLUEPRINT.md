@@ -53,10 +53,14 @@ Web だけでなく iOS / Android も対象に含めるため、mobile 固有の
 - Output:
   - `phase_contract`
   - `feature_spec`
+  - `requirements_review`（任意の要件レビュー入力）
+  - `requirements_confidence`（要件定義の信頼度評価）
   - `test_model`
   - `observation_set`
   - `risk_register`
+  - `technique_plan`
   - `manual_case_set`
+  - `coverage_report`
   - `effort_plan`
   - `gate_decision`
   - `release_brief`
@@ -64,6 +68,8 @@ Web だけでなく iOS / Android も対象に含めるため、mobile 固有の
   - `local_run_manifest`
 
 ## 5. Minimal Flow
+
+要件の不確実性を評価する場合は、feature_specと任意のphase_contract・requirements_reviewから`evaluate requirements`でrequirements_confidenceを計算する。採点はホスト側だけで行い、根拠・入力版を固定する。Ready・生成品質採点・リリースGateの権限は維持する。契約は[spec-07](docs/specs/spec-07-requirements-confidence.md)を参照。
 
 ```mermaid
 flowchart LR
@@ -118,3 +124,11 @@ LLM応答は既存artifact schemaで拘束する。失敗artifactだけを1回re
   - `src/bb_harness/local_pipeline.py`
   - `src/bb_harness/local_profiles.yaml`
   - `docs/local-model-guide.md`
+
+## 生成効率・証跡版（2026-09-10）
+
+追加設計は[spec-05](docs/specs/spec-05-efficient-generation-evidence-revisions.md)。`efficient_generation`が未被覆入力とレビュー差分、`token_budget`が呼出予約とusage集計、`evidence_revisions`がケース本文・モデルの版を担当する。coverageとGateで版を照合し、旧形式はlegacy_unverifiedを明示する。
+
+## 分割生成・完了判定（2026-09-10）
+
+`batched_generation`はモデル概要／技法と、ケース／レビューの有限な分割を担当する。`design_status`は生成statusと別に設計の不足を表す。比較は実ファイルのschema/hashと再計算した被覆を確認する。[spec-06](docs/specs/spec-06-bounded-generation-readiness.md)を正本とする。

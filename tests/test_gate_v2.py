@@ -16,6 +16,7 @@ from bb_harness.gate_engine import (
     count_results_by_priority,
     evaluate_gate,
     extract_case_results,
+    load_evidence_files,
     load_json,
     matching_gate_pair,
     observation_rate,
@@ -39,6 +40,51 @@ def evidence(**overrides: object) -> dict[str, object]:
     }
     value.update(overrides)
     return value
+
+
+def generation_manifest() -> dict[str, object]:
+    path = Path(__file__).resolve().parents[1] / (
+        "examples/artifacts/techniques/discount-domain/discount.local_run_manifest.json"
+    )
+    return load_json(path)
+
+
+def test_evidence_directory_distinguishes_valid_generation_log(tmp_path: Path) -> None:
+    (tmp_path / "manifest.json").write_text(json.dumps(generation_manifest()), encoding="utf-8")
+    (tmp_path / "execution.json").write_text(json.dumps(evidence()), encoding="utf-8")
+    items = load_evidence_files(tmp_path)
+    assert len(items) == 1
+    assert items[0]["tc_id"] == "TC-1"
+    selected, build = validate_and_select_evidence(items, FEATURE, BUILD)
+    assert selected == items
+    assert build == BUILD
+
+
+def test_evidence_directory_rejects_broken_generation_log(tmp_path: Path) -> None:
+    manifest = generation_manifest()
+    manifest["artifacts"] = None
+    (tmp_path / "manifest.json").write_text(json.dumps(manifest), encoding="utf-8")
+    with pytest.raises(GateInputError):
+        load_evidence_files(tmp_path)
+
+
+def test_evidence_directory_does_not_hide_execution_markers(tmp_path: Path) -> None:
+    manifest = generation_manifest()
+    manifest["result"] = "pass"
+    (tmp_path / "manifest.json").write_text(json.dumps(manifest), encoding="utf-8")
+    items = load_evidence_files(tmp_path)
+    assert len(items) == 1
+    with pytest.raises(GateInputError):
+        validate_schema(items[0], "execution_evidence.schema.json")
+
+
+def test_explicit_generation_log_is_not_execution_evidence(tmp_path: Path) -> None:
+    path = tmp_path / "manifest.json"
+    path.write_text(json.dumps(generation_manifest()), encoding="utf-8")
+    items = load_evidence_files(path)
+    assert len(items) == 1
+    with pytest.raises(GateInputError):
+        validate_and_select_evidence(items, FEATURE, BUILD)
 
 
 def valid_automation(profile: str = "standard") -> dict[str, object]:

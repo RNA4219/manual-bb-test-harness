@@ -1,0 +1,50 @@
+{
+  "schema_version": "manual-bb-ci-receipt/v1",
+  "run_url": "https://github.com/RNA4219/manual-bb-test-harness/actions/runs/34548744025",
+  "pull_request": 13,
+  "head_commit": "33ebf3257b1242fa79e5fc4af79548d9b7930ed4",
+  "tested_merge_commit": "7a444d112b6955dd6289fc625ddf36904276ff05",
+  "run_id": "34548744025",
+  "run_attempt": 1,
+  "test_count": 1026,
+  "failures": 0,
+  "skipped": 0,
+  "coverage_percent": 88.18207520497597,
+  "qeg_verdict": "go",
+  "qeg_summary": {
+    "totalTargets": 1,
+    "passed": 1,
+    "baselineAccepted": 0,
+    "gateFailed": 0,
+    "cliErrors": 0,
+    "dqCounts": [],
+    "blockerCount": 0,
+    "residualRiskCount": 0,
+    "humanReviewCount": 0
+  },
+  "hate_completeness": {
+    "score": 1.0,
+    "partial": false,
+    "parserFailures": [],
+    "unsupportedClaims": [],
+    "excludedArtifacts": []
+  },
+  "producer_revisions": {
+    "hate": "f76f1b90772bc609094ca568cd44ca161593349f",
+    "qeg": "d957fc25907e1b678add65eb47f92853dd093d32"
+  },
+  "artifact_name": "hate-qeg-evidence-1",
+  "source_hashes": {
+    "raw/junit.xml": "sha256:48b7ed20ce66e0e2ab17302221aa10220ae4734738470f5bb68770eca258941f",
+    "hate/export/qeg-bundle.json": "sha256:03dc43867df993b05760e90f90c82660816a9ece32af727987b5ba3644ba2e5e",
+    "qeg/gate-verdict.json": "sha256:1a03b577f98d8c521dec5a8878524116b2bce0c7ae2b88cc929c5a86718d3b97",
+    "qeg-ci-report.json": "sha256:7bd1d2a5a81f482c36ad936e7be5b97c2ed5978124edee87c1169275bb321cef"
+  },
+  "not_evaluated": [
+    "リリース承認",
+    "手動受入",
+    "実LLM・外部サービスの受入",
+    "RanD・Code-to-gateの全producer連携",
+    "変更行と個別testの対応"
+  ]
+}

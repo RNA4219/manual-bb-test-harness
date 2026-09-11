@@ -23,6 +23,7 @@ def add_subparser(subparsers: argparse._SubParsersAction) -> None:
     parser.add_argument("--observations", type=Path, help="Observation set JSON file")
     parser.add_argument("--automation", type=Path, help="Automation evidence JSON file")
     parser.add_argument("--waivers", type=Path, help="Waiver set JSON file")
+    parser.add_argument("--coverage-report", type=Path, help="参考値として追加する被覆レポート")
     parser.add_argument("--build-id", help="Build identifier to evaluate")
     parser.add_argument("--output", type=Path, required=True, help="Output gate decision file")
     parser.add_argument(
@@ -58,6 +59,7 @@ def run(args: argparse.Namespace) -> int:
         ("--automation", args.automation),
         ("--waivers", args.waivers),
         ("--build-id", args.build_id),
+        ("--coverage-report", getattr(args, "coverage_report", None)),
     ):
         if value is not None:
             extra_args.extend([option, str(value)])

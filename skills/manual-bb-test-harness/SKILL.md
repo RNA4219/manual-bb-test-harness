@@ -1,6 +1,6 @@
 ---
 name: manual-bb-test-harness
-description: 手動ブラックボックス前提で、仕様・受入条件・変更点・不具合履歴・自動テスト証跡から、根拠付きテスト観点、リスク優先度、手動テストケース、工数見積り、品質ゲート判定、Go/No-Go brief を作る。Use when Codex needs to design or review manual black-box test plans, derive equivalence/boundary/decision/state coverage, triage missing oracles, assess release readiness, or build a small JSON-contract harness for QA workflows.
+description: 手動ブラックボックス前提で、仕様・受入条件・変更点・不具合履歴・自動テスト証跡から、根拠付きテスト観点、リスク優先度、手動テストケース、工数見積り、品質ゲート判定、Go/No-Go brief を作る。要確認件数・重大度・レビュー根拠から要件定義の信頼度も評価する。Use when Codex needs to assess requirements confidence, design or review manual black-box test plans, derive equivalence/boundary/decision/state coverage, triage missing oracles, assess release readiness, or build a small JSON-contract harness for QA workflows.
 ---
 
 # Manual BB Test Harness
@@ -23,13 +23,15 @@ description: 手動ブラックボックス前提で、仕様・受入条件・�
 
 企画、モック、要件メモなど、開発着手前の入力を扱う場合は、先に `references/ready-phase-contract.md` を読み、`phase_contract` で Definition of Ready を判定する。
 
+要件定義の信頼度・要確認件数を評価するときは `references/requirements-confidence.md` を読み、`evaluate requirements`で採点する。レビュー・解決の根拠を記録し、ReadyやリリースGoと区別する。
+
 1. `normalize_intake`: 仕様、受入条件、業務ルール、変更点、対象環境、既存証跡を `feature_spec` に正規化する。不足情報は `ok / degraded / blocked` で分類し、推測は assumption として残す。
 2. `model_test_surface`: `flow / state / rule / data / role / regression impact` に分解し、coverage item の母集合を作る。
 3. `derive_observations`: 同値分割、境界値、デシジョンテーブル、状態遷移、経験ベース探索チャーターから観点を作る。
 4. `assess_risk`: impact x likelihood を基底に、検出困難性、変更波及、外部依存、権限感度、自動テスト信用を補正して `P0..P3` を付ける。
-5. `synthesize_manual_cases`: 高リスク観点を優先し、重複を減らした最小の手動ケース集合へ圧縮する。各 scripted case には oracle と source_ref を必須にする。
+5. `plan_techniques / synthesize_manual_cases`: 型付きモデルから `technique_plan` と被覆義務を確定し、高リスク観点を優先してケースを作る。各 scripted case に oracle、source_ref、具体的な入力と被覆対応を持たせる。統合後も必要な入力点・条件・連続経路を保持する。
 6. `estimate_effort`: prep、execution、evidence、retry buffer を分けて見積もり、実行順を出す。
-7. `evaluate_gates`: 自動テスト証跡、手動 P0/P1 結果、欠陥状態、残余リスク、waiver を合わせて `go / conditional_go / no_go` を判定する。
+7. `evaluate_gates`: モデルと具体的入力から `coverage_report` を再計算し、設計済み・実施済み・合格を分離する。新しい被覆指標はshadowとして報告し、既存Gateは自動証跡、P0/P1結果、欠陥、残余リスク、waiverで判定する。
 8. `assemble_release_brief`: ステークホルダー向けに 1 ページ相当の判断材料へ整える。
 
 ## Artifact 方針
@@ -37,10 +39,11 @@ description: 手動ブラックボックス前提で、仕様・受入条件・�
 - 共有メモリではなく型付き artifact でつなぐ。
 - 全 artifact に `source_refs`、`assumptions`、`confidence` または根拠文を持たせる。
 - `black` を release acceptance の主役にし、`gray` はログや DB など限定内部情報による補助、`white` は自動テスト evidence の受け皿にする。
-- P0/P1 相当 feature だけ multi-run を検討する。3 run を目安に `normalized_title + technique + trace_to` で merge し、support_count が低い観点は optional に落とす。
+- multi-run の結果を統合する場合、入力値、条件、経路、期待結果、被覆ID、traceを比較する。同じタイトルだけで削除せず、required義務をsupport_countだけでoptionalに落とさない。
 - 出力をレビューするときは、典型的な失敗モードを `references/failure-modes.md` で確認する。
 
 詳細な artifact と schema の形は `references/artifact-contract.md` を読む。
+正式な技法被覆、型付きモデル、移行、Local Modeの追加成果物を扱うときは `references/technique-coverage.md` を読む。
 対象に iOS / Android / mobile が含まれる場合は `references/platform-pack-mobile.md` も読む。
 
 ## ケース設計ルール
@@ -72,3 +75,7 @@ EC、注文、決済、在庫、キャンセル、返金が主題なら `referen
 テンプレートは `references/output-templates.md` を読む。
 
 Skill 自体を評価するときは `references/forward-test.md` の golden input を使う。
+
+## 生成効率・証跡版（2026-09-10）
+
+Local Modeの生成・予算・証跡を扱う場合は `references/efficient-generation.md` を読む。compactでは未被覆補完と差分レビューを使い、実測usageと推定を区別する。新しい実行証跡はケースとモデルの版を照合する。

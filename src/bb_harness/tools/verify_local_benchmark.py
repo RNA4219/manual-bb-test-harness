@@ -41,15 +41,7 @@ def _risk_math_valid(register: dict[str, Any]) -> bool:
             - 2 * modifiers.get("auto_coverage_credit", 0)
         )
         score = round(min(100.0, raw * 100.0 / 124.0), 1)
-        priority = (
-            "P0"
-            if score >= 70
-            else "P1"
-            if score >= 55
-            else "P2"
-            if score >= 35
-            else "P3"
-        )
+        priority = "P0" if score >= 70 else "P1" if score >= 55 else "P2" if score >= 35 else "P3"
         if float(risk.get("score", -1)) != score or risk.get("priority") != priority:
             return False
     return True
@@ -154,7 +146,9 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--input", type=Path, required=True, help="Benchmark root directory")
     parser.add_argument("--scores", type=Path, help="Independent rubric score JSON")
     parser.add_argument("--output", type=Path, help="Write summary JSON")
-    parser.add_argument("--version", action="version", version=f"verify-local-benchmark {__version__}")
+    parser.add_argument(
+        "--version", action="version", version=f"verify-local-benchmark {__version__}"
+    )
     args = parser.parse_args(argv)
     try:
         result = verify_benchmark(args.input, args.scores)
@@ -163,7 +157,9 @@ def main(argv: list[str] | None = None) -> int:
             args.output.parent.mkdir(parents=True, exist_ok=True)
             args.output.write_text(rendered, encoding="utf-8")
         print(rendered, end="")
-        return 0 if result["machine_checks_passed"] and (not args.scores or result["accepted"]) else 1
+        return (
+            0 if result["machine_checks_passed"] and (not args.scores or result["accepted"]) else 1
+        )
     except (OSError, KeyError, TypeError, ValueError) as exc:
         print(f"Error: {exc}", file=sys.stderr)
         return 1

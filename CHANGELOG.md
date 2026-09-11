@@ -2,12 +2,26 @@
 
 ## Unreleased
 
+## [4.0.0] - 2026-09-11
+
+- artifact契約拡張をmajorとするrelease policyに従い、package・CLI・PowerShell validator・現行ドキュメントを4.0.0へ更新。
+- 要確認件数・重大度・密度・レビュー済み率による要件定義信頼度評価とJSON／Markdownレポートを追加。入力hashと解決根拠を照合し、LLM呼出なしで再評価できる。
+- compact生成を既定にし、通信しない見積もり、run単位のトークン予算、batched分割生成、出力上書き防止、設計状態、ケース・モデルと実行証跡の版照合を追加。
+- 実LLMによるトークン削減率の比較とbatched全段完走は未達。制約と実測結果はspec-05／06の検収記録に保存。
+- 実pytestの証跡を固定版HATEで正規化し、QEGのhash検証・実行対象照合・Gate判定へ渡すCIジョブを追加。全体85%・Gate90%を維持し、失敗時も証跡を保存する。CI範囲のgoと実LLM・手動受入・リリース承認を区別する。
+
+- Deep Researchの拡張要件から、型付き技法モデル、technique_plan、独立したcoverage_report、非破壊migrateコマンドを追加。追加artifact契約は1.1.0、既存入力は互換維持。
+- Domain/組み合わせ/状態経路/決定表/CRUD/scenario/checklistと、random・metamorphicの実施予算を検証。設計・実施・合格を分離し、Gateへshadow指標を追加。
+- Local Modeの同名ケース削除、riskへの機械的接続、review時のケース消失を修正。生成来歴と入力・手順対応を保存し、必要なschema定義のみモデルへ送信。
+
 - OpenAI互換のllama.cpp / LM Studioを明示的に選択するLocal Modeとして、`run local-design` と `generic` / `qwen36` profileを追加。
 - LLMをcoverage・observation・risk候補・case候補の生成に限定し、schema repair、risk/effort算術、lint、Gateをhost側でfail closed化。
 - Qwen向けセルフレビュー、loopback既定、secret/raw promptを残さないrun manifest、70点台受入計画を追加。
 - Qwen3.6のthinking有効時にJSON contentが空になる実測結果を受け、qwen36 profileをthinking offへ固定し、段階生成とself-reviewで補強。
 
-## [3.0.0] - Unreleased
+## [3.0.0] - タグ未発行
+
+以下はmainへ反映済みの3.0.0準備履歴で、4.0.0にも含まれる。
 
 - ライセンスをRNA Third-Party Service Attribution License 1.0へ変更し、第三者向け有償サービス利用を顧客向け帰属表示付きで許可。
 - 帰属表示なしのホワイトラベル利用向けに、別途書面による商用ライセンス導線を追加。
@@ -133,3 +147,14 @@ Keep a Changelog形式, Semantic Versioning準拠。
 - Domain packs (EC, SaaS-RBAC)
 
 [^1]: 当時の記録。現在のテスト数・カバレッジは異なる可能性がある。最新値は `uv run pytest` 実行で確認。
+
+## 生成効率・証跡版（2026-09-10）
+
+未被覆補完と差分レビューのcompactモードを既定化。事前見積もり・token予算・失敗を含むusage集計、ケース/モデルの版照合、非破壊bind-cases、実モデルのfull/compact比較を追加。仕様は[spec-05](docs/specs/spec-05-efficient-generation-evidence-revisions.md)。
+
+## 分割生成・完了判定（2026-09-10）
+
+batchedモードでモデル・ケース・レビューを分割。finish_reasonを確認し、未完了JSON応答を拒否する。出力先を新規ディレクトリに限定し、design_statusと終了コード2を追加。比較を実ファイルと被覆の再計算で検証し、--modesで対象を選択できるようにした。
+# 要件定義の信頼度評価（2026-09-11）
+
+`evaluate requirements`を追加。要確認の件数・重大度・密度・レビュー済み率を決定的に採点し、JSON／Markdownと未記入のレビュー雛形を出す。入力hash、引用可能な根拠、oracle、解決記録を検証し、重大未解決や未レビューで高信頼を誤表示しない。Ready／Gateは独立。[spec-07](docs/specs/spec-07-requirements-confidence.md)を参照。
