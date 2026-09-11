@@ -29,6 +29,18 @@ Domain、組み合わせ、状態経路、決定表、CRUD等を型付きモデ�
 
 ## Local Mode
 
+Pythonパッケージは`bb-harness`として配布します。
+[PyPI](https://pypi.org/project/bb-harness/)または
+[GitHub Release](https://github.com/RNA4219/manual-bb-test-harness/releases/tag/v4.0.0)から導入できます。
+
+```powershell
+python -m pip install bb-harness==4.0.0
+bb-harness --version
+```
+
+Skill本体・golden入力を使う場合は、本リポジトリも取得してください。
+公開手順は[リリース規約](docs/release-policy.md#pypi公開仕様)を参照してください。
+
 Local Modeは、provider障害時にもOpenAI互換のローカルLLMでテスト設計を継続するための明示的な実行モード。LLMを候補生成器に限定し、schema、risk・工数計算、lint、Gateはホスト側で制御する。
 
 ### Qwen3.6 27Bで実行
