@@ -6,6 +6,7 @@
 
 - 最終確認対象`ec28bbc`で全1026件成功（108.11秒）、全体branch coverage 88.18%。Gate専用107件も成功し、coverage 91.01%。基準85%・90%を維持した。
 - この成功試行をHATEへ渡し、eligible・export success・partial=falseを確認。QEG実CLIも`go`、DQ 0、blocker 0、終了コード0。ログ・証跡は`tmp/hate-qeg-ec28bbc/`と対応する`tmp/hate-qeg-ec28bbc-*.log`。
+- QEG CI reportも`report --json --out ... --github-summary`で生成し、終了コード0を確認。成果物は`tmp/hate-qeg-ec28bbc/qeg-ci-report.json`。workflowは固定consumerのこの引数契約に合わせている。
 - wheel／sdist smoke、Skill validator、schema例29件も成功。パッケージ検証はworkspace内のuv cacheを使用し、offlineで実施した。
 - CI境界の回帰25件、既存仕様validator 32件の計57件が成功。ruff、diff check、Workflow Cookbook freshnessも成功。
 - 実pytest 1026件の出力をHATEで正規化・exportし、eligible、export success、partial=false、missing_executions=0を確認。

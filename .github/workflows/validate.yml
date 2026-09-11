@@ -129,7 +129,7 @@ jobs:
         if: ${{ always() && hashFiles('tmp/ci-evidence/qeg/gate-input.json') != '' }}
         run: >-
           node tmp/quality-tools/qeg/qeg-report-action/dist/cli.mjs report
-          --output tmp/ci-evidence/qeg-ci-report.json --github-summary
+          --json --out tmp/ci-evidence/qeg-ci-report.json --github-summary
           tmp/ci-evidence/qeg > tmp/ci-evidence/qeg-report.log 2>&1
       - name: Preserve HATE and QEG evidence
         if: always()
