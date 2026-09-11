@@ -1,12 +1,12 @@
 {
-  "version": "4.0.0",
+  "version": "4.0.1",
   "generated_at": "2026-09-10T18:49:27.509380+00:00",
   "description": "manual-bb-test-harness Workflow Cookbook Hot List - Primary entry points",
   "project_status": {
     "tier": 3,
     "cli_status": "complete",
     "import_status": "complete",
-    "test_count": 1026,
+    "test_count": 1039,
     "total_capsules": 33,
     "last_updated": "2026-09-11"
   },

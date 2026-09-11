@@ -170,4 +170,4 @@ jobs:
         with:
           version: "0.11.12"
       - name: Isolated wheel and sdist verification
-        run: uv run python tools/ci/package_smoke.py
+        run: uv run --extra dev python tools/ci/package_smoke.py

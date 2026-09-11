@@ -12,7 +12,7 @@ import zipfile
 from email.parser import BytesParser
 from pathlib import Path
 
-from package_smoke import smoke_artifact, verify_license_documents
+from package_smoke import smoke_artifact, verify_classifiers, verify_license_documents
 
 
 def verify_bundle(directory: Path, tag: str) -> list[Path]:
@@ -54,6 +54,7 @@ def verify_bundle(directory: Path, tag: str) -> list[Path]:
         headers = BytesParser().parsebytes(metadata, headersonly=True)
         if headers.get_all("Name") != ["bb-harness"] or headers.get_all("Version") != [version]:
             raise ValueError(f"パッケージ名または版の不一致: {artifact.name}")
+        verify_classifiers(headers.get_all("Classifier", []))
         verify_license_documents(artifact)
     return artifacts
 

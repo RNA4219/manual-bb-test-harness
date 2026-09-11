@@ -2,7 +2,7 @@
   "id": "README.md",
   "role": "overview",
   "title": "Project Overview",
-  "summary": "4.0.0の利用入口。要件定義信頼度評価、技法別被覆検証、compact・batched生成とトークン予算、HATE・QEG CIを案内する。Local Modeの実行例、ライセンス、検証手順と各仕様・ガイドへの導線を含む。実LLMの削減率比較とbatched全段完走は未完了で、CIのgoはリポジトリ自動検証の範囲。",
+  "summary": "4.0.1の利用入口。PyPI導入方法、要件定義信頼度評価、技法別被覆検証、compact・batched生成とトークン予算、HATE・QEG CIを案内する。Local Modeの実行例、ライセンス、検証手順と各仕様・ガイドへの導線を含む。実LLMの削減率比較とbatched全段完走は未完了で、CIのgoはリポジトリ自動検証の範囲。",
   "public_api": [],
   "deps_out": [
     "HUB.codex.md",

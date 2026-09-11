@@ -1,6 +1,6 @@
 # SPEC: manual-bb-test-harness 改修仕様書
 
-現行契約: **4.0.0** / 検証済みテスト: **1026件** / Workflow Cookbook: **33 nodes・45 edges・33 capsules** / 次回レビュー: **2026-10-11**
+現行契約: **4.0.1** / 検証済みテスト: **1039件** / Workflow Cookbook: **33 nodes・45 edges・33 capsules** / 次回レビュー: **2026-10-11**
 
 ## 概要
 
@@ -87,9 +87,9 @@
 
 ## Version
 
-4.0.0 - Keep a Changelog形式、[release policy](docs/release-policy.md)に準拠。
+4.0.1 - Keep a Changelog形式、[release policy](docs/release-policy.md)に準拠。
 
-artifact契約の拡張を含むためmajorを更新する。追加artifactの契約versionは1.1.0を維持し、package、CLI、PowerShell validator、README、Workflow Cookbookの現行versionを4.0.0へ揃える。既存入力との互換性と、実LLM比較・batched全段完走の未達記録を保持する。更新後のPR CI成功を確認してmainへマージし、mainのCI成功コミットへv4.0.0タグを付ける。
+4.0.0でartifact契約の拡張に伴うmajor更新を行った。4.0.1ではPyPIが拒否した未登録classifierを除去し、PyPAの分類辞書によるbuild・公開前検証を追加する。package、CLI、PowerShell validator、README、Workflow Cookbookの現行版を4.0.1へ同期する。追加artifact契約1.1.0、既存入力との互換性、実LLM比較・batched全段完走の未達記録を保持する。PRとmainのCI成功を確認し、v4.0.1タグから新規配布物を作成する。既存v4.0.0タグ・配布物は変更しない。
 
 ## 分割生成・完了判定（2026-09-10）
 

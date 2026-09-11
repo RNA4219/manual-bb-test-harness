@@ -1,8 +1,8 @@
 ---
 intent_id: INT-MBB-001
 owner: manual-bb-test-harness
-release_version: 4.0.0
-test_count: 1026
+release_version: 4.0.1
+test_count: 1039
 knowledge_map: 33 nodes, 45 edges, 33 capsules
 next_review_due: 2026-10-11
 status: active
