@@ -426,6 +426,43 @@ def test_lint_detects_oracle_trace_state_and_ownership_gaps(tmp_path: Path) -> N
     assert any("ownership context" in item for item in lint["errors"])
 
 
+@pytest.mark.parametrize("fault,expected", [
+    ("oracle", "oracle refs missing"), ("source", "source_ref missing"),
+    ("trace", "risk trace missing"), ("effort", "effort arithmetic mismatch"),
+    ("mobile", "background_resume matrix missing"),
+    ("mobile-resume", "adverse network matrix missing"),
+    ("mobile-offline", "permission matrix missing"),
+])
+def test_generated_design_rejects_single_missing_quality_requirement(tmp_path, fault, expected):
+    source = tmp_path / "order-cancel.input.md"
+    _feature_input(source)
+    output = tmp_path / "out"
+    config = LocalRuntimeConfig(profile="generic", base_url="http://127.0.0.1:8080/v1",
+                                model="fake", generation_mode="full", timeout_seconds=10,
+                                temperature=0.1, max_tokens=1000)
+    LocalDesignPipeline(config, client=FakeClient(_responses())).run(source, output)
+    values = {kind: json.loads((output / f"{kind}.json").read_text(encoding="utf-8"))
+              for kind in ("feature_spec", "test_model", "observation_set", "risk_register", "manual_case_set", "effort_plan")}
+    case = values["manual_case_set"]["manual_cases"][0]
+    case["priority"] = "P1"
+    if fault == "oracle":
+        case["oracle"]["refs"] = []
+    elif fault == "source":
+        case["source_ref"]["refs"] = []
+    elif fault == "trace":
+        case["trace_to"] = [ref for ref in case["trace_to"] if not ref.startswith("RISK-")]
+    elif fault == "effort":
+        values["effort_plan"]["total_estimate_hours"] += 1
+    else:
+        values["feature_spec"]["devices"] = ["iOS"]
+        matrix = [] if fault == "mobile" else [{"platform": "iOS", "lifecycle": "background_resume",
+                                               "network": "offline" if fault == "mobile-offline" else "wifi"}]
+        values["manual_case_set"]["platform_matrix"] = matrix
+    lint = lint_design(*(values[kind] for kind in ("feature_spec", "test_model", "observation_set", "risk_register", "manual_case_set", "effort_plan")))
+    assert lint["status"] == "fail"
+    assert any(expected in error for error in lint["errors"])
+
+
 def test_execution_evidence_uses_existing_gate_engine(tmp_path: Path) -> None:
     input_path = tmp_path / "order-cancel.input.md"
     first_output = tmp_path / "first"

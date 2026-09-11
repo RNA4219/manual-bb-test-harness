@@ -2,9 +2,22 @@
 
 from __future__ import annotations
 
+import hashlib
+import json
 import re
 from pathlib import Path
 from typing import Any
+
+
+def read_markdown(path: Path) -> str:
+    """先頭のUTF-8 BOMだけを除去し、本文の文字と行位置を保持する。"""
+    return path.read_text(encoding="utf-8-sig")
+
+
+def fallback_feature_id(stem: str) -> str:
+    """既存の要件評価と互換の、場所・時刻に依存しない代替ID。"""
+    content = json.dumps(stem, ensure_ascii=False).encode("utf-8")
+    return "MD-" + hashlib.sha256(content).hexdigest()[:12]
 
 
 def parse_yaml_frontmatter(content: str) -> dict[str, str]:
@@ -95,7 +108,7 @@ def normalize_section_name(name: str) -> str:
 def ingest_markdown_spec(path: Path) -> dict[str, Any]:
     """Ingest a feature specification from a Markdown file."""
     try:
-        content = path.read_text(encoding="utf-8")
+        content = read_markdown(path)
     except OSError as exc:
         raise ValueError(f"Cannot read {path}: {exc}") from exc
 
@@ -107,6 +120,8 @@ def ingest_markdown_spec(path: Path) -> dict[str, Any]:
     feature_id = frontmatter.get("feature_id", frontmatter.get("id", ""))
     if not feature_id:
         feature_id = re.sub(r"[^A-Z0-9-]", "", path.stem.upper().replace("-", "-"))
+    if not feature_id:
+        feature_id = fallback_feature_id(path.stem)
 
     result: dict[str, Any] = {
         "feature_id": feature_id,

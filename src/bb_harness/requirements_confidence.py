@@ -11,6 +11,7 @@ from pathlib import Path
 from typing import Any
 
 from bb_harness.schema_validation import validate_artifact
+from bb_harness.tools._shared.spec_ingest_markdown import read_markdown
 from bb_harness.tools.spec_ingest import extract_markdown_sections, ingest_markdown_spec
 
 WEIGHTS = {"critical": 8, "high": 4, "medium": 2, "low": 1}
@@ -50,7 +51,7 @@ def load_input(path: Path) -> tuple[dict, list[dict]]:
         return json.loads(path.read_text(encoding="utf-8")), []
     if path.suffix.lower() not in {".md", ".markdown"}:
         raise ValueError("入力はMarkdownまたはfeature_spec JSONを指定してください")
-    text = path.read_text(encoding="utf-8")
+    text = read_markdown(path)
     feature = ingest_markdown_spec(path)
     aliases = {
         "受入条件": "acceptance_criteria",
@@ -76,8 +77,6 @@ def load_input(path: Path) -> tuple[dict, list[dict]]:
             feature.setdefault(field, []).extend(items)
     # 文書の未取込部分の変更でもレビューを失効させ、実内容を引用できるようにする。
     feature["source_refs"][0]["excerpt"] = text.strip()
-    if not feature["feature_id"]:
-        feature["feature_id"] = "MD-" + _digest(path.stem)[:12]
     heading = re.search(r"^#\s+(.+)$", text, re.MULTILINE)
     if heading:
         feature["title"] = heading[1].strip()

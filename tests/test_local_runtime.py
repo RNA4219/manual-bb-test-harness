@@ -5,6 +5,7 @@ from __future__ import annotations
 import io
 import json
 import urllib.error
+from dataclasses import replace
 
 import pytest
 
@@ -104,6 +105,79 @@ def _client(model: str | None = None) -> OpenAICompatibleClient:
             max_tokens=100,
         )
     )
+
+
+@pytest.mark.parametrize("timeout,expected", [("12.5", 12.5), ("invalid", None), ("0", None), ("-1", None)])
+def test_environment_timeout_is_applied_or_rejected(monkeypatch, timeout, expected):
+    monkeypatch.setenv("BB_HARNESS_LOCAL_TIMEOUT", timeout)
+    if expected is None:
+        with pytest.raises(LocalRuntimeError, match="numeric|greater than zero"):
+            resolve_config("generic")
+    else:
+        assert resolve_config("generic").timeout_seconds == expected
+
+
+@pytest.mark.parametrize("endpoint", ["file:///local", "localhost:8080/v1", "http://"])
+def test_malformed_endpoint_is_rejected(endpoint):
+    with pytest.raises(LocalRuntimeError, match="absolute http"):
+        resolve_config("generic", base_url=endpoint)
+
+
+def test_localhost_endpoint_is_supported():
+    assert resolve_config("generic", base_url="http://localhost:8080/v1").base_url == "http://localhost:8080/v1"
+
+
+def test_completion_request_serializes_utf8_and_authorization(monkeypatch):
+    client = _client("loaded")
+    client.config = replace(client.config, api_key="synthetic-test-key")
+    captured = []
+
+    def respond(request, timeout):
+        captured.append(request)
+        assert timeout == 1
+        return io.BytesIO(json.dumps({"choices": [{"message": {"content": '{"保存":true}'}}]}).encode("utf-8"))
+
+    monkeypatch.setattr("urllib.request.urlopen", respond)
+    result = client.complete_json(system="仕様", user="保存", schema_name="example", schema={"type": "object"})
+    assert result.value == {"保存": True}
+    request = captured[0]
+    assert request.get_method() == "POST"
+    assert request.get_header("Authorization") == "Bearer synthetic-test-key"
+    assert request.get_header("Content-type") == "application/json"
+    assert json.loads(request.data)["messages"][0]["content"] == "仕様"
+
+
+@pytest.mark.parametrize("raw,match", [(b"{", "invalid JSON"), (b"[]", "JSON object")])
+def test_invalid_api_response_is_not_a_success(monkeypatch, raw, match):
+    monkeypatch.setattr("urllib.request.urlopen", lambda *args, **kwargs: io.BytesIO(raw))
+    with pytest.raises(LocalRuntimeError, match=match):
+        _client("loaded")._request("GET", "/models")
+
+
+@pytest.mark.parametrize("choices", [[], None, [None], [{}]])
+def test_missing_completion_message_keeps_usage_in_failure(monkeypatch, choices):
+    client = _client("loaded")
+    monkeypatch.setattr(client, "_request", lambda *args: {"choices": choices, "usage": {"prompt_tokens": 2}})
+    with pytest.raises(LocalRuntimeError, match="no message content") as error:
+        client.complete_json(system="s", user="u", schema_name="example", schema={})
+    assert error.value.usage == {"prompt_tokens": 2}
+    assert error.value.elapsed_seconds >= 0
+
+
+@pytest.mark.parametrize("content,expected", [
+    ([None, {"text": 3}, {"text": '{"ok":'}, {"text": "true}"}], {"ok": True}),
+    ("```json\n{\"ok\":true}\n```", {"ok": True}),
+    ([None, {"text": 3}], None),
+    ("[]", None),
+])
+def test_completion_content_parts_and_json_object_contract(monkeypatch, content, expected):
+    client = _client("loaded")
+    monkeypatch.setattr(client, "_request", lambda *args: {"choices": [{"message": {"content": content}}]})
+    if expected is None:
+        with pytest.raises(LocalRuntimeError, match="not text|JSON object"):
+            client.complete_json(system="s", user="u", schema_name="example", schema={})
+    else:
+        assert client.complete_json(system="s", user="u", schema_name="example", schema={}).value == expected
 
 
 @pytest.mark.parametrize("models", [[], [{"id": "a"}, {"id": "b"}]])

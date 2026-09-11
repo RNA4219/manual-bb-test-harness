@@ -48,8 +48,10 @@ from bb_harness.schema_validation import (
 from bb_harness.token_budget import TokenBudgetExceeded, TokenMeter, estimate_input, output_limit
 from bb_harness.tools._shared.spec_ingest_markdown import (
     extract_markdown_sections,
+    fallback_feature_id,
     ingest_markdown_spec,
     normalize_section_name,
+    read_markdown,
 )
 
 
@@ -707,7 +709,7 @@ class LocalDesignPipeline:
 def normalize_feature_spec(path: Path) -> dict[str, Any]:
     """Markdown intakeを根拠ID付きfeature_specへ正規化する。"""
     feature = ingest_markdown_spec(path)
-    text = path.read_text(encoding="utf-8")
+    text = read_markdown(path)
     sections = {
         normalize_section_name(name): items
         for name, items in extract_markdown_sections(text).items()
@@ -716,7 +718,9 @@ def normalize_feature_spec(path: Path) -> dict[str, Any]:
     if h1:
         feature["title"] = h1.group(1).strip()
     stem = re.sub(r"\.input$", "", path.stem, flags=re.IGNORECASE)
-    feature["feature_id"] = re.sub(r"[^A-Z0-9]+", "-", stem.upper()).strip("-")
+    feature["feature_id"] = re.sub(r"[^A-Z0-9]+", "-", stem.upper()).strip("-") or (
+        fallback_feature_id(path.stem)
+    )
     raw_feature = sections.get("feature", [])
     if raw_feature:
         feature["summary"] = " ".join(raw_feature)
