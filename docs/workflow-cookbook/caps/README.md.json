@@ -2,7 +2,7 @@
   "id": "README.md",
   "role": "overview",
   "title": "Project Overview",
-  "summary": "4.1.0の利用入口。PyPIリンク修正、リスク分割・生成指示の改善、公開後の隔離インストール検証、要件信頼度と実績を比較する手順を案内する。要件評価、技法別被覆、トークン予算、HATE・QEG CIを含む。実LLMの品質受入と実案件による校正の未達をCI成功と区別する。",
+  "summary": "4.1.1の利用入口。日本語ファイル名・BOM・証跡0件の修正、実測分岐率のCI判定と1,168テストの結果を案内する。要件評価、技法別被覆、トークン予算、HATE・QEG、PyPI導入と過去の変更履歴を含む。実LLMの品質受入と実案件校正の未達をCI成功と区別する。",
   "public_api": [],
   "deps_out": [
     "HUB.codex.md",
@@ -15,5 +15,5 @@
   "deps_in": [],
   "risks": [],
   "tests": [],
-  "last_verified": "2026-09-11"
+  "last_verified": "2026-09-12"
 }

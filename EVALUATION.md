@@ -1,8 +1,8 @@
 ---
 intent_id: INT-MBB-001
 owner: manual-bb-test-harness
-release_version: 4.1.0
-test_count: 1096
+release_version: 4.1.1
+test_count: 1168
 knowledge_map: 33 nodes, 45 edges, 33 capsules
 next_review_due: 2026-10-11
 status: active
@@ -79,10 +79,10 @@ last_reviewed_at: 2026-05-16
 - [x] `HUB.codex.md` の読み順が repo 実態と一致する
 - [x] artifact contract / schema / example / golden が同期している
 - [x] mobile golden が追加観点を検知できる（`mobile-session-resume`: lifecycle/permission/network/push_entry観点あり @ 2026-05-30）
-- [x] `uv run pytest` が成功する（765 tests passed @ 2026-07-21）
+- [x] `uv run pytest` が成功する（1,168 tests passed、失敗・エラー・スキップ0件 @ 2026-09-11）
 - [x] validator が成功する（quick-validate-skill, validate-skill.ps1, validate-artifact --all --strict）
-- [x] branch coverage が 85% 以上（86.00% @ 2026-07-21）
-- [x] Gate branch coverage 90% 以上（gate_engine: 92.76% @ 2026-07-12）
+- [x] branch coverage が 85% 以上（1,711/2,006 = 85.29% @ 2026-09-11）
+- [x] Gate branch coverage 90% 以上（184/200 = 92.00% @ 2026-09-11）
 - [x] Black-box Fidelity Gate PASS（P0/P1 scripted case 100% source_ref/oracle/trace_to、user-visible behavior で説明できない scripted case 0件 @ 2026-05-30）
   - order-cancel: TC-001(P1), TC-002(P0), TC-003(P1) 全て source_ref/oracle/trace_to 明示済み
   - mobile-session-resume: TC-MOBILE-001(P0), TC-MOBILE-002(P1), TC-MOBILE-004(P1) 全て source_ref/oracle/trace_to 明示済み
@@ -112,3 +112,7 @@ last_reviewed_at: 2026-05-16
 ## 4.1.0追加検収（2026-09-11）
 
 全1096件成功、分岐を含むcoverage 88.37%、Gate専用107件・91.01%。実PyPI 4.0.1の配布物照合と新規インストールが成功した。小規模batchedはケース3件とレビューまで生成完了したが、決定表モデル不整合によりdegradedで品質受入は未達。実案件校正はデータ未提供。[追加検収記録](docs/acceptance/AC-20260911-followups.md)を参照。
+
+## 4.1.1の修正検収
+
+[PR #17の検証](https://github.com/RNA4219/manual-bb-test-harness/actions/runs/34588173926)で全9ジョブが成功した。全体1,168件、Gate専用124件、純分岐率85.29%・92.00%を確認し、HATEは欠落・解析失敗なし、QEGはCI範囲のgoとなった。以前の「分岐を含むcoverage」は行・分岐の合算値であり、純分岐率の実績とは区別する。[指標の訂正と追加回帰](docs/acceptance/AC-20260911-branch-coverage.md)を参照。4.1.1の公開は更新後のPR/main CIと公開後検証を条件とする。

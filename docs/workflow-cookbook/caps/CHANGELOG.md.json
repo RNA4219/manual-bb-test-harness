@@ -2,7 +2,7 @@
   "id": "CHANGELOG.md",
   "role": "history",
   "title": "Changelog",
-  "summary": "Keep a Changelog形式の変更履歴。4.1.0はPyPIリンク修正、リスク分割・生成指示、公開後検証CI、実案件分析準備を追加。4.0.1の分類修正・Trusted Publishing、4.0.0の要件信頼度・技法被覆・生成予算・HATE/QEG、過去のライセンス履歴と未達記録を保持する。",
+  "summary": "Keep a Changelog形式の変更履歴。4.1.1は日本語名・BOM・証跡0件の入力不具合とCIの純分岐率判定を修正し、異常系回帰を追加。4.1.0の生成改善・公開後検証・実案件分析準備、以前の契約・ライセンス変更と未達記録を保持する。",
   "deps_out": [
     "skills/manual-bb-test-harness/references/requirements-confidence.md"
   ],
@@ -12,5 +12,5 @@
   ],
   "risks": [],
   "tests": [],
-  "last_verified": "2026-09-11"
+  "last_verified": "2026-09-12"
 }

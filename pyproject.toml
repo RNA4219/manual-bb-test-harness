@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "bb-harness"
-version = "4.1.0"
+version = "4.1.1"
 description = "Manual black-box test harness with an optional OpenAI-compatible Local Mode"
 readme = "README.md"
 license = "LicenseRef-RNA-TPSAL-1.0"
