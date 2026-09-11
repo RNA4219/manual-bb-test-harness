@@ -377,7 +377,7 @@ def test_local_pipeline_emits_verified_domain_report_and_provenance(tmp_path):
     report = json.loads((tmp_path / "out/coverage_report.json").read_text(encoding="utf-8"))
     assert report["design"]["rate"] == 100
     assert report["execution"]["rate"] == 0
-    assert manifest["generation"]["prompt_template_version"] == "coverage-1"
+    assert manifest["generation"]["prompt_template_version"] == "coverage-2"
     assert manifest["generation"]["review_status"] == "pending"
 
 

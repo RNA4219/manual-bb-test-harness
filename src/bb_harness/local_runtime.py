@@ -174,7 +174,12 @@ class OpenAICompatibleClient:
             "model": model,
             "messages": [
                 {"role": "system", "content": system},
-                {"role": "user", "content": user},
+                {
+                    "role": "user",
+                    "content": user
+                    + "\nRequired JSON Schema:\n"
+                    + json.dumps(schema, ensure_ascii=False, separators=(",", ":")),
+                },
             ],
             "temperature": temperature,
             "max_tokens": max_tokens,

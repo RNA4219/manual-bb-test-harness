@@ -88,3 +88,37 @@ jobs:
         uses: pypa/gh-action-pypi-publish@dc37677b2e1c63e2034f94d8a5b11f265b73ba33
         with:
           packages-dir: dist/
+
+  verify-publication:
+    needs: [prepare, publish]
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405 # v6.2.0
+        with:
+          python-version: "3.13"
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
+        with:
+          name: pypi-dist-${{ github.run_attempt }}
+          path: tmp/pypi-expected/
+      - name: Verify the public distributions and a fresh PyPI installation
+        env:
+          RELEASE_TAG: ${{ inputs.tag }}
+        run: >-
+          python tools/ci/verify_pypi_publication.py --tag "$RELEASE_TAG"
+          --expected tmp/pypi-expected --output tmp/pypi-verification
+      - name: Preserve publication verification evidence
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: pypi-verification-${{ github.run_attempt }}
+          path: |
+            tmp/pypi-verification/verification.json
+            tmp/pypi-verification/pip-install-report.json
+          if-no-files-found: warn
+          retention-days: 30

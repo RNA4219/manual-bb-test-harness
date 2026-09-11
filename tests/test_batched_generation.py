@@ -6,12 +6,17 @@ from dataclasses import replace
 
 import pytest
 
-from bb_harness.batched_generation import design_status, generate_cases, select_schema
+from bb_harness.batched_generation import (
+    design_status,
+    generate_cases,
+    generate_risks,
+    select_schema,
+)
 from bb_harness.cli import main
 from bb_harness.efficiency_benchmark import compare_runs, summarize_run
 from bb_harness.local_pipeline import LocalDesignPipeline, normalize_feature_spec, portable_schema
 from bb_harness.local_runtime import LocalRuntimeError, OpenAICompatibleClient, resolve_config
-from bb_harness.schema_validation import validate_artifact
+from bb_harness.schema_validation import SchemaValidationError, validate_artifact
 from bb_harness.techniques.common import ModelError
 from bb_harness.token_budget import TokenBudgetExceeded, output_limit
 from tests.test_coverage_engine import FEATURE, OBS, RISKS, domain, plan
@@ -50,6 +55,87 @@ def batched_responses():
     ]
 
 
+def risk_partitions(tmp_path):
+    source = _responses()
+    observations = {
+        "observations": [
+            {**source[1]["observations"][0], "id": f"OBS-TEST-{i:02d}"} for i in range(6)
+        ]
+    }
+    responses = [
+        {
+            "risks": [
+                {
+                    **source[2]["risks"][0],
+                    "observation_ids": [
+                        item["id"] for item in observations["observations"][offset : offset + 4]
+                    ],
+                }
+            ]
+        }
+        for offset in (0, 4)
+    ]
+    pipeline = LocalDesignPipeline(
+        resolve_config("generic", model="fake", generation_mode="batched"), FakeClient(responses)
+    )
+    pipeline.checkpoint_dir = tmp_path / "checkpoints"
+    return pipeline, observations, responses
+
+
+def test_risk_partitions_cover_every_required_observation_with_unique_ids(tmp_path):
+    pipeline, observations, responses = risk_partitions(tmp_path)
+    # Low impact observations must not be inflated to P1 in every partition.
+    responses[1]["risks"][0].update(impact=1, likelihood=1)
+    result = generate_risks(pipeline, FEATURE, {}, observations)
+    assert [item["id"] for item in result["risks"]] == ["candidate-1", "candidate-2"]
+    assert {ref for item in result["risks"] for ref in item["observation_ids"]} == {
+        item["id"] for item in observations["observations"]
+    }
+    assert len(list(pipeline.checkpoint_dir.glob("risks-*.json"))) == 2
+    assert [item["name"] for item in pipeline.stage_records] == [
+        "risk_candidates__1",
+        "risk_candidates__2",
+    ]
+
+
+@pytest.mark.parametrize("damage", ["missing", "foreign", "empty", "duplicate"])
+def test_invalid_risk_partition_stops_after_one_repair_preserving_checkpoint(tmp_path, damage):
+    pipeline, observations, responses = risk_partitions(tmp_path)
+    target = responses[1]["risks"][0]["observation_ids"]
+    if damage == "missing":
+        target.pop()
+    elif damage == "foreign":
+        target.append("OBS-TEST-00")
+    elif damage == "duplicate":
+        target.append(target[0])
+    else:
+        responses[1]["risks"] = []
+    responses.append(copy.deepcopy(responses[1]))
+    with pytest.raises(SchemaValidationError):
+        generate_risks(pipeline, FEATURE, {}, observations)
+    assert pipeline.client.calls == 3
+    assert (pipeline.checkpoint_dir / "risks-01.json").exists()
+    assert not (pipeline.checkpoint_dir / "risks-02.json").exists()
+    assert pipeline.meter.summary()["total_tokens"] == 90
+
+
+@pytest.mark.parametrize("count", [0, 33])
+def test_risk_partition_bound_stops_before_model_calls(tmp_path, count):
+    pipeline, observations, _ = risk_partitions(tmp_path)
+    observations["observations"] = [observations["observations"][0]] * count
+    with pytest.raises(ModelError, match="1..32"):
+        generate_risks(pipeline, FEATURE, {}, observations)
+    assert pipeline.client.calls == 0
+
+
+def test_merged_risks_still_require_existing_priority_calibration(tmp_path):
+    pipeline, observations, responses = risk_partitions(tmp_path)
+    for response in responses:
+        response["risks"][0].update(impact=1, likelihood=1)
+    with pytest.raises(SchemaValidationError, match="under-calibrated"):
+        generate_risks(pipeline, FEATURE, {}, observations)
+
+
 def write_valid_run(tmp_path, name="out"):
     path = tmp_path / "order-cancel.input.md"
     _feature_input(path)
@@ -64,12 +150,31 @@ def test_batched_pipeline_finishes_complete_json_partitions(tmp_path):
     out, manifest, client = write_valid_run(tmp_path)
     assert manifest["design_status"] == "ready"
     assert client.calls == 8
-    assert len(list((out / "checkpoints").glob("*.json"))) == 6
+    assert len(list((out / "checkpoints").glob("*.json"))) == 7
     assert manifest["usage_summary"]["total_tokens"] == 240
     assert manifest["comparison_config_hash"]
     for record in manifest["artifacts"].values():
         assert record["schema_valid"]
     assert summarize_run(out)["eligible_for_expanded_benchmark"]
+
+
+@pytest.mark.parametrize("missing", ["parameters", "finite_values"])
+def test_parameter_dependent_model_stops_during_core_repair(tmp_path, missing):
+    path = tmp_path / "spec.md"
+    _feature_input(path)
+    core = batched_responses()[0]
+    core["selected_techniques"] = ["decision_tables"]
+    if missing == "parameters":
+        core["parameters"] = []
+    else:
+        for parameter in core["parameters"]:
+            parameter.pop("values", None)
+    client = FakeClient([core, copy.deepcopy(core)])
+    config = resolve_config("generic", model="fake", generation_mode="batched")
+    with pytest.raises(ModelError, match="requires"):
+        LocalDesignPipeline(config, client).run(path, tmp_path / "out")
+    assert client.calls == 2
+    assert not (tmp_path / "out/test_model.json").exists()
 
 
 @pytest.mark.parametrize(

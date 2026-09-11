@@ -1,0 +1,144 @@
+{
+  "runs": {
+    "full": {
+      "status": "succeeded",
+      "error": null,
+      "elapsed_seconds": 665.413,
+      "usage": {
+        "calls": 9,
+        "repair_calls": 3,
+        "unreported_calls": 0,
+        "prompt_tokens": 55227,
+        "completion_tokens": 20868,
+        "total_tokens": 76095,
+        "reported_total_tokens": 76095,
+        "accounted_tokens": 76095,
+        "budget_tokens": 150000,
+        "remaining_tokens": 73905,
+        "budget_exhausted": false,
+        "estimation_method": "utf8_bytes_plus_256_v1"
+      },
+      "schema_valid": true,
+      "structure_valid": false,
+      "automatic_fails": [],
+      "coverage_valid": false,
+      "design_coverage": {
+        "required_feasible": 3,
+        "covered_by_cases": 0,
+        "rate": 0.0,
+        "uncovered_ids": [
+          "COV-order_lifecycle-34cc632be6a147444f43",
+          "COV-order_lifecycle-54712f9aa8323f86da95",
+          "COV-order_lifecycle-6e35546be3e42f1c02c5"
+        ]
+      },
+      "eligible_for_expanded_benchmark": false,
+      "independent_quality_score": null,
+      "validation_errors": [],
+      "identity": {
+        "input_sha256": "c9df1767a22b201de071dfaea45989011006ca01f8399ff8fe6ac4c269abb49f",
+        "model": "qwen3.6-27b",
+        "profile": "qwen36",
+        "common_config_hash": "6ccc4b0648b6e27df69da4c647388f44bd49c31f9d172107039a65159989bfde"
+      }
+    },
+    "compact": {
+      "status": "failed",
+      "error": "ValueError: TC-004: coverage input references a missing step/expected result; TC-004: unverified coverage claims: ['COV-sm_order_cancel-2d9f3e982e7a97563789']; TC-005: coverage input references a missing step/expected result; TC-006: coverage input references a missing step/expected result",
+      "elapsed_seconds": 551.473,
+      "usage": {
+        "calls": 9,
+        "repair_calls": 3,
+        "unreported_calls": 0,
+        "prompt_tokens": 45217,
+        "completion_tokens": 16967,
+        "total_tokens": 62184,
+        "reported_total_tokens": 62184,
+        "accounted_tokens": 62184,
+        "budget_tokens": 150000,
+        "remaining_tokens": 87816,
+        "budget_exhausted": false,
+        "estimation_method": "utf8_bytes_plus_256_v1"
+      },
+      "schema_valid": false,
+      "structure_valid": false,
+      "automatic_fails": null,
+      "coverage_valid": false,
+      "design_coverage": null,
+      "eligible_for_expanded_benchmark": false,
+      "independent_quality_score": null,
+      "validation_errors": [
+        "quality_report: FileNotFoundError",
+        "coverage_report: FileNotFoundError"
+      ],
+      "identity": {
+        "input_sha256": "c9df1767a22b201de071dfaea45989011006ca01f8399ff8fe6ac4c269abb49f",
+        "model": "qwen3.6-27b",
+        "profile": "qwen36",
+        "common_config_hash": "6ccc4b0648b6e27df69da4c647388f44bd49c31f9d172107039a65159989bfde"
+      }
+    }
+  },
+  "identities_match": true,
+  "comparable": false,
+  "token_reduction_percent": null,
+  "expanded_benchmark_allowed": false,
+  "note": "構造・被覆の成立は独立した意味的品質採点ではない。失敗と欠測を0消費にしない。",
+  "input_sha256": "c9df1767a22b201de071dfaea45989011006ca01f8399ff8fe6ac4c269abb49f",
+  "common_config": {
+    "profile": "qwen36",
+    "base_url": "http://127.0.0.1:8084/v1",
+    "model": "qwen3.6-27b",
+    "timeout_seconds": 600.0,
+    "temperature": 0.15,
+    "max_tokens": 6000,
+    "extra_body": {
+      "chat_template_kwargs": {
+        "enable_thinking": false
+      }
+    },
+    "stage_overrides": {
+      "test_model": {
+        "temperature": 0.2,
+        "max_tokens": 3500,
+        "extra_body": {
+          "chat_template_kwargs": {
+            "enable_thinking": false
+          }
+        }
+      },
+      "observation_set": {
+        "temperature": 0.15,
+        "max_tokens": 4500,
+        "extra_body": {
+          "chat_template_kwargs": {
+            "enable_thinking": false
+          }
+        }
+      },
+      "risk_candidates": {
+        "temperature": 0.1,
+        "max_tokens": 3000,
+        "extra_body": {
+          "chat_template_kwargs": {
+            "enable_thinking": false
+          }
+        }
+      },
+      "manual_case_set": {
+        "temperature": 0.1,
+        "max_tokens": 4000
+      },
+      "manual_case_remainder": {
+        "temperature": 0.1,
+        "max_tokens": 3500
+      },
+      "manual_case_review": {
+        "temperature": 0.05,
+        "max_tokens": 5000
+      }
+    },
+    "token_budget": 150000
+  },
+  "common_config_hash": "6ccc4b0648b6e27df69da4c647388f44bd49c31f9d172107039a65159989bfde"
+}

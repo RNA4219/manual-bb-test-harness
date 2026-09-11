@@ -8,7 +8,12 @@ import pytest
 
 from bb_harness.cli import main
 from bb_harness.efficiency_benchmark import compare_runs, summarize_run
-from bb_harness.efficient_generation import apply_review_patch, compact_case_prompt, remaining_work
+from bb_harness.efficient_generation import (
+    apply_review_patch,
+    compact_case_prompt,
+    coverage_input_examples,
+    remaining_work,
+)
 from bb_harness.local_pipeline import LocalDesignPipeline
 from bb_harness.local_runtime import LocalRuntimeError, OpenAICompatibleClient, resolve_config
 from bb_harness.schema_validation import SchemaValidationError, validate_artifact
@@ -16,6 +21,56 @@ from bb_harness.techniques.common import ModelError
 from bb_harness.token_budget import TokenBudgetExceeded, TokenMeter, estimate_input, output_limit
 from tests.test_coverage_engine import FEATURE, OBS, RISKS, case, cases, domain, plan
 from tests.test_local_pipeline import FakeClient, _feature_input, _responses
+
+
+@pytest.mark.parametrize("kind", ["domain", "combination", "state", "states", "decision"])
+def test_model_derived_input_examples_satisfy_claimed_obligations_without_mutation(kind):
+    from bb_harness.coverage_engine import validate_case_coverage
+    from tests.test_coverage_engine import combination, decision, obligations, state
+
+    value = {
+        "domain": domain,
+        "combination": combination,
+        "state": state,
+        "states": lambda: state("all_states"),
+        "decision": decision,
+    }[kind]()
+    required = obligations(value)
+    original = copy.deepcopy((value, required))
+    examples = coverage_input_examples(value, required)
+    assert examples and len(examples) <= 8
+    for item in examples:
+        candidate = case(
+            coverage_inputs=[{**item["input"], "step_refs": [1], "expected_result_refs": [1]}],
+            coverage_obligation_ids=[item["obligation_id"]],
+        )
+        assert not validate_case_coverage(cases(candidate), value, plan(value))["errors"]
+    assert (value, required) == original
+
+
+def test_input_examples_do_not_invent_feasible_state_contexts():
+    from tests.test_coverage_engine import obligations, state
+
+    value = state("valid_transitions")
+    required = obligations(value)
+    for transition in value["state_models"][0]["transitions"]:
+        transition["guard"] = {"const": False}
+    assert coverage_input_examples(value, required) == []
+
+
+def test_unknown_or_unsupported_obligations_have_no_generated_input():
+    value = domain()
+    assert (
+        coverage_input_examples(
+            value,
+            [
+                {"model_ref": "missing", "selector": {}, "id": "one"},
+                {"model_ref": "D", "selector": {"unsupported": True}, "id": "two"},
+                {"model_ref": "D", "selector": {"rule_id": "missing"}, "id": "three"},
+            ],
+        )
+        == []
+    )
 
 
 @pytest.mark.parametrize("budget", [0, -1, True, 1.5, "100"])

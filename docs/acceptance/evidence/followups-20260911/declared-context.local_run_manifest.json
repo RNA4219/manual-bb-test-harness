@@ -1,0 +1,370 @@
+{
+  "run_id": "local-20260911T062227Z-a9c98e49",
+  "status": "failed",
+  "profile": "qwen36",
+  "base_url": "http://127.0.0.1:8084/v1",
+  "model": "qwen3.6-27b",
+  "config_hash": "51458e4a784973a031dfb6c33948b821fc7dc2427a9f2e3cffc9bb24d64e7ebb",
+  "comparison_config_hash": "6ccc4b0648b6e27df69da4c647388f44bd49c31f9d172107039a65159989bfde",
+  "input_sha256": "6a49d0ab3fa58896cbe2c79c909e6f7b95390573ffdc88d5e63235b213eb56a9",
+  "started_at": "2026-09-11T06:22:27.588776Z",
+  "finished_at": "2026-09-11T06:32:25.757737Z",
+  "elapsed_seconds": 598.185,
+  "stages": [
+    {
+      "name": "test_model__core",
+      "elapsed_seconds": 22.864,
+      "repairs": 0,
+      "schema_valid": true,
+      "usage": {
+        "completion_tokens": 751,
+        "prompt_tokens": 1912,
+        "total_tokens": 2663
+      }
+    },
+    {
+      "name": "test_model__state_models",
+      "elapsed_seconds": 25.678,
+      "repairs": 0,
+      "schema_valid": true,
+      "usage": {
+        "completion_tokens": 855,
+        "prompt_tokens": 2088,
+        "total_tokens": 2943
+      }
+    },
+    {
+      "name": "test_model__decision_tables",
+      "elapsed_seconds": 51.356,
+      "repairs": 0,
+      "schema_valid": true,
+      "usage": {
+        "completion_tokens": 1764,
+        "prompt_tokens": 2178,
+        "total_tokens": 3942
+      }
+    },
+    {
+      "name": "test_model__combination_models",
+      "elapsed_seconds": 21.715,
+      "repairs": 0,
+      "schema_valid": true,
+      "usage": {
+        "completion_tokens": 686,
+        "prompt_tokens": 1963,
+        "total_tokens": 2649
+      }
+    },
+    {
+      "name": "observation_set",
+      "elapsed_seconds": 145.939,
+      "repairs": 1,
+      "schema_valid": true,
+      "usage": {
+        "completion_tokens": 4547,
+        "prompt_tokens": 11732,
+        "total_tokens": 16279
+      }
+    },
+    {
+      "name": "risk_candidates__1",
+      "elapsed_seconds": 30.892,
+      "repairs": 0,
+      "schema_valid": true,
+      "usage": {
+        "completion_tokens": 856,
+        "prompt_tokens": 4471,
+        "total_tokens": 5327
+      }
+    },
+    {
+      "name": "risk_candidates__2",
+      "elapsed_seconds": 25.267,
+      "repairs": 0,
+      "schema_valid": true,
+      "usage": {
+        "completion_tokens": 668,
+        "prompt_tokens": 4400,
+        "total_tokens": 5068
+      }
+    },
+    {
+      "name": "risk_candidates__3",
+      "elapsed_seconds": 22.124,
+      "repairs": 0,
+      "schema_valid": true,
+      "usage": {
+        "completion_tokens": 569,
+        "prompt_tokens": 4072,
+        "total_tokens": 4641
+      }
+    },
+    {
+      "name": "manual_case_set__1",
+      "elapsed_seconds": 70.778,
+      "repairs": 0,
+      "schema_valid": true,
+      "usage": {
+        "completion_tokens": 1892,
+        "prompt_tokens": 10014,
+        "total_tokens": 11906
+      }
+    },
+    {
+      "name": "manual_case_set__2",
+      "elapsed_seconds": 181.217,
+      "repairs": 1,
+      "schema_valid": false,
+      "usage": {
+        "completion_tokens": 4892,
+        "prompt_tokens": 22589,
+        "total_tokens": 27481
+      }
+    }
+  ],
+  "artifacts": {
+    "feature_spec": {
+      "path": "feature_spec.json",
+      "sha256": "33b78d9438fef631d80b3f763f669623d04eaa1bcbd33461b04c73dfa02097ee",
+      "schema_valid": true
+    },
+    "test_model": {
+      "path": "test_model.json",
+      "sha256": "4e805bdb871380e1aaa9a8b0ddcdfa155b08dd81452f85fc928aa4bd04294666",
+      "schema_valid": true
+    },
+    "observation_set": {
+      "path": "observation_set.json",
+      "sha256": "d14942250976627cd54980af488acb0252f7cfe56ba9e310241364217a8881d1",
+      "schema_valid": true
+    },
+    "risk_register": {
+      "path": "risk_register.json",
+      "sha256": "ebb2201900c22db27714231cc610d1fcb7f561f76b902e475cc83949b7f32bc5",
+      "schema_valid": true
+    },
+    "technique_plan": {
+      "path": "technique_plan.json",
+      "sha256": "0162acbb82e02afcc21481cee831aae4dddff2ec62c7e91d07d98d660a0447be",
+      "schema_valid": true
+    }
+  },
+  "generation_mode": "batched",
+  "design_status": "blocked",
+  "call_records": [
+    {
+      "stage": "test_model__core",
+      "repair": false,
+      "estimated_input_tokens": 8772,
+      "max_output_tokens": 3500,
+      "outcome": "succeeded",
+      "elapsed_seconds": 22.864,
+      "prompt_tokens": 1912,
+      "completion_tokens": 751,
+      "total_tokens": 2663,
+      "usage_status": "reported",
+      "accounted_tokens": 2663,
+      "finish_reason": "stop",
+      "model": "qwen3.6-27b"
+    },
+    {
+      "stage": "test_model__state_models",
+      "repair": false,
+      "estimated_input_tokens": 8959,
+      "max_output_tokens": 3500,
+      "outcome": "succeeded",
+      "elapsed_seconds": 25.678,
+      "prompt_tokens": 2088,
+      "completion_tokens": 855,
+      "total_tokens": 2943,
+      "usage_status": "reported",
+      "accounted_tokens": 2943,
+      "finish_reason": "stop",
+      "model": "qwen3.6-27b"
+    },
+    {
+      "stage": "test_model__decision_tables",
+      "repair": false,
+      "estimated_input_tokens": 9450,
+      "max_output_tokens": 3500,
+      "outcome": "succeeded",
+      "elapsed_seconds": 51.356,
+      "prompt_tokens": 2178,
+      "completion_tokens": 1764,
+      "total_tokens": 3942,
+      "usage_status": "reported",
+      "accounted_tokens": 3942,
+      "finish_reason": "stop",
+      "model": "qwen3.6-27b"
+    },
+    {
+      "stage": "test_model__combination_models",
+      "repair": false,
+      "estimated_input_tokens": 8443,
+      "max_output_tokens": 3500,
+      "outcome": "succeeded",
+      "elapsed_seconds": 21.715,
+      "prompt_tokens": 1963,
+      "completion_tokens": 686,
+      "total_tokens": 2649,
+      "usage_status": "reported",
+      "accounted_tokens": 2649,
+      "finish_reason": "stop",
+      "model": "qwen3.6-27b"
+    },
+    {
+      "stage": "observation_set",
+      "repair": false,
+      "estimated_input_tokens": 19563,
+      "max_output_tokens": 4500,
+      "outcome": "invalid_artifact",
+      "elapsed_seconds": 70.903,
+      "prompt_tokens": 4796,
+      "completion_tokens": 2270,
+      "total_tokens": 7066,
+      "usage_status": "reported",
+      "accounted_tokens": 7066,
+      "finish_reason": "stop",
+      "model": "qwen3.6-27b"
+    },
+    {
+      "stage": "observation_set_repair",
+      "repair": true,
+      "estimated_input_tokens": 28130,
+      "max_output_tokens": 4500,
+      "outcome": "succeeded",
+      "elapsed_seconds": 75.036,
+      "prompt_tokens": 6936,
+      "completion_tokens": 2277,
+      "total_tokens": 9213,
+      "usage_status": "reported",
+      "accounted_tokens": 9213,
+      "finish_reason": "stop",
+      "model": "qwen3.6-27b"
+    },
+    {
+      "stage": "risk_candidates__1",
+      "repair": false,
+      "estimated_input_tokens": 17061,
+      "max_output_tokens": 3000,
+      "outcome": "succeeded",
+      "elapsed_seconds": 30.892,
+      "prompt_tokens": 4471,
+      "completion_tokens": 856,
+      "total_tokens": 5327,
+      "usage_status": "reported",
+      "accounted_tokens": 5327,
+      "finish_reason": "stop",
+      "model": "qwen3.6-27b"
+    },
+    {
+      "stage": "risk_candidates__2",
+      "repair": false,
+      "estimated_input_tokens": 16927,
+      "max_output_tokens": 3000,
+      "outcome": "succeeded",
+      "elapsed_seconds": 25.267,
+      "prompt_tokens": 4400,
+      "completion_tokens": 668,
+      "total_tokens": 5068,
+      "usage_status": "reported",
+      "accounted_tokens": 5068,
+      "finish_reason": "stop",
+      "model": "qwen3.6-27b"
+    },
+    {
+      "stage": "risk_candidates__3",
+      "repair": false,
+      "estimated_input_tokens": 15683,
+      "max_output_tokens": 3000,
+      "outcome": "succeeded",
+      "elapsed_seconds": 22.124,
+      "prompt_tokens": 4072,
+      "completion_tokens": 569,
+      "total_tokens": 4641,
+      "usage_status": "reported",
+      "accounted_tokens": 4641,
+      "finish_reason": "stop",
+      "model": "qwen3.6-27b"
+    },
+    {
+      "stage": "manual_case_set__1",
+      "repair": false,
+      "estimated_input_tokens": 40542,
+      "max_output_tokens": 4000,
+      "outcome": "succeeded",
+      "elapsed_seconds": 70.778,
+      "prompt_tokens": 10014,
+      "completion_tokens": 1892,
+      "total_tokens": 11906,
+      "usage_status": "reported",
+      "accounted_tokens": 11906,
+      "finish_reason": "stop",
+      "model": "qwen3.6-27b"
+    },
+    {
+      "stage": "manual_case_set__2",
+      "repair": false,
+      "estimated_input_tokens": 41676,
+      "max_output_tokens": 4000,
+      "outcome": "invalid_artifact",
+      "elapsed_seconds": 88.129,
+      "prompt_tokens": 10344,
+      "completion_tokens": 2416,
+      "total_tokens": 12760,
+      "usage_status": "reported",
+      "accounted_tokens": 12760,
+      "finish_reason": "stop",
+      "model": "qwen3.6-27b"
+    },
+    {
+      "stage": "manual_case_set__2_repair",
+      "repair": true,
+      "estimated_input_tokens": 49149,
+      "max_output_tokens": 4000,
+      "outcome": "invalid_artifact",
+      "elapsed_seconds": 93.088,
+      "prompt_tokens": 12245,
+      "completion_tokens": 2476,
+      "total_tokens": 14721,
+      "usage_status": "reported",
+      "accounted_tokens": 14721,
+      "finish_reason": "stop",
+      "model": "qwen3.6-27b"
+    }
+  ],
+  "usage_summary": {
+    "calls": 12,
+    "repair_calls": 2,
+    "unreported_calls": 0,
+    "prompt_tokens": 65419,
+    "completion_tokens": 17480,
+    "total_tokens": 82899,
+    "reported_total_tokens": 82899,
+    "accounted_tokens": 82899,
+    "budget_tokens": 150000,
+    "remaining_tokens": 67101,
+    "budget_exhausted": false,
+    "estimation_method": "utf8_bytes_plus_256_v1"
+  },
+  "stop_reason": "generation_error",
+  "error": "ModelError: TC-001: state input context outside declared contexts; TC-001: unverified coverage claims: ['COV-combo-order-cancel-state-actor-34a44c4323649ced5eda']; TC-002: state input context outside declared contexts; TC-002: unverified coverage claims: ['COV-combo-order-cancel-state-actor-9b3b59366f622526e30e']",
+  "generation": {
+    "generation_run_id": "local-20260911T062227Z-a9c98e49",
+    "prompt_template_id": "local-design",
+    "prompt_template_version": "batched-2",
+    "input_sha256": "6a49d0ab3fa58896cbe2c79c909e6f7b95390573ffdc88d5e63235b213eb56a9",
+    "output_schema_id": "local_run_manifest.schema.json",
+    "model": {
+      "provider": "openai-compatible",
+      "name": "qwen3.6-27b",
+      "version": null
+    },
+    "parameters": {
+      "temperature": 0.15,
+      "seed": null
+    },
+    "generated_at": "2026-09-11T06:22:27.588776Z",
+    "review_status": "pending"
+  }
+}

@@ -63,6 +63,15 @@ def test_qwen36_profile_uses_expected_endpoint_model_and_disables_thinking(
     assert all(
         body["chat_template_kwargs"] == {"enable_thinking": False} for body in captured
     )
+    # 文法制約を実装しない互換APIでも、モデルが要求するフィールドを読める。
+    from bb_harness.token_budget import estimate_input
+
+    for body in captured:
+        content = body["messages"][1]["content"]
+        assert json.loads(content.split("Required JSON Schema:\n", 1)[1]) == {"type": "object"}
+        assert estimate_input("system", "user", {"type": "object"}) >= len(
+            ("system" + content).encode("utf-8")
+        )
 
 
 def test_removed_gemma4a4b_profile_is_rejected() -> None:

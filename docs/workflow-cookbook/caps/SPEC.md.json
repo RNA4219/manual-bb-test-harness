@@ -2,7 +2,7 @@
   "id": "SPEC.md",
   "role": "specification",
   "title": "Specification",
-  "summary": "4.0.1の改修仕様と機能・検証履歴。F1〜F13を一覧化し、Local Mode、技法被覆、生成効率・証跡版、分割生成、要件定義信頼度、HATE・QEG CIの仕様と未達事項へ案内する。PyPI分類修正と事前検証、現行版の同期、緑CI後のv4.0.1発行、既存v4.0.0保持を定める。",
+  "summary": "4.1.0の改修仕様と機能・検証履歴。F1〜F13に加え、リスク分割・生成指示、PyPI公開後検証、実案件の要件信頼度分析準備へ案内する。既存artifact契約・policy・Gateを保持し、実モデルや実案件データの未達を明示する。過去のPyPI分類修正とTrusted Publishing導入の履歴も保持する。",
   "public_api": [],
   "deps_out": [
     "CHANGELOG.md",

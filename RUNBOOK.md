@@ -1,8 +1,8 @@
 ---
 intent_id: INT-MBB-001
 owner: manual-bb-test-harness
-release_version: 4.0.1
-test_count: 1039
+release_version: 4.1.0
+test_count: 1096
 knowledge_map: 33 nodes, 45 edges, 33 capsules
 next_review_due: 2026-10-11
 status: active
@@ -18,6 +18,9 @@ last_reviewed_at: 2026-05-16
 - Consumer: Codex Skill として利用し、Markdown または JSON artifact を生成する
 - PyPI: `publish-pypi.yml`をmainから手動起動する。GitHub Releaseの既存配布物を検証して公開する。[公開仕様・初回設定](docs/release-policy.md#pypi公開仕様)を参照。
 
+公開後は同workflowの`verify-publication`が配布物hashと新規PyPIインストールを確認する。
+失敗時に公開を再送せず、[読取り専用の再検証手順](docs/release-policy.md#pypi公開仕様)を使う。
+
 ## Execute
 
 ### 要件定義の信頼度を評価する
@@ -25,6 +28,9 @@ last_reviewed_at: 2026-05-16
 `bb-harness evaluate requirements --input spec.md --output tmp/requirements-first`で、LLMを呼ばずに要確認・重大度・レビュー率を採点する。出力のレビュー雛形へ実際の確認結果を記入し、`--review reviewed.json`と新しい出力先で再評価する。`--fail-under 85`で閾値未達を終了コード2にできる。[契約・入力形式・採点式](skills/manual-bb-test-harness/references/requirements-confidence.md)を参照。
 
 ### 1. Skill 出力を確認する
+
+実案件で信頼度policyを調整する場合は[実績収集・分析手順](docs/requirements-calibration.md)を使う。
+未観測・データ不足・模擬データを校正済みとせず、実案件のsnapshotを公開repoへ入れない。
 
 ```powershell
 Get-Content .\skills\manual-bb-test-harness\SKILL.md

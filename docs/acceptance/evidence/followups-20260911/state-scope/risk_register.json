@@ -1,0 +1,65 @@
+{
+  "feature_id": "MINIMAL-CANCEL",
+  "risks": [
+    {
+      "id": "RISK-01",
+      "scenario": "pending状態の取消しで在庫が戻らない、または重複して戻り、在庫整合性が崩れる",
+      "impact": 5,
+      "likelihood": 4,
+      "modifiers": [
+        "detectability_difficulty=0",
+        "change_surface=2",
+        "externality=0",
+        "privilege=0",
+        "auto_coverage_credit=0"
+      ],
+      "score": 67.7,
+      "priority": "P1",
+      "rationale": "BR-1により在庫戻しロジックが変更対象（inventory）に含まれる。在庫/金額関連の不具合はimpact 4〜5とする。変更対象かつ自動テスト根拠が明記されていないためlikelihood 4とする。",
+      "trace_to": [
+        "OBS-STATE-01",
+        "TC-001"
+      ]
+    },
+    {
+      "id": "RISK-02",
+      "scenario": "cancelled状態の再取消しで在庫が追加戻りし、在庫整合性が崩れる",
+      "impact": 5,
+      "likelihood": 4,
+      "modifiers": [
+        "detectability_difficulty=0",
+        "change_surface=2",
+        "externality=0",
+        "privilege=0",
+        "auto_coverage_credit=0"
+      ],
+      "score": 67.7,
+      "priority": "P1",
+      "rationale": "BR-1により再取消時の在庫追加戻し防止ロジックが変更対象（inventory）に含まれる。在庫/金額関連の不具合はimpact 4〜5とする。変更対象かつ自動テスト根拠が明記されていないためlikelihood 4とする。",
+      "trace_to": [
+        "OBS-STATE-03",
+        "TC-003"
+      ]
+    },
+    {
+      "id": "RISK-03",
+      "scenario": "shipped状態の注文が取消可能になり、状態がcancelledに遷移する",
+      "impact": 4,
+      "likelihood": 4,
+      "modifiers": [
+        "detectability_difficulty=0",
+        "change_surface=2",
+        "externality=0",
+        "privilege=0",
+        "auto_coverage_credit=0"
+      ],
+      "score": 54.8,
+      "priority": "P2",
+      "rationale": "AC-2によりshipped状態の取消不可制御が変更対象（order_detail）に含まれる。業務整合性・権限・重複副作用の主要riskはP2/P3にならないよう較正し、impact 4とする。変更対象かつ自動テスト根拠が明記されていないためlikelihood 4とする。",
+      "trace_to": [
+        "OBS-STATE-02",
+        "TC-002"
+      ]
+    }
+  ]
+}

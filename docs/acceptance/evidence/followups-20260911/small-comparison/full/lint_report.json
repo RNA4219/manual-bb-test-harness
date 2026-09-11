@@ -1,0 +1,17 @@
+{
+  "status": "pass",
+  "errors": [],
+  "warnings": [
+    "RISK-03: uncovered risk; scripted case mapping missing",
+    "形式的被覆に未設計・未解決の項目がある。coverage_reportを確認する"
+  ],
+  "checks": {
+    "source_oracle_trace": true,
+    "boundary": true,
+    "state": true,
+    "authorization": true,
+    "mobile": true,
+    "race": true,
+    "effort_arithmetic": true
+  }
+}

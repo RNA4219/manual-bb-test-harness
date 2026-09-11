@@ -1,0 +1,64 @@
+{
+  "schema_version": "1.1.0",
+  "id": "COVREPORT-73a5dcaf5288d47942c0",
+  "feature_id": "MINIMAL-CANCEL",
+  "build_id": "local-design-unexecuted",
+  "model_hash": "096dc2ca94af6f725704edc8c28a8808d2d68219912f023cffff7c1d157fe8e5",
+  "case_hash": "311e1594e2d2c181567bf3e78fa249580a29d150271456aa2db26eb00bae70d8",
+  "evidence_binding_mode": "case_revision",
+  "plan_hash": "5a91a779371d9a1cd6d7075c1847122601ccded78ec509b696070e8872c2c7c4",
+  "mode": "shadow",
+  "design": {
+    "required_feasible": 3,
+    "covered_by_cases": 3,
+    "rate": 100.0,
+    "uncovered_ids": []
+  },
+  "execution": {
+    "required_feasible": 3,
+    "executed": 0,
+    "passed": 0,
+    "rate": 0.0,
+    "unexecuted_ids": [
+      "COV-MINIMAL-CANCEL-order-state-6666c64ce07bf0ccacd6",
+      "COV-MINIMAL-CANCEL-order-state-66834fbe67d9ff797786",
+      "COV-MINIMAL-CANCEL-order-state-a4cfcffdbc0f9a3f2c70"
+    ]
+  },
+  "results": [
+    {
+      "id": "COV-MINIMAL-CANCEL-order-state-66834fbe67d9ff797786",
+      "design": "covered",
+      "case_ids": [
+        "TC-001"
+      ],
+      "executed": false,
+      "passed": false
+    },
+    {
+      "id": "COV-MINIMAL-CANCEL-order-state-6666c64ce07bf0ccacd6",
+      "design": "covered",
+      "case_ids": [
+        "TC-002"
+      ],
+      "executed": false,
+      "passed": false
+    },
+    {
+      "id": "COV-MINIMAL-CANCEL-order-state-a4cfcffdbc0f9a3f2c70",
+      "design": "covered",
+      "case_ids": [
+        "TC-003"
+      ],
+      "executed": false,
+      "passed": false
+    }
+  ],
+  "unknown_ids": [],
+  "infeasible_ids": [],
+  "errors": [],
+  "exit_criteria": [],
+  "blocked_selections": [
+    "TECH-DT-MINIMAL-CANCEL-STATE"
+  ]
+}

@@ -1,0 +1,415 @@
+{
+  "feature_id": "MINIMAL-CANCEL",
+  "manual_cases": [
+    {
+      "tc_id": "TC-001",
+      "title": "Pending状態の注文取消しと在庫戻し",
+      "priority": "P0",
+      "primary_view": "black",
+      "techniques": [
+        "state_transition_testing",
+        "decision_table_testing"
+      ],
+      "preconditions": [
+        "注文状態がpendingであること",
+        "在庫サービスが正常に動作していること"
+      ],
+      "steps": [
+        "pending状態の注文詳細画面を開く",
+        "取消ボタンをクリックする",
+        "注文状態の表示を確認する",
+        "在庫数の変化を確認する"
+      ],
+      "expected_results": [
+        "注文状態がcancelledに遷移している",
+        "在庫が注文数量分戻されている"
+      ],
+      "oracle": {
+        "type": "specified",
+        "refs": [
+          "AC-1",
+          "BR-1"
+        ]
+      },
+      "source_ref": {
+        "type": "acceptance",
+        "refs": [
+          "AC-1",
+          "BR-1"
+        ]
+      },
+      "estimate_minutes": 5,
+      "trace_to": [
+        "OBS-STATE-01",
+        "RISK-01"
+      ],
+      "technique_refs": [
+        {
+          "key": "state_transition_testing",
+          "standard": "ISTQB CTAL-TA v4.0",
+          "reference": "TA-3.2.2",
+          "criterion": "all_transitions"
+        },
+        {
+          "key": "decision_table_testing",
+          "standard": "ISTQB CTAL-TA v4.0",
+          "reference": "TA-3.3.1",
+          "criterion": "feasible_rules"
+        }
+      ],
+      "coverage_obligation_ids": [],
+      "coverage_inputs": [],
+      "test_data": [
+        {
+          "parameter_id": "order_state",
+          "value": "pending"
+        },
+        {
+          "parameter_id": "inventory_delta",
+          "value": 1,
+          "unit": "items"
+        }
+      ],
+      "case_revision": "99eb5bd03866f67a42fb9011ca8cfc54c15a9cbab3f78cdb5d26622cf9be54aa"
+    },
+    {
+      "tc_id": "TC-002",
+      "title": "Shipped状態の注文取消し不可とエラー表示",
+      "priority": "P2",
+      "primary_view": "black",
+      "techniques": [
+        "state_transition_testing",
+        "boundary_value_analysis"
+      ],
+      "preconditions": [
+        "注文状態がshippedであること"
+      ],
+      "steps": [
+        "shipped状態の注文詳細画面を開く",
+        "取消ボタンをクリックする",
+        "注文状態の表示を確認する",
+        "エラーメッセージの表示を確認する"
+      ],
+      "expected_results": [
+        "注文状態はshippedのまま維持される",
+        "「取消不可」または同等のエラーメッセージが表示される"
+      ],
+      "oracle": {
+        "type": "specified",
+        "refs": [
+          "AC-2"
+        ]
+      },
+      "source_ref": {
+        "type": "acceptance",
+        "refs": [
+          "AC-2"
+        ]
+      },
+      "estimate_minutes": 5,
+      "trace_to": [
+        "OBS-STATE-02",
+        "RISK-04",
+        "RISK-05"
+      ],
+      "technique_refs": [
+        {
+          "key": "state_transition_testing",
+          "standard": "ISTQB CTAL-TA v4.0",
+          "reference": "TA-3.2.2",
+          "criterion": "all_transitions"
+        },
+        {
+          "key": "boundary_value_analysis",
+          "standard": "ISTQB CTAL-TA v4.0",
+          "reference": "TA-3.2.1",
+          "criterion": "boundary_values"
+        }
+      ],
+      "coverage_obligation_ids": [],
+      "coverage_inputs": [],
+      "test_data": [
+        {
+          "parameter_id": "order_state",
+          "value": "shipped"
+        },
+        {
+          "parameter_id": "inventory_delta",
+          "value": 0,
+          "unit": "items"
+        }
+      ],
+      "case_revision": "e16b1b1c366d6f762124129e60cb3689c8e455e3a24b70d35d23d27a15c7fcb0"
+    },
+    {
+      "tc_id": "TC-003",
+      "title": "Cancelled状態の注文再取消し（冪等性）",
+      "priority": "P0",
+      "primary_view": "black",
+      "techniques": [
+        "state_transition_testing",
+        "decision_table_testing"
+      ],
+      "preconditions": [
+        "注文状態がcancelledであること"
+      ],
+      "steps": [
+        "cancelled状態の注文詳細画面を開く",
+        "取消ボタンをクリックする",
+        "注文状態の表示を確認する",
+        "在庫数の変化を確認する"
+      ],
+      "expected_results": [
+        "注文状態はcancelledのまま維持される",
+        "在庫は追加で戻されていない"
+      ],
+      "oracle": {
+        "type": "specified",
+        "refs": [
+          "AC-3",
+          "BR-1"
+        ]
+      },
+      "source_ref": {
+        "type": "acceptance",
+        "refs": [
+          "AC-3",
+          "BR-1"
+        ]
+      },
+      "estimate_minutes": 5,
+      "trace_to": [
+        "OBS-STATE-03",
+        "RISK-02"
+      ],
+      "technique_refs": [
+        {
+          "key": "state_transition_testing",
+          "standard": "ISTQB CTAL-TA v4.0",
+          "reference": "TA-3.2.2",
+          "criterion": "all_transitions"
+        },
+        {
+          "key": "decision_table_testing",
+          "standard": "ISTQB CTAL-TA v4.0",
+          "reference": "TA-3.3.1",
+          "criterion": "feasible_rules"
+        }
+      ],
+      "coverage_obligation_ids": [],
+      "coverage_inputs": [],
+      "test_data": [
+        {
+          "parameter_id": "order_state",
+          "value": "cancelled"
+        },
+        {
+          "parameter_id": "inventory_delta",
+          "value": 0,
+          "unit": "items"
+        }
+      ],
+      "case_revision": "5926ac42031629508b773cfb73c937371182990eb077055d9413b6c2291a88e4"
+    },
+    {
+      "tc_id": "TC-004",
+      "title": "Pending状態の注文取消しと在庫戻し",
+      "priority": "P0",
+      "primary_view": "black",
+      "techniques": [
+        "state_transition_testing",
+        "decision_table_testing"
+      ],
+      "preconditions": [
+        "注文状態がpendingであること",
+        "在庫サービスが正常に動作していること"
+      ],
+      "steps": [
+        "pending状態の注文詳細画面を開く",
+        "取消ボタンをクリックする",
+        "注文状態の表示を確認する",
+        "在庫サービスへの戻し処理が実行されたことを確認する（ログまたは在庫数変化）"
+      ],
+      "expected_results": [
+        "注文状態がcancelledに遷移している",
+        "在庫が注文数量分戻されている"
+      ],
+      "oracle": {
+        "type": "specified",
+        "refs": [
+          "AC-1",
+          "BR-1"
+        ]
+      },
+      "source_ref": {
+        "type": "acceptance",
+        "refs": [
+          "AC-1",
+          "BR-1"
+        ]
+      },
+      "estimate_minutes": 5,
+      "trace_to": [
+        "OBS-STATE-01",
+        "RISK-01"
+      ],
+      "technique_refs": [
+        {
+          "key": "state_transition_testing",
+          "standard": "ISTQB CTAL-TA v4.0",
+          "reference": "TA-3.2.2",
+          "criterion": "all_transitions"
+        },
+        {
+          "key": "decision_table_testing",
+          "standard": "ISTQB CTAL-TA v4.0",
+          "reference": "TA-3.3.1",
+          "criterion": "feasible_rules"
+        }
+      ],
+      "coverage_obligation_ids": [],
+      "coverage_inputs": [],
+      "test_data": [
+        {
+          "parameter_id": "order_state",
+          "value": "pending"
+        },
+        {
+          "parameter_id": "inventory_delta",
+          "value": 1,
+          "unit": "items"
+        }
+      ],
+      "case_revision": "4d2080de33c8e9bde13798ea33c0a80b61f8891851b2c402f65f92074f6250db"
+    },
+    {
+      "tc_id": "TC-005",
+      "title": "Cancelled状態の注文再取消し（冪等性）",
+      "priority": "P0",
+      "primary_view": "black",
+      "techniques": [
+        "state_transition_testing",
+        "decision_table_testing"
+      ],
+      "preconditions": [
+        "注文状態がcancelledであること"
+      ],
+      "steps": [
+        "cancelled状態の注文詳細画面を開く",
+        "取消ボタンをクリックする",
+        "注文状態の表示を確認する",
+        "在庫サービスへの戻し処理が実行されていないことを確認する（ログまたは在庫数変化なし）"
+      ],
+      "expected_results": [
+        "注文状態はcancelledのまま維持される",
+        "在庫は追加で戻されていない"
+      ],
+      "oracle": {
+        "type": "specified",
+        "refs": [
+          "AC-3",
+          "BR-1"
+        ]
+      },
+      "source_ref": {
+        "type": "acceptance",
+        "refs": [
+          "AC-3",
+          "BR-1"
+        ]
+      },
+      "estimate_minutes": 5,
+      "trace_to": [
+        "OBS-STATE-03",
+        "RISK-02"
+      ],
+      "technique_refs": [
+        {
+          "key": "state_transition_testing",
+          "standard": "ISTQB CTAL-TA v4.0",
+          "reference": "TA-3.2.2",
+          "criterion": "all_transitions"
+        },
+        {
+          "key": "decision_table_testing",
+          "standard": "ISTQB CTAL-TA v4.0",
+          "reference": "TA-3.3.1",
+          "criterion": "feasible_rules"
+        }
+      ],
+      "coverage_obligation_ids": [],
+      "coverage_inputs": [],
+      "test_data": [
+        {
+          "parameter_id": "order_state",
+          "value": "cancelled"
+        },
+        {
+          "parameter_id": "inventory_delta",
+          "value": 0,
+          "unit": "items"
+        }
+      ],
+      "case_revision": "343412d16d584600b60111709a5a68d4e2ff677c3dd321c2212dd8ad2a856bbd"
+    }
+  ],
+  "exploratory_charters": [
+    {
+      "id": "CHARTER-001",
+      "title": "在庫サービス更新失敗時の復旧処理と整合性",
+      "priority": "P0",
+      "scope": "注文取消し処理中に在庫サービスが失敗した場合の補償トランザクションと状態整合性",
+      "questions": [
+        "在庫サービスがタイムアウトまたはエラーを返した場合、注文状態はどのように遷移するか？",
+        "補償トランザクションは正しく実行され、注文状態と在庫状態の整合性が保たれているか？",
+        "失敗後の再試行処理は冪等性を保っているか？"
+      ],
+      "estimate_minutes": 30,
+      "trace_to": [
+        "OBS-INTEGRATION-04",
+        "RISK-03"
+      ],
+      "technique_refs": [
+        {
+          "key": "exploratory_testing",
+          "standard": "ISTQB CTAL-TA v4.0",
+          "reference": "TA-3.4.1",
+          "criterion": "session_based"
+        },
+        {
+          "key": "error_guessing",
+          "standard": "ISTQB CTAL-TA v4.0",
+          "reference": "TA-3.4.2",
+          "criterion": "failure_modes"
+        }
+      ],
+      "basis_refs": [
+        "BR-1",
+        "ip1"
+      ],
+      "mission": "在庫サービス失敗時のシステム振る舞いを検証し、データ整合性の破綻がないことを確認する",
+      "resources": [
+        "ネットワーク遮断ツール",
+        "ログ監視ツール",
+        "在庫サービスモック"
+      ],
+      "entry_criteria": [
+        "テスト環境で在庫サービスの失敗をシミュレーションできること"
+      ],
+      "exit_criteria": [
+        "失敗シナリオでの復旧動作が確認されたこと",
+        "データ整合性の破綻が見つからないこと、または既知の制限として文書化されたこと"
+      ],
+      "environment": "テスト環境（在庫サービスモック利用可）",
+      "limitations": [
+        "本番環境でのネットワーク故障はシミュレーションできない",
+        "補償トランザクションの詳細実装は仕様で明示されていない"
+      ],
+      "case_revision": "da2573c229ac6151f9cbd3e577955b098cac89a7a9ddc715146fe0d394895cee"
+    }
+  ],
+  "evidence_binding": {
+    "mode": "case_revision",
+    "model_hash": "b0a01f0443f45a6f37d409ca42d3bbc0046cd44ebe289f92830b6d08edeac033"
+  }
+}

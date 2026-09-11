@@ -1,0 +1,108 @@
+{
+  "feature_id": "MINIMAL-CANCEL",
+  "risks": [
+    {
+      "id": "RISK-01",
+      "scenario": "Pending状態の注文取消し時に在庫が戻されず、在庫不足により他の注文がブロックされる",
+      "impact": 5,
+      "likelihood": 4,
+      "modifiers": [
+        "detectability_difficulty=1",
+        "change_surface=2",
+        "externality=2",
+        "privilege=0",
+        "auto_coverage_credit=0"
+      ],
+      "score": 72.6,
+      "priority": "P0",
+      "rationale": "BR-1により在庫戻しは必須だが、変更対象かつ自動テスト根拠が明記されていないためlikelihood 4。在庫/金額関連のためimpact 5。外部サービス（inventory_service）をまたぐためchange_surface/externality 2。",
+      "trace_to": [
+        "OBS-INTEGRATION-04",
+        "OBS-STATE-01",
+        "TC-001",
+        "TC-004"
+      ]
+    },
+    {
+      "id": "RISK-02",
+      "scenario": "Cancelled状態の注文を再取消しした際に、在庫が重複して戻される",
+      "impact": 5,
+      "likelihood": 4,
+      "modifiers": [
+        "detectability_difficulty=1",
+        "change_surface=2",
+        "externality=2",
+        "privilege=0",
+        "auto_coverage_credit=0"
+      ],
+      "score": 72.6,
+      "priority": "P0",
+      "rationale": "BR-1により再取消で在庫を追加しないことが規定されているが、冪等性処理の不備により重複戻しが発生するリスク。在庫/重複副作用のためimpact 5。変更対象かつ自動テスト根拠なしのためlikelihood 4。外部サービス連携のためchange_surface/externality 2。",
+      "trace_to": [
+        "OBS-STATE-03",
+        "TC-003",
+        "TC-005"
+      ]
+    },
+    {
+      "id": "RISK-03",
+      "scenario": "在庫サービス更新失敗時に補償トランザクションが実行されず、注文状態と在庫状態が不一致になる",
+      "impact": 5,
+      "likelihood": 4,
+      "modifiers": [
+        "detectability_difficulty=2",
+        "change_surface=2",
+        "externality=2",
+        "privilege=0",
+        "auto_coverage_credit=0"
+      ],
+      "score": 74.2,
+      "priority": "P0",
+      "rationale": "integration_paths ip1により復旧要件が定義されているが、失敗時の動作検証が不十分。業務整合性・在庫不一致のためimpact 5。変更対象かつ自動テスト根拠なしのためlikelihood 4。外部サービス連携かつ検出困難なためchange_surface/externality/detectability_difficulty 2。",
+      "trace_to": [
+        "OBS-INTEGRATION-04",
+        "CHARTER-001"
+      ]
+    },
+    {
+      "id": "RISK-04",
+      "scenario": "Shipped状態の注文が取消し可能となり、状態がCancelledに遷移してしまう",
+      "impact": 4,
+      "likelihood": 4,
+      "modifiers": [
+        "detectability_difficulty=0",
+        "change_surface=0",
+        "externality=0",
+        "privilege=0",
+        "auto_coverage_credit=0"
+      ],
+      "score": 51.6,
+      "priority": "P2",
+      "rationale": "AC-2によりShipped状態は取消不可と規定されているが、状態遷移ガードの不備により不正遷移が発生するリスク。業務整合性のためimpact 4。変更対象かつ自動テスト根拠なしのためlikelihood 4。",
+      "trace_to": [
+        "OBS-STATE-02",
+        "TC-002"
+      ]
+    },
+    {
+      "id": "RISK-05",
+      "scenario": "Shipped状態の注文で「取消不可」のエラー表示がされず、ユーザーに誤解を与える",
+      "impact": 2,
+      "likelihood": 4,
+      "modifiers": [
+        "detectability_difficulty=0",
+        "change_surface=0",
+        "externality=0",
+        "privilege=0",
+        "auto_coverage_credit=0"
+      ],
+      "score": 25.8,
+      "priority": "P3",
+      "rationale": "AC-2によりエラー表示が規定されているが、UI文言だけの不具合のためimpact 2。変更対象かつ自動テスト根拠なしのためlikelihood 4。",
+      "trace_to": [
+        "OBS-STATE-02",
+        "TC-002"
+      ]
+    }
+  ]
+}

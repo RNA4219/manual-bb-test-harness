@@ -1,0 +1,305 @@
+{
+  "run_id": "local-20260911T065526Z-16076a92",
+  "status": "succeeded",
+  "profile": "qwen36",
+  "base_url": "http://127.0.0.1:8084/v1",
+  "model": "qwen3.6-27b",
+  "config_hash": "9e43254e77bf9413f6b7e436d662a1300b4dfd5ad44c3390a49e5f8b92912bae",
+  "comparison_config_hash": "6ccc4b0648b6e27df69da4c647388f44bd49c31f9d172107039a65159989bfde",
+  "input_sha256": "c9df1767a22b201de071dfaea45989011006ca01f8399ff8fe6ac4c269abb49f",
+  "started_at": "2026-09-11T06:55:26.736563Z",
+  "finished_at": "2026-09-11T07:06:32.132478Z",
+  "elapsed_seconds": 665.413,
+  "stages": [
+    {
+      "name": "test_model",
+      "elapsed_seconds": 75.151,
+      "repairs": 0,
+      "schema_valid": true,
+      "usage": {
+        "completion_tokens": 2474,
+        "prompt_tokens": 5456,
+        "total_tokens": 7930
+      }
+    },
+    {
+      "name": "observation_set",
+      "elapsed_seconds": 43.016,
+      "repairs": 0,
+      "schema_valid": true,
+      "usage": {
+        "completion_tokens": 1378,
+        "prompt_tokens": 3714,
+        "total_tokens": 5092
+      }
+    },
+    {
+      "name": "risk_candidates",
+      "elapsed_seconds": 32.631,
+      "repairs": 0,
+      "schema_valid": true,
+      "usage": {
+        "completion_tokens": 1005,
+        "prompt_tokens": 3616,
+        "total_tokens": 4621
+      }
+    },
+    {
+      "name": "manual_case_set",
+      "elapsed_seconds": 173.234,
+      "repairs": 1,
+      "schema_valid": true,
+      "usage": {
+        "completion_tokens": 5486,
+        "prompt_tokens": 13302,
+        "total_tokens": 18788
+      }
+    },
+    {
+      "name": "manual_case_remainder",
+      "elapsed_seconds": 178.386,
+      "repairs": 1,
+      "schema_valid": true,
+      "usage": {
+        "completion_tokens": 5486,
+        "prompt_tokens": 15948,
+        "total_tokens": 21434
+      }
+    },
+    {
+      "name": "manual_case_review",
+      "elapsed_seconds": 162.549,
+      "repairs": 1,
+      "schema_valid": true,
+      "usage": {
+        "completion_tokens": 5039,
+        "prompt_tokens": 13191,
+        "total_tokens": 18230
+      }
+    }
+  ],
+  "artifacts": {
+    "feature_spec": {
+      "path": "feature_spec.json",
+      "sha256": "55bb04ee00fe4f9c0ae1f2b4a1f4070e09d1e289393389f4685df4b0df6f0e98",
+      "schema_valid": true
+    },
+    "test_model": {
+      "path": "test_model.json",
+      "sha256": "2b3823fe4a9381730a05e3bfac8c514d924a30c4614e63497f8f1b56b53e0521",
+      "schema_valid": true
+    },
+    "observation_set": {
+      "path": "observation_set.json",
+      "sha256": "9aeee9fa456d637f336caeb9ef49bb81b19f8ca789f553a0c9ca96a59b6fca99",
+      "schema_valid": true
+    },
+    "risk_register": {
+      "path": "risk_register.json",
+      "sha256": "ab10e8dc510545120b0f3cf5eaf189ea530a9492ac27aef2906b38d297da54bc",
+      "schema_valid": true
+    },
+    "technique_plan": {
+      "path": "technique_plan.json",
+      "sha256": "1f9886af326d57e575ba159866bee589f1f199dd09dbf527c6dd488129c7d30a",
+      "schema_valid": true
+    },
+    "manual_case_set": {
+      "path": "manual_case_set.json",
+      "sha256": "5199c3bd61cd6f825fa2f91173d9b9f96948d1030d678634632d80d150634db4",
+      "schema_valid": true
+    },
+    "effort_plan": {
+      "path": "effort_plan.json",
+      "sha256": "b6943f1ec2c187c62ad7c4d7e92bbb3c3cadb96445aadc2e33174fa91ea93234",
+      "schema_valid": true
+    },
+    "coverage_report": {
+      "path": "coverage_report.json",
+      "sha256": "bb348c45e989d2418c147ea6db8493613b1507a833b9ec6ae2a24336e64cce7a",
+      "schema_valid": true
+    },
+    "gate_decision": {
+      "path": "gate_decision.json",
+      "sha256": "2112a9357e1296aa87faaad0bde9d577588acb777ba3ca6482a7ff3550d7e35d",
+      "schema_valid": true
+    },
+    "release_brief": {
+      "path": "release_brief.json",
+      "sha256": "02ff334e8498756df57b333f8a15c64d1353f661d6913b5013299986e9c42d47",
+      "schema_valid": true
+    }
+  },
+  "generation_mode": "full",
+  "design_status": "degraded",
+  "call_records": [
+    {
+      "stage": "test_model",
+      "repair": false,
+      "estimated_input_tokens": 24403,
+      "max_output_tokens": 3500,
+      "outcome": "succeeded",
+      "elapsed_seconds": 75.151,
+      "prompt_tokens": 5456,
+      "completion_tokens": 2474,
+      "total_tokens": 7930,
+      "usage_status": "reported",
+      "accounted_tokens": 7930,
+      "finish_reason": "stop",
+      "model": "qwen3.6-27b"
+    },
+    {
+      "stage": "observation_set",
+      "repair": false,
+      "estimated_input_tokens": 15600,
+      "max_output_tokens": 4500,
+      "outcome": "succeeded",
+      "elapsed_seconds": 43.016,
+      "prompt_tokens": 3714,
+      "completion_tokens": 1378,
+      "total_tokens": 5092,
+      "usage_status": "reported",
+      "accounted_tokens": 5092,
+      "finish_reason": "stop",
+      "model": "qwen3.6-27b"
+    },
+    {
+      "stage": "risk_candidates",
+      "repair": false,
+      "estimated_input_tokens": 13686,
+      "max_output_tokens": 3000,
+      "outcome": "succeeded",
+      "elapsed_seconds": 32.631,
+      "prompt_tokens": 3616,
+      "completion_tokens": 1005,
+      "total_tokens": 4621,
+      "usage_status": "reported",
+      "accounted_tokens": 4621,
+      "finish_reason": "stop",
+      "model": "qwen3.6-27b"
+    },
+    {
+      "stage": "manual_case_set",
+      "repair": false,
+      "estimated_input_tokens": 33214,
+      "max_output_tokens": 4000,
+      "outcome": "invalid_artifact",
+      "elapsed_seconds": 94.971,
+      "prompt_tokens": 8327,
+      "completion_tokens": 2957,
+      "total_tokens": 11284,
+      "usage_status": "reported",
+      "accounted_tokens": 11284,
+      "finish_reason": "stop",
+      "model": "qwen3.6-27b"
+    },
+    {
+      "stage": "manual_case_set_repair",
+      "repair": true,
+      "estimated_input_tokens": 20594,
+      "max_output_tokens": 4000,
+      "outcome": "succeeded",
+      "elapsed_seconds": 78.263,
+      "prompt_tokens": 4975,
+      "completion_tokens": 2529,
+      "total_tokens": 7504,
+      "usage_status": "reported",
+      "accounted_tokens": 7504,
+      "finish_reason": "stop",
+      "model": "qwen3.6-27b"
+    },
+    {
+      "stage": "manual_case_remainder",
+      "repair": false,
+      "estimated_input_tokens": 42374,
+      "max_output_tokens": 3500,
+      "outcome": "invalid_artifact",
+      "elapsed_seconds": 100.004,
+      "prompt_tokens": 10972,
+      "completion_tokens": 2957,
+      "total_tokens": 13929,
+      "usage_status": "reported",
+      "accounted_tokens": 13929,
+      "finish_reason": "stop",
+      "model": "qwen3.6-27b"
+    },
+    {
+      "stage": "manual_case_remainder_repair",
+      "repair": true,
+      "estimated_input_tokens": 20600,
+      "max_output_tokens": 3500,
+      "outcome": "succeeded",
+      "elapsed_seconds": 78.382,
+      "prompt_tokens": 4976,
+      "completion_tokens": 2529,
+      "total_tokens": 7505,
+      "usage_status": "reported",
+      "accounted_tokens": 7505,
+      "finish_reason": "stop",
+      "model": "qwen3.6-27b"
+    },
+    {
+      "stage": "manual_case_review",
+      "repair": false,
+      "estimated_input_tokens": 34242,
+      "max_output_tokens": 5000,
+      "outcome": "invalid_artifact",
+      "elapsed_seconds": 84.635,
+      "prompt_tokens": 8477,
+      "completion_tokens": 2542,
+      "total_tokens": 11019,
+      "usage_status": "reported",
+      "accounted_tokens": 11019,
+      "finish_reason": "stop",
+      "model": "qwen3.6-27b"
+    },
+    {
+      "stage": "manual_case_review_repair",
+      "repair": true,
+      "estimated_input_tokens": 19774,
+      "max_output_tokens": 5000,
+      "outcome": "succeeded",
+      "elapsed_seconds": 77.914,
+      "prompt_tokens": 4714,
+      "completion_tokens": 2497,
+      "total_tokens": 7211,
+      "usage_status": "reported",
+      "accounted_tokens": 7211,
+      "finish_reason": "stop",
+      "model": "qwen3.6-27b"
+    }
+  ],
+  "usage_summary": {
+    "calls": 9,
+    "repair_calls": 3,
+    "unreported_calls": 0,
+    "prompt_tokens": 55227,
+    "completion_tokens": 20868,
+    "total_tokens": 76095,
+    "reported_total_tokens": 76095,
+    "accounted_tokens": 76095,
+    "budget_tokens": 150000,
+    "remaining_tokens": 73905,
+    "budget_exhausted": false,
+    "estimation_method": "utf8_bytes_plus_256_v1"
+  },
+  "stop_reason": null,
+  "generation": {
+    "generation_run_id": "local-20260911T065526Z-16076a92",
+    "prompt_template_id": "local-design",
+    "prompt_template_version": "coverage-2",
+    "input_sha256": "c9df1767a22b201de071dfaea45989011006ca01f8399ff8fe6ac4c269abb49f",
+    "output_schema_id": "local_run_manifest.schema.json",
+    "model": {
+      "provider": "openai-compatible",
+      "name": "qwen3.6-27b",
+      "version": null
+    },
+    "parameters": {
+      "temperature": 0.15,
+      "seed": null
+    },
+    "generated_at": "2026-09-11T06:55:26.736563Z",
+    "review_status": "pending"
+  }
+}

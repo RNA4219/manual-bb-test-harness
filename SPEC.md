@@ -1,8 +1,12 @@
 # SPEC: manual-bb-test-harness 改修仕様書
 
-現行契約: **4.0.1** / 検証済みテスト: **1039件** / Workflow Cookbook: **33 nodes・45 edges・33 capsules** / 次回レビュー: **2026-10-11**
+現行契約: **4.1.0** / 検証済みテスト: **1096件** / Workflow Cookbook: **33 nodes・45 edges・33 capsules** / 次回レビュー: **2026-10-11**
 
 ## 概要
+
+4.1.0ではREADMEリンク、[生成分割と指示](docs/specs/spec-06-bounded-generation-readiness.md)、
+[PyPI公開後検証](docs/release-policy.md)、[要件信頼度の実績分析準備](docs/requirements-calibration.md)
+を追加する。既存artifact契約・採点policy・Gate条件を維持する。
 
 本仕様書は `manual-bb-test-harness` リポジトリの品質改善と機能拡張の仕様・検証履歴を記録する。
 
@@ -31,7 +35,7 @@
 | F8: Local Mode | OK | `bb-harness run local-design`、OpenAI互換endpoint、Qwen 27B profile、schema repair、host管理Gate |
 | F9: 技法被覆 | OK（有限モデル） | `coverage / migrate`、technique_plan、設計・実施・合格分離、Gate shadow。契約・上限は技法被覆ガイドを参照 |
 | F10: 生成効率・証跡版 | 実装済み・実LLM比較は不成立（spec-05検収記録参照） | [spec-05](docs/specs/spec-05-efficient-generation-evidence-revisions.md)。重複送信削減、差分レビュー、予算・usage、case/model版照合、実LLM比較 |
-| F11: 分割生成・完了判定 | 実装済み・実LLMの全段完走は未達 | [spec-06](docs/specs/spec-06-bounded-generation-readiness.md)。batched、終了理由、出力保護、設計状態、比較の実ファイル再検証 |
+| F11: 分割生成・完了判定 | 実装済み・小規模実LLMで全段生成完了、品質受入は未達（degraded） | [spec-06](docs/specs/spec-06-bounded-generation-readiness.md)。batched、終了理由、出力保護、設計状態、比較の実ファイル再検証 |
 | F12: 要件定義信頼度 | 実装済み・運用policyによる評価 | [spec-07](docs/specs/spec-07-requirements-confidence.md)。要確認件数・重大度・密度・レビュー率、根拠付き解決、JSON／Markdown出力 |
 | F13: HATE・QEG CI | 実装済み・GitHub CI成功 | [spec-08](docs/specs/spec-08-hate-qeg-ci.md)。実pytest証跡の正規化、hash・実行対象・合否検証、失敗時もartifact保存 |
 
@@ -87,7 +91,7 @@
 
 ## Version
 
-4.0.1 - Keep a Changelog形式、[release policy](docs/release-policy.md)に準拠。
+4.1.0 - Keep a Changelog形式、[release policy](docs/release-policy.md)に準拠。
 
 4.0.0でartifact契約の拡張に伴うmajor更新を行った。4.0.1ではPyPIが拒否した未登録classifierを除去し、PyPAの分類辞書によるbuild・公開前検証を追加する。package、CLI、PowerShell validator、README、Workflow Cookbookの現行版を4.0.1へ同期する。追加artifact契約1.1.0、既存入力との互換性、実LLM比較・batched全段完走の未達記録を保持する。PRとmainのCI成功を確認し、v4.0.1タグから新規配布物を作成する。既存v4.0.0タグ・配布物は変更しない。
 

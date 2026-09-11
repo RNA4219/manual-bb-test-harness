@@ -1,0 +1,75 @@
+{
+  "feature_id": "MINIMAL-CANCEL",
+  "build_id": "local-design-unexecuted",
+  "status": "no_go",
+  "profile": "standard",
+  "reasons": [
+    "手動実行証跡が未指定のためrelease判断はfail closed"
+  ],
+  "evidence_summary": {
+    "evidence_binding_mode": "case_revision",
+    "manual_by_priority": {
+      "P0": {
+        "pass": 0,
+        "fail": 0,
+        "skip": 0,
+        "blocked": 0,
+        "unknown": 0,
+        "untested": 4,
+        "total": 4
+      },
+      "P1": {
+        "pass": 0,
+        "fail": 0,
+        "skip": 0,
+        "blocked": 0,
+        "unknown": 0,
+        "untested": 0,
+        "total": 0
+      },
+      "P2": {
+        "pass": 0,
+        "fail": 0,
+        "skip": 0,
+        "blocked": 0,
+        "unknown": 0,
+        "untested": 1,
+        "total": 1
+      },
+      "P3": {
+        "pass": 0,
+        "fail": 0,
+        "skip": 0,
+        "blocked": 0,
+        "unknown": 0,
+        "untested": 0,
+        "total": 0
+      }
+    },
+    "mandatory_observation_rate": 0,
+    "required_obligation_design_rate": 0.0,
+    "required_obligation_execution_rate": 0.0,
+    "coverage_exit_criteria_met": false,
+    "coverage_report_id": "COVREPORT-29b85a8c03aa6e857e98",
+    "coverage_mode": "shadow",
+    "coverage_unknown_count": 1
+  },
+  "blocking_risks": [
+    "RISK-01",
+    "RISK-02",
+    "RISK-03"
+  ],
+  "residual_risks": [
+    "RISK-01",
+    "RISK-02",
+    "RISK-03",
+    "RISK-04",
+    "RISK-05"
+  ],
+  "unmet_conditions": [
+    "P0/P1 manual caseの実行証跡を収集する"
+  ],
+  "required_follow_up": [
+    "bb-harness gateで実行証跡を再評価する"
+  ]
+}
