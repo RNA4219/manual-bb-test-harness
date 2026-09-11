@@ -55,6 +55,33 @@ def head(repo: Path) -> str:
     return subprocess.check_output(["git", "rev-parse", "HEAD"], cwd=repo, text=True).strip()
 
 
+def coverage_metrics(coverage: dict, floor: float) -> dict:
+    """表示用合算値を信用せず、実測件数から行率・分岐率を計算する。"""
+    require(type(floor) in (int, float) and math.isfinite(floor) and 0 <= floor <= 100,
+            "coverage閾値が不正です")
+    require(coverage["meta"]["branch_coverage"] is True, "branch coverageの実測値が必要です")
+    totals = coverage["totals"]
+    names = ("covered_lines", "missing_lines", "num_statements",
+             "covered_branches", "missing_branches", "num_branches")
+    require(all(type(totals[name]) is int and totals[name] >= 0 for name in names),
+            "coverage件数は非負整数が必要です")
+    lines, branches = totals["num_statements"], totals["num_branches"]
+    covered_lines, covered_branches = totals["covered_lines"], totals["covered_branches"]
+    require(lines > 0 and branches > 0, "coverage分母は正の整数が必要です")
+    require(covered_lines + totals["missing_lines"] == lines
+            and covered_branches + totals["missing_branches"] == branches,
+            "coverage件数の合計が一致しません")
+    return {
+        "metric": "branch", "floor": floor,
+        "covered_branches": covered_branches, "num_branches": branches,
+        "covered_lines": covered_lines, "num_statements": lines,
+        "branch_percent": 100 * covered_branches / branches,
+        "line_percent": 100 * covered_lines / lines,
+        "combined_percent": 100 * (covered_lines + covered_branches) / (lines + branches),
+        "passed": covered_branches * 100 >= floor * branches,
+    }
+
+
 def capture(out: Path, repo: Path) -> int:
     """収集先を新規作成し、実際のpytest終了コードも保存する。"""
     out.mkdir(parents=True, exist_ok=False)
@@ -108,23 +135,31 @@ def capture(out: Path, repo: Path) -> int:
     )
     context["finished_at"] = now()
     write(raw / "github-context.json", context)
+    try:
+        metrics = coverage_metrics(read(raw / "coverage.json"), COVERAGE_FLOOR)
+    except (OSError, ValueError, KeyError, TypeError) as exc:
+        metrics = {"metric": "branch", "passed": False, "error": str(exc)}
+    print(json.dumps(metrics, ensure_ascii=False))
     write(
         out / "collection.json",
         {
-            "version": "manual-bb-ci/v1",
+            "version": "manual-bb-ci/v2",
             "command": command,
             "pytest_exit_code": result.returncode,
             "coverage_export_exit_code": coverage_export.returncode,
             "coverage_floor": COVERAGE_FLOOR,
+            "coverage_metric": "branch",
+            "coverage_metrics": metrics,
             "hashes": {name: digest(raw / name) for name in RAW_FILES if (raw / name).is_file()},
         },
     )
-    return result.returncode or coverage_export.returncode
+    return result.returncode or coverage_export.returncode or int(not metrics["passed"])
 
 
 def verify_collection(root: Path, revision: str, run_id: str, attempt: int) -> tuple[dict, dict]:
     collection = read(root / "collection.json")
-    require(collection["version"] == "manual-bb-ci/v1", "未知の収集契約です")
+    require(collection["version"] == "manual-bb-ci/v2", "未知の収集契約です")
+    require(collection["coverage_metric"] == "branch", "coverage指標が分岐率ではありません")
     require(collection["coverage_floor"] == COVERAGE_FLOOR, "coverage閾値が変更されています")
     require(type(collection["pytest_exit_code"]) is int, "pytest終了コードが不正です")
     require(collection["coverage_export_exit_code"] == 0, "coverageのexportが失敗しています")
@@ -261,15 +296,8 @@ def build_qeg(root: Path, revision: str, run_id: str, attempt: int) -> Path:
         "HATE exportの証跡が不完全です",
     )
     coverage = read(root / "raw/coverage.json")
-    percent = coverage["totals"]["percent_covered"]
-    require(
-        type(percent) in (float, int) and math.isfinite(percent) and 0 <= percent <= 100,
-        "coverage値が不正です",
-    )
-    require(
-        coverage["meta"]["branch_coverage"] is True and coverage["totals"]["num_statements"] > 0,
-        "branch coverageの実測値が必要です",
-    )
+    metrics = coverage_metrics(coverage, COVERAGE_FLOOR)
+    percent = metrics["branch_percent"]
 
     out = root / "qeg"
     out.mkdir(exist_ok=False)
@@ -396,7 +424,7 @@ def build_qeg(root: Path, revision: str, run_id: str, attempt: int) -> Path:
         )
     add_test(
         "pytest-exit-and-branch-coverage-85",
-        "pass" if collection["pytest_exit_code"] == 0 and percent >= COVERAGE_FLOOR else "fail",
+        "pass" if collection["pytest_exit_code"] == 0 and metrics["passed"] else "fail",
         "manual-bb-ci-checker",
         revision,
     )
@@ -489,7 +517,7 @@ def build_qeg(root: Path, revision: str, run_id: str, attempt: int) -> Path:
     write(
         out / "conversion-summary.json",
         {
-            "version": "manual-bb-hate-qeg/v1",
+            "version": "manual-bb-hate-qeg/v2",
             "revision": revision,
             "run_id": run_id,
             "run_attempt": attempt,
@@ -497,6 +525,8 @@ def build_qeg(root: Path, revision: str, run_id: str, attempt: int) -> Path:
             "qeg_revision": QEG_REVISION,
             "test_count": len(records),
             "coverage_percent": percent,
+            "coverage_metric": "branch",
+            "coverage_metrics": metrics,
             "pytest_exit_code": collection["pytest_exit_code"],
             "not_evaluated": NOT_EVALUATED,
             "hate_completeness": bundle["completeness"],
@@ -507,12 +537,20 @@ def build_qeg(root: Path, revision: str, run_id: str, attempt: int) -> Path:
 
 def main(argv=None) -> int:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("mode", choices=("capture", "convert"))
-    parser.add_argument("--out", type=Path, required=True)
+    parser.add_argument("mode", choices=("capture", "convert", "check-coverage"))
+    parser.add_argument("--out", type=Path)
+    parser.add_argument("--input", type=Path)
+    parser.add_argument("--floor", type=float, default=COVERAGE_FLOOR)
     args = parser.parse_args(argv)
     repo = Path(__file__).resolve().parents[2]
-    root = args.out.resolve()
     try:
+        if args.mode == "check-coverage":
+            require(args.input is not None, "--input required")
+            metrics = coverage_metrics(read(args.input), args.floor)
+            print(json.dumps(metrics, ensure_ascii=False))
+            return int(not metrics["passed"])
+        require(args.out is not None, "--out required")
+        root = args.out.resolve()
         if args.mode == "capture":
             return capture(root, repo)
         context = read(root / "raw/github-context.json")

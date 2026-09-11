@@ -1,8 +1,14 @@
 # SPEC: manual-bb-test-harness 改修仕様書
 
-現行契約: **4.1.0** / 検証済みテスト: **1096件** / Workflow Cookbook: **33 nodes・45 edges・33 capsules** / 次回レビュー: **2026-10-11**
+現行契約: **4.1.1** / 検証済みテスト: **1168件** / Workflow Cookbook: **33 nodes・45 edges・33 capsules** / 次回レビュー: **2026-10-11**
 
 ## 概要
+
+4.1.1では日本語ファイル名・UTF-8 BOM・証跡0件の入力不具合と、CIの分岐率判定を修正する。
+[自己BBの修正受入](docs/acceptance/self-bb-fix-20260911/report.md)、
+[純分岐率の検収](docs/acceptance/AC-20260911-branch-coverage.md)、
+[配布仕様](docs/release-policy.md#411-自己bbの入力不具合と分岐率判定の修正)に基づき、
+互換修正のパッチ版として公開する。
 
 4.1.0ではREADMEリンク、[生成分割と指示](docs/specs/spec-06-bounded-generation-readiness.md)、
 [PyPI公開後検証](docs/release-policy.md)、[要件信頼度の実績分析準備](docs/requirements-calibration.md)
@@ -91,7 +97,7 @@
 
 ## Version
 
-4.1.0 - Keep a Changelog形式、[release policy](docs/release-policy.md)に準拠。
+4.1.1 - Keep a Changelog形式、[release policy](docs/release-policy.md)に準拠。
 
 4.0.0でartifact契約の拡張に伴うmajor更新を行った。4.0.1ではPyPIが拒否した未登録classifierを除去し、PyPAの分類辞書によるbuild・公開前検証を追加する。package、CLI、PowerShell validator、README、Workflow Cookbookの現行版を4.0.1へ同期する。追加artifact契約1.1.0、既存入力との互換性、実LLM比較・batched全段完走の未達記録を保持する。PRとmainのCI成功を確認し、v4.0.1タグから新規配布物を作成する。既存v4.0.0タグ・配布物は変更しない。
 

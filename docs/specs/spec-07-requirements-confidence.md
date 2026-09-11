@@ -24,12 +24,15 @@
 | R10 | 出力は新規ディレクトリに限定し、入力・既存成果物を上書きしない。dry-runでは書き込まない | P0 |
 | R11 | 評価完了は終了コード0、入力不正は1。任意の--fail-underで閾値未達・評価不能を2にできる。GateやReadyの判断権限は変更しない | P0 |
 | R12 | schemaのroot/package、CLI、Skill、例、golden、配布smokeを同期し、既存の未コミット差分を保持する | P0 |
+| R13 | Markdownの先頭BOMを読込境界で扱い、BOM有無だけで要件数・タイトル・frontmatter・採点を変えない。日本語名の既存代替IDと本文変更時のレビュー失効を維持する | P1 |
 
 ## 設計
 
 `requirements_review`はレビュー入力、`requirements_confidence`は評価出力とする。feature_spec/phase_contract自体のschemaは変更しない。Markdownは既存ingestを再利用し、文書中の明示タグを追加収集する。タグは`[要確認]`、`【要確認】`、`TBD`、`TODO`。AC・業務ルール内では`未定`・`未確定`も候補にする。1項目中のタグ反復で件数を増やさない。未検出の曖昧さ・矛盾は意味レビューでfindingsへ登録する。
 
 母数Nは空白・全角互換表記・AC/BRの番号を正規化した一意のAC／業務ルール数。入力hashはfeature・phase・Markdown追加確認項目を含む。要件IDは本文由来の安定IDとし、元配列の位置を残す。重複source IDやissue IDは入力不正として拒否する。
+
+Markdown取込は[CLI共通契約](spec-02-cli-integration.md#markdown取込と証跡0件の契約自己bb指摘-mbb-bb-001003)に従う。同じパス・本文のBOM有無は入力hashも同じとし、本文が変われば従来どおりレビューを失効させる。この保証範囲はMarkdownであり、JSONの文字コード契約を変更しない。
 
 未解決の重みWはcritical=8、high=4、medium=2、low=1の合計。基礎点は`70 × max(0, 1 - W/(4N)) + 30 × (レビュー済み数/N)`で、小数1桁に丸めた後にR5の上限を適用する。85以上=high、60以上=medium、それ未満=low。N=0はscore=null、band=unknown、status=insufficient_data。未解決critical/blocks_readyはstatus=blocked、それ以外の不足はneeds_confirmation、全件レビュー済み・未解決0はreviewed。部分レビューはprovisional=true。
 

@@ -6,6 +6,13 @@
 
 手動ブラックボックステスト設計を、根拠付きartifactと決定的な品質Gateで支援する。
 
+## 4.1.1の主な変更
+
+- 日本語だけのファイル名でも、Local Modeで安定した機能IDを生成します。
+- UTF-8 BOM付きMarkdownの先頭見出し・frontmatterを取り込み、BOMの有無で要件数や信頼度評価が変わる問題を修正しました。
+- buildを明示した証跡0件の入力は、全件未実施として`no_go`レポートを生成します。
+- CIは実測の分岐件数から全体85%・Gate専用90%を判定します。1,168テスト成功、純分岐率は全体85.29%・Gate専用92.00%です。[自己BBの修正受入](https://github.com/RNA4219/manual-bb-test-harness/blob/main/docs/acceptance/self-bb-fix-20260911/report.md)・[分岐率の検収記録](https://github.com/RNA4219/manual-bb-test-harness/blob/main/docs/acceptance/AC-20260911-branch-coverage.md)。
+
 ## 4.1.0の主な変更
 
 - PyPI説明ページから文書・ライセンスへ正しく移動できるよう、リンクをGitHubの絶対URLへ修正しました。
@@ -40,10 +47,10 @@ Domain、組み合わせ、状態経路、決定表、CRUD等を型付きモデ�
 
 Pythonパッケージは`bb-harness`として配布します。
 [PyPI](https://pypi.org/project/bb-harness/)または
-[GitHub Release](https://github.com/RNA4219/manual-bb-test-harness/releases/tag/v4.1.0)から導入できます。
+[GitHub Release](https://github.com/RNA4219/manual-bb-test-harness/releases/tag/v4.1.1)から導入できます。
 
 ```powershell
-python -m pip install bb-harness==4.1.0
+python -m pip install bb-harness==4.1.1
 bb-harness --version
 ```
 
@@ -81,7 +88,7 @@ uv run bb-harness run local-design `
 
 Local Modeは本リポジトリに統合済みで、別リポジトリの導入は不要。設定、成果物、fail closed条件の詳細は [Local Mode guide](https://github.com/RNA4219/manual-bb-test-harness/blob/main/docs/local-model-guide.md) を参照。
 
-現行リリース系列: **4.1.0** / 検証済みテスト: **1096件** / Workflow Cookbook: **33 nodes・45 edges・33 capsules** / 次回レビュー: **2026-10-11**
+現行リリース系列: **4.1.1** / 検証済みテスト: **1168件** / Workflow Cookbook: **33 nodes・45 edges・33 capsules** / 次回レビュー: **2026-10-11**
 人間向け概要は [docs/human-readme.md](https://github.com/RNA4219/manual-bb-test-harness/blob/main/docs/human-readme.md) を参照。
 
 ## ライセンス

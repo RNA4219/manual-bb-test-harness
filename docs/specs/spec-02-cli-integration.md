@@ -165,6 +165,14 @@ bb-harness --dry-run export notion --input report.json
 - 失敗時: stderrにエラー詳細
 - JSON出力: 指定ファイルパス
 
+### Markdown取込と証跡0件の契約（自己BB指摘 MBB-BB-001〜003）
+
+- MarkdownはUTF-8 BOMあり／なしを受け付ける。ファイル先頭のBOMだけを読込時に除き、先頭H1・H2・frontmatterを通常どおり認識する。本文中の文字は除去しない。
+- `ingest`、要件評価、Local Modeの既存の非空feature IDは維持する。ファイル名からIDが空になる場合、`MD-`とstemのcanonical JSON（非ASCIIをエスケープしない）のSHA-256先頭12桁を代替IDにする。ディレクトリや実行時刻に依存せず、異なる日本語stemを区別する。Local Modeの既存ASCII名と`.input`除去規則は変更しない。
+- `gate --input <artifact-dir> --build-id <build>`、または`--evidence / --risk / --cases`の有効な入力で実行証跡が0件なら、ケース集合全体をuntestedとして通常のGate評価へ渡す。全profileで`no_go`を終了0で出力し、分母・未実施数・未達理由を保持する。
+- 証跡0件でbuild未指定／空白の場合は終了1。schema不正、存在しない入力、feature/build不一致、曖昧な重複、ケース版不一致の拒否は維持する。証跡を捏造・補完してpassにしない。
+- 受入確認は、同一本文の日本語名／ASCII名、同一stemの別ディレクトリ、BOM有無のH1／H2／frontmatter、証跡0件の両CLI導線とbuild欠落を対照にする。既存の自己BB証跡は保持し、修正後の結果を別記録にする。
+
 ## 制約
 
 - Python 3.11+必須

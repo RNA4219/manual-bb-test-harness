@@ -186,8 +186,9 @@ def test_patch_rejects_unknown_and_duplicate_ids(ids):
         )
 
 
-def test_cli_estimate_has_no_network_or_output_side_effect(tmp_path, monkeypatch, capsys):
-    path = tmp_path / "spec.md"
+@pytest.mark.parametrize("filename", ["spec.md", "日本語 空白.md", "日本語.input.md", "💾.md"])
+def test_cli_estimate_has_no_network_or_output_side_effect(tmp_path, monkeypatch, capsys, filename):
+    path = tmp_path / filename
     _feature_input(path)
 
     def forbidden(*args, **kwargs):
@@ -217,8 +218,9 @@ def test_cli_estimate_has_no_network_or_output_side_effect(tmp_path, monkeypatch
     assert not (tmp_path / "out").exists()
 
 
-def test_pipeline_budget_failure_keeps_manifest(tmp_path):
-    path = tmp_path / "spec.md"
+@pytest.mark.parametrize("filename", ["spec.md", "日本語 空白.md"])
+def test_pipeline_budget_failure_keeps_manifest(tmp_path, filename):
+    path = tmp_path / filename
     _feature_input(path)
     client = FakeClient([])
     pipeline = LocalDesignPipeline(resolve_config("generic", model="fake", token_budget=1), client)

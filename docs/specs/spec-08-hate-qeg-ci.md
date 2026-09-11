@@ -12,7 +12,7 @@
 
 | id | 要件 | 優先度 |
 |---|---|---|
-| R1 | Python 3.10〜3.13、integration、PowerShell、package smoke、全体85%・Gate90%の既存条件を維持する | P0 |
+| R1 | Python 3.10〜3.13、integration、PowerShell、package smokeを維持し、全体85%・Gate専用90%を分岐率そのもので検証する。既存の合算値チェックも補助条件として維持する | P0 |
 | R2 | 全体pytestのJUnit・LCOV・coverage JSON・終了コード・開始終了時刻・Gitコミット・run ID・attemptを保存する | P0 |
 | R3 | HATE P0aとQEG exportを実行し、生成されたHATE/v1の出力を保存する | P0 |
 | R4 | HATE/v1からQEG 0.2へ明示的に変換する。成功fixtureのコピーや未実行証跡の生成はしない | P0 |
@@ -21,8 +21,13 @@
 | R7 | 証跡を失敗時もartifactに保存する。依存先はコミットSHA固定、権限はcontents:read、秘密情報を証跡へ含めない | P0 |
 | R8 | CI scopeと未評価項目をレポートに明示する。mockで外部サービスを代替する単体テストの成功を、実サービス・実LLMの成功に読み替えない | P0 |
 | R9 | ローカルで正常系・欠測・改変・版不一致・失敗結果の回帰検証を行い、変更をpushしたGitHub Actionsの全必須ジョブ成功を確認する | P0 |
+| R10 | 分岐率はcovered_branches / num_branchesで求め、丸め前の値で閾値と比較する。行率・分岐率・合算値を区別し、欠測・分母0・不正な件数・行のみ計測を拒否する | P0 |
 
 ## 設計
+
+2026-09-11の自己BB後の訂正: `percent_covered`は行・分岐の合算値であり、分岐率ではない。収集契約を`manual-bb-ci/v2`とし、`coverage_metric=branch`と行・分岐の件数／率／合算値を保存する。旧v1を分岐基準の合格証跡として再利用しない。captureとQEG変換は同じ件数検証・計算を使い、合算値だけ高い結果でも分岐率が85%未満なら失敗とする。Gate専用のcoverage JSONにも同じ検査を90%で適用する。
+
+件数はboolを含まない非負整数、covered + missing = total、total > 0を必要とする。JSONの表示用percent欄を閾値判定へ流用しない。入力不正も未達もCIを非0終了させる。除外追加や分母の縮小で閾値を満たさない。
 
 coverageジョブで実行と収集を一体化し、元ファイルのhash一覧を保存する。HATE/QEGジョブは同一workflow runのartifactだけを入力とし、checkoutのHEADとGitHub run/attemptを照合する。HATEとQEGは別checkoutにSHA固定で配置し、manual-bbの通常利用者に追加runtimeを要求しない。
 
@@ -36,6 +41,7 @@ QEG policyはstandard、scopeはreal_environmentのリポジトリCIに限定す
 
 ```bash
 python tools/ci/quality_evidence.py capture --out tmp/ci-evidence
+python tools/ci/quality_evidence.py check-coverage --input tmp/ci-evidence/gate-coverage.json --floor 90
 # HATEを固定revisionからインストールしたPythonで実行する。
 python tools/ci/quality_evidence.py convert --out tmp/ci-evidence
 node tmp/quality-tools/qeg/qeg-report-action/dist/cli.mjs record tmp/ci-evidence/qeg

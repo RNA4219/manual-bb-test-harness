@@ -29,6 +29,91 @@ FEATURE = "FEATURE-2"
 BUILD = "build-2"
 
 
+@pytest.mark.parametrize("profile", ["strict", "standard", "lean"])
+@pytest.mark.parametrize("input_mode", ["directory", "explicit"])
+def test_cli_empty_evidence_generates_untested_no_go(tmp_path, profile, input_mode):
+    from bb_harness.cli import main
+
+    source = Path(__file__).resolve().parents[1] / "examples/artifacts"
+    artifacts = tmp_path / "artifacts"
+    artifacts.mkdir()
+    paths = {}
+    for kind in ("feature_spec", "risk_register", "manual_case_set"):
+        path = artifacts / f"order-cancel.{kind}.json"
+        path.write_bytes((source / path.name).read_bytes())
+        paths[kind] = path
+    if input_mode == "directory":
+        args = ["--input", str(artifacts)]
+    else:
+        empty = tmp_path / "evidence"
+        empty.mkdir()
+        args = ["--evidence", str(empty), "--feature", str(paths["feature_spec"]),
+                "--risk", str(paths["risk_register"]), "--cases", str(paths["manual_case_set"])]
+    output = tmp_path / "gate.json"
+    assert main(["gate", *args, "--build-id", BUILD, "--profile", profile, "--output", str(output)]) == 0
+    report = load_json(output)
+    validate_schema(report, "gate_decision.schema.json")
+    assert report["status"] == "no_go"
+    assert report["build_id"] == BUILD
+    manual = report["evidence_summary"]["manual_by_priority"]
+    assert sum(row["total"] for row in manual.values()) == 4
+    assert sum(row["untested"] for row in manual.values()) == 4
+    assert sum(row["pass"] for row in manual.values()) == 0
+    assert report["unmet_conditions"]
+
+
+@pytest.mark.parametrize("build", [None, "", "  "])
+def test_empty_evidence_requires_explicit_nonempty_build(build):
+    with pytest.raises(GateInputError, match="--build-id"):
+        validate_and_select_evidence([], FEATURE, build)
+
+
+@pytest.mark.parametrize("fault", ["no-evidence-path", "missing-risk", "missing-cases", "risk-feature", "feature", "observations"])
+def test_gate_rejects_invalid_artifact_inputs_without_success_report(tmp_path, fault):
+    from bb_harness.gate_engine import main
+
+    source = Path(__file__).resolve().parents[1] / "examples/artifacts"
+    paths = {}
+    for kind in ("feature_spec", "risk_register", "manual_case_set", "observation_set"):
+        example = (source / "techniques/discount-domain/discount.observation_set.json"
+                   if kind == "observation_set" else source / f"order-cancel.{kind}.json")
+        value = load_json(example)
+        value["feature_id"] = "ORD-CANCEL-01"
+        if (fault, kind) in (("risk-feature", "risk_register"), ("feature", "feature_spec"),
+                             ("observations", "observation_set")):
+            value["feature_id"] = "OTHER"
+        path = tmp_path / f"{kind}.json"
+        path.write_text(json.dumps(value), encoding="utf-8")
+        paths[kind] = path
+    empty = tmp_path / "evidence"
+    empty.mkdir()
+    args = ["--build-id", BUILD, "--output", str(tmp_path / "gate.json")]
+    if fault != "no-evidence-path":
+        args += ["--evidence", str(empty)]
+    args += ["--risk", str(tmp_path / "absent-risk.json" if fault == "missing-risk" else paths["risk_register"]),
+             "--cases", str(tmp_path / "absent-cases.json" if fault == "missing-cases" else paths["manual_case_set"]),
+             "--feature", str(paths["feature_spec"]), "--observations", str(paths["observation_set"])]
+    assert main(args) == 1
+    assert not (tmp_path / "gate.json").exists()
+
+
+@pytest.mark.parametrize("explicit", ["risk", "cases"])
+def test_gate_directory_resolves_remaining_artifact_after_explicit_override(tmp_path, explicit):
+    from bb_harness.gate_engine import main
+
+    source = Path(__file__).resolve().parents[1] / "examples/artifacts"
+    paths = {}
+    for kind in ("risk_register", "manual_case_set"):
+        path = tmp_path / f"order-cancel.{kind}.json"
+        path.write_bytes((source / path.name).read_bytes())
+        paths[kind] = path
+    kind = "risk_register" if explicit == "risk" else "manual_case_set"
+    output = tmp_path / "gate.json"
+    assert main(["--input", str(tmp_path), "--" + explicit, str(paths[kind]),
+                 "--build-id", BUILD, "--output", str(output)]) == 0
+    assert load_json(output)["status"] == "no_go"
+
+
 def evidence(**overrides: object) -> dict[str, object]:
     value: dict[str, object] = {
         "run_id": "RUN-1",

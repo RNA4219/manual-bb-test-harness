@@ -92,6 +92,8 @@ def parse_timestamp(value: Any, source: str) -> datetime:
 def validate_and_select_evidence(
     evidence: list[dict[str, Any]], feature_id: str, build_id: str | None
 ) -> tuple[list[dict[str, Any]], str]:
+    if build_id is not None and not build_id.strip():
+        raise GateInputError("--build-id must be non-empty")
     matching = []
     builds: set[str] = set()
     for index, item in enumerate(evidence):
@@ -114,8 +116,7 @@ def validate_and_select_evidence(
             raise GateInputError("--build-id required when evidence has zero or multiple builds")
         build_id = next(iter(builds))
     matching = [item for item in matching if item["build_id"] == build_id]
-    if not matching:
-        raise GateInputError(f"No evidence for feature={feature_id}, build={build_id}")
+    # 明示buildの証跡0件は、後段で全ケースをuntestedとして評価する。
 
     latest: dict[str, tuple[datetime, dict[str, Any]]] = {}
     for item in matching:

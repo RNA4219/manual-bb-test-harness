@@ -1,0 +1,2082 @@
+{
+  "target": "4.1.0 + self-BB fixes; local unreleased wheel",
+  "verified_at": "2026-09-11T09:14:36.531726+00:00",
+  "base_commit": "6149d81fee17b6271503717b3fc2c0f6a738a540",
+  "bb": {
+    "pass": 45,
+    "fail": 0,
+    "blocked": 0,
+    "exploration_observed": 5,
+    "cli_calls": 58
+  },
+  "pytest": {
+    "passed": 1117,
+    "coverage_percent": 88.48189415041783
+  },
+  "gate_pytest": {
+    "passed": 116,
+    "coverage_percent": 92.3202614379085
+  },
+  "fix_acceptance": "pass",
+  "release_status": "unreleased; no GitHub Actions rerun, merge, or PyPI publication",
+  "llm_calls": 0,
+  "resolved_findings": [
+    {
+      "id": "MBB-BB-001",
+      "status": "fixed_and_retested",
+      "cases": [
+        "BB-31",
+        "BB-32"
+      ]
+    },
+    {
+      "id": "MBB-BB-002",
+      "status": "fixed_and_retested",
+      "cases": [
+        "CH-01-bom"
+      ]
+    },
+    {
+      "id": "MBB-BB-003",
+      "status": "fixed_and_retested",
+      "cases": [
+        "BB-38"
+      ]
+    }
+  ],
+  "runner_finalization": {
+    "status": "completed",
+    "bb_cases": "45 passed; 5 exploration observations",
+    "runner_exit": 1,
+    "runner_error": "試験完了後のverification.json収録が先行準備失敗で未実施",
+    "recovery": "wheel/source照合の成功後にpackage-verification.jsonを収録。既存のBB実測結果は変更せず全件・全ログの存在と成功を照合"
+  },
+  "cases": [
+    {
+      "id": "BB-01",
+      "result": "pass",
+      "error": null,
+      "details": "bb-harness 4.1.0",
+      "commands": [
+        5,
+        6
+      ],
+      "elapsed_seconds": 0.879
+    },
+    {
+      "id": "BB-02",
+      "result": "pass",
+      "error": null,
+      "details": {
+        "score": null,
+        "band": "unknown",
+        "status": "insufficient_data",
+        "counts": {
+          "requirements": 0,
+          "raw_requirements": 0,
+          "duplicate_requirements": 0,
+          "reviewed_requirements": 0,
+          "unreviewed_requirements": 0,
+          "raw_findings": 3,
+          "unique_findings": 3,
+          "open_confirmations": 3,
+          "resolved_confirmations": 0,
+          "by_severity": {
+            "critical": 1,
+            "high": 2,
+            "medium": 0,
+            "low": 0
+          },
+          "technical_risks": 0
+        }
+      },
+      "commands": [
+        7
+      ],
+      "elapsed_seconds": 0.556
+    },
+    {
+      "id": "BB-03",
+      "result": "pass",
+      "error": null,
+      "details": {
+        "score": 69,
+        "band": "medium",
+        "status": "needs_confirmation",
+        "counts": {
+          "requirements": 1,
+          "raw_requirements": 1,
+          "duplicate_requirements": 0,
+          "reviewed_requirements": 0,
+          "unreviewed_requirements": 1,
+          "raw_findings": 0,
+          "unique_findings": 0,
+          "open_confirmations": 0,
+          "resolved_confirmations": 0,
+          "by_severity": {
+            "critical": 0,
+            "high": 0,
+            "medium": 0,
+            "low": 0
+          },
+          "technical_risks": 0
+        }
+      },
+      "commands": [
+        8
+      ],
+      "elapsed_seconds": 0.522
+    },
+    {
+      "id": "BB-04",
+      "result": "pass",
+      "error": null,
+      "details": [
+        {
+          "score": 69,
+          "band": "medium",
+          "status": "needs_confirmation",
+          "counts": {
+            "requirements": 2,
+            "raw_requirements": 2,
+            "duplicate_requirements": 0,
+            "reviewed_requirements": 0,
+            "unreviewed_requirements": 2,
+            "raw_findings": 0,
+            "unique_findings": 0,
+            "open_confirmations": 0,
+            "resolved_confirmations": 0,
+            "by_severity": {
+              "critical": 0,
+              "high": 0,
+              "medium": 0,
+              "low": 0
+            },
+            "technical_risks": 0
+          }
+        },
+        {
+          "score": 69,
+          "band": "medium",
+          "status": "needs_confirmation",
+          "counts": {
+            "requirements": 2,
+            "raw_requirements": 2,
+            "duplicate_requirements": 0,
+            "reviewed_requirements": 0,
+            "unreviewed_requirements": 2,
+            "raw_findings": 0,
+            "unique_findings": 0,
+            "open_confirmations": 0,
+            "resolved_confirmations": 0,
+            "by_severity": {
+              "critical": 0,
+              "high": 0,
+              "medium": 0,
+              "low": 0
+            },
+            "technical_risks": 0
+          }
+        }
+      ],
+      "commands": [
+        9,
+        10
+      ],
+      "elapsed_seconds": 0.937
+    },
+    {
+      "id": "BB-05",
+      "result": "pass",
+      "error": null,
+      "details": {
+        "score": 69,
+        "band": "medium",
+        "status": "needs_confirmation",
+        "counts": {
+          "requirements": 1,
+          "raw_requirements": 3,
+          "duplicate_requirements": 2,
+          "reviewed_requirements": 0,
+          "unreviewed_requirements": 1,
+          "raw_findings": 0,
+          "unique_findings": 0,
+          "open_confirmations": 0,
+          "resolved_confirmations": 0,
+          "by_severity": {
+            "critical": 0,
+            "high": 0,
+            "medium": 0,
+            "low": 0
+          },
+          "technical_risks": 0
+        }
+      },
+      "commands": [
+        11
+      ],
+      "elapsed_seconds": 0.485
+    },
+    {
+      "id": "BB-06",
+      "result": "pass",
+      "error": null,
+      "details": {
+        "score": 35.0,
+        "band": "low",
+        "status": "needs_confirmation",
+        "counts": {
+          "requirements": 1,
+          "raw_requirements": 1,
+          "duplicate_requirements": 0,
+          "reviewed_requirements": 0,
+          "unreviewed_requirements": 1,
+          "raw_findings": 2,
+          "unique_findings": 1,
+          "open_confirmations": 1,
+          "resolved_confirmations": 0,
+          "by_severity": {
+            "critical": 0,
+            "high": 0,
+            "medium": 1,
+            "low": 0
+          },
+          "technical_risks": 0
+        }
+      },
+      "commands": [
+        12
+      ],
+      "elapsed_seconds": 0.577
+    },
+    {
+      "id": "BB-07",
+      "result": "pass",
+      "error": null,
+      "details": {
+        "score": 100.0,
+        "status": "reviewed",
+        "provisional": false,
+        "counts": {
+          "requirements": 2,
+          "raw_requirements": 2,
+          "duplicate_requirements": 0,
+          "reviewed_requirements": 2,
+          "unreviewed_requirements": 0,
+          "raw_findings": 0,
+          "unique_findings": 0,
+          "open_confirmations": 0,
+          "resolved_confirmations": 0,
+          "by_severity": {
+            "critical": 0,
+            "high": 0,
+            "medium": 0,
+            "low": 0
+          },
+          "technical_risks": 0
+        }
+      },
+      "commands": [
+        13
+      ],
+      "elapsed_seconds": 0.501
+    },
+    {
+      "id": "BB-08",
+      "result": "pass",
+      "error": null,
+      "details": {
+        "score": 84,
+        "status": "needs_confirmation",
+        "provisional": true,
+        "counts": {
+          "requirements": 2,
+          "raw_requirements": 2,
+          "duplicate_requirements": 0,
+          "reviewed_requirements": 1,
+          "unreviewed_requirements": 1,
+          "raw_findings": 0,
+          "unique_findings": 0,
+          "open_confirmations": 0,
+          "resolved_confirmations": 0,
+          "by_severity": {
+            "critical": 0,
+            "high": 0,
+            "medium": 0,
+            "low": 0
+          },
+          "technical_risks": 0
+        }
+      },
+      "commands": [
+        14
+      ],
+      "elapsed_seconds": 0.527
+    },
+    {
+      "id": "BB-09",
+      "result": "pass",
+      "error": null,
+      "details": {
+        "score": 84,
+        "status": "needs_confirmation",
+        "provisional": false,
+        "counts": {
+          "requirements": 10,
+          "raw_requirements": 10,
+          "duplicate_requirements": 0,
+          "reviewed_requirements": 10,
+          "unreviewed_requirements": 0,
+          "raw_findings": 1,
+          "unique_findings": 1,
+          "open_confirmations": 1,
+          "resolved_confirmations": 0,
+          "by_severity": {
+            "critical": 0,
+            "high": 0,
+            "medium": 0,
+            "low": 1
+          },
+          "technical_risks": 0
+        }
+      },
+      "commands": [
+        15
+      ],
+      "elapsed_seconds": 0.539
+    },
+    {
+      "id": "BB-10",
+      "result": "pass",
+      "error": null,
+      "details": {
+        "score": 84,
+        "status": "needs_confirmation",
+        "provisional": false,
+        "counts": {
+          "requirements": 10,
+          "raw_requirements": 10,
+          "duplicate_requirements": 0,
+          "reviewed_requirements": 10,
+          "unreviewed_requirements": 0,
+          "raw_findings": 1,
+          "unique_findings": 1,
+          "open_confirmations": 1,
+          "resolved_confirmations": 0,
+          "by_severity": {
+            "critical": 0,
+            "high": 0,
+            "medium": 1,
+            "low": 0
+          },
+          "technical_risks": 0
+        }
+      },
+      "commands": [
+        16
+      ],
+      "elapsed_seconds": 0.507
+    },
+    {
+      "id": "BB-11",
+      "result": "pass",
+      "error": null,
+      "details": {
+        "score": 69,
+        "status": "needs_confirmation",
+        "provisional": false,
+        "counts": {
+          "requirements": 10,
+          "raw_requirements": 10,
+          "duplicate_requirements": 0,
+          "reviewed_requirements": 10,
+          "unreviewed_requirements": 0,
+          "raw_findings": 1,
+          "unique_findings": 1,
+          "open_confirmations": 1,
+          "resolved_confirmations": 0,
+          "by_severity": {
+            "critical": 0,
+            "high": 1,
+            "medium": 0,
+            "low": 0
+          },
+          "technical_risks": 0
+        }
+      },
+      "commands": [
+        17
+      ],
+      "elapsed_seconds": 0.478
+    },
+    {
+      "id": "BB-12",
+      "result": "pass",
+      "error": null,
+      "details": {
+        "score": 39,
+        "status": "blocked",
+        "provisional": false,
+        "counts": {
+          "requirements": 10,
+          "raw_requirements": 10,
+          "duplicate_requirements": 0,
+          "reviewed_requirements": 10,
+          "unreviewed_requirements": 0,
+          "raw_findings": 1,
+          "unique_findings": 1,
+          "open_confirmations": 1,
+          "resolved_confirmations": 0,
+          "by_severity": {
+            "critical": 1,
+            "high": 0,
+            "medium": 0,
+            "low": 0
+          },
+          "technical_risks": 0
+        }
+      },
+      "commands": [
+        18
+      ],
+      "elapsed_seconds": 0.463
+    },
+    {
+      "id": "BB-13",
+      "result": "pass",
+      "error": null,
+      "details": {
+        "score": 39,
+        "status": "blocked",
+        "provisional": false,
+        "counts": {
+          "requirements": 100,
+          "raw_requirements": 100,
+          "duplicate_requirements": 0,
+          "reviewed_requirements": 100,
+          "unreviewed_requirements": 0,
+          "raw_findings": 1,
+          "unique_findings": 1,
+          "open_confirmations": 1,
+          "resolved_confirmations": 0,
+          "by_severity": {
+            "critical": 1,
+            "high": 0,
+            "medium": 0,
+            "low": 0
+          },
+          "technical_risks": 0
+        }
+      },
+      "commands": [
+        19
+      ],
+      "elapsed_seconds": 0.506
+    },
+    {
+      "id": "BB-14",
+      "result": "pass",
+      "error": null,
+      "details": {
+        "score": 100.0,
+        "status": "reviewed",
+        "provisional": false,
+        "counts": {
+          "requirements": 2,
+          "raw_requirements": 2,
+          "duplicate_requirements": 0,
+          "reviewed_requirements": 2,
+          "unreviewed_requirements": 0,
+          "raw_findings": 1,
+          "unique_findings": 1,
+          "open_confirmations": 0,
+          "resolved_confirmations": 1,
+          "by_severity": {
+            "critical": 0,
+            "high": 0,
+            "medium": 0,
+            "low": 0
+          },
+          "technical_risks": 0
+        }
+      },
+      "commands": [
+        20
+      ],
+      "elapsed_seconds": 0.552
+    },
+    {
+      "id": "BB-15",
+      "result": "pass",
+      "error": null,
+      "details": null,
+      "commands": [
+        21
+      ],
+      "elapsed_seconds": 0.623
+    },
+    {
+      "id": "BB-16",
+      "result": "pass",
+      "error": null,
+      "details": null,
+      "commands": [
+        22
+      ],
+      "elapsed_seconds": 0.476
+    },
+    {
+      "id": "BB-17",
+      "result": "pass",
+      "error": null,
+      "details": null,
+      "commands": [
+        23
+      ],
+      "elapsed_seconds": 0.475
+    },
+    {
+      "id": "BB-18",
+      "result": "pass",
+      "error": null,
+      "details": null,
+      "commands": [
+        24
+      ],
+      "elapsed_seconds": 0.481
+    },
+    {
+      "id": "BB-19",
+      "result": "pass",
+      "error": null,
+      "details": null,
+      "commands": [
+        25
+      ],
+      "elapsed_seconds": 0.53
+    },
+    {
+      "id": "BB-20",
+      "result": "pass",
+      "error": null,
+      "details": null,
+      "commands": [
+        26
+      ],
+      "elapsed_seconds": 0.509
+    },
+    {
+      "id": "BB-21",
+      "result": "pass",
+      "error": null,
+      "details": null,
+      "commands": [
+        27
+      ],
+      "elapsed_seconds": 0.476
+    },
+    {
+      "id": "BB-22",
+      "result": "pass",
+      "error": null,
+      "details": {
+        "schema_version": "1.0.0",
+        "policy_version": "requirements-confidence-1",
+        "feature_id": "MD-02d46ebef8cc",
+        "input_sha256": "678f0276bd1de52778723e46f398f04faf380e79d297126a9c7973f2d2e7938b",
+        "score": 69,
+        "band": "medium",
+        "status": "needs_confirmation",
+        "provisional": true,
+        "counts": {
+          "requirements": 1,
+          "raw_requirements": 1,
+          "duplicate_requirements": 0,
+          "reviewed_requirements": 0,
+          "unreviewed_requirements": 1,
+          "raw_findings": 0,
+          "unique_findings": 0,
+          "open_confirmations": 0,
+          "resolved_confirmations": 0,
+          "by_severity": {
+            "critical": 0,
+            "high": 0,
+            "medium": 0,
+            "low": 0
+          },
+          "technical_risks": 0
+        },
+        "metrics": {
+          "review_coverage_percent": 0.0,
+          "open_items_per_requirement": 0.0,
+          "uncertainty_weight": 0,
+          "normalization_capacity": 4,
+          "uncertainty_points": 70.0,
+          "review_points": 0.0,
+          "base_score": 70.0
+        },
+        "score_caps": [
+          {
+            "reason": "未レビューの要件があります",
+            "maximum": 84
+          },
+          {
+            "reason": "レビュー済み要件がありません",
+            "maximum": 69
+          }
+        ],
+        "requirements": [
+          {
+            "requirement_id": "REQ-939710f2cf70b736",
+            "text": "保存後に完了と表示する。",
+            "locations": [
+              "feature/acceptance_criteria/0"
+            ],
+            "reviewed": false
+          }
+        ],
+        "issues": [],
+        "next_actions": [
+          {
+            "priority": "medium",
+            "target_id": "REQ-939710f2cf70b736",
+            "text": "根拠・oracle・曖昧さ・矛盾をレビュー: 保存後に完了と表示する。",
+            "owner": null,
+            "due": null
+          }
+        ],
+        "source_refs": [
+          {
+            "id": "MD-日本語 空白",
+            "kind": "spec",
+            "excerpt": "# 自己BB\n\n## Acceptance Criteria\n- AC-1: 保存後に完了と表示する。"
+          }
+        ],
+        "review": {
+          "reviewer": null,
+          "reviewed_at": null,
+          "requirements": []
+        },
+        "limitations": [
+          "点数は記録された不確実性とレビューのルール評価であり、正しさの確率ではありません。",
+          "タグのない曖昧さ・矛盾・未記載要件は自動発見しません。意味レビューで登録してください。",
+          "根拠の内容とoracleの意味的正しさは自動保証しません。高得点もReadyやリリースGoではありません。",
+          "重み・閾値は初期policyであり、実案件データによる統計的な校正は未実施です。"
+        ]
+      },
+      "commands": [
+        28
+      ],
+      "elapsed_seconds": 0.538
+    },
+    {
+      "id": "BB-23",
+      "result": "pass",
+      "error": null,
+      "details": {
+        "schema_version": "1.0.0",
+        "policy_version": "requirements-confidence-1",
+        "feature_id": "MD-02d46ebef8cc",
+        "input_sha256": "678f0276bd1de52778723e46f398f04faf380e79d297126a9c7973f2d2e7938b",
+        "score": 69,
+        "band": "medium",
+        "status": "needs_confirmation",
+        "provisional": true,
+        "counts": {
+          "requirements": 1,
+          "raw_requirements": 1,
+          "duplicate_requirements": 0,
+          "reviewed_requirements": 0,
+          "unreviewed_requirements": 1,
+          "raw_findings": 0,
+          "unique_findings": 0,
+          "open_confirmations": 0,
+          "resolved_confirmations": 0,
+          "by_severity": {
+            "critical": 0,
+            "high": 0,
+            "medium": 0,
+            "low": 0
+          },
+          "technical_risks": 0
+        },
+        "metrics": {
+          "review_coverage_percent": 0.0,
+          "open_items_per_requirement": 0.0,
+          "uncertainty_weight": 0,
+          "normalization_capacity": 4,
+          "uncertainty_points": 70.0,
+          "review_points": 0.0,
+          "base_score": 70.0
+        },
+        "score_caps": [
+          {
+            "reason": "未レビューの要件があります",
+            "maximum": 84
+          },
+          {
+            "reason": "レビュー済み要件がありません",
+            "maximum": 69
+          }
+        ],
+        "requirements": [
+          {
+            "requirement_id": "REQ-939710f2cf70b736",
+            "text": "保存後に完了と表示する。",
+            "locations": [
+              "feature/acceptance_criteria/0"
+            ],
+            "reviewed": false
+          }
+        ],
+        "issues": [],
+        "next_actions": [
+          {
+            "priority": "medium",
+            "target_id": "REQ-939710f2cf70b736",
+            "text": "根拠・oracle・曖昧さ・矛盾をレビュー: 保存後に完了と表示する。",
+            "owner": null,
+            "due": null
+          }
+        ],
+        "source_refs": [
+          {
+            "id": "MD-日本語 空白",
+            "kind": "spec",
+            "excerpt": "# 自己BB\n\n## Acceptance Criteria\n- AC-1: 保存後に完了と表示する。"
+          }
+        ],
+        "review": {
+          "reviewer": null,
+          "reviewed_at": null,
+          "requirements": []
+        },
+        "limitations": [
+          "点数は記録された不確実性とレビューのルール評価であり、正しさの確率ではありません。",
+          "タグのない曖昧さ・矛盾・未記載要件は自動発見しません。意味レビューで登録してください。",
+          "根拠の内容とoracleの意味的正しさは自動保証しません。高得点もReadyやリリースGoではありません。",
+          "重み・閾値は初期policyであり、実案件データによる統計的な校正は未実施です。"
+        ]
+      },
+      "commands": [
+        29
+      ],
+      "elapsed_seconds": 0.514
+    },
+    {
+      "id": "BB-24",
+      "result": "pass",
+      "error": null,
+      "details": {
+        "schema_version": "1.0.0",
+        "policy_version": "requirements-confidence-1",
+        "feature_id": "MD-02d46ebef8cc",
+        "input_sha256": "678f0276bd1de52778723e46f398f04faf380e79d297126a9c7973f2d2e7938b",
+        "score": 69,
+        "band": "medium",
+        "status": "needs_confirmation",
+        "provisional": true,
+        "counts": {
+          "requirements": 1,
+          "raw_requirements": 1,
+          "duplicate_requirements": 0,
+          "reviewed_requirements": 0,
+          "unreviewed_requirements": 1,
+          "raw_findings": 0,
+          "unique_findings": 0,
+          "open_confirmations": 0,
+          "resolved_confirmations": 0,
+          "by_severity": {
+            "critical": 0,
+            "high": 0,
+            "medium": 0,
+            "low": 0
+          },
+          "technical_risks": 0
+        },
+        "metrics": {
+          "review_coverage_percent": 0.0,
+          "open_items_per_requirement": 0.0,
+          "uncertainty_weight": 0,
+          "normalization_capacity": 4,
+          "uncertainty_points": 70.0,
+          "review_points": 0.0,
+          "base_score": 70.0
+        },
+        "score_caps": [
+          {
+            "reason": "未レビューの要件があります",
+            "maximum": 84
+          },
+          {
+            "reason": "レビュー済み要件がありません",
+            "maximum": 69
+          }
+        ],
+        "requirements": [
+          {
+            "requirement_id": "REQ-939710f2cf70b736",
+            "text": "保存後に完了と表示する。",
+            "locations": [
+              "feature/acceptance_criteria/0"
+            ],
+            "reviewed": false
+          }
+        ],
+        "issues": [],
+        "next_actions": [
+          {
+            "priority": "medium",
+            "target_id": "REQ-939710f2cf70b736",
+            "text": "根拠・oracle・曖昧さ・矛盾をレビュー: 保存後に完了と表示する。",
+            "owner": null,
+            "due": null
+          }
+        ],
+        "source_refs": [
+          {
+            "id": "MD-日本語 空白",
+            "kind": "spec",
+            "excerpt": "# 自己BB\n\n## Acceptance Criteria\n- AC-1: 保存後に完了と表示する。"
+          }
+        ],
+        "review": {
+          "reviewer": null,
+          "reviewed_at": null,
+          "requirements": []
+        },
+        "limitations": [
+          "点数は記録された不確実性とレビューのルール評価であり、正しさの確率ではありません。",
+          "タグのない曖昧さ・矛盾・未記載要件は自動発見しません。意味レビューで登録してください。",
+          "根拠の内容とoracleの意味的正しさは自動保証しません。高得点もReadyやリリースGoではありません。",
+          "重み・閾値は初期policyであり、実案件データによる統計的な校正は未実施です。"
+        ]
+      },
+      "commands": [
+        30
+      ],
+      "elapsed_seconds": 0.539
+    },
+    {
+      "id": "BB-25",
+      "result": "pass",
+      "error": null,
+      "details": {
+        "schema_version": "1.0.0",
+        "policy_version": "requirements-confidence-1",
+        "feature_id": "EMPTY",
+        "input_sha256": "fd6af8b25a9b4d2e966f381a8d42c2cab5a4e9bf5445d467ef179bd68b050703",
+        "score": null,
+        "band": "unknown",
+        "status": "insufficient_data",
+        "provisional": true,
+        "counts": {
+          "requirements": 0,
+          "raw_requirements": 0,
+          "duplicate_requirements": 0,
+          "reviewed_requirements": 0,
+          "unreviewed_requirements": 0,
+          "raw_findings": 3,
+          "unique_findings": 3,
+          "open_confirmations": 3,
+          "resolved_confirmations": 0,
+          "by_severity": {
+            "critical": 1,
+            "high": 2,
+            "medium": 0,
+            "low": 0
+          },
+          "technical_risks": 0
+        },
+        "metrics": {
+          "review_coverage_percent": null,
+          "open_items_per_requirement": null,
+          "uncertainty_weight": 16,
+          "normalization_capacity": 0,
+          "uncertainty_points": null,
+          "review_points": null,
+          "base_score": null
+        },
+        "score_caps": [
+          {
+            "reason": "重大な未解決事項または着手を妨げる確認事項が残っています",
+            "maximum": 39
+          },
+          {
+            "reason": "highの未解決事項が残っています",
+            "maximum": 69
+          },
+          {
+            "reason": "要確認事項が残っています",
+            "maximum": 84
+          },
+          {
+            "reason": "レビュー済み要件がありません",
+            "maximum": 69
+          }
+        ],
+        "requirements": [],
+        "issues": [
+          {
+            "issue_id": "feature:assumption:ASM-1",
+            "ids": [
+              "feature:assumption:ASM-1"
+            ],
+            "kind": "assumption",
+            "severity": "high",
+            "text": "No acceptance criteria section found in source",
+            "requirement_ids": [],
+            "source_refs": [],
+            "locations": [
+              "feature/assumptions/ASM-1"
+            ],
+            "owner": null,
+            "due": null,
+            "blocks_ready": false,
+            "status": "open",
+            "resolution": null
+          },
+          {
+            "issue_id": "system:empty",
+            "ids": [
+              "system:empty"
+            ],
+            "kind": "missing_requirements",
+            "severity": "critical",
+            "text": "評価できるAC・業務ルールがありません",
+            "requirement_ids": [],
+            "source_refs": [],
+            "locations": [],
+            "owner": null,
+            "due": null,
+            "blocks_ready": true,
+            "status": "open",
+            "resolution": null
+          },
+          {
+            "issue_id": "system:source",
+            "ids": [
+              "system:source"
+            ],
+            "kind": "missing_source",
+            "severity": "high",
+            "text": "引用可能な仕様根拠がありません",
+            "requirement_ids": [],
+            "source_refs": [],
+            "locations": [],
+            "owner": null,
+            "due": null,
+            "blocks_ready": false,
+            "status": "open",
+            "resolution": null
+          }
+        ],
+        "next_actions": [
+          {
+            "priority": "critical",
+            "target_id": "system:empty",
+            "text": "確認・根拠の記録: 評価できるAC・業務ルールがありません",
+            "owner": null,
+            "due": null
+          },
+          {
+            "priority": "high",
+            "target_id": "feature:assumption:ASM-1",
+            "text": "確認・根拠の記録: No acceptance criteria section found in source",
+            "owner": null,
+            "due": null
+          },
+          {
+            "priority": "high",
+            "target_id": "system:source",
+            "text": "確認・根拠の記録: 引用可能な仕様根拠がありません",
+            "owner": null,
+            "due": null
+          }
+        ],
+        "source_refs": [
+          {
+            "id": "MD-empty",
+            "kind": "spec",
+            "excerpt": ""
+          }
+        ],
+        "review": {
+          "reviewer": null,
+          "reviewed_at": null,
+          "requirements": []
+        },
+        "limitations": [
+          "点数は記録された不確実性とレビューのルール評価であり、正しさの確率ではありません。",
+          "タグのない曖昧さ・矛盾・未記載要件は自動発見しません。意味レビューで登録してください。",
+          "根拠の内容とoracleの意味的正しさは自動保証しません。高得点もReadyやリリースGoではありません。",
+          "重み・閾値は初期policyであり、実案件データによる統計的な校正は未実施です。"
+        ]
+      },
+      "commands": [
+        31
+      ],
+      "elapsed_seconds": 0.48
+    },
+    {
+      "id": "BB-26",
+      "result": "pass",
+      "error": null,
+      "details": null,
+      "commands": [
+        32
+      ],
+      "elapsed_seconds": 0.404
+    },
+    {
+      "id": "BB-27",
+      "result": "pass",
+      "error": null,
+      "details": null,
+      "commands": [
+        33
+      ],
+      "elapsed_seconds": 0.394
+    },
+    {
+      "id": "BB-28",
+      "result": "pass",
+      "error": null,
+      "details": null,
+      "commands": [
+        34
+      ],
+      "elapsed_seconds": 0.396
+    },
+    {
+      "id": "BB-29",
+      "result": "pass",
+      "error": null,
+      "details": null,
+      "commands": [
+        35
+      ],
+      "elapsed_seconds": 0.387
+    },
+    {
+      "id": "BB-30",
+      "result": "pass",
+      "error": null,
+      "details": null,
+      "commands": [
+        36
+      ],
+      "elapsed_seconds": 0.38
+    },
+    {
+      "id": "BB-31",
+      "result": "pass",
+      "error": null,
+      "details": null,
+      "commands": [
+        37
+      ],
+      "elapsed_seconds": 0.452
+    },
+    {
+      "id": "BB-32",
+      "result": "pass",
+      "error": null,
+      "details": {
+        "requests": [],
+        "usage": {
+          "calls": 0,
+          "repair_calls": 0,
+          "unreported_calls": 0,
+          "prompt_tokens": 0,
+          "completion_tokens": 0,
+          "total_tokens": 0,
+          "reported_total_tokens": 0,
+          "accounted_tokens": 0,
+          "budget_tokens": 1,
+          "remaining_tokens": 1,
+          "budget_exhausted": true,
+          "estimation_method": "utf8_bytes_plus_256_v1"
+        }
+      },
+      "commands": [
+        38
+      ],
+      "elapsed_seconds": 0.451
+    },
+    {
+      "id": "BB-33",
+      "result": "pass",
+      "error": null,
+      "details": null,
+      "commands": [
+        39
+      ],
+      "elapsed_seconds": 0.433
+    },
+    {
+      "id": "BB-34",
+      "result": "pass",
+      "error": null,
+      "details": {
+        "schema_version": "1.1.0",
+        "id": "COVREPORT-75e3a8602d5f66f113a0",
+        "feature_id": "DISCOUNT-01",
+        "build_id": "demo-1",
+        "model_hash": "318d0e7a17cc30958cdb52f863989d4320add284a852f027861a9f3b5041ce83",
+        "case_hash": "aa3e1db620d786d6e83bb38181336852a1dfa19a99a423a11028de083e8c68f6",
+        "evidence_binding_mode": "case_revision",
+        "plan_hash": "c675bcc92cfebfd35a4168b8ba3f0698e5fbdc5c09b6663aed9a111ae4ad42f0",
+        "mode": "shadow",
+        "design": {
+          "required_feasible": 4,
+          "covered_by_cases": 4,
+          "rate": 100.0,
+          "uncovered_ids": []
+        },
+        "execution": {
+          "required_feasible": 4,
+          "executed": 0,
+          "passed": 0,
+          "rate": 0.0,
+          "unexecuted_ids": [
+            "COV-DOMAIN-SHIPPING-43b7661297b1271a8b43",
+            "COV-DOMAIN-SHIPPING-6f6d0d1981beaa3b9f3a",
+            "COV-DOMAIN-SHIPPING-8bb2dfcd7580f6a853cb",
+            "COV-DOMAIN-SHIPPING-d18403dc92aec569fe95"
+          ]
+        },
+        "results": [
+          {
+            "id": "COV-DOMAIN-SHIPPING-43b7661297b1271a8b43",
+            "design": "covered",
+            "case_ids": [
+              "TC-001"
+            ],
+            "executed": false,
+            "passed": false
+          },
+          {
+            "id": "COV-DOMAIN-SHIPPING-6f6d0d1981beaa3b9f3a",
+            "design": "covered",
+            "case_ids": [
+              "TC-002"
+            ],
+            "executed": false,
+            "passed": false
+          },
+          {
+            "id": "COV-DOMAIN-SHIPPING-d18403dc92aec569fe95",
+            "design": "covered",
+            "case_ids": [
+              "TC-003"
+            ],
+            "executed": false,
+            "passed": false
+          },
+          {
+            "id": "COV-DOMAIN-SHIPPING-8bb2dfcd7580f6a853cb",
+            "design": "covered",
+            "case_ids": [
+              "TC-004"
+            ],
+            "executed": false,
+            "passed": false
+          }
+        ],
+        "unknown_ids": [],
+        "infeasible_ids": [],
+        "errors": [],
+        "exit_criteria": [],
+        "blocked_selections": []
+      },
+      "commands": [
+        40
+      ],
+      "elapsed_seconds": 0.485
+    },
+    {
+      "id": "BB-35",
+      "result": "pass",
+      "error": null,
+      "details": {
+        "schema_version": "1.1.0",
+        "id": "COVREPORT-3e93656c5e55ad5189bf",
+        "feature_id": "DISCOUNT-01",
+        "build_id": "demo-1",
+        "model_hash": "318d0e7a17cc30958cdb52f863989d4320add284a852f027861a9f3b5041ce83",
+        "case_hash": "f7868c5197f37b97137b1a2d5c9ddc1bfb2b4abb986edfeac192fa82b048e36e",
+        "evidence_binding_mode": "case_revision",
+        "plan_hash": "c675bcc92cfebfd35a4168b8ba3f0698e5fbdc5c09b6663aed9a111ae4ad42f0",
+        "mode": "shadow",
+        "design": {
+          "required_feasible": 4,
+          "covered_by_cases": 3,
+          "rate": 75.0,
+          "uncovered_ids": [
+            "COV-DOMAIN-SHIPPING-43b7661297b1271a8b43"
+          ]
+        },
+        "execution": {
+          "required_feasible": 4,
+          "executed": 0,
+          "passed": 0,
+          "rate": 0.0,
+          "unexecuted_ids": [
+            "COV-DOMAIN-SHIPPING-43b7661297b1271a8b43",
+            "COV-DOMAIN-SHIPPING-6f6d0d1981beaa3b9f3a",
+            "COV-DOMAIN-SHIPPING-8bb2dfcd7580f6a853cb",
+            "COV-DOMAIN-SHIPPING-d18403dc92aec569fe95"
+          ]
+        },
+        "results": [
+          {
+            "id": "COV-DOMAIN-SHIPPING-43b7661297b1271a8b43",
+            "design": "uncovered",
+            "case_ids": [],
+            "executed": false,
+            "passed": false
+          },
+          {
+            "id": "COV-DOMAIN-SHIPPING-6f6d0d1981beaa3b9f3a",
+            "design": "covered",
+            "case_ids": [
+              "TC-002"
+            ],
+            "executed": false,
+            "passed": false
+          },
+          {
+            "id": "COV-DOMAIN-SHIPPING-d18403dc92aec569fe95",
+            "design": "covered",
+            "case_ids": [
+              "TC-003"
+            ],
+            "executed": false,
+            "passed": false
+          },
+          {
+            "id": "COV-DOMAIN-SHIPPING-8bb2dfcd7580f6a853cb",
+            "design": "covered",
+            "case_ids": [
+              "TC-004"
+            ],
+            "executed": false,
+            "passed": false
+          }
+        ],
+        "unknown_ids": [],
+        "infeasible_ids": [],
+        "errors": [
+          "TC-001: coverage input references a missing step/expected result",
+          "TC-001: unverified coverage claims: ['COV-DOMAIN-SHIPPING-43b7661297b1271a8b43']"
+        ],
+        "exit_criteria": [],
+        "blocked_selections": []
+      },
+      "commands": [
+        41,
+        42
+      ],
+      "elapsed_seconds": 0.878
+    },
+    {
+      "id": "BB-36",
+      "result": "pass",
+      "error": null,
+      "details": null,
+      "commands": [
+        43
+      ],
+      "elapsed_seconds": 0.422
+    },
+    {
+      "id": "BB-37",
+      "result": "pass",
+      "error": null,
+      "details": null,
+      "commands": [
+        44,
+        45
+      ],
+      "elapsed_seconds": 0.753
+    },
+    {
+      "id": "BB-38",
+      "result": "pass",
+      "error": null,
+      "details": {
+        "feature_id": "ORD-CANCEL-01",
+        "status": "no_go",
+        "profile": "standard",
+        "reasons": [
+          "P0 pass rate 0.0% < 100%",
+          "automation evidence missing",
+          "P0 blocking risks unresolved: RISK-02",
+          "P1 pass rate 0.0% < 95%",
+          "P1 blocking risks unresolved",
+          "residual risks exceed standard profile",
+          "waiver missing for risks: RISK-01, RISK-03, RISK-04"
+        ],
+        "build_id": "self-bb-4.1.0",
+        "evidence_summary": {
+          "evidence_binding_mode": "legacy_unverified",
+          "manual_by_priority": {
+            "P0": {
+              "pass": 0,
+              "fail": 0,
+              "skip": 1,
+              "blocked": 0,
+              "unknown": 0,
+              "untested": 1,
+              "total": 1
+            },
+            "P1": {
+              "pass": 0,
+              "fail": 0,
+              "skip": 2,
+              "blocked": 0,
+              "unknown": 0,
+              "untested": 2,
+              "total": 2
+            },
+            "P2": {
+              "pass": 0,
+              "fail": 0,
+              "skip": 1,
+              "blocked": 0,
+              "unknown": 0,
+              "untested": 1,
+              "total": 1
+            },
+            "P3": {
+              "pass": 0,
+              "fail": 0,
+              "skip": 0,
+              "blocked": 0,
+              "unknown": 0,
+              "untested": 0,
+              "total": 0
+            }
+          },
+          "mandatory_observation_rate": 0.0
+        },
+        "blocking_risks": [
+          "RISK-01",
+          "RISK-02",
+          "RISK-04"
+        ],
+        "residual_risks": [
+          "RISK-03: クーポン残数が復元されない"
+        ],
+        "unmet_conditions": [
+          "P0 pass rate 0.0% < 100%",
+          "automation evidence missing",
+          "P0 blocking risks unresolved: RISK-02",
+          "P1 pass rate 0.0% < 95%",
+          "P1 blocking risks unresolved",
+          "residual risks exceed standard profile",
+          "waiver missing for risks: RISK-01, RISK-03, RISK-04"
+        ],
+        "required_follow_up": [
+          "Review residual risks in next sprint"
+        ]
+      },
+      "commands": [
+        46
+      ],
+      "elapsed_seconds": 0.441
+    },
+    {
+      "id": "BB-39",
+      "result": "pass",
+      "error": null,
+      "details": {
+        "data_kind": "real",
+        "window_days": 30,
+        "input_sha256": "ff608f3c1da62156db06335c8459b129e6af0a5081af4412bdeadc8e30c359a0",
+        "total_cases": 0,
+        "status": "insufficient_data",
+        "excluded": {
+          "incomplete_outcomes": 0,
+          "unscored": 0
+        },
+        "groups": {
+          "calibration": {
+            "cases": 0,
+            "adverse_cases": 0,
+            "bands": {
+              "low": {
+                "cases": 0,
+                "adverse_rate": null,
+                "mean_defects_per_requirement": null,
+                "mean_rework_hours": null
+              },
+              "medium": {
+                "cases": 0,
+                "adverse_rate": null,
+                "mean_defects_per_requirement": null,
+                "mean_rework_hours": null
+              },
+              "high": {
+                "cases": 0,
+                "adverse_rate": null,
+                "mean_defects_per_requirement": null,
+                "mean_rework_hours": null
+              }
+            },
+            "thresholds": [
+              {
+                "threshold": 60,
+                "true_positive": 0,
+                "false_negative": 0,
+                "false_positive": 0,
+                "true_negative": 0,
+                "weighted_loss": null
+              },
+              {
+                "threshold": 70,
+                "true_positive": 0,
+                "false_negative": 0,
+                "false_positive": 0,
+                "true_negative": 0,
+                "weighted_loss": null
+              },
+              {
+                "threshold": 80,
+                "true_positive": 0,
+                "false_negative": 0,
+                "false_positive": 0,
+                "true_negative": 0,
+                "weighted_loss": null
+              },
+              {
+                "threshold": 85,
+                "true_positive": 0,
+                "false_negative": 0,
+                "false_positive": 0,
+                "true_negative": 0,
+                "weighted_loss": null
+              },
+              {
+                "threshold": 90,
+                "true_positive": 0,
+                "false_negative": 0,
+                "false_positive": 0,
+                "true_negative": 0,
+                "weighted_loss": null
+              }
+            ],
+            "score_defect_density_spearman": null,
+            "score_rework_density_spearman": null
+          },
+          "holdout": {
+            "cases": 0,
+            "adverse_cases": 0,
+            "bands": {
+              "low": {
+                "cases": 0,
+                "adverse_rate": null,
+                "mean_defects_per_requirement": null,
+                "mean_rework_hours": null
+              },
+              "medium": {
+                "cases": 0,
+                "adverse_rate": null,
+                "mean_defects_per_requirement": null,
+                "mean_rework_hours": null
+              },
+              "high": {
+                "cases": 0,
+                "adverse_rate": null,
+                "mean_defects_per_requirement": null,
+                "mean_rework_hours": null
+              }
+            },
+            "thresholds": [
+              {
+                "threshold": 60,
+                "true_positive": 0,
+                "false_negative": 0,
+                "false_positive": 0,
+                "true_negative": 0,
+                "weighted_loss": null
+              },
+              {
+                "threshold": 70,
+                "true_positive": 0,
+                "false_negative": 0,
+                "false_positive": 0,
+                "true_negative": 0,
+                "weighted_loss": null
+              },
+              {
+                "threshold": 80,
+                "true_positive": 0,
+                "false_negative": 0,
+                "false_positive": 0,
+                "true_negative": 0,
+                "weighted_loss": null
+              },
+              {
+                "threshold": 85,
+                "true_positive": 0,
+                "false_negative": 0,
+                "false_positive": 0,
+                "true_negative": 0,
+                "weighted_loss": null
+              },
+              {
+                "threshold": 90,
+                "true_positive": 0,
+                "false_negative": 0,
+                "false_positive": 0,
+                "true_negative": 0,
+                "weighted_loss": null
+              }
+            ],
+            "score_defect_density_spearman": null,
+            "score_rework_density_spearman": null
+          }
+        },
+        "candidate": null,
+        "policy_changed": false,
+        "limitations": [
+          "相関は因果関係や正しさの確率を示しません。",
+          "最低件数は探索の条件であり、精度を保証しません。",
+          "重み・重大度上限・Ready/Gate条件は変更していません。"
+        ]
+      },
+      "commands": [
+        47
+      ],
+      "elapsed_seconds": 0.306
+    },
+    {
+      "id": "BB-40",
+      "result": "pass",
+      "error": null,
+      "details": {
+        "data_kind": "synthetic",
+        "window_days": 30,
+        "input_sha256": "aea8b0ecdb1bc0dde76294861f5834dac2f51802232eb81e7119f497646152b3",
+        "total_cases": 1,
+        "status": "synthetic_only",
+        "excluded": {
+          "incomplete_outcomes": 1,
+          "unscored": 0
+        },
+        "groups": {
+          "calibration": {
+            "cases": 0,
+            "adverse_cases": 0,
+            "bands": {
+              "low": {
+                "cases": 0,
+                "adverse_rate": null,
+                "mean_defects_per_requirement": null,
+                "mean_rework_hours": null
+              },
+              "medium": {
+                "cases": 0,
+                "adverse_rate": null,
+                "mean_defects_per_requirement": null,
+                "mean_rework_hours": null
+              },
+              "high": {
+                "cases": 0,
+                "adverse_rate": null,
+                "mean_defects_per_requirement": null,
+                "mean_rework_hours": null
+              }
+            },
+            "thresholds": [
+              {
+                "threshold": 60,
+                "true_positive": 0,
+                "false_negative": 0,
+                "false_positive": 0,
+                "true_negative": 0,
+                "weighted_loss": null
+              },
+              {
+                "threshold": 70,
+                "true_positive": 0,
+                "false_negative": 0,
+                "false_positive": 0,
+                "true_negative": 0,
+                "weighted_loss": null
+              },
+              {
+                "threshold": 80,
+                "true_positive": 0,
+                "false_negative": 0,
+                "false_positive": 0,
+                "true_negative": 0,
+                "weighted_loss": null
+              },
+              {
+                "threshold": 85,
+                "true_positive": 0,
+                "false_negative": 0,
+                "false_positive": 0,
+                "true_negative": 0,
+                "weighted_loss": null
+              },
+              {
+                "threshold": 90,
+                "true_positive": 0,
+                "false_negative": 0,
+                "false_positive": 0,
+                "true_negative": 0,
+                "weighted_loss": null
+              }
+            ],
+            "score_defect_density_spearman": null,
+            "score_rework_density_spearman": null
+          },
+          "holdout": {
+            "cases": 0,
+            "adverse_cases": 0,
+            "bands": {
+              "low": {
+                "cases": 0,
+                "adverse_rate": null,
+                "mean_defects_per_requirement": null,
+                "mean_rework_hours": null
+              },
+              "medium": {
+                "cases": 0,
+                "adverse_rate": null,
+                "mean_defects_per_requirement": null,
+                "mean_rework_hours": null
+              },
+              "high": {
+                "cases": 0,
+                "adverse_rate": null,
+                "mean_defects_per_requirement": null,
+                "mean_rework_hours": null
+              }
+            },
+            "thresholds": [
+              {
+                "threshold": 60,
+                "true_positive": 0,
+                "false_negative": 0,
+                "false_positive": 0,
+                "true_negative": 0,
+                "weighted_loss": null
+              },
+              {
+                "threshold": 70,
+                "true_positive": 0,
+                "false_negative": 0,
+                "false_positive": 0,
+                "true_negative": 0,
+                "weighted_loss": null
+              },
+              {
+                "threshold": 80,
+                "true_positive": 0,
+                "false_negative": 0,
+                "false_positive": 0,
+                "true_negative": 0,
+                "weighted_loss": null
+              },
+              {
+                "threshold": 85,
+                "true_positive": 0,
+                "false_negative": 0,
+                "false_positive": 0,
+                "true_negative": 0,
+                "weighted_loss": null
+              },
+              {
+                "threshold": 90,
+                "true_positive": 0,
+                "false_negative": 0,
+                "false_positive": 0,
+                "true_negative": 0,
+                "weighted_loss": null
+              }
+            ],
+            "score_defect_density_spearman": null,
+            "score_rework_density_spearman": null
+          }
+        },
+        "candidate": null,
+        "policy_changed": false,
+        "limitations": [
+          "相関は因果関係や正しさの確率を示しません。",
+          "最低件数は探索の条件であり、精度を保証しません。",
+          "重み・重大度上限・Ready/Gate条件は変更していません。"
+        ]
+      },
+      "commands": [
+        48
+      ],
+      "elapsed_seconds": 0.306
+    },
+    {
+      "id": "BB-41",
+      "result": "pass",
+      "error": null,
+      "details": null,
+      "commands": [
+        49
+      ],
+      "elapsed_seconds": 0.353
+    },
+    {
+      "id": "BB-42",
+      "result": "pass",
+      "error": null,
+      "details": null,
+      "commands": [
+        50
+      ],
+      "elapsed_seconds": 0.287
+    },
+    {
+      "id": "BB-43",
+      "result": "pass",
+      "error": null,
+      "details": {
+        "data_kind": "synthetic",
+        "window_days": 30,
+        "input_sha256": "47a60bcb0bad7c8d7d81c499933f9989b4c733ba3268be9d7a8dc393b15a91aa",
+        "total_cases": 1,
+        "status": "synthetic_only",
+        "excluded": {
+          "incomplete_outcomes": 0,
+          "unscored": 0
+        },
+        "groups": {
+          "calibration": {
+            "cases": 1,
+            "adverse_cases": 1,
+            "bands": {
+              "low": {
+                "cases": 0,
+                "adverse_rate": null,
+                "mean_defects_per_requirement": null,
+                "mean_rework_hours": null
+              },
+              "medium": {
+                "cases": 0,
+                "adverse_rate": null,
+                "mean_defects_per_requirement": null,
+                "mean_rework_hours": null
+              },
+              "high": {
+                "cases": 1,
+                "adverse_rate": 1,
+                "mean_defects_per_requirement": 0.5,
+                "mean_rework_hours": 2
+              }
+            },
+            "thresholds": [
+              {
+                "threshold": 60,
+                "true_positive": 0,
+                "false_negative": 1,
+                "false_positive": 0,
+                "true_negative": 0,
+                "weighted_loss": 5.0
+              },
+              {
+                "threshold": 70,
+                "true_positive": 0,
+                "false_negative": 1,
+                "false_positive": 0,
+                "true_negative": 0,
+                "weighted_loss": 5.0
+              },
+              {
+                "threshold": 80,
+                "true_positive": 0,
+                "false_negative": 1,
+                "false_positive": 0,
+                "true_negative": 0,
+                "weighted_loss": 5.0
+              },
+              {
+                "threshold": 85,
+                "true_positive": 0,
+                "false_negative": 1,
+                "false_positive": 0,
+                "true_negative": 0,
+                "weighted_loss": 5.0
+              },
+              {
+                "threshold": 90,
+                "true_positive": 0,
+                "false_negative": 1,
+                "false_positive": 0,
+                "true_negative": 0,
+                "weighted_loss": 5.0
+              }
+            ],
+            "score_defect_density_spearman": null,
+            "score_rework_density_spearman": null
+          },
+          "holdout": {
+            "cases": 0,
+            "adverse_cases": 0,
+            "bands": {
+              "low": {
+                "cases": 0,
+                "adverse_rate": null,
+                "mean_defects_per_requirement": null,
+                "mean_rework_hours": null
+              },
+              "medium": {
+                "cases": 0,
+                "adverse_rate": null,
+                "mean_defects_per_requirement": null,
+                "mean_rework_hours": null
+              },
+              "high": {
+                "cases": 0,
+                "adverse_rate": null,
+                "mean_defects_per_requirement": null,
+                "mean_rework_hours": null
+              }
+            },
+            "thresholds": [
+              {
+                "threshold": 60,
+                "true_positive": 0,
+                "false_negative": 0,
+                "false_positive": 0,
+                "true_negative": 0,
+                "weighted_loss": null
+              },
+              {
+                "threshold": 70,
+                "true_positive": 0,
+                "false_negative": 0,
+                "false_positive": 0,
+                "true_negative": 0,
+                "weighted_loss": null
+              },
+              {
+                "threshold": 80,
+                "true_positive": 0,
+                "false_negative": 0,
+                "false_positive": 0,
+                "true_negative": 0,
+                "weighted_loss": null
+              },
+              {
+                "threshold": 85,
+                "true_positive": 0,
+                "false_negative": 0,
+                "false_positive": 0,
+                "true_negative": 0,
+                "weighted_loss": null
+              },
+              {
+                "threshold": 90,
+                "true_positive": 0,
+                "false_negative": 0,
+                "false_positive": 0,
+                "true_negative": 0,
+                "weighted_loss": null
+              }
+            ],
+            "score_defect_density_spearman": null,
+            "score_rework_density_spearman": null
+          }
+        },
+        "candidate": null,
+        "policy_changed": false,
+        "limitations": [
+          "相関は因果関係や正しさの確率を示しません。",
+          "最低件数は探索の条件であり、精度を保証しません。",
+          "重み・重大度上限・Ready/Gate条件は変更していません。"
+        ]
+      },
+      "commands": [
+        51
+      ],
+      "elapsed_seconds": 0.314
+    },
+    {
+      "id": "BB-44",
+      "result": "pass",
+      "error": null,
+      "details": null,
+      "commands": [
+        52
+      ],
+      "elapsed_seconds": 0.328
+    },
+    {
+      "id": "BB-45",
+      "result": "pass",
+      "error": null,
+      "details": {
+        "schema_version": "1.1.0",
+        "id": "COVREPORT-922090612a7da6cd13aa",
+        "feature_id": "DISCOUNT-01",
+        "build_id": "demo-1",
+        "model_hash": "318d0e7a17cc30958cdb52f863989d4320add284a852f027861a9f3b5041ce83",
+        "case_hash": "aa3e1db620d786d6e83bb38181336852a1dfa19a99a423a11028de083e8c68f6",
+        "evidence_binding_mode": "case_revision",
+        "plan_hash": "c675bcc92cfebfd35a4168b8ba3f0698e5fbdc5c09b6663aed9a111ae4ad42f0",
+        "mode": "shadow",
+        "design": {
+          "required_feasible": 4,
+          "covered_by_cases": 4,
+          "rate": 100.0,
+          "uncovered_ids": []
+        },
+        "execution": {
+          "required_feasible": 4,
+          "executed": 3,
+          "passed": 2,
+          "rate": 75.0,
+          "unexecuted_ids": [
+            "COV-DOMAIN-SHIPPING-8bb2dfcd7580f6a853cb"
+          ]
+        },
+        "results": [
+          {
+            "id": "COV-DOMAIN-SHIPPING-43b7661297b1271a8b43",
+            "design": "covered",
+            "case_ids": [
+              "TC-001"
+            ],
+            "executed": true,
+            "passed": true
+          },
+          {
+            "id": "COV-DOMAIN-SHIPPING-6f6d0d1981beaa3b9f3a",
+            "design": "covered",
+            "case_ids": [
+              "TC-002"
+            ],
+            "executed": true,
+            "passed": false
+          },
+          {
+            "id": "COV-DOMAIN-SHIPPING-d18403dc92aec569fe95",
+            "design": "covered",
+            "case_ids": [
+              "TC-003"
+            ],
+            "executed": true,
+            "passed": true
+          },
+          {
+            "id": "COV-DOMAIN-SHIPPING-8bb2dfcd7580f6a853cb",
+            "design": "covered",
+            "case_ids": [
+              "TC-004"
+            ],
+            "executed": false,
+            "passed": false
+          }
+        ],
+        "unknown_ids": [],
+        "infeasible_ids": [],
+        "errors": [],
+        "exit_criteria": [],
+        "blocked_selections": []
+      },
+      "commands": [
+        53
+      ],
+      "elapsed_seconds": 0.486
+    },
+    {
+      "id": "CH-01-nan",
+      "result": "observed",
+      "error": null,
+      "details": {
+        "returncode": 2,
+        "stdout": "",
+        "stderr": "usage: bb-harness evaluate requirements [-h] --input INPUT\n                                        [--phase-contract PHASE_CONTRACT]\n                                        [--review REVIEW] --output OUTPUT\n                                        [--fail-under FAIL_UNDER] [--dry-run]\nbb-harness evaluate requirements: error: argument --fail-under: 閾値は0から100を指定してください\n"
+      },
+      "commands": [
+        54
+      ],
+      "elapsed_seconds": 0.407
+    },
+    {
+      "id": "CH-01-inf",
+      "result": "observed",
+      "error": null,
+      "details": {
+        "returncode": 2,
+        "stdout": "",
+        "stderr": "usage: bb-harness evaluate requirements [-h] --input INPUT\n                                        [--phase-contract PHASE_CONTRACT]\n                                        [--review REVIEW] --output OUTPUT\n                                        [--fail-under FAIL_UNDER] [--dry-run]\nbb-harness evaluate requirements: error: argument --fail-under: 閾値は0から100を指定してください\n"
+      },
+      "commands": [
+        55
+      ],
+      "elapsed_seconds": 0.506
+    },
+    {
+      "id": "CH-01-negative",
+      "result": "observed",
+      "error": null,
+      "details": {
+        "returncode": 2,
+        "stdout": "",
+        "stderr": "usage: bb-harness evaluate requirements [-h] --input INPUT\n                                        [--phase-contract PHASE_CONTRACT]\n                                        [--review REVIEW] --output OUTPUT\n                                        [--fail-under FAIL_UNDER] [--dry-run]\nbb-harness evaluate requirements: error: argument --fail-under: 閾値は0から100を指定してください\n"
+      },
+      "commands": [
+        56
+      ],
+      "elapsed_seconds": 0.544
+    },
+    {
+      "id": "CH-01-over",
+      "result": "observed",
+      "error": null,
+      "details": {
+        "returncode": 2,
+        "stdout": "",
+        "stderr": "usage: bb-harness evaluate requirements [-h] --input INPUT\n                                        [--phase-contract PHASE_CONTRACT]\n                                        [--review REVIEW] --output OUTPUT\n                                        [--fail-under FAIL_UNDER] [--dry-run]\nbb-harness evaluate requirements: error: argument --fail-under: 閾値は0から100を指定してください\n"
+      },
+      "commands": [
+        57
+      ],
+      "elapsed_seconds": 0.406
+    },
+    {
+      "id": "CH-01-bom",
+      "result": "observed",
+      "error": null,
+      "details": {
+        "score": 69,
+        "band": "medium",
+        "status": "needs_confirmation",
+        "counts": {
+          "requirements": 1,
+          "raw_requirements": 1,
+          "duplicate_requirements": 0,
+          "reviewed_requirements": 0,
+          "unreviewed_requirements": 1,
+          "raw_findings": 0,
+          "unique_findings": 0,
+          "open_confirmations": 0,
+          "resolved_confirmations": 0,
+          "by_severity": {
+            "critical": 0,
+            "high": 0,
+            "medium": 0,
+            "low": 0
+          },
+          "technical_risks": 0
+        }
+      },
+      "commands": [
+        58
+      ],
+      "elapsed_seconds": 0.414
+    }
+  ]
+}

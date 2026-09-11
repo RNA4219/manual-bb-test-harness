@@ -72,10 +72,9 @@ jobs:
       - name: Overall branch coverage (85%)
         run: python tools/ci/quality_evidence.py capture --out tmp/ci-evidence
       - name: Gate branch coverage (90%)
-        run: >-
-          pytest tests/test_evaluate_gate.py tests/test_gate_v2.py
-          --cov=bb_harness.gate_engine --cov-branch
-          --cov-report=term-missing --cov-fail-under=90
+        run: |
+          pytest tests/test_evaluate_gate.py tests/test_gate_v2.py --cov=bb_harness.gate_engine --cov-branch --cov-report=term-missing --cov-report=json:tmp/ci-evidence/gate-coverage.json --cov-fail-under=90
+          python tools/ci/quality_evidence.py check-coverage --input tmp/ci-evidence/gate-coverage.json --floor 90
       - name: Preserve raw test evidence
         if: always()
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2

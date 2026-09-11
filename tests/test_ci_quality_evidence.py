@@ -35,13 +35,18 @@ def evidence(tmp_path):
     (raw / "lcov.info").write_text("SF:sample.py\nDA:1,1\nend_of_record\n", encoding="utf-8")
     ci.write(
         raw / "coverage.json",
-        {"meta": {"branch_coverage": True}, "totals": {"percent_covered": 90, "num_statements": 1}},
+        {"meta": {"branch_coverage": True}, "totals": {
+            "percent_covered": 99, "num_statements": 1000, "covered_lines": 1000,
+            "missing_lines": 0, "num_branches": 10000, "covered_branches": 9000,
+            "missing_branches": 1000,
+        }},
     )
     ci.write(
         tmp_path / "collection.json",
         {
-            "version": "manual-bb-ci/v1",
+            "version": "manual-bb-ci/v2",
             "coverage_floor": 85,
+            "coverage_metric": "branch",
             "pytest_exit_code": 0,
             "coverage_export_exit_code": 0,
             "hashes": {name: ci.digest(raw / name) for name in ci.RAW_FILES},
@@ -188,7 +193,8 @@ def test_pytest_exit_and_coverage_floor_produce_failed_check(evidence, exit_code
     collection["pytest_exit_code"] = exit_code
     ci.write(root / "collection.json", collection)
     coverage = ci.read(root / "raw/coverage.json")
-    coverage["totals"]["percent_covered"] = percent
+    coverage["totals"]["covered_branches"] = round(percent * 100)
+    coverage["totals"]["missing_branches"] = 10000 - round(percent * 100)
     ci.write(root / "raw/coverage.json", coverage)
     reseal(root)
     out = build(evidence)
@@ -206,6 +212,74 @@ def test_existing_qeg_output_is_not_overwritten(evidence):
     with pytest.raises(FileExistsError):
         build(evidence)
     assert ci.digest(out / "gate-input.json") == original
+
+
+@pytest.mark.parametrize("covered,expected", [(8499, 1), (8500, 0), (8501, 0)])
+def test_cli_branch_boundary_ignores_inflated_combined_percent(evidence, capsys, covered, expected):
+    path = evidence[0] / "raw/coverage.json"
+    coverage = ci.read(path)
+    coverage["totals"].update(covered_branches=covered, missing_branches=10000-covered,
+                             percent_covered=100)
+    ci.write(path, coverage)
+    assert ci.main(["check-coverage", "--input", str(path), "--floor", "85"]) == expected
+    report = json.loads(capsys.readouterr().out)
+    assert report["branch_percent"] == covered / 100
+    assert report["line_percent"] == 100
+    assert report["metric"] == "branch"
+
+
+@pytest.mark.parametrize("mutation", ["line-only", "missing", "zero", "negative", "bool", "sum", "nan", "string"])
+def test_invalid_branch_measurement_fails_closed(evidence, mutation):
+    path = evidence[0] / "raw/coverage.json"
+    data = ci.read(path)
+    if mutation == "line-only":
+        data["meta"]["branch_coverage"] = False
+    elif mutation == "missing":
+        del data["totals"]["covered_branches"]
+    elif mutation == "zero":
+        data["totals"].update(num_branches=0, covered_branches=0, missing_branches=0)
+    else:
+        data["totals"]["covered_branches"] = {"negative": -1, "bool": True, "sum": 10001,
+                                              "nan": float("nan"), "string": "9000"}[mutation]
+    ci.write(path, data)
+    assert ci.main(["check-coverage", "--input", str(path)]) == 1
+
+
+@pytest.mark.parametrize("floor", ["nan", "inf", "-1", "101"])
+def test_invalid_branch_floor_is_rejected(evidence, floor):
+    assert ci.main(["check-coverage", "--input", str(evidence[0] / "raw/coverage.json"),
+                    "--floor", floor]) == 1
+
+
+def test_legacy_combined_collection_cannot_claim_branch_acceptance(evidence):
+    path = evidence[0] / "collection.json"
+    data = ci.read(path)
+    data["version"] = "manual-bb-ci/v1"
+    ci.write(path, data)
+    with pytest.raises(ValueError, match="収集契約"):
+        build(evidence)
+
+
+def test_capture_returns_failure_when_pytest_passes_but_branches_do_not(tmp_path, monkeypatch):
+    out = tmp_path / "capture"
+    monkeypatch.setattr(ci, "head", lambda repo: REVISION)
+
+    def fake_pytest_and_export(*args, **kwargs):
+        ci.write(out / "raw/coverage.json", {
+            "meta": {"branch_coverage": True}, "totals": {
+                "num_statements": 1000, "covered_lines": 1000, "missing_lines": 0,
+                "num_branches": 100, "covered_branches": 84, "missing_branches": 16,
+                "percent_covered": 98.5,
+            },
+        })
+        return type("Result", (), {"returncode": 0})()
+
+    monkeypatch.setattr(ci.subprocess, "run", fake_pytest_and_export)
+    assert ci.capture(out, tmp_path) == 1
+    saved = ci.read(out / "collection.json")
+    assert saved["pytest_exit_code"] == 0
+    assert saved["coverage_metrics"]["branch_percent"] == 84
+    assert saved["coverage_metrics"]["passed"] is False
 
 
 def test_capture_records_failure_without_fabricating_missing_reports(tmp_path, monkeypatch):
