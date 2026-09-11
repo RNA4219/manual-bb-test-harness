@@ -17,7 +17,9 @@
 
 ## CI確認
 
-[PR #13](https://github.com/RNA4219/manual-bb-test-harness/pull/13)で検証中。全体85%・Gate90%、既存のPython matrix／integration／PowerShell／package smokeを保持し、新しいHATE/QEGジョブも成功を必須とする。
+[PR #13](https://github.com/RNA4219/manual-bb-test-harness/pull/13)の[run 34548744025](https://github.com/RNA4219/manual-bb-test-harness/actions/runs/34548744025)で、HATE/QEGを含む全9ジョブの成功を確認した。対象headは`33ebf32`、実際にテストされたPR merge commitは`7a444d112b6955dd6289fc625ddf36904276ff05`。
+
+取得したCI artifactでは1026 passed、failure 0、skip 0、全体branch coverage 88.18%、HATE exportのpartial=false、QEG go・DQ 0・blocker 0・CLI error 0を確認。Gate専用90%条件もCIで成功した。[実行結果と原本hash](evidence/hate-qeg-ci-20260911/summary.json)を保存した。全体85%・Gate90%、既存のPython matrix／integration／PowerShell／package smokeと、新しいHATE/QEGジョブを成功条件として維持する。
 
 初回[run 34548238938](https://github.com/RNA4219/manual-bb-test-harness/actions/runs/34548238938)は既存8ジョブが成功したが、QEGがLinuxでskipされたCRLFテスト1件をDQ-05として拒否した。CRLF入力の検証はOS固有APIを使わないため、全OSで実行するよう変更し、必要ファイルのあるSkill入力と終了コード・成功出力のassertionを追加した。QEGのskip拒否は維持。修正後のローカル関連69件は成功。
 
