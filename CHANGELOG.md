@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- 実pytestの証跡を固定版HATEで正規化し、QEGのhash検証・実行対象照合・Gate判定へ渡すCIジョブを追加。全体85%・Gate90%を維持し、失敗時も証跡を保存する。CI範囲のgoと実LLM・手動受入・リリース承認を区別する。
+
 - Deep Researchの拡張要件から、型付き技法モデル、technique_plan、独立したcoverage_report、非破壊migrateコマンドを追加。追加artifact契約は1.1.0、既存入力は互換維持。
 - Domain/組み合わせ/状態経路/決定表/CRUD/scenario/checklistと、random・metamorphicの実施予算を検証。設計・実施・合格を分離し、Gateへshadow指標を追加。
 - Local Modeの同名ケース削除、riskへの機械的接続、review時のケース消失を修正。生成来歴と入力・手順対応を保存し、必要なschema定義のみモデルへ送信。

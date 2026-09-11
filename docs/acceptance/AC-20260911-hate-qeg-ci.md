@@ -4,6 +4,9 @@
 
 ## ローカル確認
 
+- 最終確認対象`ec28bbc`で全1026件成功（108.11秒）、全体branch coverage 88.18%。Gate専用107件も成功し、coverage 91.01%。基準85%・90%を維持した。
+- この成功試行をHATEへ渡し、eligible・export success・partial=falseを確認。QEG実CLIも`go`、DQ 0、blocker 0、終了コード0。ログ・証跡は`tmp/hate-qeg-ec28bbc/`と対応する`tmp/hate-qeg-ec28bbc-*.log`。
+- wheel／sdist smoke、Skill validator、schema例29件も成功。パッケージ検証はworkspace内のuv cacheを使用し、offlineで実施した。
 - CI境界の回帰25件、既存仕様validator 32件の計57件が成功。ruff、diff check、Workflow Cookbook freshnessも成功。
 - 実pytest 1026件の出力をHATEで正規化・exportし、eligible、export success、partial=false、missing_executions=0を確認。
 - 上記実pytest試行は1024 passed・仕様チェック2 failedだった。未完了の受入結果と仕様書の基準定義を区別し、仕様書の必須形式を整えた後、該当validator 32件が成功した。失敗試行の原本は変更していない。
@@ -13,7 +16,7 @@
 
 ## CI確認
 
-GitHub Actionsによる今回の変更の確認は実施中。全体85%・Gate90%、既存のPython matrix／integration／PowerShell／package smokeを保持し、新しいHATE/QEGジョブも成功を必須とする。
+GitHub Actionsでの確認はpush承認待ち。自動承認レビューが、既存改修を含む153ファイルの外部送信について明示承認がないことを理由にpushを拒否したため、リモートには未反映。全体85%・Gate90%、既存のPython matrix／integration／PowerShell／package smokeを保持し、新しいHATE/QEGジョブも成功を必須とする。
 
 原本は`ci-raw-evidence-<attempt>`、HATE・QEG出力は`hate-qeg-evidence-<attempt>`として、失敗時も14日間保存する。
 

@@ -13,6 +13,8 @@ knowledge_map: 33 nodes, 45 edges, 33 capsules
 
 `HUB_SCOPE_DECLARATION`: 本ファイルの適用範囲は `manual-bb-test-harness/` 全体。
 
+HATE/QEGによるCI証跡の連携は[spec-08](docs/specs/spec-08-hate-qeg-ci.md)、実行結果は[検収記録](docs/acceptance/AC-20260911-hate-qeg-ci.md)を参照する。
+
 この repo は、手動ブラックボックス QA 設計 Skill の正本を管理する。  
 最初に AI-first 入口の `README.md` で task classification を行い、次に目的に応じて下記の正本へ進む。
 
