@@ -4,8 +4,8 @@ owner: manual-bb-test-harness
 status: active
 last_reviewed_at: 2026-05-16
 next_review_due: 2026-10-11
-release_version: 4.0.1
-test_count: 1039
+release_version: 4.1.0
+test_count: 1096
 knowledge_map: 33 nodes, 45 edges, 33 capsules
 ---
 
@@ -14,6 +14,9 @@ knowledge_map: 33 nodes, 45 edges, 33 capsules
 `HUB_SCOPE_DECLARATION`: 本ファイルの適用範囲は `manual-bb-test-harness/` 全体。
 
 HATE/QEGによるCI証跡の連携は[spec-08](docs/specs/spec-08-hate-qeg-ci.md)、実行結果は[検収記録](docs/acceptance/AC-20260911-hate-qeg-ci.md)を参照する。
+
+公開後検証は[release policy](docs/release-policy.md)、要件信頼度と実案件実績の比較は
+[調整手順](docs/requirements-calibration.md)を参照する。
 
 この repo は、手動ブラックボックス QA 設計 Skill の正本を管理する。  
 最初に AI-first 入口の `README.md` で task classification を行い、次に目的に応じて下記の正本へ進む。

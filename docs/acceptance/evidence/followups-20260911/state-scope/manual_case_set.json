@@ -1,0 +1,228 @@
+{
+  "feature_id": "MINIMAL-CANCEL",
+  "manual_cases": [
+    {
+      "tc_id": "TC-001",
+      "title": "pending状態の注文取消しと在庫戻し検証",
+      "priority": "P1",
+      "primary_view": "black",
+      "techniques": [
+        "state_transition_testing",
+        "decision_table_testing"
+      ],
+      "preconditions": [
+        "注文状態がpendingである注文が存在する"
+      ],
+      "steps": [
+        "pending状態の注文詳細画面を開く",
+        "取消ボタンをクリックする",
+        "注文状態の表示を確認する",
+        "在庫数量の変化を確認する"
+      ],
+      "expected_results": [
+        "注文詳細画面が表示される",
+        "取消処理が実行される",
+        "注文状態がcancelledと表示される",
+        "在庫が注文数量分戻っている"
+      ],
+      "oracle": {
+        "type": "specified",
+        "refs": [
+          "AC-1",
+          "BR-1"
+        ]
+      },
+      "source_ref": {
+        "type": "acceptance",
+        "refs": [
+          "AC-1",
+          "BR-1"
+        ]
+      },
+      "estimate_minutes": 5,
+      "trace_to": [
+        "OBS-STATE-01",
+        "RISK-01"
+      ],
+      "coverage_obligation_ids": [
+        "COV-MINIMAL-CANCEL-order-state-66834fbe67d9ff797786"
+      ],
+      "coverage_inputs": [
+        {
+          "model_ref": "MINIMAL-CANCEL-order-state",
+          "initial_state": "pending",
+          "transition_ids": [
+            "T1"
+          ],
+          "data": {
+            "order_state": "pending"
+          },
+          "step_refs": [
+            1,
+            2,
+            3,
+            4
+          ],
+          "expected_result_refs": [
+            1,
+            2,
+            3,
+            4
+          ]
+        }
+      ],
+      "case_revision": "43d67705a0c46c702e46793e038839827e136b1ad09518150e1bacc65bdaf8bc"
+    },
+    {
+      "tc_id": "TC-002",
+      "title": "shipped状態の注文取消し不可検証",
+      "priority": "P2",
+      "primary_view": "black",
+      "techniques": [
+        "state_transition_testing",
+        "boundary_value_analysis"
+      ],
+      "preconditions": [
+        "注文状態がshippedである注文が存在する"
+      ],
+      "steps": [
+        "shipped状態の注文詳細画面を開く",
+        "取消ボタンをクリックする",
+        "注文状態の表示を確認する",
+        "エラーメッセージまたは不可表示を確認する"
+      ],
+      "expected_results": [
+        "注文詳細画面が表示される",
+        "取消処理は実行されない",
+        "注文状態はshippedのまま維持される",
+        "取消不可と表示される"
+      ],
+      "oracle": {
+        "type": "specified",
+        "refs": [
+          "AC-2"
+        ]
+      },
+      "source_ref": {
+        "type": "acceptance",
+        "refs": [
+          "AC-2"
+        ]
+      },
+      "estimate_minutes": 5,
+      "trace_to": [
+        "OBS-STATE-02",
+        "RISK-03"
+      ],
+      "coverage_obligation_ids": [
+        "COV-MINIMAL-CANCEL-order-state-6666c64ce07bf0ccacd6"
+      ],
+      "coverage_inputs": [
+        {
+          "model_ref": "MINIMAL-CANCEL-order-state",
+          "initial_state": "shipped",
+          "transition_ids": [
+            "T2"
+          ],
+          "data": {
+            "order_state": "shipped"
+          },
+          "step_refs": [
+            1,
+            2,
+            3,
+            4
+          ],
+          "expected_result_refs": [
+            1,
+            2,
+            3,
+            4
+          ]
+        }
+      ],
+      "case_revision": "3e1ce38460e5aa3b802e0f297774c5ed80ff84179c388ebc7df84ce8fbb7422d"
+    },
+    {
+      "tc_id": "TC-003",
+      "title": "cancelled状態の注文再取消し検証（冪等性・在庫不変）",
+      "priority": "P1",
+      "primary_view": "black",
+      "techniques": [
+        "state_transition_testing",
+        "decision_table_testing"
+      ],
+      "preconditions": [
+        "注文状態がcancelledである注文が存在する。"
+      ],
+      "steps": [
+        "cancelled状態の注文詳細画面を開く。",
+        "取消ボタンをクリックする。",
+        "注文状態の表示を確認する。",
+        "在庫管理画面またはログで、該当商品の在庫数量が変化していないことを確認する。"
+      ],
+      "expected_results": [
+        "注文詳細画面が表示される。",
+        "取消処理が実行される（エラー表示なし、または無視される）。",
+        "注文状態はcancelledのまま維持される。",
+        "在庫数量は変更されていない（追加戻りしていない）。"
+      ],
+      "oracle": {
+        "type": "specified",
+        "refs": [
+          "AC-3",
+          "BR-1"
+        ]
+      },
+      "source_ref": {
+        "type": "acceptance",
+        "refs": [
+          "AC-3",
+          "BR-1"
+        ]
+      },
+      "estimate_minutes": 2,
+      "trace_to": [
+        "OBS-STATE-03",
+        "RISK-02"
+      ],
+      "coverage_obligation_ids": [
+        "COV-MINIMAL-CANCEL-order-state-a4cfcffdbc0f9a3f2c70"
+      ],
+      "coverage_inputs": [
+        {
+          "model_ref": "MINIMAL-CANCEL-order-state",
+          "initial_state": "cancelled",
+          "transition_ids": [
+            "T3"
+          ],
+          "data": {
+            "order_state": "cancelled"
+          },
+          "action_checks": {
+            "order_state": "cancelled",
+            "inventory_change": 0
+          },
+          "step_refs": [
+            1,
+            2,
+            3,
+            4
+          ],
+          "expected_result_refs": [
+            1,
+            2,
+            3,
+            4
+          ]
+        }
+      ],
+      "case_revision": "60cacc191de41747ea60e98534b28ba90b997e9957ec78e8d0699254b3687b70"
+    }
+  ],
+  "exploratory_charters": [],
+  "evidence_binding": {
+    "mode": "case_revision",
+    "model_hash": "096dc2ca94af6f725704edc8c28a8808d2d68219912f023cffff7c1d157fe8e5"
+  }
+}

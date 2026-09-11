@@ -39,6 +39,20 @@ uv run bb-harness run local-design `
 
 ## 設定優先順位
 
+### Windowsのllama.cpp b9733で検証したサーバー設定
+
+Qwen3.6-27B UD-Q4_K_XLの実機再評価では、context 32768、単一スロット、
+`--batch-size 512 --ubatch-size 128 --skip-chat-parsing`を使った。
+既定の応答解析でプロセス異常終了を観測したため、JSON本文を直接受ける構成で確認している。
+`qwen36` profileのthinking無効と、ホスト側のJSON・schema・終了理由・被覆検証は維持する。
+この設定だけで生成品質の合格を保証しない。
+
+```powershell
+llama-server -m path/to/Qwen3.6-27B.gguf --alias qwen3.6-27b --host 127.0.0.1 --port 8084 --ctx-size 32768 --parallel 1 --batch-size 512 --ubatch-size 128 --jinja --reasoning-format deepseek --skip-chat-parsing
+```
+
+### クライアント設定
+
 1. CLI: `--base-url`, `--model`, `--timeout`
 2. 環境変数: `BB_HARNESS_LOCAL_BASE_URL`, `BB_HARNESS_LOCAL_MODEL`, `BB_HARNESS_LOCAL_TIMEOUT`
 3. `src/bb_harness/local_profiles.yaml`
@@ -63,6 +77,10 @@ API keyが必要な互換serverでは `BB_HARNESS_LOCAL_API_KEY` を使う。key
 8. hostがrelease briefとMarkdownを生成する。
 
 artifactごとにschema不正または重要な構造不足があればrepairを1回だけ行う。再度失敗した場合は処理を停止し、部分成果物とfailed manifestを残す。
+
+要求するJSON SchemaはAPIのresponse_formatとモデルへの指示の両方へ送る。
+技法別の被覆入力にはモデルから計算した記入例を添え、ケースへの自動注入は行わない。
+LLMが作成した手順・期待値・入力の対応と、未被覆の義務を改めて検証する。
 
 `qwen36` profileは全stageでthinkingを無効にする。Qwen3.6 27B + llama.cppのJSON Schema出力では、thinking有効時にreasoningだけでtoken上限へ達してcontentが空になることを実測したためである。planning品質はstage分割、低temperature、self-reviewで補う。
 

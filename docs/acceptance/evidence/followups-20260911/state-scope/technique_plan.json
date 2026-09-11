@@ -1,0 +1,160 @@
+{
+  "schema_version": "1.1.0",
+  "feature_id": "MINIMAL-CANCEL",
+  "model_hash": "096dc2ca94af6f725704edc8c28a8808d2d68219912f023cffff7c1d157fe8e5",
+  "generator_version": "finite-coverage-1",
+  "selections": [
+    {
+      "id": "TECH-MINIMAL-CANCEL-order-state",
+      "technique": {
+        "key": "state_transition_testing",
+        "standard": "ISTQB CTAL-TA v4.0",
+        "reference": "TA-3.2.2",
+        "criterion": "all_transitions"
+      },
+      "status": "selected",
+      "rationale": "注文取消の仕様に基づき、order_stateの遷移と在庫戻しルールをモデル化。",
+      "model_refs": [
+        "MINIMAL-CANCEL-order-state"
+      ],
+      "risk_ids": [],
+      "observation_ids": []
+    },
+    {
+      "id": "TECH-DT-MINIMAL-CANCEL-STATE",
+      "technique": {
+        "key": "decision_table_testing",
+        "standard": "ISTQB CTAL-TA v4.0",
+        "reference": "TA-3.3.1",
+        "criterion": "feasible_rules"
+      },
+      "status": "blocked_by_missing_information",
+      "rationale": "invalid minimized rule mapping",
+      "model_refs": [
+        "DT-MINIMAL-CANCEL-STATE"
+      ],
+      "risk_ids": [],
+      "observation_ids": []
+    }
+  ],
+  "obligation_sets": [
+    {
+      "id": "COVSET-MINIMAL-CANCEL-order-state",
+      "representation": "explicit",
+      "obligations": [
+        {
+          "id": "COV-MINIMAL-CANCEL-order-state-66834fbe67d9ff797786",
+          "technique_key": "state_transition_testing",
+          "model_ref": "MINIMAL-CANCEL-order-state",
+          "criterion": "all_transitions",
+          "selector": {
+            "transition_ids": [
+              "T1"
+            ]
+          },
+          "required": true,
+          "feasibility": "feasible",
+          "observation_ids": [],
+          "risk_ids": [],
+          "source_refs": [
+            {
+              "id": "AC-1",
+              "kind": "ac",
+              "excerpt": "pending状態の注文は取消後にcancelledと表示される。"
+            },
+            {
+              "id": "AC-2",
+              "kind": "ac",
+              "excerpt": "shipped状態の注文は取消不可と表示され、状態はshippedのまま維持される。"
+            },
+            {
+              "id": "AC-3",
+              "kind": "ac",
+              "excerpt": "cancelled状態の注文を再度取り消しても状態は変わらない。"
+            },
+            {
+              "id": "BR-1",
+              "kind": "rule",
+              "excerpt": "pendingからcancelledへの取消成功時だけ在庫を注文数量分戻す。再取消で在庫を追加しない。"
+            }
+          ]
+        },
+        {
+          "id": "COV-MINIMAL-CANCEL-order-state-6666c64ce07bf0ccacd6",
+          "technique_key": "state_transition_testing",
+          "model_ref": "MINIMAL-CANCEL-order-state",
+          "criterion": "all_transitions",
+          "selector": {
+            "transition_ids": [
+              "T2"
+            ]
+          },
+          "required": true,
+          "feasibility": "feasible",
+          "observation_ids": [],
+          "risk_ids": [],
+          "source_refs": [
+            {
+              "id": "AC-1",
+              "kind": "ac",
+              "excerpt": "pending状態の注文は取消後にcancelledと表示される。"
+            },
+            {
+              "id": "AC-2",
+              "kind": "ac",
+              "excerpt": "shipped状態の注文は取消不可と表示され、状態はshippedのまま維持される。"
+            },
+            {
+              "id": "AC-3",
+              "kind": "ac",
+              "excerpt": "cancelled状態の注文を再度取り消しても状態は変わらない。"
+            },
+            {
+              "id": "BR-1",
+              "kind": "rule",
+              "excerpt": "pendingからcancelledへの取消成功時だけ在庫を注文数量分戻す。再取消で在庫を追加しない。"
+            }
+          ]
+        },
+        {
+          "id": "COV-MINIMAL-CANCEL-order-state-a4cfcffdbc0f9a3f2c70",
+          "technique_key": "state_transition_testing",
+          "model_ref": "MINIMAL-CANCEL-order-state",
+          "criterion": "all_transitions",
+          "selector": {
+            "transition_ids": [
+              "T3"
+            ]
+          },
+          "required": true,
+          "feasibility": "feasible",
+          "observation_ids": [],
+          "risk_ids": [],
+          "source_refs": [
+            {
+              "id": "AC-1",
+              "kind": "ac",
+              "excerpt": "pending状態の注文は取消後にcancelledと表示される。"
+            },
+            {
+              "id": "AC-2",
+              "kind": "ac",
+              "excerpt": "shipped状態の注文は取消不可と表示され、状態はshippedのまま維持される。"
+            },
+            {
+              "id": "AC-3",
+              "kind": "ac",
+              "excerpt": "cancelled状態の注文を再度取り消しても状態は変わらない。"
+            },
+            {
+              "id": "BR-1",
+              "kind": "rule",
+              "excerpt": "pendingからcancelledへの取消成功時だけ在庫を注文数量分戻す。再取消で在庫を追加しない。"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "exit_models": []
+}

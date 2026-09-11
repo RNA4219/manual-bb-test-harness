@@ -20,6 +20,7 @@ from bb_harness.batched_generation import (
     design_status,
     generate_cases,
     generate_model,
+    generate_risks,
     review_cases,
 )
 from bb_harness.coverage_engine import (
@@ -31,6 +32,7 @@ from bb_harness.coverage_engine import (
 from bb_harness.efficient_generation import (
     apply_review_patch,
     compact_case_prompt,
+    coverage_input_examples,
     remaining_work,
     review_patch_prompt,
 )
@@ -165,11 +167,11 @@ class LocalDesignPipeline:
             self.generation = {
                 "generation_run_id": run_id,
                 "prompt_template_id": "local-design",
-                "prompt_template_version": "batched-1"
+                "prompt_template_version": "batched-3"
                 if self.config.generation_mode == "batched"
-                else "efficient-1"
+                else "efficient-2"
                 if self.config.generation_mode == "compact"
-                else "coverage-1",
+                else "coverage-2",
                 "input_sha256": hashlib.sha256(input_bytes).hexdigest(),
                 "output_schema_id": "local_run_manifest.schema.json",
                 "model": {"provider": "openai-compatible", "name": model, "version": None},
@@ -198,17 +200,20 @@ class LocalDesignPipeline:
             )
             self._save_artifact(output_dir, "observation_set", observations, artifacts)
 
-            risk_candidates = self._generate_custom(
-                "risk_candidates",
-                RISK_CANDIDATE_SCHEMA,
-                _risk_prompt(feature, test_model, observations),
-                normalize=lambda value: _normalize_risk_candidates(
-                    value, feature["feature_id"], observations
-                ),
-                semantic_validate=lambda value: _validate_risk_candidate_semantics(
-                    value, observations
-                ),
-            )
+            if self.config.generation_mode == "batched":
+                risk_candidates = generate_risks(self, feature, test_model, observations)
+            else:
+                risk_candidates = self._generate_custom(
+                    "risk_candidates",
+                    RISK_CANDIDATE_SCHEMA,
+                    _risk_prompt(feature, test_model, observations),
+                    normalize=lambda value: _normalize_risk_candidates(
+                        value, feature["feature_id"], observations
+                    ),
+                    semantic_validate=lambda value: _validate_risk_candidate_semantics(
+                        value, observations
+                    ),
+                )
             risks = build_risk_register(feature["feature_id"], risk_candidates)
             self._save_artifact(output_dir, "risk_register", risks, artifacts)
             technique_plan = build_technique_plan(feature, test_model, observations, risks)
@@ -1391,6 +1396,9 @@ statefulなら競合・二重実行・終端後の不正遷移、mobileならOS/
 数値境界はparameters(type/unit/step)、domain_models(variable_ids/partition_predicate/borders)へ構造化します。
 各borderはid/operator/predicate/axis/anchorを持ち、anchorには全variableの具体値を置きます。式は許可されたASTだけを使います。
 有限選択値はcombination_models、状態はstate_models(event/guard/actions/context)、条件表はdecision_tablesへ分解します。
+組み合わせ・決定表で参照するparameterはparametersに有限valuesを明記します。空のparametersから参照を発明しません。
+ExprNodeの定数は{"const":true}、変数は{"var":"x"}です。const/var/call/ifをopにしません。状態actionsはcontext変数の更新だけで、API呼出ではありません。
+状態はfrom/toで表し、context変数に不要に複製しません。guardは状態以外の追加条件です。追加条件がなければguard/actions/contextsを省略できます。条件変数が必要なら各対象遷移の仕様に基づく初期contextsを全て列挙します。
 各モデルに実在するsource_refsとcoverage_criterionを付けます。不明な精度・条件・oracleは発明せず未構造化のまま残します。
 根拠のない実装詳細は作らないでください。\nfeature_spec:\n""" + json.dumps(
         feature, ensure_ascii=False
@@ -1407,9 +1415,10 @@ source_refsはfeature_specに実在するオブジェクトだけをそのまま
 
 
 def _risk_prompt(
-    feature: dict[str, Any], model: dict[str, Any], observations: dict[str, Any]
+    feature: dict[str, Any], model: dict[str, Any], observations: dict[str, Any],
+    *, count_hint: str = "3〜8件",
 ) -> str:
-    return """失敗シナリオを3〜8件に絞り、各因子を独立評価してください。
+    return f"""失敗シナリオを{count_hint}に絞り、各因子を独立評価してください。
 impact/likelihoodは1..5、modifierは0..2。自動テスト根拠が明記された時だけautomation_creditを1以上にします。
 UI文言だけの不具合は通常impact 1〜2、在庫/金額/権限/重複副作用はimpact 4〜5とします。
 変更対象かつ自動テスト未網羅の経路はlikelihood 4、変更対象で網羅済みなら3を目安にします。
@@ -1436,6 +1445,7 @@ def _case_prompt(
     return f"""manual caseとexploratory charterを作成してください。
 今回のfocus: {focus}
 technique_planのobligationsを保持し、coverage_inputsにmodel_ref、具体的data/path/sequence、step_refsとexpected_result_refs（1始まり）を付けます。
+coverage_input_examplesを有効な入力形式の記入例として使い、本文へ対応付けます。決定表はaction_checksも必要です。
 coverage_obligation_idsだけを申告しても被覆になりません。補完時は未被覆IDを優先し、予算超過なら未被覆を残します。
 focus対象のriskをscripted caseで覆い、各caseに実在するAC/BRのoracle refsとsource_ref、OBSとRISK両方のtrace_to、観測可能なexpected_results、estimate_minutesを付けます。
 正常系だけでなく境界、不正状態遷移、二重/同時操作、失敗時の副作用不発を含めます。
@@ -1450,6 +1460,9 @@ focus対象のriskをscripted caseで覆い、各caseに実在するAC/BRのorac
             "risks": risks,
             "already_selected_do_not_duplicate": existing,
             "technique_plan": plan,
+            "coverage_input_examples": coverage_input_examples(
+                model, [item for group in plan["obligation_sets"] for item in group["obligations"]]
+            ),
             "coverage_validation": gaps,
         },
         ensure_ascii=False,
@@ -1515,16 +1528,23 @@ def _validate_case_semantics(value: dict[str, Any], *, compact: bool = False) ->
         raise SchemaValidationError("at least one exploratory charter is required")
 
 
-def _validate_risk_candidate_semantics(value: dict[str, Any], observations: dict[str, Any]) -> None:
+def _validate_risk_observations(value: dict[str, Any], observations: dict[str, Any]) -> None:
     mandatory = {item["id"] for item in observations["observations"] if item.get("mandatory")}
     covered = {
         observation_id for risk in value["risks"] for observation_id in risk["observation_ids"]
     }
+    unknown = sorted(covered - {item["id"] for item in observations["observations"]})
+    if unknown:
+        raise SchemaValidationError("unknown observations in risk analysis: " + ", ".join(unknown))
     missing = sorted(mandatory - covered)
     if missing:
         raise SchemaValidationError(
             "mandatory observations missing from risk analysis: " + ", ".join(missing)
         )
+
+
+def _validate_risk_candidate_semantics(value: dict[str, Any], observations: dict[str, Any]) -> None:
+    _validate_risk_observations(value, observations)
     scores = []
     for risk in value["risks"]:
         raw = (

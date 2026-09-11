@@ -102,7 +102,9 @@ class TestPowershellParameters:
         """Test --version flag output."""
         result = run_powershell_script(["--version"])
         assert result.returncode == 0
-        assert "validate-skill.ps1 version 4.0.1" in result.stdout
+        from bb_harness import __version__
+
+        assert f"validate-skill.ps1 version {__version__}" in result.stdout
 
     def test_skill_name_parameter(self) -> None:
         """Test -SkillName parameter customization."""

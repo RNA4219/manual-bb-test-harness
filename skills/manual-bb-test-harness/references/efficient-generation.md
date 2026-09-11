@@ -26,6 +26,8 @@ bb-harness bind-cases --input cases.json --test-model model.json --output bound-
 
 各応答を完全JSONとして検証し、`checkpoints/`に分割結果を保存する。分割・修復にも同じrun予算と段階別profileを適用し、出力上限を自動で増やさない。checkpointからの自動resumeは未実装。続ける場合も新規出力先を使用する。
 
+リスク生成は観点を最大4件ずつ、最大8分割で処理する。各分割の必須観点漏れと対象外の参照を拒否し、統合後も全体を検証する。低リスクの観点を分割ごとにP1へ引き上げることはしない。32観点を超えた場合はリスク生成の呼出前に停止する。
+
 finish_reasonがlengthならoutput_truncated、stop以外の明示終了ならincomplete_response。JSONが読めても成功にはしない。未報告のfinish_reasonはnullで残す。既存の出力ディレクトリは上書きしない。
 
 manifestのstatusは生成処理の成否、design_statusは設計の状態を示す。lintエラーはblocked、必須被覆の不足や計算不能はdegraded、構造と必須設計被覆が成立したらready。CLI終了コードは生成失敗1、degraded/blockedは2、readyは0。readyでも実行証跡なしのGateはno_goであり、独立した意味的品質採点は別に必要。

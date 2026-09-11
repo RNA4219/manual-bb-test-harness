@@ -4,12 +4,19 @@ import copy
 import json
 
 from bb_harness.coverage_engine import TECHNIQUES, validate_case_coverage
-from bb_harness.efficient_generation import apply_review_patch, remaining_work, review_patch_prompt
+from bb_harness.efficient_generation import (
+    apply_review_patch,
+    coverage_input_examples,
+    remaining_work,
+    review_patch_prompt,
+)
 from bb_harness.schema_validation import validate_artifact
 from bb_harness.techniques.common import ModelError
 
 MAX_CASE_BATCHES = 24
 BATCH_SIZE = 2
+RISK_OBSERVATION_BATCH_SIZE = 4
+MAX_RISK_BATCHES = 8
 CORE_FIELDS = (
     "feature_id",
     "flows",
@@ -92,6 +99,8 @@ def model_core_request(feature: dict) -> tuple[dict, str]:
     prompt = (
         "モデルの概要と共有parameterだけを返します。型付きモデル本文は次の呼出で生成します。\n"
         "selected_techniquesには、この仕様で根拠を持って適用する技法だけを列挙します。\n"
+        "domain/組み合わせ/決定表を選ぶなら共有parametersを必ず宣言します。\n"
+        "組み合わせ・決定表のparameterには有限values（例: pending/shipped）を明記します。\n"
         "不要な技法を選択せず、不明な値を発明しません。JSONは余分な空白を省いてください。\n"
         "boundariesには数値境界と状態境界を含めます。仕様の許可状態／拒否状態の切替点も境界です。\n"
         + _test_model_prompt(feature)
@@ -114,6 +123,14 @@ def generate_model(pipeline, feature: dict) -> dict:
         base = {key: item for key, item in value.items() if key != "selected_techniques"}
         validate_artifact(base, "test_model.schema.json")
         _validate_test_model_semantics(base, feature=None)
+        selected = set(value["selected_techniques"])
+        parameters = value.get("parameters", [])
+        if selected & {"domain_models", "combination_models", "decision_tables"} and not parameters:
+            raise ModelError("selected technique requires shared parameters in model core")
+        if selected & {"combination_models", "decision_tables"} and not any(
+            item.get("values") for item in parameters
+        ):
+            raise ModelError("combination/decision model core requires explicit finite values")
 
     core = pipeline._generate_custom(
         "test_model__core",
@@ -127,9 +144,20 @@ def generate_model(pipeline, feature: dict) -> dict:
     result = copy.deepcopy(core)
     for field in selected:
         part_schema = select_schema(whole, [field])
+        part_schema["properties"][field]["maxItems"] = 2
         prompt = (
             f"{field}だけを完全なJSONで返してください。他技法や概要の再出力は不要です。\n"
+            "1技法につき最大2モデル。関連する状態・ルールを1モデルにまとめます。\n"
+            "任意フィールドは必要な場合だけ出力し、空の配列や重複した説明は省きます。\n"
             "共有parameterを使い、根拠source_refsはfeature_specの実在オブジェクトを保持します。\n"
+            "state_modelsのactionsはcontext変数の新値をExprNodeで表す代入だけです。\n"
+            "call/ifなどの疑似コードやAPI呼出は無効です。副作用の期待値は後段のケースに書きます。\n"
+            "明示されたcontext変数の更新がなければactionsを省略し、変数を発明しません。\n"
+            "状態はfrom/toで表現し、同じ状態をcontext変数へ不要に複製しません。\n"
+            "guardは状態以外の追加条件に使います。追加条件がなければguard/actions/contextsは省略できます。\n"
+            "条件変数が必要なら、各対象遷移を実行するための仕様に基づく初期contextsを全て列挙します。\n"
+            'ExprNodeの定数は{"const":true}、変数は{"var":"x"}です。const/varはopではありません。\n'
+            '比較は{"op":"eq","args":[{"var":"x"},{"const":"a"}]}の形です。\n'
             "まだ存在しないobservation/risk IDを参照しません。\n"
             "モデルIDは技法名を含め一意にします。\n"
             "条件や精度が不明なら発明せず空配列にしてください。JSONの余分な空白は省きます。\n"
@@ -146,6 +174,54 @@ def generate_model(pipeline, feature: dict) -> dict:
         raise ModelError("duplicate shared parameter IDs")
     validate_artifact(result, "test_model.schema.json")
     _validate_test_model_semantics(result, feature=None)
+    return result
+
+
+def generate_risks(pipeline, feature: dict, model: dict, observations: dict) -> dict:
+    from bb_harness.local_pipeline import (
+        RISK_CANDIDATE_SCHEMA,
+        _normalize_risk_candidates,
+        _risk_prompt,
+        _validate_risk_candidate_semantics,
+        _validate_risk_observations,
+    )
+
+    items = observations["observations"]
+    if not items or len(items) > RISK_OBSERVATION_BATCH_SIZE * MAX_RISK_BATCHES:
+        raise ModelError("risk generation requires 1..32 observations")
+    result = {"feature_id": feature["feature_id"], "risks": []}
+    for offset in range(0, len(items), RISK_OBSERVATION_BATCH_SIZE):
+        number = offset // RISK_OBSERVATION_BATCH_SIZE + 1
+        selected = {
+            **observations,
+            "observations": items[offset : offset + RISK_OBSERVATION_BATCH_SIZE],
+        }
+        schema = copy.deepcopy(RISK_CANDIDATE_SCHEMA)
+        schema["properties"]["risks"].update(minItems=1, maxItems=4)
+        refs = schema["properties"]["risks"]["items"]["properties"]["observation_ids"]
+        refs.update(
+            uniqueItems=True,
+            items={"enum": [item["id"] for item in selected["observations"]]},
+        )
+        prompt = _risk_prompt(feature, model, selected, count_hint="1〜4件") + (
+            "\n今回は上記観点だけが対象です。mandatory=trueの全IDをobservation_idsに含めます。"
+            "同じリスクが複数の観点を説明する場合はまとめます。JSONの余分な空白は省きます。"
+        )
+        batch = pipeline._generate_custom(
+            f"risk_candidates__{number}",
+            schema,
+            prompt,
+            normalize=lambda value, selected=selected: _normalize_risk_candidates(
+                value, feature["feature_id"], selected
+            ),
+            semantic_validate=lambda value, selected=selected: _validate_risk_observations(
+                value, selected
+            ),
+        )
+        _checkpoint(pipeline, f"risks-{number:02d}", batch)
+        result["risks"].extend(batch["risks"])
+    result = _normalize_risk_candidates(result, feature["feature_id"], observations)
+    _validate_risk_candidate_semantics(result, observations)
     return result
 
 
@@ -182,6 +258,13 @@ def generate_cases(pipeline, feature: dict, model: dict, observations: dict, ris
         prompt = (
             "追加ケースを最大2件、探索チャーターを最大2件、完全JSONで返します。\n"
             "focusの入力・経路をcoverage_inputsへ保持し、step_refs/expected_result_refsは1始まり。\n"
+            "状態モデルのcoverage_inputsはinitial_state、transition_ids、dataを使います。\n"
+            "dataは対象state_model.contextsの1要素と完全一致させ、追加キーを入れません。\n"
+            "contextsが省略されている場合のdataは空オブジェクトです。contextというキーは使いません。\n"
+            "複数技法を覆う場合はmodel_ref別にcoverage_inputsを作り、dataを混同しません。\n"
+            "coverage_input_examplesを入力形式の記入例に使い、手順・期待値へ対応付けます。\n"
+            "決定表はdataだけでなく、検証する結果をaction_checksへ記載します。\n"
+            "決定表/組み合わせ/数値領域の入力はdataへ、parameter IDをキーに具体値を記載します。\n"
             "指定したrisk/観点の未被覆を優先し、既存ケースの再出力は不要です。\n"
             "oracle/source_refとtrace_toには実在する根拠/OBS/RISK IDだけを使います。\n"
             "仕様にない表示文言・内部実装を発明しません。期待値は具体的に観測可能にします。\n"
@@ -193,6 +276,9 @@ def generate_cases(pipeline, feature: dict, model: dict, observations: dict, ris
                     "observations": observations,
                     "risks": risks,
                     "focus": focused,
+                    "coverage_input_examples": coverage_input_examples(
+                        model, focused["obligations"]
+                    ),
                     "existing": [
                         {"tc_id": c["tc_id"], "title": c["title"], "trace_to": c["trace_to"]}
                         for c in cases["manual_cases"]

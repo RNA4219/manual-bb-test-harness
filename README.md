@@ -1,45 +1,54 @@
 # manual-bb-test-harness
 
 [![CI](https://github.com/RNA4219/manual-bb-test-harness/actions/workflows/validate.yml/badge.svg?branch=main)](https://github.com/RNA4219/manual-bb-test-harness/actions/workflows/validate.yml)
-[![license: RNA-TPSAL-1.0](https://img.shields.io/badge/license-RNA--TPSAL--1.0-blue.svg)](LICENSE)
-[![source-available](https://img.shields.io/badge/source--available-yes-orange.svg)](LICENSE)
+[![license: RNA-TPSAL-1.0](https://img.shields.io/badge/license-RNA--TPSAL--1.0-blue.svg)](https://github.com/RNA4219/manual-bb-test-harness/blob/main/LICENSE)
+[![source-available](https://img.shields.io/badge/source--available-yes-orange.svg)](https://github.com/RNA4219/manual-bb-test-harness/blob/main/LICENSE)
 
 手動ブラックボックステスト設計を、根拠付きartifactと決定的な品質Gateで支援する。
 
+## 4.1.0の主な変更
+
+- PyPI説明ページから文書・ライセンスへ正しく移動できるよう、リンクをGitHubの絶対URLへ修正しました。
+- リスク生成を観点単位に分割し、JSON形式・状態モデル・被覆入力の指示を改善しました。
+- PyPI公開後のファイル照合と新規インストール検証をCIへ追加しました。
+- 要件信頼度と後日の不具合・手戻りを比較する[実案件調整の手順と補助ツール](https://github.com/RNA4219/manual-bb-test-harness/blob/main/docs/requirements-calibration.md)を追加しました。実案件データによる校正は未実施で、採点の重み・閾値は変えていません。
+
 ## 4.0.0の主な変更
 
-- **要件定義の信頼度評価**: 要確認件数・重大度・レビュー済み率から点数と次の確認事項を出します。評価処理のLLM呼出はありません。[利用手順](skills/manual-bb-test-harness/references/requirements-confidence.md)。
-- **技法別の被覆検証**: 型付き技法モデル、`technique_plan.json`、`coverage_report.json`と非破壊の移行コマンドを追加しました。[対応技法・制約](skills/manual-bb-test-harness/references/technique-coverage.md)。
-- **生成予算と完了判定**: Local Modeは`compact`が既定です。`--estimate-only`で通信せず見積もり、`--token-budget`で修復を含む1 runの予算を管理します。`--generation-mode batched`で分割生成でき、既存出力の上書きを防ぎ、設計不足を`design_status`と終了コード2で示します。[生成効率・証跡版](docs/specs/spec-05-efficient-generation-evidence-revisions.md)・[分割生成仕様](docs/specs/spec-06-bounded-generation-readiness.md)・[運用ガイド](skills/manual-bb-test-harness/references/efficient-generation.md)。
-- **HATE・QEGによるCI検証**: 実pytest結果をHATEで正規化し、QEGで証跡のhash・実行対象・合否を検証します。全体85%・Gate90%のcoverage基準を維持します。[CI連携仕様](docs/specs/spec-08-hate-qeg-ci.md)・[検収記録](docs/acceptance/AC-20260911-hate-qeg-ci.md)。
+- **要件定義の信頼度評価**: 要確認件数・重大度・レビュー済み率から点数と次の確認事項を出します。評価処理のLLM呼出はありません。[利用手順](https://github.com/RNA4219/manual-bb-test-harness/blob/main/skills/manual-bb-test-harness/references/requirements-confidence.md)。
+- **技法別の被覆検証**: 型付き技法モデル、`technique_plan.json`、`coverage_report.json`と非破壊の移行コマンドを追加しました。[対応技法・制約](https://github.com/RNA4219/manual-bb-test-harness/blob/main/skills/manual-bb-test-harness/references/technique-coverage.md)。
+- **生成予算と完了判定**: Local Modeは`compact`が既定です。`--estimate-only`で通信せず見積もり、`--token-budget`で修復を含む1 runの予算を管理します。`--generation-mode batched`で分割生成でき、既存出力の上書きを防ぎ、設計不足を`design_status`と終了コード2で示します。[生成効率・証跡版](https://github.com/RNA4219/manual-bb-test-harness/blob/main/docs/specs/spec-05-efficient-generation-evidence-revisions.md)・[分割生成仕様](https://github.com/RNA4219/manual-bb-test-harness/blob/main/docs/specs/spec-06-bounded-generation-readiness.md)・[運用ガイド](https://github.com/RNA4219/manual-bb-test-harness/blob/main/skills/manual-bb-test-harness/references/efficient-generation.md)。
+- **HATE・QEGによるCI検証**: 実pytest結果をHATEで正規化し、QEGで証跡のhash・実行対象・合否を検証します。全体85%・Gate90%のcoverage基準を維持します。[CI連携仕様](https://github.com/RNA4219/manual-bb-test-harness/blob/main/docs/specs/spec-08-hate-qeg-ci.md)・[検収記録](https://github.com/RNA4219/manual-bb-test-harness/blob/main/docs/acceptance/AC-20260911-hate-qeg-ci.md)。
 
 ```powershell
 uv run bb-harness evaluate requirements --input spec.md --output tmp/requirements
 ```
 
-追加artifact契約は1.1.0で、既存入力との互換性を維持します。リポジトリの版は、artifact契約の変更をmajorとする[リリース規約](docs/release-policy.md)に従って4.0.0へ更新しています。変更履歴は[CHANGELOG](CHANGELOG.md)を参照してください。
+追加artifact契約は1.1.0で、既存入力との互換性を維持します。リポジトリの版は、artifact契約の変更をmajorとする[リリース規約](https://github.com/RNA4219/manual-bb-test-harness/blob/main/docs/release-policy.md)に従って4.0.0へ更新しています。変更履歴は[CHANGELOG](https://github.com/RNA4219/manual-bb-test-harness/blob/main/CHANGELOG.md)を参照してください。
 
-実LLMでのトークン削減率の比較とbatched生成の全段完走は未完了です。CIの成功とQEGのgoが示す範囲はリポジトリの自動検証です。[生成効率の検収記録](docs/acceptance/AC-20260910-efficiency.md)・[分割生成の検収記録](docs/acceptance/AC-20260910-batched.md)を参照してください。
+小規模の実LLM試行でbatchedのケース生成・レビューまで完了しました。ただし決定表の不整合により`degraded`で、生成品質の受入とトークン削減率の立証は未達です。CIの成功とQEGのgoが示す範囲はリポジトリの自動検証です。[生成効率の初回検収](https://github.com/RNA4219/manual-bb-test-harness/blob/main/docs/acceptance/AC-20260910-efficiency.md)・[分割生成の初回検収](https://github.com/RNA4219/manual-bb-test-harness/blob/main/docs/acceptance/AC-20260910-batched.md)を参照してください。
+
+4.1.0の再評価と公開後検証、実案件データ待ちの状況は[追加検収記録](https://github.com/RNA4219/manual-bb-test-harness/blob/main/docs/acceptance/AC-20260911-followups.md)へまとめています。
 
 ## 技法別の被覆検証
 
 Domain、組み合わせ、状態経路、決定表、CRUD等を型付きモデルで表し、必要な入力点・条件・経路をケースへ対応させる。Local Modeは `technique_plan.json` と `coverage_report.json` を追加出力する。設計済み・実施済み・合格を分け、新指標はGateの参考値として報告する。
 
-既存JSONにも `bb-harness coverage` と非破壊の `bb-harness migrate` を利用できる。[手順・対応技法・制約](skills/manual-bb-test-harness/references/technique-coverage.md)、[実行可能なサンプル](examples/artifacts/techniques/discount-domain/README.md)、[調査の採用範囲](docs/research/istqb-extension-adoption.md) を参照。
+既存JSONにも `bb-harness coverage` と非破壊の `bb-harness migrate` を利用できる。[手順・対応技法・制約](https://github.com/RNA4219/manual-bb-test-harness/blob/main/skills/manual-bb-test-harness/references/technique-coverage.md)、[実行可能なサンプル](https://github.com/RNA4219/manual-bb-test-harness/blob/main/examples/artifacts/techniques/discount-domain/README.md)、[調査の採用範囲](https://github.com/RNA4219/manual-bb-test-harness/blob/main/docs/research/istqb-extension-adoption.md) を参照。
 
 ## Local Mode
 
 Pythonパッケージは`bb-harness`として配布します。
 [PyPI](https://pypi.org/project/bb-harness/)または
-[GitHub Release](https://github.com/RNA4219/manual-bb-test-harness/releases/tag/v4.0.1)から導入できます。
+[GitHub Release](https://github.com/RNA4219/manual-bb-test-harness/releases/tag/v4.1.0)から導入できます。
 
 ```powershell
-python -m pip install bb-harness==4.0.1
+python -m pip install bb-harness==4.1.0
 bb-harness --version
 ```
 
 Skill本体・golden入力を使う場合は、本リポジトリも取得してください。
-公開手順は[リリース規約](docs/release-policy.md#pypi公開仕様)を参照してください。
+公開手順は[リリース規約](https://github.com/RNA4219/manual-bb-test-harness/blob/main/docs/release-policy.md#pypi公開仕様)を参照してください。
 
 Local Modeは、provider障害時にもOpenAI互換のローカルLLMでテスト設計を継続するための明示的な実行モード。LLMを候補生成器に限定し、schema、risk・工数計算、lint、Gateはホスト側で制御する。
 
@@ -70,10 +79,10 @@ uv run bb-harness run local-design `
 
 出力先には `manual-test-design.md`、schema検証済みartifact群、`lint_report.json`、`quality_report.json`、`run_manifest.json` が生成される。実行証跡がない場合、Gateは常に `no_go` になる。
 
-Local Modeは本リポジトリに統合済みで、別リポジトリの導入は不要。設定、成果物、fail closed条件の詳細は [Local Mode guide](docs/local-model-guide.md) を参照。
+Local Modeは本リポジトリに統合済みで、別リポジトリの導入は不要。設定、成果物、fail closed条件の詳細は [Local Mode guide](https://github.com/RNA4219/manual-bb-test-harness/blob/main/docs/local-model-guide.md) を参照。
 
-現行リリース系列: **4.0.1** / 検証済みテスト: **1039件** / Workflow Cookbook: **33 nodes・45 edges・33 capsules** / 次回レビュー: **2026-10-11**
-人間向け概要は [docs/human-readme.md](docs/human-readme.md) を参照。
+現行リリース系列: **4.1.0** / 検証済みテスト: **1096件** / Workflow Cookbook: **33 nodes・45 edges・33 capsules** / 次回レビュー: **2026-10-11**
+人間向け概要は [docs/human-readme.md](https://github.com/RNA4219/manual-bb-test-harness/blob/main/docs/human-readme.md) を参照。
 
 ## ライセンス
 
@@ -83,9 +92,9 @@ Local Modeは本リポジトリに統合済みで、別リポジトリの導入�
 
 第三者向けの有償QA、テスト、開発支援、コンサルティング等で利用する場合は、顧客の技術担当者が確認できる文書に、ツール名、原開発者、公式リポジトリ、使用versionまたはcommit、改変の有無を案件単位で一度記載してください。
 
-帰属表示を省略するホワイトラベル利用には、[別途書面による商用ライセンス](COMMERCIAL-LICENSE.md)が必要です。
+帰属表示を省略するホワイトラベル利用には、[別途書面による商用ライセンス](https://github.com/RNA4219/manual-bb-test-harness/blob/main/COMMERCIAL-LICENSE.md)が必要です。
 
-過去のMIT版は、引き続きMIT Licenseの条件で利用できます。詳細は[LICENSING.md](LICENSING.md)を参照してください。
+過去のMIT版は、引き続きMIT Licenseの条件で利用できます。詳細は[LICENSING.md](https://github.com/RNA4219/manual-bb-test-harness/blob/main/LICENSING.md)を参照してください。
 
 ## License
 
@@ -95,9 +104,9 @@ Personal use, research, education, open-source activities, and internal business
 
 When the software is used to provide a paid QA, testing, development, consulting, managed, outsourced, or similar service to a third party, a one-time attribution notice must be provided in project documentation reasonably accessible to the Customer technical team.
 
-Attribution-free white-label use requires a [separate written commercial license](COMMERCIAL-LICENSE.md).
+Attribution-free white-label use requires a [separate written commercial license](https://github.com/RNA4219/manual-bb-test-harness/blob/main/COMMERCIAL-LICENSE.md).
 
-Previously released MIT-licensed versions remain available under their original MIT terms. See [LICENSING.md](LICENSING.md).
+Previously released MIT-licensed versions remain available under their original MIT terms. See [LICENSING.md](https://github.com/RNA4219/manual-bb-test-harness/blob/main/LICENSING.md).
 
 <!-- LLM-BOOTSTRAP v1 -->
 **For AI Agents**: 読む順番:

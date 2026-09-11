@@ -1,8 +1,8 @@
 ---
 intent_id: INT-MBB-001
 owner: manual-bb-test-harness
-release_version: 4.0.1
-test_count: 1039
+release_version: 4.1.0
+test_count: 1096
 knowledge_map: 33 nodes, 45 edges, 33 capsules
 next_review_due: 2026-10-11
 status: active
@@ -26,6 +26,10 @@ last_reviewed_at: 2026-05-16
 - 形式的な被覆の合格はLLM出力の意味的品質を保証しない。実モデルの9-run benchmarkを省略した場合、その制約を検収記録に明示する。
 
 ## Quality Gates
+
+公開後検証は実PyPI配布物のhash・sizeと隔離導入のCLI動作を確認する。
+実績分析の補助ツールはsnapshot改変・重複・欠測・群の混在を検証する。
+実案件データがない場合、重みや閾値を校正済みと判定しない。
 
 | gate | criterion |
 |---|---|
@@ -104,3 +108,7 @@ last_reviewed_at: 2026-05-16
 ## 要件定義信頼度の追加検収（2026-09-11）
 
 全1001件成功、分岐を含むcoverage 88.18%。新機能の評価エンジン・CLIは98.14%、Gate専用107件・91.01%。schema例29件、仕様書7件、Skill validator、wheel／sdist smoke成功。[検収記録](docs/acceptance/AC-20260911-requirements-confidence.md)を参照。要件信頼度の点数を生成品質や実LLMの完走評価へ流用しない。
+
+## 4.1.0追加検収（2026-09-11）
+
+全1096件成功、分岐を含むcoverage 88.37%、Gate専用107件・91.01%。実PyPI 4.0.1の配布物照合と新規インストールが成功した。小規模batchedはケース3件とレビューまで生成完了したが、決定表モデル不整合によりdegradedで品質受入は未達。実案件校正はデータ未提供。[追加検収記録](docs/acceptance/AC-20260911-followups.md)を参照。

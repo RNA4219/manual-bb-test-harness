@@ -1,0 +1,47 @@
+{
+  "feature_id": "MINIMAL-CANCEL",
+  "phases": [
+    {
+      "phase_name": "prep",
+      "activities": [
+        "データ・環境準備"
+      ],
+      "estimate_hours": 0.5
+    },
+    {
+      "phase_name": "execution",
+      "activities": [
+        "scripted caseとcharter実行"
+      ],
+      "estimate_hours": 0.2
+    },
+    {
+      "phase_name": "evidence",
+      "activities": [
+        "観測証跡の保存"
+      ],
+      "estimate_hours": 0.25
+    },
+    {
+      "phase_name": "review",
+      "activities": [
+        "結果・残余リスク確認"
+      ],
+      "estimate_hours": 0.25
+    },
+    {
+      "phase_name": "cleanup",
+      "activities": [
+        "テストデータ後始末"
+      ],
+      "estimate_hours": 0.1
+    }
+  ],
+  "total_estimate_hours": 1.56,
+  "retry_buffer_percent": 20,
+  "execution_order": [
+    "TC-001",
+    "TC-002",
+    "TC-003"
+  ]
+}

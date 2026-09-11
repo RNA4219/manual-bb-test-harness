@@ -51,7 +51,9 @@ class TestMainModule:
             cwd=REPO_ROOT,
         )
         assert result.returncode == 0
-        assert "4.0.1" in result.stdout
+        from bb_harness import __version__
+
+        assert __version__ in result.stdout
 
     def test_module_execution_no_args(self) -> None:
         """python -m bb_harness with no args shows help."""

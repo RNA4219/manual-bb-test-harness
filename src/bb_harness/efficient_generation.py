@@ -38,6 +38,59 @@ def remaining_work(
     }
 
 
+def coverage_input_examples(model: dict, obligations: list[dict]) -> list[dict]:
+    """候補入力の記入例。実ケースへ自動適用せず、LLMへの説明にだけ使う。"""
+    from bb_harness.techniques.common import ModelError, configurations, indexed
+    from bb_harness.techniques.finite import rule_matches, validate_input
+
+    models = {item["id"]: item for field in TECHNIQUES for item in model.get(field, [])}
+    parameters = indexed(model.get("parameters", []), "parameter")
+    examples = []
+    for obligation in obligations[:8]:
+        selected = models.get(obligation["model_ref"])
+        if selected is None:
+            continue
+        selector = obligation["selector"]
+        value = {"model_ref": selected["id"]}
+        try:
+            if "transition_ids" in selector or "state_id" in selector:
+                sequence = selector.get("transition_ids", [])
+                transitions = indexed(selected["transitions"], "transition")
+                initial = transitions[sequence[0]]["from"] if sequence else selector["state_id"]
+                value.update(initial_state=initial, transition_ids=sequence)
+                candidates = selected.get("contexts", [{}])
+            elif "rule_id" in selector:
+                rule = indexed(selected["rules"], "rule")[selector["rule_id"]]
+                value["action_checks"] = rule["actions"]
+                candidates = [
+                    row for row in configurations(selected, parameters) if rule_matches(rule, row)
+                ]
+            elif "data" in selector:
+                wanted = selector["data"]
+                candidates = (
+                    [
+                        row
+                        for row in configurations(selected, parameters)
+                        if all(row[key] == item for key, item in wanted.items())
+                    ]
+                    if "parameter_ids" in selected
+                    else [wanted]
+                )
+            else:
+                continue
+            for data in candidates:
+                candidate = {**value, "data": data}
+                try:
+                    validate_input(selected, candidate, parameters)
+                except ModelError:
+                    continue
+                examples.append({"obligation_id": obligation["id"], "input": candidate})
+                break
+        except (KeyError, ModelError):
+            continue
+    return examples
+
+
 def compact_case_prompt(
     feature: dict, model: dict, observations: dict, risks: dict, existing: dict | None = None
 ) -> str:
@@ -76,6 +129,7 @@ def compact_case_prompt(
         "observations": selected_observations,
         "risks": selected_risks,
         "required_obligations": obligations,
+        "coverage_input_examples": coverage_input_examples(model, obligations),
         "pending": pending,
         "existing_case_index": []
         if existing is None
@@ -90,6 +144,7 @@ def compact_case_prompt(
     }
     return """根拠付きmanual_case_setをJSONで返してください。
 required_obligationsの具体的入力・経路をcoverage_inputsへ保持し、step_refs/expected_result_refs（1始まり）を本文の手順・期待値と対応させます。
+coverage_input_examplesは有効な入力形式の記入例です。該当するケースの手順と期待値へ対応付けてください。決定表はaction_checksが必要です。
 各caseに実在するsource_ref、oracle、OBS/RISKのtrace_to、観測可能なexpected_results、estimate_minutesを付けます。priorityは参照riskに合わせます。
 正常・拒否・境界・二重/同時操作・部分失敗・対象platformを仕様に即して設計します。
 仕様にない表示文言・HTTP status・内部実装を発明しません。
