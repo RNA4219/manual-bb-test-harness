@@ -27,8 +27,9 @@ def checksums(directory):
     (directory / "SHA256SUMS.txt").write_text("\n".join(lines) + "\n", encoding="utf-8")
 
 
-def bundle(directory, version="4.0.0", omit_license=False):
-    metadata = f"Name: bb-harness\nVersion: {version}\n".encode()
+def bundle(directory, version="4.0.0", omit_license=False,
+           classifier="Topic :: Software Development :: Testing"):
+    metadata = f"Name: bb-harness\nVersion: {version}\nClassifier: {classifier}\n".encode()
     licenses = release.verify_license_documents.__globals__["LICENSE_DOCUMENTS"]
     docs = {} if omit_license else dict.fromkeys(licenses, b"license")
     with zipfile.ZipFile(directory / "bb_harness-4.0.0-py3-none-any.whl", "w") as archive:
@@ -53,9 +54,14 @@ def test_invalid_tag(tmp_path, tag):
         release.verify_bundle(tmp_path, tag)
 
 
-@pytest.mark.parametrize("kind", ["tampered", "missing", "version", "license", "duplicate", "extra"])
+@pytest.mark.parametrize("kind", ["tampered", "missing", "version", "license", "duplicate", "extra", "classifier", "private"])
 def test_reject_incomplete_or_changed_bundle(tmp_path, kind):
-    bundle(tmp_path, version="3.0.0" if kind == "version" else "4.0.0", omit_license=kind == "license")
+    classifier = {
+        "classifier": "Intended Audience :: Quality Assurance",
+        "private": "Private :: Do Not Upload",
+    }.get(kind, "Topic :: Software Development :: Testing")
+    bundle(tmp_path, version="3.0.0" if kind == "version" else "4.0.0",
+           omit_license=kind == "license", classifier=classifier)
     wheel = tmp_path / "bb_harness-4.0.0-py3-none-any.whl"
     sums = tmp_path / "SHA256SUMS.txt"
     if kind == "tampered":

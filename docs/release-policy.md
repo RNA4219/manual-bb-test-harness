@@ -37,15 +37,24 @@ Use semantic versions for the Skill repository.
 | PUB-5 | PyPI Trusted Publisherを`RNA4219/manual-bb-test-harness`、workflow `publish-pypi.yml`、environment `pypi`へ限定する。GitHubの同environmentはmainのみ許可する |
 | PUB-6 | OIDCの`id-token: write`は公開ジョブだけに付け、長期API tokenを保存しない。ActionはコミットSHAで固定する |
 | PUB-7 | 公開後はPyPIのversion・2ファイルのSHA-256と、PyPIからの隔離インストールを確認する。同版の再公開は自動skipせず停止し、失敗時は公開状態を確認してから対応する |
+| PUB-8 | PyPAの`trove-classifiers`と照合し、未登録または`Private ::`で始まる分類をbuild・公開前に拒否する。検証依存はdevだけに追加する |
 
 PyPIアカウントのメール確認・2FAとPending Trusted Publisherを初回公開前に設定する。
 Pending Publisherは初回公開時にプロジェクトのPublisherへ切り替わる。
 設定手順は[PyPI公式文書](https://docs.pypi.org/trusted-publishers/creating-a-project-through-oidc/)を参照する。
 
 ```powershell
-gh workflow run publish-pypi.yml --ref main -f tag=v4.0.0
+gh workflow run publish-pypi.yml --ref main -f tag=v4.0.1
 ```
 
 受入では、正常な配布物、改変・欠測・版不一致の拒否、追加workflowを含む緑CI、
 実PyPI公開および公開後の照合を確認する。今回の変更は配布経路の追加であり、
 既存の4.0.0パッケージの内容・バージョンは変えない。
+
+### 4.0.1: PyPIメタデータの修正
+
+初回4.0.0公開は、未登録classifier `Intended Audience :: Quality Assurance`により
+PyPIがHTTP 400で拒否した。PyPIのプロジェクト未作成（HTTP 404）を確認済み。
+この分類を除去し、分類辞書に基づく検証を追加して4.0.1を発行する。
+README・CLI・関連文書の現行版を同期し、4.0.0のGitHub Releaseは保持する。
+実装・artifact契約・ライセンスの挙動は変えず、緑CI後に新規タグから配布物を作成する。

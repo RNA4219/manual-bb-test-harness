@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
     inputs:
       tag:
-        description: "公開済みGitHub Releaseの正式版タグ（例: v4.0.0）"
+        description: "公開済みGitHub Releaseの正式版タグ（例: v4.0.1）"
         required: true
         type: string
 
@@ -61,7 +61,7 @@ jobs:
         env:
           RELEASE_TAG: ${{ inputs.tag }}
         run: >-
-          python tools/ci/prepare_pypi_release.py --tag "$RELEASE_TAG"
+          uv run --extra dev python tools/ci/prepare_pypi_release.py --tag "$RELEASE_TAG"
           --input tmp/pypi-release --output tmp/pypi-dist
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with:

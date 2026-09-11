@@ -31,10 +31,10 @@ Domain、組み合わせ、状態経路、決定表、CRUD等を型付きモデ�
 
 Pythonパッケージは`bb-harness`として配布します。
 [PyPI](https://pypi.org/project/bb-harness/)または
-[GitHub Release](https://github.com/RNA4219/manual-bb-test-harness/releases/tag/v4.0.0)から導入できます。
+[GitHub Release](https://github.com/RNA4219/manual-bb-test-harness/releases/tag/v4.0.1)から導入できます。
 
 ```powershell
-python -m pip install bb-harness==4.0.0
+python -m pip install bb-harness==4.0.1
 bb-harness --version
 ```
 
@@ -72,7 +72,7 @@ uv run bb-harness run local-design `
 
 Local Modeは本リポジトリに統合済みで、別リポジトリの導入は不要。設定、成果物、fail closed条件の詳細は [Local Mode guide](docs/local-model-guide.md) を参照。
 
-現行リリース系列: **4.0.0** / 検証済みテスト: **1026件** / Workflow Cookbook: **33 nodes・45 edges・33 capsules** / 次回レビュー: **2026-10-11**
+現行リリース系列: **4.0.1** / 検証済みテスト: **1039件** / Workflow Cookbook: **33 nodes・45 edges・33 capsules** / 次回レビュー: **2026-10-11**
 人間向け概要は [docs/human-readme.md](docs/human-readme.md) を参照。
 
 ## ライセンス

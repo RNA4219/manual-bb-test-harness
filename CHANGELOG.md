@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+## [4.0.1] - 2026-09-11
+
+- PyPIが拒否する未登録classifierを除去。PyPAの分類辞書によるbuild・公開前検証を追加。
+- mainの緑CIとGitHub ReleaseのSHA-256・メタデータ・ライセンス・隔離CLI smokeを確認し、Trusted Publishingで同じ配布物をPyPIへ公開する手順を追加。
+- READMEにPyPIの導入方法を追加し、CLI・PowerShell validator・現行文書の版を同期。4.0.0のGitHub Releaseと既存のartifact契約・動作を保持。
+
 ## [4.0.0] - 2026-09-11
 
 - artifact契約拡張をmajorとするrelease policyに従い、package・CLI・PowerShell validator・現行ドキュメントを4.0.0へ更新。

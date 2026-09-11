@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import argparse
+import ast
 import os
 import re
 import subprocess
@@ -11,6 +12,8 @@ import tarfile
 import tempfile
 import zipfile
 from pathlib import Path, PurePosixPath
+
+from trove_classifiers import classifiers
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
 LICENSE_DOCUMENTS = {
@@ -21,6 +24,15 @@ LICENSE_DOCUMENTS = {
     "COMMERCIAL-LICENSE.md",
     "THIRD_PARTY_NOTICES.md",
 }
+
+
+def verify_classifiers(values: list[str]) -> None:
+    """PyPIが受け入れる公開用classifierだけを許可する。"""
+    invalid = [
+        value for value in values if value not in classifiers or value.startswith("Private ::")
+    ]
+    if invalid:
+        raise ValueError(f"PyPIで利用できないclassifier: {invalid}")
 
 
 def verify_release_metadata(repo_root: Path) -> str:
@@ -55,6 +67,12 @@ def verify_release_metadata(repo_root: Path) -> str:
     mismatches = {label: value for label, value in versions.items() if value != expected}
     if mismatches:
         raise RuntimeError(f"release version mismatch: expected {expected}, got {mismatches}")
+    classifier_block = re.search(
+        r"^classifiers\s*=\s*(\[.*?^\])", sources["pyproject.toml"][0], re.MULTILINE | re.DOTALL
+    )
+    if classifier_block is None:
+        raise ValueError("pyproject.tomlのclassifier一覧が見つかりません")
+    verify_classifiers(ast.literal_eval(classifier_block[1]))
     return expected
 
 
