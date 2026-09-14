@@ -121,6 +121,12 @@
         },
         "additionalProperties": false
       }
+    },
+    "schema_version": {
+      "const": "1.1.0"
+    },
+    "migration": {
+      "$ref": "shared_defs.schema.json#/$defs/Migration"
     }
   },
   "additionalProperties": false

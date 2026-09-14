@@ -58,12 +58,29 @@
         },
         "coverage_population": {
           "type": "object",
-          "required": ["defined", "mandatory", "observed", "case_traced"],
+          "required": [
+            "defined",
+            "mandatory",
+            "observed",
+            "case_traced"
+          ],
           "properties": {
-            "defined": {"type": "integer", "minimum": 1},
-            "mandatory": {"type": "integer", "minimum": 0},
-            "observed": {"type": "integer", "minimum": 0},
-            "case_traced": {"type": "integer", "minimum": 0}
+            "defined": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "mandatory": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "observed": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "case_traced": {
+              "type": "integer",
+              "minimum": 0
+            }
           },
           "additionalProperties": false
         },
@@ -179,6 +196,44 @@
             },
             "additionalProperties": false
           }
+        },
+        "required_obligation_design_rate": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "minimum": 0,
+          "maximum": 100
+        },
+        "required_obligation_execution_rate": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "minimum": 0,
+          "maximum": 100
+        },
+        "coverage_exit_criteria_met": {
+          "type": "boolean"
+        },
+        "coverage_report_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "coverage_mode": {
+          "enum": [
+            "shadow"
+          ]
+        },
+        "coverage_unknown_count": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "evidence_binding_mode": {
+          "enum": [
+            "case_revision",
+            "legacy_unverified"
+          ]
         }
       },
       "additionalProperties": false
@@ -268,6 +323,15 @@
         "additionalProperties": false
       },
       "description": "Manual cases excluded from manual execution counts because they were retired."
+    },
+    "schema_version": {
+      "const": "1.1.0"
+    },
+    "migration": {
+      "$ref": "shared_defs.schema.json#/$defs/Migration"
+    },
+    "generation": {
+      "$ref": "shared_defs.schema.json#/$defs/Generation"
     }
   },
   "additionalProperties": false

@@ -88,6 +88,8 @@ replacement automation is sufficient.
 
 retired の除外後も、自動証跡、未解決欠陥、必須観点の実施状況はそれぞれ検証する。
 
+追加契約1.1.0の `coverage_report` は設計済み・実施済み・合格を分離する。failも実施率へ計数し、unknownとblockedは別表示する。現在はshadowとしてevidence_summaryへ添え、上記profileの閾値・waiver条件・Go/No-Go判断は変えない。ケース更新時はreportを再生成する。詳細は [technique-coverage.md](technique-coverage.md) を参照。
+
 ## Stakeholder Alignment
 
 Before using gate profiles, confirm alignment with stakeholders:

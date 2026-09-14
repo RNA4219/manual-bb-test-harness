@@ -2,19 +2,22 @@
   "id": "HUB.codex.md",
   "role": "navigation",
   "title": "AI Navigation Hub",
-  "summary": "README・利用ガイド・設計・運用・品質基準・履歴の役割を整理し、Skill 実行、保守、artifact 変更、mobile、RanD 連携の読み順を示す。",
+  "summary": "README・利用ガイド・設計・運用・品質基準・履歴の役割と、Skill、保守、artifact、mobile、RanD、Local Mode、技法別被覆、要件信頼度の読み順を示す。",
   "public_api": [],
   "deps_out": [
     "BLUEPRINT.md",
     "RUNBOOK.md",
     "GUARDRAILS.md",
     "EVALUATION.md",
-    "SPEC.md"
+    "SPEC.md",
+    "skills/manual-bb-test-harness/references/technique-coverage.md",
+    "skills/manual-bb-test-harness/references/efficient-generation.md",
+    "skills/manual-bb-test-harness/references/requirements-confidence.md"
   ],
   "deps_in": [
     "README.md"
   ],
   "risks": [],
   "tests": [],
-  "last_verified": "2026-09-12"
+  "last_verified": "2026-09-14"
 }

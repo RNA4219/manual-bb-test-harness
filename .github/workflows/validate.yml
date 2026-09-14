@@ -70,12 +70,74 @@ jobs:
           cache: pip
       - run: python -m pip install -e ".[dev]"
       - name: Overall branch coverage (85%)
-        run: pytest tests/ --cov=src/bb_harness --cov=scripts --cov-branch --cov-report=xml --cov-fail-under=85 --durations=20
+        run: python tools/ci/quality_evidence.py capture --out tmp/ci-evidence
       - name: Gate branch coverage (90%)
+        run: |
+          pytest tests/test_evaluate_gate.py tests/test_gate_v2.py tests/test_gate_review_contract.py tests/test_gate_evidence_lifecycle.py tests/test_istqb_first_wave_contract.py tests/test_istqb_second_wave_contract.py --cov=bb_harness.gate_engine --cov-branch --cov-report=term-missing --cov-report=json:tmp/ci-evidence/gate-coverage.json --cov-fail-under=90
+          python tools/ci/quality_evidence.py check-coverage --input tmp/ci-evidence/gate-coverage.json --floor 90
+      - name: Preserve raw test evidence
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: ci-raw-evidence-${{ github.run_attempt }}
+          path: tmp/ci-evidence/
+          if-no-files-found: error
+          retention-days: 14
+
+  quality-evidence:
+    name: HATE and QEG evidence gate
+    needs: coverage
+    if: ${{ always() && (needs.coverage.result == 'success' || needs.coverage.result == 'failure') }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+      - name: Checkout pinned HATE
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          repository: RNA4219/harness-auto-test-evidence
+          ref: f76f1b90772bc609094ca568cd44ca161593349f
+          path: tmp/quality-tools/hate
+          persist-credentials: false
+      - name: Checkout pinned QEG
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          repository: RNA4219/quality-evidence-graph
+          ref: d957fc25907e1b678add65eb47f92853dd093d32
+          path: tmp/quality-tools/qeg
+          persist-credentials: false
+      - uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405 # v6.2.0
+        with:
+          python-version: "3.13"
+      - uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v6.4.0
+        with:
+          node-version: "24"
+      - run: python -m pip install ./tmp/quality-tools/hate
+      - name: Download this run's raw evidence
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
+        with:
+          name: ci-raw-evidence-${{ github.run_attempt }}
+          path: tmp/ci-evidence
+      - name: Normalize with HATE and convert to QEG
+        run: python tools/ci/quality_evidence.py convert --out tmp/ci-evidence
+      - name: QEG artifact verification and gate record
         run: >-
-          pytest tests/test_evaluate_gate.py tests/test_gate_v2.py
-          --cov=bb_harness.gate_engine --cov-branch
-          --cov-report=term-missing --cov-fail-under=90
+          node tmp/quality-tools/qeg/qeg-report-action/dist/cli.mjs
+          record tmp/ci-evidence/qeg > tmp/ci-evidence/qeg-record.log 2>&1
+      - name: QEG CI report
+        if: ${{ always() && hashFiles('tmp/ci-evidence/qeg/gate-input.json') != '' }}
+        run: >-
+          node tmp/quality-tools/qeg/qeg-report-action/dist/cli.mjs report
+          --json --out tmp/ci-evidence/qeg-ci-report.json --github-summary
+          tmp/ci-evidence/qeg > tmp/ci-evidence/qeg-report.log 2>&1
+      - name: Preserve HATE and QEG evidence
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: hate-qeg-evidence-${{ github.run_attempt }}
+          path: tmp/ci-evidence/
+          if-no-files-found: error
+          retention-days: 14
 
   powershell:
     name: PowerShell
@@ -107,4 +169,4 @@ jobs:
         with:
           version: "0.11.12"
       - name: Isolated wheel and sdist verification
-        run: uv run python tools/ci/package_smoke.py
+        run: uv run --extra dev python tools/ci/package_smoke.py

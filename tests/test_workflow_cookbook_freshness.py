@@ -469,7 +469,7 @@ class TestCliIntegration:
         caps_dir = workflow_dir / "caps"
         caps_dir.mkdir(parents=True)
         (tmp_path / "README.md").write_text(
-            "index.json (1 nodes, 0 edges)\n現行リリース系列: **2.0.0** / 検証済みテスト: **1件**",
+            "index.json (1 nodes, 0 edges)\n現行リリース系列: **3.0.0** / 検証済みテスト: **1件**",
             encoding="utf-8",
         )
         index = {

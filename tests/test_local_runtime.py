@@ -1,0 +1,291 @@
+"""OpenAI互換ローカルランタイムの安全性テスト。"""
+
+from __future__ import annotations
+
+import io
+import json
+import urllib.error
+from dataclasses import replace
+
+import pytest
+
+from bb_harness.local_runtime import (
+    LocalRuntimeConfig,
+    LocalRuntimeError,
+    OpenAICompatibleClient,
+    _parse_json_object,
+    resolve_config,
+)
+
+
+def test_resolve_config_precedence(monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setenv("BB_HARNESS_LOCAL_BASE_URL", "http://127.0.0.1:9000/v1")
+    monkeypatch.setenv("BB_HARNESS_LOCAL_MODEL", "env-model")
+    config = resolve_config(
+        "generic",
+        base_url="http://127.0.0.1:9100/v1",
+        model="cli-model",
+    )
+    assert config.base_url == "http://127.0.0.1:9100/v1"
+    assert config.model == "cli-model"
+
+
+def test_qwen36_profile_uses_expected_endpoint_model_and_disables_thinking(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    config = resolve_config("qwen36")
+    assert config.base_url == "http://127.0.0.1:8084/v1"
+    assert config.model == "qwen3.6-27b"
+
+    client = OpenAICompatibleClient(config)
+    captured: list[dict[str, object]] = []
+
+    def respond(_method: str, _path: str, body: dict[str, object]) -> dict[str, object]:
+        captured.append(body)
+        return {
+            "model": "qwen3.6-27b",
+            "choices": [{"message": {"content": "{}"}}],
+        }
+
+    monkeypatch.setattr(client, "_request", respond)
+    for stage in (
+        "test_model",
+        "observation_set",
+        "risk_candidates",
+        "manual_case_set",
+        "manual_case_remainder",
+        "manual_case_review",
+        "manual_case_set_repair",
+    ):
+        client.complete_json(system="system", user="user", schema_name=stage, schema={"type": "object"})
+
+    assert len(captured) == 7
+    assert all(body["model"] == "qwen3.6-27b" for body in captured)
+    assert all(
+        body["chat_template_kwargs"] == {"enable_thinking": False} for body in captured
+    )
+    # 文法制約を実装しない互換APIでも、モデルが要求するフィールドを読める。
+    from bb_harness.token_budget import estimate_input
+
+    for body in captured:
+        content = body["messages"][1]["content"]
+        assert json.loads(content.split("Required JSON Schema:\n", 1)[1]) == {"type": "object"}
+        assert estimate_input("system", "user", {"type": "object"}) >= len(
+            ("system" + content).encode("utf-8")
+        )
+
+
+def test_removed_gemma4a4b_profile_is_rejected() -> None:
+    with pytest.raises(LocalRuntimeError, match="Unknown local profile: gemma4a4b"):
+        resolve_config("gemma4a4b")
+
+
+def test_non_loopback_is_rejected_by_default() -> None:
+    with pytest.raises(LocalRuntimeError, match="Non-loopback"):
+        resolve_config("generic", base_url="http://example.test/v1")
+
+
+def test_non_loopback_requires_explicit_opt_in() -> None:
+    config = resolve_config(
+        "generic",
+        base_url="http://trusted.example.test/v1",
+        allow_non_loopback=True,
+    )
+    assert config.base_url == "http://trusted.example.test/v1"
+
+
+def _client(model: str | None = None) -> OpenAICompatibleClient:
+    return OpenAICompatibleClient(
+        LocalRuntimeConfig(
+            profile="test",
+            base_url="http://127.0.0.1:9999/v1",
+            model=model,
+            timeout_seconds=1,
+            temperature=0.1,
+            max_tokens=100,
+        )
+    )
+
+
+@pytest.mark.parametrize("timeout,expected", [("12.5", 12.5), ("invalid", None), ("0", None), ("-1", None)])
+def test_environment_timeout_is_applied_or_rejected(monkeypatch, timeout, expected):
+    monkeypatch.setenv("BB_HARNESS_LOCAL_TIMEOUT", timeout)
+    if expected is None:
+        with pytest.raises(LocalRuntimeError, match="numeric|greater than zero"):
+            resolve_config("generic")
+    else:
+        assert resolve_config("generic").timeout_seconds == expected
+
+
+@pytest.mark.parametrize("endpoint", ["file:///local", "localhost:8080/v1", "http://"])
+def test_malformed_endpoint_is_rejected(endpoint):
+    with pytest.raises(LocalRuntimeError, match="absolute http"):
+        resolve_config("generic", base_url=endpoint)
+
+
+def test_localhost_endpoint_is_supported():
+    assert resolve_config("generic", base_url="http://localhost:8080/v1").base_url == "http://localhost:8080/v1"
+
+
+def test_completion_request_serializes_utf8_and_authorization(monkeypatch):
+    client = _client("loaded")
+    client.config = replace(client.config, api_key="synthetic-test-key")
+    captured = []
+
+    def respond(request, timeout):
+        captured.append(request)
+        assert timeout == 1
+        return io.BytesIO(json.dumps({"choices": [{"message": {"content": '{"保存":true}'}}]}).encode("utf-8"))
+
+    monkeypatch.setattr("urllib.request.urlopen", respond)
+    result = client.complete_json(system="仕様", user="保存", schema_name="example", schema={"type": "object"})
+    assert result.value == {"保存": True}
+    request = captured[0]
+    assert request.get_method() == "POST"
+    assert request.get_header("Authorization") == "Bearer synthetic-test-key"
+    assert request.get_header("Content-type") == "application/json"
+    assert json.loads(request.data)["messages"][0]["content"] == "仕様"
+
+
+@pytest.mark.parametrize("raw,match", [(b"{", "invalid JSON"), (b"[]", "JSON object")])
+def test_invalid_api_response_is_not_a_success(monkeypatch, raw, match):
+    monkeypatch.setattr("urllib.request.urlopen", lambda *args, **kwargs: io.BytesIO(raw))
+    with pytest.raises(LocalRuntimeError, match=match):
+        _client("loaded")._request("GET", "/models")
+
+
+@pytest.mark.parametrize("choices", [[], None, [None], [{}]])
+def test_missing_completion_message_keeps_usage_in_failure(monkeypatch, choices):
+    client = _client("loaded")
+    monkeypatch.setattr(client, "_request", lambda *args: {"choices": choices, "usage": {"prompt_tokens": 2}})
+    with pytest.raises(LocalRuntimeError, match="no message content") as error:
+        client.complete_json(system="s", user="u", schema_name="example", schema={})
+    assert error.value.usage == {"prompt_tokens": 2}
+    assert error.value.elapsed_seconds >= 0
+
+
+@pytest.mark.parametrize("content,expected", [
+    ([None, {"text": 3}, {"text": '{"ok":'}, {"text": "true}"}], {"ok": True}),
+    ("```json\n{\"ok\":true}\n```", {"ok": True}),
+    ([None, {"text": 3}], None),
+    ("[]", None),
+])
+def test_completion_content_parts_and_json_object_contract(monkeypatch, content, expected):
+    client = _client("loaded")
+    monkeypatch.setattr(client, "_request", lambda *args: {"choices": [{"message": {"content": content}}]})
+    if expected is None:
+        with pytest.raises(LocalRuntimeError, match="not text|JSON object"):
+            client.complete_json(system="s", user="u", schema_name="example", schema={})
+    else:
+        assert client.complete_json(system="s", user="u", schema_name="example", schema={}).value == expected
+
+
+@pytest.mark.parametrize("models", [[], [{"id": "a"}, {"id": "b"}]])
+def test_model_discovery_rejects_zero_or_multiple(
+    monkeypatch: pytest.MonkeyPatch, models: list[dict[str, str]]
+) -> None:
+    client = _client()
+    monkeypatch.setattr(client, "_request", lambda *_: {"data": models})
+    with pytest.raises(LocalRuntimeError, match="candidates"):
+        client.discover_model()
+
+
+def test_model_discovery_accepts_exactly_one(monkeypatch: pytest.MonkeyPatch) -> None:
+    client = _client()
+    monkeypatch.setattr(client, "_request", lambda *_: {"data": [{"id": "only"}]})
+    assert client.discover_model() == "only"
+
+
+def test_connection_error_is_fail_closed(monkeypatch: pytest.MonkeyPatch) -> None:
+    client = _client("loaded")
+
+    def fail(*_: object, **__: object) -> None:
+        raise urllib.error.URLError("connection refused")
+
+    monkeypatch.setattr("urllib.request.urlopen", fail)
+    with pytest.raises(LocalRuntimeError, match="connection failed"):
+        client._request("GET", "/models")
+
+
+def test_timeout_is_fail_closed(monkeypatch: pytest.MonkeyPatch) -> None:
+    client = _client("loaded")
+
+    def fail(*_: object, **__: object) -> None:
+        raise TimeoutError("timed out")
+
+    monkeypatch.setattr("urllib.request.urlopen", fail)
+    with pytest.raises(LocalRuntimeError, match="connection failed"):
+        client._request("GET", "/models")
+
+
+def test_http_error_is_fail_closed(monkeypatch: pytest.MonkeyPatch) -> None:
+    client = _client("loaded")
+
+    def fail(*_: object, **__: object) -> None:
+        raise urllib.error.HTTPError(
+            "http://127.0.0.1",
+            500,
+            "failure",
+            {},
+            io.BytesIO(b'{"error":"boom"}'),
+        )
+
+    monkeypatch.setattr("urllib.request.urlopen", fail)
+    with pytest.raises(LocalRuntimeError, match="HTTP 500"):
+        client._request("GET", "/models")
+
+
+def test_invalid_json_and_empty_content_are_rejected(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    client = _client("loaded")
+    monkeypatch.setattr(
+        client,
+        "_request",
+        lambda *_args, **_kwargs: {"choices": [{"message": {"content": ""}}]},
+    )
+    with pytest.raises(LocalRuntimeError, match="does not contain"):
+        client.complete_json(system="s", user="u", schema_name="x", schema={"type": "object"})
+    with pytest.raises(LocalRuntimeError, match="invalid JSON"):
+        _parse_json_object("not-json {broken}")
+
+
+def test_stage_override_is_applied_without_recording_prompt(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    config = LocalRuntimeConfig(
+        profile="test",
+        base_url="http://127.0.0.1:9999/v1",
+        model="loaded",
+        timeout_seconds=1,
+        temperature=0.2,
+        max_tokens=100,
+        extra_body={"chat_template_kwargs": {"enable_thinking": False}},
+        stage_overrides={
+            "test_model": {
+                "temperature": 0.05,
+                "max_tokens": 321,
+                "extra_body": {"chat_template_kwargs": {"enable_thinking": True}},
+            }
+        },
+    )
+    client = OpenAICompatibleClient(config)
+    captured: dict[str, object] = {}
+
+    def respond(_method: str, _path: str, body: dict[str, object]) -> dict[str, object]:
+        captured.update(body)
+        return {
+            "model": "loaded",
+            "choices": [{"message": {"content": json.dumps({"ok": True})}}],
+        }
+
+    monkeypatch.setattr(client, "_request", respond)
+    client.complete_json(
+        system="secret-system",
+        user="secret-user",
+        schema_name="test_model",
+        schema={"type": "object"},
+    )
+    assert captured["temperature"] == 0.05
+    assert captured["max_tokens"] == 321
+    assert captured["chat_template_kwargs"] == {"enable_thinking": True}

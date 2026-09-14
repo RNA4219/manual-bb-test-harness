@@ -1,0 +1,189 @@
+{
+  "run_id": "local-20260910T012230Z-e0131c70",
+  "status": "failed",
+  "profile": "qwen36",
+  "base_url": "http://127.0.0.1:8084/v1",
+  "model": "qwen3.6-27b",
+  "config_hash": "65c2ba6c87f1895c6b4d67295728e78a407d870f2892298df08968609cbc1cba",
+  "input_sha256": "6a49d0ab3fa58896cbe2c79c909e6f7b95390573ffdc88d5e63235b213eb56a9",
+  "started_at": "2026-09-10T01:22:30.952656Z",
+  "finished_at": "2026-09-10T01:30:50.889252Z",
+  "elapsed_seconds": 499.987,
+  "stages": [
+    {
+      "name": "test_model",
+      "elapsed_seconds": 230.169,
+      "repairs": 1,
+      "schema_valid": true,
+      "usage": {
+        "completion_tokens": 4931,
+        "prompt_tokens": 2584,
+        "total_tokens": 7515
+      }
+    },
+    {
+      "name": "observation_set",
+      "elapsed_seconds": 59.163,
+      "repairs": 0,
+      "schema_valid": true,
+      "usage": {
+        "completion_tokens": 1917,
+        "prompt_tokens": 2342,
+        "total_tokens": 4259
+      }
+    },
+    {
+      "name": "risk_candidates",
+      "elapsed_seconds": 83.846,
+      "repairs": 1,
+      "schema_valid": true,
+      "usage": {
+        "completion_tokens": 2494,
+        "prompt_tokens": 4981,
+        "total_tokens": 7475
+      }
+    }
+  ],
+  "artifacts": {
+    "feature_spec": {
+      "path": "feature_spec.json",
+      "sha256": "33b78d9438fef631d80b3f763f669623d04eaa1bcbd33461b04c73dfa02097ee",
+      "schema_valid": true
+    },
+    "test_model": {
+      "path": "test_model.json",
+      "sha256": "b8226d05cde098469309962001e40385524920509a703e85f2eb7df2c0a27906",
+      "schema_valid": true
+    },
+    "observation_set": {
+      "path": "observation_set.json",
+      "sha256": "91590581c6680026b7ef6f722e4d5be90563a1ca287aaf43007c2e8bac6e4edf",
+      "schema_valid": true
+    },
+    "risk_register": {
+      "path": "risk_register.json",
+      "sha256": "626d3eab75354c823175819accaedcaef5ecd501bbb6ee0f019196b9e80cb3bb",
+      "schema_valid": true
+    },
+    "technique_plan": {
+      "path": "technique_plan.json",
+      "sha256": "9b745fee128a3ff03a60107fd64e418108cc126ed0ef645d2c15100c11dcb76a",
+      "schema_valid": true
+    }
+  },
+  "generation_mode": "full",
+  "call_records": [
+    {
+      "stage": "test_model",
+      "repair": false,
+      "estimated_input_tokens": 24224,
+      "max_output_tokens": 3500,
+      "outcome": "invalid_artifact",
+      "elapsed_seconds": 155.695,
+      "prompt_tokens": 836,
+      "completion_tokens": 2453,
+      "total_tokens": 3289,
+      "usage_status": "reported",
+      "accounted_tokens": 3289
+    },
+    {
+      "stage": "test_model_repair",
+      "repair": true,
+      "estimated_input_tokens": 27216,
+      "max_output_tokens": 3500,
+      "outcome": "succeeded",
+      "elapsed_seconds": 74.474,
+      "prompt_tokens": 1748,
+      "completion_tokens": 2478,
+      "total_tokens": 4226,
+      "usage_status": "reported",
+      "accounted_tokens": 4226
+    },
+    {
+      "stage": "observation_set",
+      "repair": false,
+      "estimated_input_tokens": 16290,
+      "max_output_tokens": 4500,
+      "outcome": "succeeded",
+      "elapsed_seconds": 59.163,
+      "prompt_tokens": 2342,
+      "completion_tokens": 1917,
+      "total_tokens": 4259,
+      "usage_status": "reported",
+      "accounted_tokens": 4259
+    },
+    {
+      "stage": "risk_candidates",
+      "repair": false,
+      "estimated_input_tokens": 16087,
+      "max_output_tokens": 3000,
+      "outcome": "invalid_artifact",
+      "elapsed_seconds": 40.914,
+      "prompt_tokens": 3831,
+      "completion_tokens": 1251,
+      "total_tokens": 5082,
+      "usage_status": "reported",
+      "accounted_tokens": 5082
+    },
+    {
+      "stage": "risk_candidates_repair",
+      "repair": true,
+      "estimated_input_tokens": 5972,
+      "max_output_tokens": 3000,
+      "outcome": "succeeded",
+      "elapsed_seconds": 42.932,
+      "prompt_tokens": 1150,
+      "completion_tokens": 1243,
+      "total_tokens": 2393,
+      "usage_status": "reported",
+      "accounted_tokens": 2393
+    },
+    {
+      "stage": "manual_case_set",
+      "repair": false,
+      "estimated_input_tokens": 33485,
+      "max_output_tokens": 4000,
+      "outcome": "runtime_error",
+      "elapsed_seconds": 126.663,
+      "prompt_tokens": 5430,
+      "completion_tokens": 4000,
+      "total_tokens": 9430,
+      "usage_status": "reported",
+      "accounted_tokens": 9430
+    }
+  ],
+  "usage_summary": {
+    "calls": 6,
+    "repair_calls": 2,
+    "unreported_calls": 0,
+    "prompt_tokens": 15337,
+    "completion_tokens": 13342,
+    "total_tokens": 28679,
+    "reported_total_tokens": 28679,
+    "accounted_tokens": 28679,
+    "budget_tokens": null,
+    "remaining_tokens": null,
+    "budget_exhausted": false,
+    "estimation_method": "utf8_bytes_plus_256_v1"
+  },
+  "stop_reason": "generation_error",
+  "error": "LocalRuntimeError: model output is invalid JSON: Expecting ',' delimiter: line 365 column 8 (char 9857)",
+  "generation": {
+    "generation_run_id": "local-20260910T012230Z-e0131c70",
+    "prompt_template_id": "local-design",
+    "prompt_template_version": "coverage-1",
+    "input_sha256": "6a49d0ab3fa58896cbe2c79c909e6f7b95390573ffdc88d5e63235b213eb56a9",
+    "output_schema_id": "local_run_manifest.schema.json",
+    "model": {
+      "provider": "openai-compatible",
+      "name": "qwen3.6-27b",
+      "version": null
+    },
+    "parameters": {
+      "temperature": 0.15,
+      "seed": null
+    },
+    "generated_at": "2026-09-10T01:22:30.952656Z",
+    "review_status": "pending"
+  }
+}

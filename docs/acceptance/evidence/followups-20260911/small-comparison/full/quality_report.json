@@ -1,0 +1,15 @@
+{
+  "kind": "structural_preflight_not_independent_rubric_score",
+  "score": 100,
+  "categories": {
+    "coverage_model": 20,
+    "observation_quality": 15,
+    "risk_quality": 15,
+    "manual_cases": 20,
+    "exploratory_charters": 10,
+    "gate_decision": 15,
+    "communication": 5
+  },
+  "automatic_fails": [],
+  "source_feature_id": "MINIMAL-CANCEL"
+}

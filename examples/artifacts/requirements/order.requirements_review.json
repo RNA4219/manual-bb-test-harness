@@ -1,0 +1,47 @@
+{
+  "schema_version": "1.0.0",
+  "feature_id": "ORD-CANCEL-01",
+  "input_sha256": "a630ec2c0b9b2ec268cda4d60e06a92efc9453b6108c025092251c66ab751588",
+  "reviewer": null,
+  "reviewed_at": null,
+  "requirements": [
+    {
+      "requirement_id": "REQ-2d8dcb856092f076",
+      "reviewed": false,
+      "oracle": "",
+      "source_refs": []
+    },
+    {
+      "requirement_id": "REQ-7c1a82ac5c30cb4c",
+      "reviewed": false,
+      "oracle": "",
+      "source_refs": []
+    },
+    {
+      "requirement_id": "REQ-860549f4cb057dc3",
+      "reviewed": false,
+      "oracle": "",
+      "source_refs": []
+    },
+    {
+      "requirement_id": "REQ-93111f47844acdba",
+      "reviewed": false,
+      "oracle": "",
+      "source_refs": []
+    },
+    {
+      "requirement_id": "REQ-d1df98333ebbeca0",
+      "reviewed": false,
+      "oracle": "",
+      "source_refs": []
+    },
+    {
+      "requirement_id": "REQ-fb9c9ae292f2a164",
+      "reviewed": false,
+      "oracle": "",
+      "source_refs": []
+    }
+  ],
+  "findings": [],
+  "resolutions": []
+}

@@ -32,11 +32,15 @@ Use these artifacts in order.
 |---|---|---|
 | `phase_contract` | 企画、モック、要件メモを Definition of Ready と Phase 1 契約へ正規化する | `normalize_ready_intake` |
 | `feature_spec` | 仕様、AC、業務ルール、変更点、環境、前提を正規化する | `normalize_intake` |
+| `requirements_review` | 入力版に対する要件レビュー・追加finding・解決根拠を記録する | 実際の要件レビュー |
+| `requirements_confidence` | 要確認の重大度・密度・レビュー率から信頼度と次アクションを計算する | `evaluate requirements` |
 | `test_model` | flow/state/rule/data/role/regression の coverage item を表す | `model_test_surface` |
 | `observation_set` | 根拠付き観点を表す | `derive_observations` |
 | `risk_register` | 各観点やシナリオのリスクと優先度を表す | `assess_risk` |
+| `technique_plan` | 型付きモデルに対する技法選択・被覆義務・計算不能理由を固定する | `build_technique_plan` |
 | `manual_case_set` | 実行可能な手動ケースと探索チャーターを表す | `synthesize_manual_cases` |
 | `test_plan` | 目的、テストレベル、開始・停止・再開条件、準備状況、見積根拠を表す | `plan_test` |
+| `coverage_report` | モデルとケース入力・証跡から設計／実施／合格を独立集計する | `build_coverage_report` |
 | `effort_plan` | 実行順、担当、工数、buffer を表す | `estimate_effort` |
 | `gate_decision` | go/conditional_go/no_go と理由を表す | `evaluate_gates` |
 | `release_brief` | ステークホルダー向け判断材料を表す | `assemble_release_brief` |
@@ -46,6 +50,8 @@ Use these artifacts in order.
 | `waiver_set` | リスク受容の承認者、承認時刻、判断記録、期限、封じ込めを表す | リリース判断の取り込み |
 
 ## Shared Fields
+
+追加契約1.1.0は既存artifactへoptionalな技法参照・型付きモデル・被覆入力・生成来歴を加える。package版やGate 2.0の必須条件とは独立する。具体的なフィールド、制約、非破壊移行は [technique-coverage.md](technique-coverage.md) を参照。
 
 Prefer these fields across artifacts.
 
@@ -383,3 +389,11 @@ IDのない旧stubも未解決のまま保持する。タイトル一致で台�
 既存のカバレッジだけのartifactへ成功結果を推測で補わない。実際のCI結果と出典を追加する。`examples/`のsuiteは説明用データであり、利用者のプロジェクトで実行した証跡ではない。
 
 [複合シナリオ](../../../examples/evidence-lifecycle/)は、Android再実行pass、iOS未実行、修正確認待ち欠陥、suite失敗を同時に保持する例。
+
+## 生成効率・証跡版（2026-09-10）
+
+追加契約は[efficient-generation.md](efficient-generation.md)を参照する。`case_review_patch`はID指定の変更だけを返し、空配列を許す。`manual_case_set`の`evidence_binding`と各caseの`case_revision`を実行前に固定し、`execution_evidence`へ実行対象の`model_hash / case_revision`を保存する。旧実行結果へ新しい版を遡及付与しない。manifestの`usage_summary / call_records`は修復・失敗・未報告を含む。
+
+## 分割生成・完了判定（2026-09-10）
+
+local_run_manifestにはdesign_statusとcomparison_config_hash、call_recordsにはfinish_reasonと応答model名を追加。batchedの分割結果はcheckpointsへ保存する。schema_validは成果物全体の完了や意味的品質を意味しない。[詳細](efficient-generation.md)。

@@ -3,13 +3,90 @@
 from __future__ import annotations
 
 import argparse
+import ast
 import os
+import re
 import subprocess
 import sys
+import tarfile
 import tempfile
-from pathlib import Path
+import zipfile
+from pathlib import Path, PurePosixPath
+
+from trove_classifiers import classifiers
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
+LICENSE_DOCUMENTS = {
+    "LICENSE",
+    "LICENSE.ja.md",
+    "NOTICE",
+    "LICENSING.md",
+    "COMMERCIAL-LICENSE.md",
+    "THIRD_PARTY_NOTICES.md",
+}
+
+
+def verify_classifiers(values: list[str]) -> None:
+    """PyPIが受け入れる公開用classifierだけを許可する。"""
+    invalid = [
+        value for value in values if value not in classifiers or value.startswith("Private ::")
+    ]
+    if invalid:
+        raise ValueError(f"PyPIで利用できないclassifier: {invalid}")
+
+
+def verify_release_metadata(repo_root: Path) -> str:
+    """Reject unresolved contact placeholders and version drift before building."""
+    commercial = (repo_root / "COMMERCIAL-LICENSE.md").read_text(encoding="utf-8")
+    if "[COMMERCIAL_CONTACT]" in commercial:
+        raise RuntimeError("COMMERCIAL-LICENSE.md still contains [COMMERCIAL_CONTACT]")
+    if "https://licensing.rna4219.com/" not in commercial:
+        raise RuntimeError("COMMERCIAL-LICENSE.md is missing the official application portal")
+
+    sources = {
+        "pyproject.toml": (
+            (repo_root / "pyproject.toml").read_text(encoding="utf-8"),
+            r'^version\s*=\s*"([^"]+)"$',
+        ),
+        "README.md": (
+            (repo_root / "README.md").read_text(encoding="utf-8"),
+            r"現行リリース系列:\s*\*\*([^*]+)\*\*",
+        ),
+        "src/bb_harness/__init__.py": (
+            (repo_root / "src" / "bb_harness" / "__init__.py").read_text(encoding="utf-8"),
+            r'^__version__\s*=\s*"([^"]+)"$',
+        ),
+    }
+    versions: dict[str, str] = {}
+    for label, (content, pattern) in sources.items():
+        match = re.search(pattern, content, re.MULTILINE)
+        if match is None:
+            raise RuntimeError(f"{label} is missing its release version")
+        versions[label] = match.group(1)
+    expected = versions["pyproject.toml"]
+    mismatches = {label: value for label, value in versions.items() if value != expected}
+    if mismatches:
+        raise RuntimeError(f"release version mismatch: expected {expected}, got {mismatches}")
+    classifier_block = re.search(
+        r"^classifiers\s*=\s*(\[.*?^\])", sources["pyproject.toml"][0], re.MULTILINE | re.DOTALL
+    )
+    if classifier_block is None:
+        raise ValueError("pyproject.tomlのclassifier一覧が見つかりません")
+    verify_classifiers(ast.literal_eval(classifier_block[1]))
+    return expected
+
+
+def verify_license_documents(artifact: Path) -> None:
+    if artifact.suffix == ".whl":
+        with zipfile.ZipFile(artifact) as archive:
+            names = archive.namelist()
+    else:
+        with tarfile.open(artifact, "r:gz") as archive:
+            names = archive.getnames()
+    basenames = {PurePosixPath(name).name for name in names}
+    missing = sorted(LICENSE_DOCUMENTS - basenames)
+    if missing:
+        raise RuntimeError(f"{artifact.name} is missing license documents: {missing}")
 
 
 def run(command: list[str], cwd: Path) -> None:
@@ -152,6 +229,50 @@ def smoke_artifact(artifact: Path, root: Path) -> None:
             ],
         ]
     )
+    coverage_example = examples / "techniques" / "discount-domain"
+    commands.append(
+        [
+            cli, "evaluate", "requirements", "--input",
+            str(examples / "order-cancel.feature_spec.json"),
+            "--phase-contract", str(examples / "order-cancel.phase_contract.json"),
+            "--output", str(work / "requirements-confidence"),
+        ]
+    )
+    commands.append(
+        [
+            cli,
+            "coverage",
+            "--feature",
+            str(coverage_example / "discount.feature_spec.json"),
+            "--test-model",
+            str(coverage_example / "discount.test_model.json"),
+            "--observations",
+            str(coverage_example / "discount.observation_set.json"),
+            "--risk",
+            str(coverage_example / "discount.risk_register.json"),
+            "--cases",
+            str(coverage_example / "discount.manual_case_set.json"),
+            "--evidence",
+            str(REPO_ROOT / "examples/coverage-evidence/discount-domain"),
+            "--build-id",
+            "demo-1",
+            "--output",
+            str(work / "coverage"),
+        ]
+    )
+    commands.append(
+        [
+            cli,
+            "migrate",
+            "--input",
+            str(examples / "order-cancel.manual_case_set.json"),
+            "--output",
+            str(work / "migrated-cases.json"),
+            "--type",
+            "manual_case_set",
+        ]
+    )
+
     commands.extend(
         [
             [
@@ -173,6 +294,31 @@ def smoke_artifact(artifact: Path, root: Path) -> None:
                 str(REPO_ROOT / "examples/rand-integration/requirements_diff.json"),
                 "--output",
                 str(work / "rand-document"),
+
+            ],
+            [
+                cli,                "bind-cases",
+                "--input",
+                str(examples / "order-cancel.manual_case_set.json"),
+                "--test-model",
+                str(examples / "order-cancel.test_model.json"),
+                "--output",
+                str(work / "bound-cases.json"),
+            ],
+            [
+                cli,
+                "run",
+                "local-design",
+                "--input",
+                str(REPO_ROOT / "goldens/order-cancel.input.md"),
+                "--output",
+                str(work / "estimate-unused"),
+                "--estimate-only",
+                "--generation-mode",
+                "batched",
+                "--token-budget",
+                "1",
+
             ],
         ]
     )
@@ -184,6 +330,7 @@ def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--keep", action="store_true", help="Keep temporary output")
     args = parser.parse_args()
+    verify_release_metadata(REPO_ROOT)
     if args.keep:
         root = Path(tempfile.mkdtemp(prefix="bb-harness-package-smoke-"))
         cleanup = None
@@ -195,6 +342,7 @@ def main() -> int:
         run(["uv", "build", "--wheel", "--sdist", "--out-dir", str(dist)], REPO_ROOT)
         artifacts = [next(dist.glob("*.whl")), next(dist.glob("*.tar.gz"))]
         for artifact in artifacts:
+            verify_license_documents(artifact)
             smoke_artifact(artifact, root)
         names = ", ".join(item.name for item in artifacts)
         print(f"Package smoke passed: {names}")

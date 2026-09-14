@@ -2,16 +2,18 @@
   "id": "SPEC.md",
   "role": "specification",
   "title": "Specification",
-  "summary": "実装済み改修の記録。2026-09-12に構成別実績、欠陥ID付き台帳と解決確認、必須suite成否の追加契約を記載。詳細をartifact契約と検収記録へ委ね、旧機能表と検証結果は各改修時点の履歴として保持する。",
+  "summary": "実装済み改修の記録。2026-09-12に構成別実績、欠陥ID付き台帳と解決確認、必須suite成否の追加契約を記載。詳細をartifact契約と検収記録へ委ね、旧機能表と検証結果は各改修時点の履歴として保持する。 4.1.1の改修仕様と機能・検証履歴。日本語名・BOM・証跡0件の入力不具合、CIの純分岐率判定、互換修正のパッチ公開へ案内する。既存artifact契約・policyと過去の生成改善・PyPI公開後検証・実案件分析準備の履歴を保持する。",
   "public_api": [],
   "deps_out": [
     "CHANGELOG.md",
-    "docs/specs/"
+    "docs/specs/",
+    "skills/manual-bb-test-harness/references/efficient-generation.md",
+    "skills/manual-bb-test-harness/references/requirements-confidence.md"
   ],
   "deps_in": [
     "HUB.codex.md"
   ],
   "risks": [],
   "tests": [],
-  "last_verified": "2026-09-12"
+  "last_verified": "2026-09-14"
 }

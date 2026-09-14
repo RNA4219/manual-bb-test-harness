@@ -2,15 +2,18 @@
   "id": "README.md",
   "role": "overview",
   "title": "Project Overview",
-  "summary": "プロジェクトの概要、セットアップ、Skill の依頼例、Gate の最小実行例、目的別の文書案内。変更履歴・運用詳細は正本文書へ案内し、AI 向けナビゲーションは折りたたみにまとめる。",
+  "summary": "プロジェクトの概要、CLI の導入、Skill と Local Mode の実行例、Gate の最小実行例、目的別の文書案内。変更履歴は CHANGELOG、詳細手順は利用ガイドと RUNBOOK にまとめ、AI 向けの読み順は折りたたみで案内する。",
   "public_api": [],
   "deps_out": [
     "HUB.codex.md",
     "docs/human-readme.md",
-    "skills/manual-bb-test-harness/SKILL.md"
+    "skills/manual-bb-test-harness/SKILL.md",
+    "skills/manual-bb-test-harness/references/technique-coverage.md",
+    "skills/manual-bb-test-harness/references/efficient-generation.md",
+    "skills/manual-bb-test-harness/references/requirements-confidence.md"
   ],
   "deps_in": [],
   "risks": [],
   "tests": [],
-  "last_verified": "2026-09-12"
+  "last_verified": "2026-09-14"
 }

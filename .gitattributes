@@ -1,0 +1,2 @@
+# 実測証跡はmanifestのSHA-256を保つため改行変換しない。
+docs/acceptance/evidence/followups-20260911/** -text whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol

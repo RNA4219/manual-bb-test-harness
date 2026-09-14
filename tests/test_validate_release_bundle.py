@@ -95,6 +95,41 @@ class TestReleaseBundleValidator:
 
         assert result is True
 
+    def test_validate_release_metadata(self) -> None:
+        """Commercial contact and all release versions are consistent."""
+        module = load_validate_release_bundle_module()
+
+        validator = module.ReleaseBundleValidator(REPO_ROOT)
+        result = validator.validate_release_metadata()
+
+        assert result is True
+        assert len(validator.errors) == 0
+
+    def test_validate_release_metadata_rejects_placeholder_and_version_drift(
+        self, tmp_path: Path
+    ) -> None:
+        """Release metadata validation rejects unresolved and inconsistent values."""
+        module = load_validate_release_bundle_module()
+        (tmp_path / "src" / "bb_harness").mkdir(parents=True)
+        (tmp_path / "COMMERCIAL-LICENSE.md").write_text(
+            "Contact: [COMMERCIAL_CONTACT]\n", encoding="utf-8"
+        )
+        (tmp_path / "pyproject.toml").write_text('version = "3.0.0"\n', encoding="utf-8")
+        (tmp_path / "README.md").write_text(
+            "現行リリース系列: **9.9.9**\n", encoding="utf-8"
+        )
+        (tmp_path / "src" / "bb_harness" / "__init__.py").write_text(
+            '__version__ = "3.0.0"\n', encoding="utf-8"
+        )
+
+        validator = module.ReleaseBundleValidator(tmp_path)
+        result = validator.validate_release_metadata()
+
+        assert result is False
+        assert any("[COMMERCIAL_CONTACT]" in error for error in validator.errors)
+        assert any("official application portal" in error for error in validator.errors)
+        assert any("README.md version mismatch" in error for error in validator.errors)
+
     def test_run_validation(self) -> None:
         """Full validation run passes."""
         module = load_validate_release_bundle_module()
@@ -108,6 +143,19 @@ class TestReleaseBundleValidator:
 
 class TestCreateDryRunBundle:
     """Tests for dry-run bundle creation."""
+
+    def test_coverage_example_paths_and_evidence_remain_distinct(self, tmp_path: Path) -> None:
+        """異なるfeatureの同名証跡を配布時に混在・上書きさせない。"""
+        import zipfile
+
+        module = load_validate_release_bundle_module()
+        bundle = module.ReleaseBundleValidator(REPO_ROOT).create_dry_run_bundle(tmp_path)
+        with zipfile.ZipFile(bundle) as archive:
+            names = archive.namelist()
+            assert len(names) == len(set(names))
+            assert "examples/artifacts/execution_evidence/TC-001.json" in names
+            assert "examples/coverage-evidence/discount-domain/TC-001.execution_evidence.json" in names
+            assert "examples/artifacts/techniques/discount-domain/discount.technique_plan.json" in names
 
     def test_create_bundle(self, tmp_path: Path) -> None:
         """Create dry-run bundle."""
@@ -145,6 +193,25 @@ class TestCreateDryRunBundle:
         with zipfile.ZipFile(bundle_path, "r") as zf:
             names = zf.namelist()
             assert any(".schema.json" in name for name in names)
+
+    def test_bundle_contains_license_documents(self, tmp_path: Path) -> None:
+        """Bundle contains all required license documents."""
+        import zipfile
+
+        module = load_validate_release_bundle_module()
+        validator = module.ReleaseBundleValidator(REPO_ROOT)
+        bundle_path = validator.create_dry_run_bundle(tmp_path)
+
+        required = {
+            "LICENSE",
+            "LICENSE.ja.md",
+            "NOTICE",
+            "LICENSING.md",
+            "COMMERCIAL-LICENSE.md",
+            "THIRD_PARTY_NOTICES.md",
+        }
+        with zipfile.ZipFile(bundle_path, "r") as zf:
+            assert required <= set(zf.namelist())
 
 
 class TestValidateReleaseBundleMain:

@@ -7,7 +7,7 @@ manual-bb-test-harness 追加レビュー（2026-09-12・第2回）
 - R1・R2・R18: 構成別実績、欠陥ID付き台帳と確認証跡、必須suiteの成否を追加して修正した。先行したNaN/Infinity拒否と合わせてR18を対応済みとする。[実行証跡の検収記録](acceptance/AC-20260912-evidence-lifecycle.md)を参照。
 - R14・R15・R17・R19・R21〜R23と第1回レビューR3〜R10もテスト先行で修正した。元ケースIDの往復、Xrayの最終期待結果、black-box受入境界、承認付きwaiver、単一トリガーnegative、golden整合、Ready契約、coverage母集団、3値境界値、testware identity、P0非該当、経験ベース技法、multi-run、test plan、品質特性feedbackを契約化した。
 - R1〜R23はすべて対応済み。外部連携では元ケース／feature IDに加え、case・spec・oracleの版、case内容hash、oracle参照まで往復させ、実行statusに依存しないhashを採用した。Lunaが反例テストと最終レビューを監督し、DGXの独立チェックリストでID、境界値、black/white、waiver、状態矛盾を再確認した。
-- 最終確認は全pytest 1002件、coverage 88.22%（基準85%）、Ruff、strict artifact 31件、root/package schema 21組、実Gate CLIと生成Gateのstrict検証がすべて成功した。実Gateの結果は、承認済みwaiverを保持する例どおりconditional_go。
+- 最新 main 統合前の確認は全pytest 1002件、行・分岐を合わせた coverage 88.22%（当時の基準85%、純分岐率ではない）、Ruff、strict artifact 31件、root/package schema 21組、実Gate CLIと生成Gateのstrict検証がすべて成功した。実Gateの結果は、承認済みwaiverを保持する例どおりconditional_go。
 
 以下は改修前の調査記録。記載の行番号と再現結果は調査時点のもの。
 

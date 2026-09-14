@@ -1,0 +1,257 @@
+{
+  "type": "object",
+  "properties": {
+    "schema_version": {
+      "const": "1.1.0"
+    },
+    "id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "feature_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "build_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "model_hash": {
+      "type": "string",
+      "minLength": 1
+    },
+    "case_hash": {
+      "type": "string",
+      "minLength": 1
+    },
+    "plan_hash": {
+      "type": "string",
+      "minLength": 1
+    },
+    "mode": {
+      "enum": [
+        "shadow"
+      ]
+    },
+    "design": {
+      "type": "object",
+      "properties": {
+        "required_feasible": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "covered_by_cases": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "rate": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "minimum": 0,
+          "maximum": 100
+        },
+        "uncovered_ids": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "minItems": 0
+        }
+      },
+      "required": [
+        "required_feasible",
+        "covered_by_cases",
+        "rate",
+        "uncovered_ids"
+      ],
+      "additionalProperties": false
+    },
+    "execution": {
+      "type": "object",
+      "properties": {
+        "required_feasible": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "executed": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "passed": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "rate": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "minimum": 0,
+          "maximum": 100
+        },
+        "unexecuted_ids": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "minItems": 0
+        }
+      },
+      "required": [
+        "required_feasible",
+        "executed",
+        "passed",
+        "rate",
+        "unexecuted_ids"
+      ],
+      "additionalProperties": false
+    },
+    "results": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "design": {
+            "enum": [
+              "covered",
+              "uncovered",
+              "infeasible",
+              "unknown"
+            ]
+          },
+          "case_ids": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1
+            },
+            "minItems": 0
+          },
+          "executed": {
+            "type": "boolean"
+          },
+          "passed": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "id",
+          "design",
+          "case_ids",
+          "executed",
+          "passed"
+        ],
+        "additionalProperties": false
+      },
+      "minItems": 0
+    },
+    "unknown_ids": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      },
+      "minItems": 0
+    },
+    "infeasible_ids": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      },
+      "minItems": 0
+    },
+    "errors": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      },
+      "minItems": 0
+    },
+    "exit_criteria": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "model_ref": {
+            "type": "string",
+            "minLength": 1
+          },
+          "metric_kind": {
+            "enum": [
+              "budget",
+              "joint_trials"
+            ]
+          },
+          "required": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "actual": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "status": {
+            "enum": [
+              "met",
+              "unmet"
+            ]
+          }
+        },
+        "required": [
+          "model_ref",
+          "metric_kind",
+          "required",
+          "actual",
+          "status"
+        ],
+        "additionalProperties": false
+      },
+      "minItems": 0
+    },
+    "blocked_selections": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      },
+      "minItems": 0
+    },
+    "evidence_binding_mode": {
+      "enum": [
+        "case_revision",
+        "legacy_unverified"
+      ]
+    }
+  },
+  "required": [
+    "id",
+    "feature_id",
+    "build_id",
+    "model_hash",
+    "case_hash",
+    "plan_hash",
+    "mode",
+    "design",
+    "execution",
+    "results",
+    "unknown_ids",
+    "infeasible_ids",
+    "errors",
+    "exit_criteria",
+    "blocked_selections"
+  ],
+  "additionalProperties": false,
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/RNA4219/manual-bb-test-harness/schemas/coverage_report.schema.json",
+  "title": "coverage_report"
+}

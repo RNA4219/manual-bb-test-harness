@@ -1,7 +1,7 @@
 ---
 intent_id: INT-MBB-001
 owner: manual-bb-test-harness
-release_version: 2.0.0
+release_version: 4.1.1
 next_review_due: 2026-10-11
 status: active
 last_reviewed_at: 2026-05-16
@@ -14,12 +14,23 @@ last_reviewed_at: 2026-05-16
 ## Environments
 
 - Local: repo 内で Skill / schema / script を編集して検証する
-- CI: `.github/workflows/validate.yml` で repo 構造と Skill を検証する
+- CI: `.github/workflows/validate.yml` で repo 構造と Skill を検証する。`HATE and QEG evidence gate`では、同一run/attemptの実pytest結果から証跡を検証する。`ci-raw-evidence-*`と`hate-qeg-evidence-*`を失敗時も14日間保存する。QEGのgoはCI範囲だけに適用する。[仕様・ローカル実行手順](docs/specs/spec-08-hate-qeg-ci.md)を参照。
 - Consumer: Codex Skill として利用し、Markdown または JSON artifact を生成する
+- PyPI: `publish-pypi.yml`をmainから手動起動する。GitHub Releaseの既存配布物を検証して公開する。[公開仕様・初回設定](docs/release-policy.md#pypi公開仕様)を参照。
+
+公開後は同workflowの`verify-publication`が配布物hashと新規PyPIインストールを確認する。
+失敗時に公開を再送せず、[読取り専用の再検証手順](docs/release-policy.md#pypi公開仕様)を使う。
 
 ## Execute
 
+### 要件定義の信頼度を評価する
+
+`bb-harness evaluate requirements --input spec.md --output tmp/requirements-first`で、LLMを呼ばずに要確認・重大度・レビュー率を採点する。出力のレビュー雛形へ実際の確認結果を記入し、`--review reviewed.json`と新しい出力先で再評価する。`--fail-under 85`で閾値未達を終了コード2にできる。[契約・入力形式・採点式](skills/manual-bb-test-harness/references/requirements-confidence.md)を参照。
+
 ### 1. Skill 出力を確認する
+
+実案件で信頼度policyを調整する場合は[実績収集・分析手順](docs/requirements-calibration.md)を使う。
+未観測・データ不足・模擬データを校正済みとせず、実案件のsnapshotを公開repoへ入れない。
 
 ```powershell
 Get-Content .\skills\manual-bb-test-harness\SKILL.md
@@ -115,6 +126,29 @@ uv run bb-harness import rand --input path/to/requirements_packet.json --feature
 
 正常保存は終了コード 0、入力・保存失敗は 1、公開後の lock 解放警告は参照を保持して 2 を返します。
 
+### 8. ローカルモデルで設計する
+
+llama.cppまたはLM StudioでOpenAI互換serverを起動し、先にmodel一覧を確認する。
+
+```powershell
+Invoke-RestMethod http://127.0.0.1:8084/v1/models
+
+uv run bb-harness run local-design `
+  --input .\goldens\order-cancel.input.md `
+  --output .\tmp\order-cancel-local `
+  --profile qwen36
+```
+
+任意serverでは `generic --base-url http://127.0.0.1:1234/v1 --model MODEL_ID` を使う。設定優先順位、環境変数、成果物は `docs/local-model-guide.md` を参照する。
+
+失敗時は次の順に確認する。
+
+1. `/v1/models` に対象modelが1件または明示IDで存在する。
+2. `run_manifest.json` の `status`、stage、repair回数を確認する。
+3. `lint_report.json` のautomatic fail相当項目を確認する。
+4. schema repair後も失敗した場合はpromptを広げず、該当stageの入力projectionを確認する。
+5. 証跡なしの `no_go` は正常動作であり、生成失敗ではない。
+
 ## Confirm
 
 - `README.md`、`HUB.codex.md`、`BLUEPRINT.md`、`RUNBOOK.md`、`GUARDRAILS.md`、`EVALUATION.md` の役割が重複しすぎていない。
@@ -122,6 +156,7 @@ uv run bb-harness import rand --input path/to/requirements_packet.json --feature
 - Skill の振る舞い変更が schema / example / golden / rubric に追随している。
 - mobile 対象では `mobile_contexts` と `platform_matrix` が artifact と docs に反映されている。
 - `uv run pytest` と Skill validator が通る。
+- local runではraw prompt / secretがmanifestに残らず、10分以内に完了する。
 
 ## Rollback / Retry
 
@@ -402,3 +437,11 @@ uv run python scripts/validate-release-bundle.py --dry-run --package-smoke
 ```
 
 Actionは完全なcommit SHAへ固定し、Dependabotで更新します。version tagだけへのpinへ戻してはいけません。
+
+## 生成効率・証跡版（2026-09-10）
+
+生成前は `run local-design --estimate-only`、予算指定は `--token-budget`、従来モードの比較は `--generation-mode full` を使う。失敗・予算停止時は `run_manifest.json` の `stop_reason / usage_summary / call_records` を確認する。実行前にケースの版を控え、実行証跡へ `case_revision / model_hash` を保存する。旧版の証跡を後から現在の版で補わない。[運用契約](skills/manual-bb-test-harness/references/efficient-generation.md)と[追加仕様](docs/specs/spec-05-efficient-generation-evidence-revisions.md)を参照。
+
+## 分割生成・完了判定（2026-09-10）
+
+`--generation-mode batched`では完全JSON単位で分割し、checkpointを保存する。出力先は未存在のディレクトリとする。終了コード1は生成停止、2は設計に不足／エラー、0は構造と必須設計被覆の成立。途中JSONを連結せず、失敗理由とusageをmanifestで確認する。[詳細契約](skills/manual-bb-test-harness/references/efficient-generation.md)。

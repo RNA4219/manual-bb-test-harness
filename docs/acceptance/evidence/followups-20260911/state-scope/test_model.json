@@ -1,0 +1,266 @@
+{
+  "feature_id": "MINIMAL-CANCEL",
+  "flows": [
+    "buyer cancellation"
+  ],
+  "data_partitions": [
+    "order_state: pending",
+    "order_state: shipped",
+    "order_state: cancelled"
+  ],
+  "boundaries": [
+    "state_transition: pending -> cancelled (valid)",
+    "state_transition: shipped -> cancelled (invalid)",
+    "state_transition: cancelled -> cancelled (invalid/no-op)"
+  ],
+  "rule_columns": [
+    "order_state x cancel_action"
+  ],
+  "states": [
+    "pending",
+    "shipped",
+    "cancelled"
+  ],
+  "valid_transitions": [
+    "pending -> cancelled"
+  ],
+  "invalid_transitions": [
+    "shipped -> cancelled",
+    "cancelled -> cancelled"
+  ],
+  "role_matrix": [
+    "buyer x cancel x own_order x pending",
+    "buyer x cancel x own_order x shipped",
+    "buyer x cancel x own_order x cancelled"
+  ],
+  "regression_edges": [
+    "inventory: stock_return_on_cancel"
+  ],
+  "quality_lenses": [
+    "consistency",
+    "idempotency"
+  ],
+  "parameters": [
+    {
+      "id": "order_state",
+      "name": "Order State",
+      "type": "enum",
+      "values": [
+        "pending",
+        "shipped",
+        "cancelled"
+      ],
+      "source_refs": [
+        {
+          "id": "AC-1",
+          "kind": "ac",
+          "excerpt": "pending状態の注文は取消後にcancelledと表示される。"
+        },
+        {
+          "id": "AC-2",
+          "kind": "ac",
+          "excerpt": "shipped状態の注文は取消不可と表示され、状態はshippedのまま維持される。"
+        },
+        {
+          "id": "AC-3",
+          "kind": "ac",
+          "excerpt": "cancelled状態の注文を再度取り消しても状態は変わらない。"
+        }
+      ]
+    }
+  ],
+  "state_models": [
+    {
+      "id": "MINIMAL-CANCEL-order-state",
+      "source_refs": [
+        {
+          "id": "AC-1",
+          "kind": "ac",
+          "excerpt": "pending状態の注文は取消後にcancelledと表示される。"
+        },
+        {
+          "id": "AC-2",
+          "kind": "ac",
+          "excerpt": "shipped状態の注文は取消不可と表示され、状態はshippedのまま維持される。"
+        },
+        {
+          "id": "AC-3",
+          "kind": "ac",
+          "excerpt": "cancelled状態の注文を再度取り消しても状態は変わらない。"
+        },
+        {
+          "id": "BR-1",
+          "kind": "rule",
+          "excerpt": "pendingからcancelledへの取消成功時だけ在庫を注文数量分戻す。再取消で在庫を追加しない。"
+        }
+      ],
+      "rationale": "注文取消の仕様に基づき、order_stateの遷移と在庫戻しルールをモデル化。",
+      "states": [
+        "pending",
+        "shipped",
+        "cancelled"
+      ],
+      "transitions": [
+        {
+          "id": "T1",
+          "from": "pending",
+          "to": "cancelled",
+          "event": "cancel_order",
+          "valid": true,
+          "actions": {
+            "order_state": {
+              "const": "cancelled"
+            }
+          }
+        },
+        {
+          "id": "T2",
+          "from": "shipped",
+          "to": "shipped",
+          "event": "cancel_order",
+          "valid": false
+        },
+        {
+          "id": "T3",
+          "from": "cancelled",
+          "to": "cancelled",
+          "event": "cancel_order",
+          "valid": false
+        }
+      ],
+      "contexts": [
+        {
+          "order_state": "pending"
+        },
+        {
+          "order_state": "shipped"
+        },
+        {
+          "order_state": "cancelled"
+        }
+      ],
+      "coverage_criterion": "all_transitions"
+    }
+  ],
+  "decision_tables": [
+    {
+      "id": "DT-MINIMAL-CANCEL-STATE",
+      "source_refs": [
+        {
+          "id": "AC-1",
+          "kind": "ac",
+          "excerpt": "pending状態の注文は取消後にcancelledと表示される。"
+        },
+        {
+          "id": "AC-2",
+          "kind": "ac",
+          "excerpt": "shipped状態の注文は取消不可と表示され、状態はshippedのまま維持される。"
+        },
+        {
+          "id": "AC-3",
+          "kind": "ac",
+          "excerpt": "cancelled状態の注文を再度取り消しても状態は変わらない。"
+        },
+        {
+          "id": "BR-1",
+          "kind": "rule",
+          "excerpt": "pendingからcancelledへの取消成功時だけ在庫を注文数量分戻す。再取消で在庫を追加しない。"
+        }
+      ],
+      "parameter_ids": [
+        "order_state"
+      ],
+      "rules": [
+        {
+          "id": "R1",
+          "conditions": {
+            "order_state": [
+              "pending"
+            ]
+          },
+          "actions": {
+            "order_state": "cancelled"
+          },
+          "feasible": true,
+          "represented_rule_ids": [
+            "AC-1",
+            "BR-1"
+          ]
+        },
+        {
+          "id": "R2",
+          "conditions": {
+            "order_state": [
+              "shipped"
+            ]
+          },
+          "actions": {},
+          "feasible": true,
+          "represented_rule_ids": [
+            "AC-2"
+          ]
+        },
+        {
+          "id": "R3",
+          "conditions": {
+            "order_state": [
+              "cancelled"
+            ]
+          },
+          "actions": {},
+          "feasible": true,
+          "represented_rule_ids": [
+            "AC-3",
+            "BR-1"
+          ]
+        }
+      ],
+      "minimized_rules": [
+        {
+          "id": "R1",
+          "conditions": {
+            "order_state": [
+              "pending"
+            ]
+          },
+          "actions": {
+            "order_state": "cancelled"
+          },
+          "feasible": true,
+          "represented_rule_ids": [
+            "AC-1",
+            "BR-1"
+          ]
+        },
+        {
+          "id": "R2",
+          "conditions": {
+            "order_state": [
+              "shipped"
+            ]
+          },
+          "actions": {},
+          "feasible": true,
+          "represented_rule_ids": [
+            "AC-2"
+          ]
+        },
+        {
+          "id": "R3",
+          "conditions": {
+            "order_state": [
+              "cancelled"
+            ]
+          },
+          "actions": {},
+          "feasible": true,
+          "represented_rule_ids": [
+            "AC-3",
+            "BR-1"
+          ]
+        }
+      ],
+      "coverage_criterion": "feasible_rules"
+    }
+  ]
+}

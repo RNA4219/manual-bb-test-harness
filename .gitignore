@@ -4,6 +4,7 @@ Thumbs.db
 *.log
 tmp-*.json
 tmp-release-bundle/
+tmp/
 __pycache__/
 .pytest_cache/
 .ruff_cache/
@@ -11,5 +12,7 @@ __pycache__/
 node_modules/
 .coverage
 coverage.xml
+build/
+dist/
 *.egg-info/
 *.egg

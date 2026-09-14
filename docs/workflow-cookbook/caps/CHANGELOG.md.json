@@ -2,13 +2,15 @@
   "id": "CHANGELOG.md",
   "role": "history",
   "title": "Changelog",
-  "summary": "リリースごとの変更履歴。Unreleased は追加・変更・修正に分類し、ISTQB と RanD の検証記録への参照を保持する。",
-  "deps_out": [],
+  "summary": "リリースごとの変更履歴。Unreleased の追加・変更・修正、4.1.1 までの既存リリース、検収記録と未達条件への参照を保持する。",
+  "deps_out": [
+    "skills/manual-bb-test-harness/references/requirements-confidence.md"
+  ],
   "deps_in": [
     "README.md",
     "SPEC.md"
   ],
   "risks": [],
   "tests": [],
-  "last_verified": "2026-09-12"
+  "last_verified": "2026-09-14"
 }

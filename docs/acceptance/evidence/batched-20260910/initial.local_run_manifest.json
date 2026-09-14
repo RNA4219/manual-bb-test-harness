@@ -1,0 +1,101 @@
+{
+  "run_id": "local-20260910T023327Z-7d0255a2",
+  "status": "failed",
+  "profile": "qwen36",
+  "base_url": "http://127.0.0.1:8084/v1",
+  "model": "qwen3.6-27b",
+  "config_hash": "51458e4a784973a031dfb6c33948b821fc7dc2427a9f2e3cffc9bb24d64e7ebb",
+  "comparison_config_hash": "6ccc4b0648b6e27df69da4c647388f44bd49c31f9d172107039a65159989bfde",
+  "input_sha256": "6a49d0ab3fa58896cbe2c79c909e6f7b95390573ffdc88d5e63235b213eb56a9",
+  "started_at": "2026-09-10T02:33:27.202749Z",
+  "finished_at": "2026-09-10T02:35:22.624106Z",
+  "elapsed_seconds": 115.426,
+  "stages": [
+    {
+      "name": "test_model__core",
+      "elapsed_seconds": 115.38,
+      "repairs": 1,
+      "schema_valid": false,
+      "usage": {
+        "completion_tokens": 1257,
+        "prompt_tokens": 1547,
+        "total_tokens": 2804
+      }
+    }
+  ],
+  "artifacts": {
+    "feature_spec": {
+      "path": "feature_spec.json",
+      "sha256": "33b78d9438fef631d80b3f763f669623d04eaa1bcbd33461b04c73dfa02097ee",
+      "schema_valid": true
+    }
+  },
+  "generation_mode": "batched",
+  "design_status": "blocked",
+  "call_records": [
+    {
+      "stage": "test_model__core",
+      "repair": false,
+      "estimated_input_tokens": 8403,
+      "max_output_tokens": 3500,
+      "outcome": "invalid_artifact",
+      "elapsed_seconds": 94.333,
+      "prompt_tokens": 905,
+      "completion_tokens": 636,
+      "total_tokens": 1541,
+      "usage_status": "reported",
+      "accounted_tokens": 1541,
+      "finish_reason": "stop",
+      "model": "qwen3.6-27b"
+    },
+    {
+      "stage": "test_model__core_repair",
+      "repair": true,
+      "estimated_input_tokens": 7046,
+      "max_output_tokens": 3500,
+      "outcome": "invalid_artifact",
+      "elapsed_seconds": 21.047,
+      "prompt_tokens": 642,
+      "completion_tokens": 621,
+      "total_tokens": 1263,
+      "usage_status": "reported",
+      "accounted_tokens": 1263,
+      "finish_reason": "stop",
+      "model": "qwen3.6-27b"
+    }
+  ],
+  "usage_summary": {
+    "calls": 2,
+    "repair_calls": 1,
+    "unreported_calls": 0,
+    "prompt_tokens": 1547,
+    "completion_tokens": 1257,
+    "total_tokens": 2804,
+    "reported_total_tokens": 2804,
+    "accounted_tokens": 2804,
+    "budget_tokens": 150000,
+    "remaining_tokens": 147196,
+    "budget_exhausted": false,
+    "estimation_method": "utf8_bytes_plus_256_v1"
+  },
+  "stop_reason": "generation_error",
+  "error": "SchemaValidationError: boundaries must name concrete before/at/after values",
+  "generation": {
+    "generation_run_id": "local-20260910T023327Z-7d0255a2",
+    "prompt_template_id": "local-design",
+    "prompt_template_version": "batched-1",
+    "input_sha256": "6a49d0ab3fa58896cbe2c79c909e6f7b95390573ffdc88d5e63235b213eb56a9",
+    "output_schema_id": "local_run_manifest.schema.json",
+    "model": {
+      "provider": "openai-compatible",
+      "name": "qwen3.6-27b",
+      "version": null
+    },
+    "parameters": {
+      "temperature": 0.15,
+      "seed": null
+    },
+    "generated_at": "2026-09-10T02:33:27.202749Z",
+    "review_status": "pending"
+  }
+}

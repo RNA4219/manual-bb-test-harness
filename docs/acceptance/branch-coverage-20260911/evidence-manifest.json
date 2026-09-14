@@ -1,0 +1,82 @@
+{
+  "archive": "evidence.zip",
+  "size": 105884,
+  "sha256": "2b687eb6dbc749f011c5c529247e08f8b882ba22ff723b263feae1c1f8092aa7",
+  "files": [
+    {
+      "path": "local/coverage-all.json",
+      "size": 453484,
+      "sha256": "689b6ac792b6213c1adb1190c7cd4700312f14b30cc987ea4cb6a2065affdd08"
+    },
+    {
+      "path": "local/gate-coverage.json",
+      "size": 30727,
+      "sha256": "592f87937eff0f8f2676e8044ea04af43b212b86b087a83bdef1a95834da8016"
+    },
+    {
+      "path": "local/gate-tests.log",
+      "size": 1301,
+      "sha256": "68e5b5527b517b1ef195fd268376902f0e79a0d35f9f3ef8d198adbcb25dd363"
+    },
+    {
+      "path": "local/pytest-all.log",
+      "size": 124376,
+      "sha256": "1b8fc0bb03d00ccecb0e0935b9f902c41ab052f45219cf69b5dfaaf9e8518cf5"
+    },
+    {
+      "path": "local/pytest-all.xml",
+      "size": 143614,
+      "sha256": "d1ae4e695a7d9cede2693492ddb0a5fa68b429f307f89040c5533abb536fc9c8"
+    },
+    {
+      "path": "local/results.json",
+      "size": 1275,
+      "sha256": "cda112d9930e3efb2b0e6f2aab4794e33ea4ed9fb4a4f214cb3b8070b92d7d85"
+    },
+    {
+      "path": "local/spec-validation.log",
+      "size": 3501,
+      "sha256": "0121e557d35da255b87565af0a760faf868b1472b7d96a12a2cafb7e51471632"
+    },
+    {
+      "path": "snapshot/.github/workflows/validate.yml",
+      "size": 6833,
+      "sha256": "de03c08ea69a942e13b362e54ad3c91855303a425a44004e477cd01afb4f6a34"
+    },
+    {
+      "path": "snapshot/docs/acceptance/AC-20260911-branch-coverage.md",
+      "size": 3545,
+      "sha256": "8299cde2bf98d181a8829d061f34136e179d7b71ff983977de9efd410551da16"
+    },
+    {
+      "path": "snapshot/docs/specs/spec-08-hate-qeg-ci.md",
+      "size": 7037,
+      "sha256": "4898d589bdc5481e28f56455e2c2c6bcc54131dcfcbb94999858b717e13c6173"
+    },
+    {
+      "path": "snapshot/tests/test_ci_quality_evidence.py",
+      "size": 12197,
+      "sha256": "cfffdce5a7db58ce7e6655388f3db1bffa015f587a84c1ca24fdae16750a0389"
+    },
+    {
+      "path": "snapshot/tests/test_gate_v2.py",
+      "size": 23322,
+      "sha256": "cbae8881a6954771b960a025e596254f7d90784ee837da99bab5b2dd64e45045"
+    },
+    {
+      "path": "snapshot/tests/test_local_pipeline.py",
+      "size": 22293,
+      "sha256": "442c56ce03ffced75605149e786d65a384cf4c0ed529a490f76e7edf0ed88121"
+    },
+    {
+      "path": "snapshot/tests/test_local_runtime.py",
+      "size": 10925,
+      "sha256": "a9452033a1c20a539004281c99935242ebda6d7ff23da97d6a8288257e76b118"
+    },
+    {
+      "path": "snapshot/tools/ci/quality_evidence.py",
+      "size": 22675,
+      "sha256": "733492e2b385cfa6722839ba2952d82a522b66192a22bdb68d2cc115648ca9c3"
+    }
+  ]
+}

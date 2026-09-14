@@ -309,4 +309,6 @@ class TestVersionSubprocess:
             [sys.executable, str(script), "--version"], capture_output=True, text=True, timeout=30
         )
         assert result.returncode == 0
-        assert "2.0.0" in result.stdout
+        from bb_harness import __version__
+
+        assert __version__ in result.stdout

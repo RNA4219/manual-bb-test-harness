@@ -88,6 +88,15 @@
         "$ref": "shared_defs.schema.json#/$defs/Assumption"
       },
       "description": "Assumptions made when information is missing. Each must have severity level."
+    },
+    "schema_version": {
+      "const": "1.1.0"
+    },
+    "migration": {
+      "$ref": "shared_defs.schema.json#/$defs/Migration"
+    },
+    "generation": {
+      "$ref": "shared_defs.schema.json#/$defs/Generation"
     }
   },
   "additionalProperties": false

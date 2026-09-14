@@ -1,0 +1,431 @@
+{
+  "feature_id": "MINIMAL-CANCEL",
+  "flows": [
+    "buyer cancellation"
+  ],
+  "data_partitions": [
+    "order_state: pending",
+    "order_state: shipped",
+    "order_state: cancelled"
+  ],
+  "boundaries": [
+    "order_state: pending",
+    "order_state: shipped",
+    "order_state: cancelled"
+  ],
+  "rule_columns": [
+    "order_state x cancel_action"
+  ],
+  "states": [
+    "pending",
+    "shipped",
+    "cancelled"
+  ],
+  "valid_transitions": [
+    "pending -> cancelled"
+  ],
+  "invalid_transitions": [
+    "shipped -> cancelled",
+    "cancelled -> cancelled"
+  ],
+  "role_matrix": [
+    "buyer x cancel x own_order x pending",
+    "buyer x cancel x own_order x shipped",
+    "buyer x cancel x own_order x cancelled"
+  ],
+  "regression_edges": [
+    "external:inventory_service"
+  ],
+  "platform_matrix": [],
+  "quality_lenses": [
+    "consistency",
+    "idempotency"
+  ],
+  "parameters": [
+    {
+      "id": "param_order_state",
+      "name": "order_state",
+      "type": "enum",
+      "values": [
+        "pending",
+        "shipped",
+        "cancelled"
+      ],
+      "source_refs": [
+        {
+          "id": "AC-1",
+          "kind": "ac",
+          "excerpt": "pending状態の注文は取消後にcancelledと表示される。"
+        },
+        {
+          "id": "AC-2",
+          "kind": "ac",
+          "excerpt": "shipped状態の注文は取消不可と表示され、状態はshippedのまま維持される。"
+        },
+        {
+          "id": "AC-3",
+          "kind": "ac",
+          "excerpt": "cancelled状態の注文を再度取り消しても状態は変わらない。"
+        }
+      ]
+    },
+    {
+      "id": "param_inventory_delta",
+      "name": "inventory_delta",
+      "type": "integer",
+      "unit": "items",
+      "values": [
+        0,
+        1
+      ],
+      "source_refs": [
+        {
+          "id": "BR-1",
+          "kind": "rule",
+          "excerpt": "pendingからcancelledへの取消成功時だけ在庫を注文数量分戻す。再取消で在庫を追加しない。"
+        }
+      ]
+    }
+  ],
+  "domain_models": [
+    {
+      "id": "dm_order_lifecycle",
+      "source_refs": [
+        {
+          "id": "AC-1",
+          "kind": "ac",
+          "excerpt": "pending状態の注文は取消後にcancelledと表示される。"
+        },
+        {
+          "id": "AC-2",
+          "kind": "ac",
+          "excerpt": "shipped状態の注文は取消不可と表示され、状態はshippedのまま維持される。"
+        },
+        {
+          "id": "AC-3",
+          "kind": "ac",
+          "excerpt": "cancelled状態の注文を再度取り消しても状態は変わらない。"
+        }
+      ],
+      "variable_ids": [
+        "order_state"
+      ],
+      "partition_predicate": {
+        "var": "order_state"
+      },
+      "borders": [
+        {
+          "id": "border_pending",
+          "operator": "=",
+          "predicate": {
+            "op": "eq",
+            "args": [
+              {
+                "var": "order_state"
+              },
+              {
+                "const": "pending"
+              }
+            ]
+          },
+          "axis": "order_state",
+          "anchor": {
+            "order_state": "pending"
+          }
+        },
+        {
+          "id": "border_shipped",
+          "operator": "=",
+          "predicate": {
+            "op": "eq",
+            "args": [
+              {
+                "var": "order_state"
+              },
+              {
+                "const": "shipped"
+              }
+            ]
+          },
+          "axis": "order_state",
+          "anchor": {
+            "order_state": "shipped"
+          }
+        },
+        {
+          "id": "border_cancelled",
+          "operator": "=",
+          "predicate": {
+            "op": "eq",
+            "args": [
+              {
+                "var": "order_state"
+              },
+              {
+                "const": "cancelled"
+              }
+            ]
+          },
+          "axis": "order_state",
+          "anchor": {
+            "order_state": "cancelled"
+          }
+        }
+      ],
+      "coverage_criterion": "reliable_domain"
+    }
+  ],
+  "combination_models": [],
+  "state_models": [
+    {
+      "id": "sm_order_cancel",
+      "source_refs": [
+        {
+          "id": "AC-1",
+          "kind": "ac",
+          "excerpt": "pending状態の注文は取消後にcancelledと表示される。"
+        },
+        {
+          "id": "AC-2",
+          "kind": "ac",
+          "excerpt": "shipped状態の注文は取消不可と表示され、状態はshippedのまま維持される。"
+        },
+        {
+          "id": "AC-3",
+          "kind": "ac",
+          "excerpt": "cancelled状態の注文を再度取り消しても状態は変わらない。"
+        },
+        {
+          "id": "BR-1",
+          "kind": "rule",
+          "excerpt": "pendingからcancelledへの取消成功時だけ在庫を注文数量分戻す。再取消で在庫を追加しない。"
+        }
+      ],
+      "states": [
+        "pending",
+        "shipped",
+        "cancelled"
+      ],
+      "transitions": [
+        {
+          "id": "t_pending_to_cancelled",
+          "from": "pending",
+          "to": "cancelled",
+          "event": "cancel_order",
+          "valid": true,
+          "actions": {
+            "inventory_delta": {
+              "const": 1
+            }
+          }
+        },
+        {
+          "id": "t_shipped_to_cancelled",
+          "from": "shipped",
+          "to": "shipped",
+          "event": "cancel_order",
+          "valid": false,
+          "actions": {
+            "inventory_delta": {
+              "const": 0
+            }
+          }
+        },
+        {
+          "id": "t_cancelled_to_cancelled",
+          "from": "cancelled",
+          "to": "cancelled",
+          "event": "cancel_order",
+          "valid": false,
+          "actions": {
+            "inventory_delta": {
+              "const": 0
+            }
+          }
+        }
+      ],
+      "contexts": [
+        {
+          "order_state": "pending",
+          "inventory_delta": 0
+        },
+        {
+          "order_state": "shipped",
+          "inventory_delta": 0
+        },
+        {
+          "order_state": "cancelled",
+          "inventory_delta": 0
+        }
+      ],
+      "coverage_criterion": "all_transitions"
+    }
+  ],
+  "decision_tables": [
+    {
+      "id": "dt_cancel_logic",
+      "source_refs": [
+        {
+          "id": "AC-1",
+          "kind": "ac",
+          "excerpt": "pending状態の注文は取消後にcancelledと表示される。"
+        },
+        {
+          "id": "AC-2",
+          "kind": "ac",
+          "excerpt": "shipped状態の注文は取消不可と表示され、状態はshippedのまま維持される。"
+        },
+        {
+          "id": "AC-3",
+          "kind": "ac",
+          "excerpt": "cancelled状態の注文を再度取り消しても状態は変わらない。"
+        },
+        {
+          "id": "BR-1",
+          "kind": "rule",
+          "excerpt": "pendingからcancelledへの取消成功時だけ在庫を注文数量分戻す。再取消で在庫を追加しない。"
+        }
+      ],
+      "parameter_ids": [
+        "param_order_state"
+      ],
+      "rules": [
+        {
+          "id": "r1",
+          "conditions": {
+            "order_state": [
+              "pending"
+            ]
+          },
+          "actions": {
+            "new_state": "cancelled",
+            "inventory_delta": 1,
+            "display_message": "cancelled"
+          },
+          "feasible": true
+        },
+        {
+          "id": "r2",
+          "conditions": {
+            "order_state": [
+              "shipped"
+            ]
+          },
+          "actions": {
+            "new_state": "shipped",
+            "inventory_delta": 0,
+            "display_message": "cancel_not_allowed"
+          },
+          "feasible": true
+        },
+        {
+          "id": "r3",
+          "conditions": {
+            "order_state": [
+              "cancelled"
+            ]
+          },
+          "actions": {
+            "new_state": "cancelled",
+            "inventory_delta": 0,
+            "display_message": "cancelled"
+          },
+          "feasible": true
+        }
+      ],
+      "minimized_rules": [
+        {
+          "id": "r1",
+          "conditions": {
+            "order_state": [
+              "pending"
+            ]
+          },
+          "actions": {
+            "new_state": "cancelled",
+            "inventory_delta": 1,
+            "display_message": "cancelled"
+          },
+          "feasible": true
+        },
+        {
+          "id": "r2",
+          "conditions": {
+            "order_state": [
+              "shipped"
+            ]
+          },
+          "actions": {
+            "new_state": "shipped",
+            "inventory_delta": 0,
+            "display_message": "cancel_not_allowed"
+          },
+          "feasible": true
+        },
+        {
+          "id": "r3",
+          "conditions": {
+            "order_state": [
+              "cancelled"
+            ]
+          },
+          "actions": {
+            "new_state": "cancelled",
+            "inventory_delta": 0,
+            "display_message": "cancelled"
+          },
+          "feasible": true
+        }
+      ],
+      "coverage_criterion": "feasible_rules"
+    }
+  ],
+  "crud_models": [],
+  "scenario_models": [],
+  "random_models": [],
+  "metamorphic_relations": [],
+  "checklist_models": [],
+  "integration_paths": [
+    {
+      "id": "ip_inventory_sync",
+      "endpoints": [
+        "order_service",
+        "inventory_service"
+      ],
+      "states": [
+        "pending",
+        "cancelled"
+      ],
+      "source_refs": [
+        {
+          "id": "BR-1",
+          "kind": "rule",
+          "excerpt": "pendingからcancelledへの取消成功時だけ在庫を注文数量分戻す。再取消で在庫を追加しない。"
+        }
+      ]
+    }
+  ],
+  "schema_version": "1.1.0",
+  "migration": {
+    "status": "migrated",
+    "reason": "Initial generation from feature_spec"
+  },
+  "generation": {
+    "generation_run_id": "gen-minimal-cancel-001",
+    "prompt_template_id": "tpl-coverage-model-v1",
+    "prompt_template_version": "1.0.0",
+    "input_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+    "output_schema_id": "test_model.schema.json",
+    "model": {
+      "provider": "manual-bb",
+      "name": "worker",
+      "version": "1.0.0"
+    },
+    "parameters": {
+      "temperature": 0.1,
+      "seed": 42
+    },
+    "generated_at": "2023-10-27T10:00:00Z",
+    "review_status": "pending"
+  }
+}

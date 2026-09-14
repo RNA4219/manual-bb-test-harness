@@ -28,6 +28,55 @@
 - ISTQB 改修: 全 pytest 1002 件、coverage 88.22%、strict artifact 31 件、root/package schema 21 組を確認。実施条件と外部サービス未接続などの制約は [第2回レビュー](docs/istqb-review-round2-20260912.md)を参照。
 - 2026-09-12 の RanD 連携検証: 全 pytest 976 件、連携専用 63 件、公開 CLI 12 ケース、wheel/sdist 隔離 smoke が成功。[受入記録](docs/acceptance/AC-20260912-rand-integration.md)に条件別証跡を保存。
 
+## [4.1.1] - 2026-09-12
+
+- CIとHATE/QEGへのcoverage判定を、行・分岐の合算値から実測分岐率へ訂正。全体85%・Gate専用90%を分岐の件数で検証し、行率・分岐率・合算値を別記する。旧合算値の収集証跡は分岐合格へ流用しない。
+- Gateの入力欠落・feature不一致、生成時の根拠・工数・モバイル観点不足、API応答不正・通信設定の回帰テストを追加。
+- 日本語だけのファイル名でLocal Modeの機能IDが空になる不具合を修正。既存IDを維持し、空の場合は安定した代替IDを使う。
+- UTF-8 BOM付きMarkdownの先頭見出し・frontmatterを認識し、BOMだけで要件数や信頼度評価が変わる不具合を修正。
+- buildを明示した証跡0件のGate入力を全件未実施として評価し、`no_go`レポートを生成。入力不正や別feature/buildの証跡は引き続き拒否する。
+
+## [4.1.0] - 2026-09-11
+
+- PyPI READMEの相対リンクを正本GitHubへの絶対URLに修正。
+- batchedのリスク生成を観点単位に分割し、必須観点漏れ・対象外ID・件数上限を検証。JSON Schemaをモデルへの指示にも含め、状態式・有限パラメータ・被覆入力の説明を改善。
+- 小規模の実LLMでケース・レビューまで生成完了。ただし決定表に不整合が残りdegraded。品質受入と削減率の立証は未達として実測を保存。
+- PyPI公開後にAPIメタデータ・実ファイル・新規インストールとCLIを確認するread-only CIジョブを追加。限定retryと失敗証跡を保存。
+- 要件信頼度と不具合・手戻りの分析用データ形式、snapshot hash検証、欠測除外、調整群と保留群の分離を追加。実案件データによる校正は未実施、既存policyとGateは維持。
+
+## [4.0.1] - 2026-09-11
+
+- PyPIが拒否する未登録classifierを除去。PyPAの分類辞書によるbuild・公開前検証を追加。
+- mainの緑CIとGitHub ReleaseのSHA-256・メタデータ・ライセンス・隔離CLI smokeを確認し、Trusted Publishingで同じ配布物をPyPIへ公開する手順を追加。
+- READMEにPyPIの導入方法を追加し、CLI・PowerShell validator・現行文書の版を同期。4.0.0のGitHub Releaseと既存のartifact契約・動作を保持。
+
+## [4.0.0] - 2026-09-11
+
+- artifact契約拡張をmajorとするrelease policyに従い、package・CLI・PowerShell validator・現行ドキュメントを4.0.0へ更新。
+- 要確認件数・重大度・密度・レビュー済み率による要件定義信頼度評価とJSON／Markdownレポートを追加。入力hashと解決根拠を照合し、LLM呼出なしで再評価できる。
+- compact生成を既定にし、通信しない見積もり、run単位のトークン予算、batched分割生成、出力上書き防止、設計状態、ケース・モデルと実行証跡の版照合を追加。
+- 実LLMによるトークン削減率の比較とbatched全段完走は未達。制約と実測結果はspec-05／06の検収記録に保存。
+- 実pytestの証跡を固定版HATEで正規化し、QEGのhash検証・実行対象照合・Gate判定へ渡すCIジョブを追加。全体85%・Gate90%を維持し、失敗時も証跡を保存する。CI範囲のgoと実LLM・手動受入・リリース承認を区別する。
+
+- Deep Researchの拡張要件から、型付き技法モデル、technique_plan、独立したcoverage_report、非破壊migrateコマンドを追加。追加artifact契約は1.1.0、既存入力は互換維持。
+- Domain/組み合わせ/状態経路/決定表/CRUD/scenario/checklistと、random・metamorphicの実施予算を検証。設計・実施・合格を分離し、Gateへshadow指標を追加。
+- Local Modeの同名ケース削除、riskへの機械的接続、review時のケース消失を修正。生成来歴と入力・手順対応を保存し、必要なschema定義のみモデルへ送信。
+
+- OpenAI互換のllama.cpp / LM Studioを明示的に選択するLocal Modeとして、`run local-design` と `generic` / `qwen36` profileを追加。
+- LLMをcoverage・observation・risk候補・case候補の生成に限定し、schema repair、risk/effort算術、lint、Gateをhost側でfail closed化。
+- Qwen向けセルフレビュー、loopback既定、secret/raw promptを残さないrun manifest、70点台受入計画を追加。
+- Qwen3.6のthinking有効時にJSON contentが空になる実測結果を受け、qwen36 profileをthinking offへ固定し、段階生成とself-reviewで補強。
+
+## [3.0.0] - タグ未発行
+
+以下はmainへ反映済みの3.0.0準備履歴で、4.0.0にも含まれる。
+
+- ライセンスをRNA Third-Party Service Attribution License 1.0へ変更し、第三者向け有償サービス利用を顧客向け帰属表示付きで許可。
+- 帰属表示なしのホワイトラベル利用向けに、別途書面による商用ライセンス導線を追加。
+- 過去のMIT版の権利を維持し、v2.0.0 / 2ee85a0e8a62fc423feed1a23e0fdc8f4fa69631を最後のMIT tag付きrelease、1d8619b2067421938d2474485dd36abcf86af634を最後にMITで公開されたcommitとして記録。
+- wheel、sdist、release bundleへ必須ライセンス文書を同梱して検証するようpackaging checksを更新。
+- package/release検証で、商用問い合わせ先プレースホルダーの残存とREADME・pyproject・package version定数の不一致を拒否。
+
 ## [2.0.0] - 2026-07-11
 
 - Gate 2.0の入力artifactをpackage resource schemaで事前検証し、不正入力を終了コード1で拒否。
@@ -146,3 +195,14 @@ Keep a Changelog形式, Semantic Versioning準拠。
 - Domain packs (EC, SaaS-RBAC)
 
 [^1]: 当時の記録。現在のテスト数・カバレッジは異なる可能性がある。最新値は `uv run pytest` 実行で確認。
+
+## 生成効率・証跡版（2026-09-10）
+
+未被覆補完と差分レビューのcompactモードを既定化。事前見積もり・token予算・失敗を含むusage集計、ケース/モデルの版照合、非破壊bind-cases、実モデルのfull/compact比較を追加。仕様は[spec-05](docs/specs/spec-05-efficient-generation-evidence-revisions.md)。
+
+## 分割生成・完了判定（2026-09-10）
+
+batchedモードでモデル・ケース・レビューを分割。finish_reasonを確認し、未完了JSON応答を拒否する。出力先を新規ディレクトリに限定し、design_statusと終了コード2を追加。比較を実ファイルと被覆の再計算で検証し、--modesで対象を選択できるようにした。
+# 要件定義の信頼度評価（2026-09-11）
+
+`evaluate requirements`を追加。要確認の件数・重大度・密度・レビュー済み率を決定的に採点し、JSON／Markdownと未記入のレビュー雛形を出す。入力hash、引用可能な根拠、oracle、解決記録を検証し、重大未解決や未レビューで高信頼を誤表示しない。Ready／Gateは独立。[spec-07](docs/specs/spec-07-requirements-confidence.md)を参照。

@@ -1,6 +1,6 @@
 {
-  "version": "2.0.0",
-  "generated_at": "2026-09-14T00:39:49.022689+00:00",
+  "version": "4.1.1",
+  "generated_at": "2026-09-14T01:27:30.591826+00:00",
   "description": "manual-bb-test-harness Workflow Cookbook Knowledge Map",
   "metadata": {
     "repo": "manual-bb-test-harness",
@@ -16,14 +16,16 @@
       "path": "./README.md",
       "role": "overview",
       "title": "Project Overview",
-      "description": "プロジェクトの概要、セットアップ、Skill の依頼例、Gate の最小実行例、目的別の文書案内。変更履歴・運用詳細は正本文書へ案内し、AI 向けナビゲーションは折りたたみにまとめる。"
+      "description": "プロジェクトの概要、セットアップ、Skill の依頼例、Gate の最小実行例、目的別の文書案内。変更履歴・運用詳細は正本文書へ案内し、AI 向けナビゲーションは折りたたみにまとめる。",
+      "summary": "プロジェクトの概要、CLI の導入、Skill と Local Mode の実行例、Gate の最小実行例、目的別の文書案内。変更履歴は CHANGELOG、詳細手順は利用ガイドと RUNBOOK にまとめ、AI 向けの読み順は折りたたみで案内する。"
     },
     {
       "id": "HUB.codex.md",
       "path": "./HUB.codex.md",
       "role": "navigation",
       "title": "AI Navigation Hub",
-      "description": "README・利用ガイド・設計・運用・品質基準・履歴の役割を整理し、Skill 実行、保守、artifact 変更、mobile、RanD 連携の読み順を示す。"
+      "description": "README・利用ガイド・設計・運用・品質基準・履歴の役割を整理し、Skill 実行、保守、artifact 変更、mobile、RanD 連携の読み順を示す。",
+      "summary": "README・利用ガイド・設計・運用・品質基準・履歴の役割と、Skill、保守、artifact、mobile、RanD、Local Mode、技法別被覆、要件信頼度の読み順を示す。"
     },
     {
       "id": "BLUEPRINT.md",
@@ -37,7 +39,8 @@
       "path": "./RUNBOOK.md",
       "role": "operations",
       "title": "Runbook",
-      "description": "CLI の操作、RanD 取り込み、全体検証、Gate 入力・構成計画・欠陥台帳・独立承認・移行条件、障害切り分け、配布前検証を集約した運用手順。過去の検証結果は CHANGELOG と検収記録を参照する。"
+      "description": "CLI の操作、RanD 取り込み、全体検証、Gate 入力・構成計画・欠陥台帳・独立承認・移行条件、障害切り分け、配布前検証を集約した運用手順。過去の検証結果は CHANGELOG と検収記録を参照する。",
+      "summary": "CLI と外部連携、RanD、Local Mode、検証、Gate 入力・構成計画・欠陥台帳・承認・移行、障害対応、配布前検証の操作手順。生成予算・被覆・要件信頼度の詳細契約と過去の検証記録へ案内する。"
     },
     {
       "id": "GUARDRAILS.md",
@@ -65,7 +68,8 @@
       "path": "./CHANGELOG.md",
       "role": "history",
       "title": "Changelog",
-      "description": "リリースごとの変更履歴。Unreleased は追加・変更・修正に分類し、ISTQB と RanD の検証記録への参照を保持する。"
+      "description": "リリースごとの変更履歴。Unreleased は追加・変更・修正に分類し、ISTQB と RanD の検証記録への参照を保持する。",
+      "summary": "リリースごとの変更履歴。Unreleased の追加・変更・修正、4.1.1 までの既存リリース、検収記録と未達条件への参照を保持する。"
     },
     {
       "id": "AGENTS.md",

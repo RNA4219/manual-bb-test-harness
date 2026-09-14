@@ -20,6 +20,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import re
 import subprocess
 import sys
 import zipfile
@@ -95,6 +96,8 @@ class ReleaseBundleValidator:
         # Check required schemas
         required_schemas = [
             "phase_contract.schema.json",
+            "requirements_review.schema.json",
+            "requirements_confidence.schema.json",
             "feature_spec.schema.json",
             "test_model.schema.json",
             "risk_register.schema.json",
@@ -103,6 +106,7 @@ class ReleaseBundleValidator:
             "execution_evidence.schema.json",
             "automation_evidence.schema.json",
             "waiver_set.schema.json",
+            "local_run_manifest.schema.json",
         ]
 
         for schema_name in required_schemas:
@@ -215,6 +219,51 @@ class ReleaseBundleValidator:
 
         return True
 
+    def validate_release_metadata(self) -> bool:
+        """Validate commercial contact resolution and release version consistency."""
+        commercial_path = self.repo_root / "COMMERCIAL-LICENSE.md"
+        if not commercial_path.exists():
+            self.errors.append("Missing COMMERCIAL-LICENSE.md")
+            return False
+        commercial = commercial_path.read_text(encoding="utf-8")
+        if "[COMMERCIAL_CONTACT]" in commercial:
+            self.errors.append("COMMERCIAL-LICENSE.md still contains [COMMERCIAL_CONTACT]")
+        if "https://licensing.rna4219.com/" not in commercial:
+            self.errors.append("COMMERCIAL-LICENSE.md is missing the official application portal")
+
+        sources = {
+            "pyproject.toml": (
+                self.repo_root / "pyproject.toml",
+                r'^version\s*=\s*"([^"]+)"$',
+            ),
+            "README.md": (
+                self.repo_root / "README.md",
+                r"現行リリース系列:\s*\*\*([^*]+)\*\*",
+            ),
+            "src/bb_harness/__init__.py": (
+                self.repo_root / "src" / "bb_harness" / "__init__.py",
+                r'^__version__\s*=\s*"([^"]+)"$',
+            ),
+        }
+        versions: dict[str, str] = {}
+        for label, (path, pattern) in sources.items():
+            if not path.exists():
+                self.errors.append(f"Missing version source: {label}")
+                continue
+            match = re.search(pattern, path.read_text(encoding="utf-8"), re.MULTILINE)
+            if match is None:
+                self.errors.append(f"{label} is missing its release version")
+                continue
+            versions[label] = match.group(1)
+        expected = versions.get("pyproject.toml")
+        if expected is not None:
+            for label, value in versions.items():
+                if value != expected:
+                    self.errors.append(
+                        f"{label} version mismatch: expected {expected}, got {value}"
+                    )
+        return len(self.errors) == 0
+
     def validate_package_distribution(self) -> bool:
         """Build and smoke-test installed wheel and sdist."""
         result = subprocess.run(
@@ -250,12 +299,10 @@ class ReleaseBundleValidator:
                 zf.write(file, f"schemas/{file.name}")
 
             # Examples
-            examples_dir = self.repo_root / "examples" / "artifacts"
-            for file in examples_dir.glob("**/*.json"):
-                if file.parent.name == "execution_evidence":
-                    zf.write(file, f"examples/artifacts/execution_evidence/{file.name}")
-                else:
-                    zf.write(file, f"examples/artifacts/{file.name}")
+            examples_dir = self.repo_root / "examples"
+            for pattern in ("*.json", "README.md"):
+                for file in examples_dir.rglob(pattern):
+                    zf.write(file, file.relative_to(self.repo_root).as_posix())
 
             # Goldens
             goldens_dir = self.repo_root / "goldens"
@@ -264,6 +311,12 @@ class ReleaseBundleValidator:
 
             # Key docs
             docs_files = [
+                "LICENSE",
+                "LICENSE.ja.md",
+                "NOTICE",
+                "LICENSING.md",
+                "COMMERCIAL-LICENSE.md",
+                "THIRD_PARTY_NOTICES.md",
                 "README.md",
                 "CHANGELOG.md",
                 "BLUEPRINT.md",
@@ -288,6 +341,7 @@ class ReleaseBundleValidator:
             "goldens": self.validate_goldens(),
             "utf8_encoding": self.validate_utf8_encoding(),
             "readme_references": self.validate_readme_references(),
+            "release_metadata": self.validate_release_metadata(),
             "errors": self.errors,
             "warnings": self.warnings,
         }

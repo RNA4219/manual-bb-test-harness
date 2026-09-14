@@ -1,0 +1,124 @@
+name: Publish to PyPI
+
+on:
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: "公開済みGitHub Releaseの正式版タグ（例: v4.0.1）"
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+concurrency:
+  group: publish-pypi
+  cancel-in-progress: false
+
+jobs:
+  prepare:
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: read
+      actions: read
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405 # v6.2.0
+        with:
+          python-version: "3.13"
+      - uses: astral-sh/setup-uv@08807647e7069bb48b6ef5acd8ec9567f424441b # v8.1.0
+        with:
+          version: "0.11.12"
+      - name: Require green main CI and download the existing release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_TAG: ${{ inputs.tag }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          [[ "$RELEASE_TAG" =~ ^v(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)$ ]]
+          tag_sha=$(git rev-parse "refs/tags/$RELEASE_TAG^{commit}")
+          git merge-base --is-ancestor "$tag_sha" HEAD
+          for sha in "$GITHUB_SHA" "$tag_sha"; do
+            gh run list --repo "$GITHUB_REPOSITORY" --workflow validate.yml \
+              --branch main --event push --commit "$sha" --limit 1 \
+              --json status,conclusion,url | \
+              jq -e 'length == 1 and .[0].status == "completed" and .[0].conclusion == "success"'
+          done
+          gh release view "$RELEASE_TAG" --repo "$GITHUB_REPOSITORY" \
+            --json isDraft,isPrerelease,tagName | \
+            jq -e --arg tag "$RELEASE_TAG" '.isDraft == false and .isPrerelease == false and .tagName == $tag'
+          version="${RELEASE_TAG#v}"
+          gh release download "$RELEASE_TAG" --repo "$GITHUB_REPOSITORY" --dir tmp/pypi-release \
+            --pattern "bb_harness-$version-py3-none-any.whl" \
+            --pattern "bb_harness-$version.tar.gz" --pattern SHA256SUMS.txt
+      - name: Verify hashes, metadata, licenses and installed CLI
+        env:
+          RELEASE_TAG: ${{ inputs.tag }}
+        run: >-
+          uv run --extra dev python tools/ci/prepare_pypi_release.py --tag "$RELEASE_TAG"
+          --input tmp/pypi-release --output tmp/pypi-dist
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: pypi-dist-${{ github.run_attempt }}
+          path: tmp/pypi-dist/*
+          if-no-files-found: error
+          retention-days: 7
+
+  publish:
+    needs: prepare
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    environment:
+      name: pypi
+      url: https://pypi.org/project/bb-harness/
+    permissions:
+      id-token: write
+    steps:
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
+        with:
+          name: pypi-dist-${{ github.run_attempt }}
+          path: dist/
+      - name: Publish the verified distributions using OIDC
+        uses: pypa/gh-action-pypi-publish@dc37677b2e1c63e2034f94d8a5b11f265b73ba33
+        with:
+          packages-dir: dist/
+
+  verify-publication:
+    needs: [prepare, publish]
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405 # v6.2.0
+        with:
+          python-version: "3.13"
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
+        with:
+          name: pypi-dist-${{ github.run_attempt }}
+          path: tmp/pypi-expected/
+      - name: Verify the public distributions and a fresh PyPI installation
+        env:
+          RELEASE_TAG: ${{ inputs.tag }}
+        run: >-
+          python tools/ci/verify_pypi_publication.py --tag "$RELEASE_TAG"
+          --expected tmp/pypi-expected --output tmp/pypi-verification
+      - name: Preserve publication verification evidence
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: pypi-verification-${{ github.run_attempt }}
+          path: |
+            tmp/pypi-verification/verification.json
+            tmp/pypi-verification/pip-install-report.json
+          if-no-files-found: warn
+          retention-days: 30

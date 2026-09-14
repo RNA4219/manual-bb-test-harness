@@ -4,7 +4,16 @@
   "title": "TestModel",
   "description": "Coverage model artifact representing test surface decomposition. Produced by model_test_surface workflow step.",
   "type": "object",
-  "required": ["feature_id", "coverage_items", "flows", "data_partitions", "rule_columns", "states", "role_matrix", "regression_edges"],
+  "required": [
+    "feature_id",
+    "coverage_items",
+    "flows",
+    "data_partitions",
+    "rule_columns",
+    "states",
+    "role_matrix",
+    "regression_edges"
+  ],
   "properties": {
     "feature_id": {
       "type": "string",
@@ -16,47 +25,199 @@
       "minItems": 1,
       "items": {
         "type": "object",
-        "required": ["id", "dimension", "technique", "applicability", "mandatory", "coverage_criterion", "source_refs"],
+        "required": [
+          "id",
+          "dimension",
+          "technique",
+          "applicability",
+          "mandatory",
+          "coverage_criterion",
+          "source_refs"
+        ],
         "properties": {
-          "id": {"type": "string", "pattern": "^COV-[A-Z0-9-]+$"},
-          "dimension": {"enum": ["flow", "state", "rule", "data", "role", "regression", "platform", "quality"]},
-          "technique": {"enum": ["equivalence_partitioning", "boundary_value", "decision_table", "state_transition", "checklist_based", "exploratory", "error_guessing", "use_case", "user_scenario"]},
-          "applicability": {"enum": ["applicable", "not_applicable"]},
-          "mandatory": {"type": "boolean"},
-          "coverage_criterion": {"enum": ["each_item", "each_state", "each_valid_transition", "each_transition", "each_feasible_column", "pairwise"]},
-          "source_refs": {"type": "array", "minItems": 1, "items": {"$ref": "shared_defs.schema.json#/$defs/SourceRef"}},
-          "not_applicable_reason": {"type": "string", "minLength": 1},
+          "id": {
+            "type": "string",
+            "pattern": "^COV-[A-Z0-9-]+$"
+          },
+          "dimension": {
+            "enum": [
+              "flow",
+              "state",
+              "rule",
+              "data",
+              "role",
+              "regression",
+              "platform",
+              "quality"
+            ]
+          },
+          "technique": {
+            "enum": [
+              "equivalence_partitioning",
+              "boundary_value",
+              "decision_table",
+              "state_transition",
+              "checklist_based",
+              "exploratory",
+              "error_guessing",
+              "use_case",
+              "user_scenario"
+            ]
+          },
+          "applicability": {
+            "enum": [
+              "applicable",
+              "not_applicable"
+            ]
+          },
+          "mandatory": {
+            "type": "boolean"
+          },
+          "coverage_criterion": {
+            "enum": [
+              "each_item",
+              "each_state",
+              "each_valid_transition",
+              "each_transition",
+              "each_feasible_column",
+              "pairwise"
+            ]
+          },
+          "source_refs": {
+            "type": "array",
+            "minItems": 1,
+            "items": {
+              "$ref": "shared_defs.schema.json#/$defs/SourceRef"
+            }
+          },
+          "not_applicable_reason": {
+            "type": "string",
+            "minLength": 1
+          },
           "boundary_spec": {
             "type": "object",
-            "required": ["analysis_type", "partition", "boundary_value", "included", "step", "selected_values", "rationale"],
+            "required": [
+              "analysis_type",
+              "partition",
+              "boundary_value",
+              "included",
+              "step",
+              "selected_values",
+              "rationale"
+            ],
             "properties": {
-              "analysis_type": {"enum": ["two_value", "three_value"]},
-              "partition": {"type": "string", "minLength": 1},
-              "boundary_value": {"type": "string", "minLength": 1},
-              "included": {"type": "boolean"},
-              "step": {"type": "string", "minLength": 1},
-              "selected_values": {"type": "array", "minItems": 2, "uniqueItems": true, "items": {"type": "string"}},
-              "rationale": {"type": "string", "minLength": 1}
+              "analysis_type": {
+                "enum": [
+                  "two_value",
+                  "three_value"
+                ]
+              },
+              "partition": {
+                "type": "string",
+                "minLength": 1
+              },
+              "boundary_value": {
+                "type": "string",
+                "minLength": 1
+              },
+              "included": {
+                "type": "boolean"
+              },
+              "step": {
+                "type": "string",
+                "minLength": 1
+              },
+              "selected_values": {
+                "type": "array",
+                "minItems": 2,
+                "uniqueItems": true,
+                "items": {
+                  "type": "string"
+                }
+              },
+              "rationale": {
+                "type": "string",
+                "minLength": 1
+              }
             },
             "additionalProperties": false
           },
           "decision_column": {
             "type": "object",
-            "required": ["conditions", "actions", "feasible"],
+            "required": [
+              "conditions",
+              "actions",
+              "feasible"
+            ],
             "properties": {
-              "conditions": {"type": "object"},
-              "actions": {"type": "array", "items": {"type": "string"}},
-              "feasible": {"type": "boolean"},
-              "dont_care_conditions": {"type": "array", "items": {"type": "string"}},
-              "infeasible_reason": {"type": "string"}
+              "conditions": {
+                "type": "object"
+              },
+              "actions": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "feasible": {
+                "type": "boolean"
+              },
+              "dont_care_conditions": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "infeasible_reason": {
+                "type": "string"
+              }
             },
             "additionalProperties": false
           }
         },
         "allOf": [
-          {"if": {"properties": {"applicability": {"const": "not_applicable"}}}, "then": {"required": ["not_applicable_reason"]}},
-          {"if": {"properties": {"technique": {"const": "boundary_value"}}}, "then": {"required": ["boundary_spec"]}},
-          {"if": {"properties": {"technique": {"const": "decision_table"}}}, "then": {"required": ["decision_column"]}}
+          {
+            "if": {
+              "properties": {
+                "applicability": {
+                  "const": "not_applicable"
+                }
+              }
+            },
+            "then": {
+              "required": [
+                "not_applicable_reason"
+              ]
+            }
+          },
+          {
+            "if": {
+              "properties": {
+                "technique": {
+                  "const": "boundary_value"
+                }
+              }
+            },
+            "then": {
+              "required": [
+                "boundary_spec"
+              ]
+            }
+          },
+          {
+            "if": {
+              "properties": {
+                "technique": {
+                  "const": "decision_table"
+                }
+              }
+            },
+            "then": {
+              "required": [
+                "decision_column"
+              ]
+            }
+          }
         ],
         "additionalProperties": false
       },
@@ -64,69 +225,124 @@
     },
     "flows": {
       "type": "array",
-      "items": {"type": "string"},
+      "items": {
+        "type": "string"
+      },
       "description": "User/system flows identified from the feature, e.g., 'buyer cancellation', 'admin approval'."
     },
     "data_partitions": {
       "type": "array",
-      "items": {"type": "string"},
+      "items": {
+        "type": "string"
+      },
       "description": "Equivalence class partitions for data values, e.g., 'coupon_used', 'payment_failed'."
     },
     "boundaries": {
       "type": "array",
-      "items": {"type": "string"},
+      "items": {
+        "type": "string"
+      },
       "description": "Boundary values identified for testing, e.g., 'last cancellable state before shipped'."
     },
     "rule_columns": {
       "type": "array",
-      "items": {"type": "string"},
+      "items": {
+        "type": "string"
+      },
       "description": "Decision table columns derived from business rules, e.g., 'order_state x coupon_used x actor'."
     },
     "states": {
       "type": "array",
-      "items": {"type": "string"},
+      "items": {
+        "type": "string"
+      },
       "description": "State machine states identified, e.g., 'pending', 'shipped', 'cancelled'."
     },
     "valid_transitions": {
       "type": "array",
-      "items": {"type": "string"},
+      "items": {
+        "type": "string"
+      },
       "description": "Valid state transitions that should succeed, e.g., 'pending -> cancelled'."
     },
     "invalid_transitions": {
       "type": "array",
-      "items": {"type": "string"},
+      "items": {
+        "type": "string"
+      },
       "description": "Invalid state transitions that should fail, e.g., 'shipped -> cancelled'."
     },
     "role_matrix": {
       "type": "array",
-      "items": {"type": "string"},
+      "items": {
+        "type": "string"
+      },
       "description": "Role-permission matrix entries, e.g., 'buyer x cancel x own_order x pending'."
     },
     "regression_edges": {
       "type": "array",
-      "items": {"type": "string"},
+      "items": {
+        "type": "string"
+      },
       "description": "Regression impact edges to other services/systems, e.g., 'external:inventory_service'."
     },
     "platform_matrix": {
       "type": "array",
-      "items": {"type": "string"},
+      "items": {
+        "type": "string"
+      },
       "description": "Platform coverage combinations such as 'iOS x background_resume x 4g-lossy' or 'Android x notification_denied x offline'."
     },
     "quality_lenses": {
       "type": "array",
       "items": {
         "type": "object",
-        "required": ["id", "lens", "applicable", "reason", "owner"],
+        "required": [
+          "id",
+          "lens",
+          "applicable",
+          "reason",
+          "owner"
+        ],
         "properties": {
-          "id": {"type": "string", "minLength": 1},
-          "lens": {"type": "string", "minLength": 1},
-          "applicable": {"type": "boolean"},
-          "reason": {"type": "string", "minLength": 1},
-          "owner": {"type": "string", "minLength": 1},
-          "oracle": {"$ref": "shared_defs.schema.json#/$defs/Oracle"}
+          "id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "lens": {
+            "type": "string",
+            "minLength": 1
+          },
+          "applicable": {
+            "type": "boolean"
+          },
+          "reason": {
+            "type": "string",
+            "minLength": 1
+          },
+          "owner": {
+            "type": "string",
+            "minLength": 1
+          },
+          "oracle": {
+            "$ref": "shared_defs.schema.json#/$defs/Oracle"
+          }
         },
         "allOf": [
-          {"if": {"properties": {"applicable": {"const": true}}}, "then": {"required": ["oracle"]}}
+          {
+            "if": {
+              "properties": {
+                "applicable": {
+                  "const": true
+                }
+              }
+            },
+            "then": {
+              "required": [
+                "oracle"
+              ]
+            }
+          }
         ],
         "additionalProperties": false
       },
@@ -136,16 +352,131 @@
       "type": "array",
       "items": {
         "type": "object",
-        "required": ["id", "source_refs", "finding", "action", "target_refs"],
+        "required": [
+          "id",
+          "source_refs",
+          "finding",
+          "action",
+          "target_refs"
+        ],
         "properties": {
-          "id": {"type": "string", "minLength": 1},
-          "source_refs": {"type": "array", "minItems": 1, "items": {"type": "string", "minLength": 1}},
-          "finding": {"type": "string", "minLength": 1},
-          "action": {"type": "string", "minLength": 1},
-          "target_refs": {"type": "array", "minItems": 1, "items": {"type": "string", "minLength": 1}}
+          "id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "source_refs": {
+            "type": "array",
+            "minItems": 1,
+            "items": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          "finding": {
+            "type": "string",
+            "minLength": 1
+          },
+          "action": {
+            "type": "string",
+            "minLength": 1
+          },
+          "target_refs": {
+            "type": "array",
+            "minItems": 1,
+            "items": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
         },
         "additionalProperties": false
       }
+    },
+    "parameters": {
+      "type": "array",
+      "items": {
+        "$ref": "shared_defs.schema.json#/$defs/Parameter"
+      },
+      "minItems": 0
+    },
+    "domain_models": {
+      "type": "array",
+      "items": {
+        "$ref": "shared_defs.schema.json#/$defs/DomainModel"
+      },
+      "minItems": 0
+    },
+    "combination_models": {
+      "type": "array",
+      "items": {
+        "$ref": "shared_defs.schema.json#/$defs/CombinationModel"
+      },
+      "minItems": 0
+    },
+    "state_models": {
+      "type": "array",
+      "items": {
+        "$ref": "shared_defs.schema.json#/$defs/StateModel"
+      },
+      "minItems": 0
+    },
+    "decision_tables": {
+      "type": "array",
+      "items": {
+        "$ref": "shared_defs.schema.json#/$defs/DecisionTable"
+      },
+      "minItems": 0
+    },
+    "crud_models": {
+      "type": "array",
+      "items": {
+        "$ref": "shared_defs.schema.json#/$defs/CrudModel"
+      },
+      "minItems": 0
+    },
+    "scenario_models": {
+      "type": "array",
+      "items": {
+        "$ref": "shared_defs.schema.json#/$defs/ScenarioModel"
+      },
+      "minItems": 0
+    },
+    "random_models": {
+      "type": "array",
+      "items": {
+        "$ref": "shared_defs.schema.json#/$defs/RandomModel"
+      },
+      "minItems": 0
+    },
+    "metamorphic_relations": {
+      "type": "array",
+      "items": {
+        "$ref": "shared_defs.schema.json#/$defs/MetamorphicModel"
+      },
+      "minItems": 0
+    },
+    "checklist_models": {
+      "type": "array",
+      "items": {
+        "$ref": "shared_defs.schema.json#/$defs/ChecklistModel"
+      },
+      "minItems": 0
+    },
+    "integration_paths": {
+      "type": "array",
+      "items": {
+        "$ref": "shared_defs.schema.json#/$defs/IntegrationPath"
+      },
+      "minItems": 0
+    },
+    "schema_version": {
+      "const": "1.1.0"
+    },
+    "migration": {
+      "$ref": "shared_defs.schema.json#/$defs/Migration"
+    },
+    "generation": {
+      "$ref": "shared_defs.schema.json#/$defs/Generation"
     }
   },
   "additionalProperties": false

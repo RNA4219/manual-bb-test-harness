@@ -1,0 +1,507 @@
+{
+  "target": "bb-harness==4.1.0 (public PyPI wheel)",
+  "base_commit": "6149d81fee17b6271503717b3fc2c0f6a738a540",
+  "reviewed_at": "2026-09-11T08:07:26.353183+00:00",
+  "method": "manual-bb-test-harness Skillによる仕様ベース設計と、Codex操作のCLIブラックボックス試験",
+  "initial_scripted": {
+    "pass": 40,
+    "fail": 5,
+    "total": 45
+  },
+  "final_scripted": {
+    "pass": 42,
+    "fail": 3,
+    "blocked": 0,
+    "total": 45
+  },
+  "by_priority": {
+    "P0": {
+      "pass": 5,
+      "fail": 0
+    },
+    "P1": {
+      "pass": 31,
+      "fail": 1
+    },
+    "P2": {
+      "pass": 6,
+      "fail": 2
+    }
+  },
+  "exploration": {
+    "observed_rejections": [
+      "nan",
+      "inf",
+      "-1",
+      "101"
+    ],
+    "confirmed_defects": [
+      "MBB-BB-002"
+    ]
+  },
+  "cli_invocations": {
+    "initial_including_4_setup": 57,
+    "triage": 10,
+    "followup": 7,
+    "total": 74
+  },
+  "llm_generation_calls": 0,
+  "gate": {
+    "status": "no_go",
+    "kind": "reviewer_decision",
+    "profile_reference": "standard",
+    "reason": "P1全件passという今回の受入条件を満たさず、未修正3件が残る",
+    "release_action": "none",
+    "is_sut_gate_output": false
+  },
+  "defects": [
+    {
+      "id": "MBB-BB-001",
+      "title": "日本語だけのファイル名でLocal Modeのfeature_idが空になり停止",
+      "severity": "medium",
+      "fix_priority": "P1",
+      "status": "open",
+      "cases": [
+        "BB-31",
+        "BB-32"
+      ],
+      "basis": "同一本文のASCII名・日本語ディレクトリ内ASCII名・混在名は成功、日本語のみは失敗"
+    },
+    {
+      "id": "MBB-BB-002",
+      "title": "UTF-8 BOM付きMarkdownの先頭要件見出しを読み落とす",
+      "severity": "medium",
+      "fix_priority": "P1",
+      "status": "open",
+      "cases": [
+        "CH-01-bom"
+      ],
+      "basis": "BOM有無だけを変えた対照で要件数1→0、score69→null。互換性期待に基づく不具合"
+    },
+    {
+      "id": "MBB-BB-003",
+      "title": "証跡0件のGate CLIがno_goレポートを生成しない",
+      "severity": "medium",
+      "fix_priority": "P2",
+      "status": "open",
+      "cases": [
+        "BB-38"
+      ],
+      "basis": "READMEの未実施評価・終了コード契約と、--input/--evidenceの実動作が不一致。誤Goはなし"
+    }
+  ],
+  "cases": [
+    {
+      "id": "BB-01",
+      "priority": "P1",
+      "initial_result": "pass",
+      "final_result": "pass",
+      "defect_id": null,
+      "evidence": "evidence.zip!commands/005.json",
+      "note": null
+    },
+    {
+      "id": "BB-02",
+      "priority": "P1",
+      "initial_result": "pass",
+      "final_result": "pass",
+      "defect_id": null,
+      "evidence": "evidence.zip!commands/007.json",
+      "note": null
+    },
+    {
+      "id": "BB-03",
+      "priority": "P1",
+      "initial_result": "pass",
+      "final_result": "pass",
+      "defect_id": null,
+      "evidence": "evidence.zip!commands/008.json",
+      "note": null
+    },
+    {
+      "id": "BB-04",
+      "priority": "P1",
+      "initial_result": "pass",
+      "final_result": "pass",
+      "defect_id": null,
+      "evidence": "evidence.zip!commands/009.json",
+      "note": null
+    },
+    {
+      "id": "BB-05",
+      "priority": "P1",
+      "initial_result": "pass",
+      "final_result": "pass",
+      "defect_id": null,
+      "evidence": "evidence.zip!commands/011.json",
+      "note": null
+    },
+    {
+      "id": "BB-06",
+      "priority": "P1",
+      "initial_result": "pass",
+      "final_result": "pass",
+      "defect_id": null,
+      "evidence": "evidence.zip!commands/012.json",
+      "note": null
+    },
+    {
+      "id": "BB-07",
+      "priority": "P1",
+      "initial_result": "pass",
+      "final_result": "pass",
+      "defect_id": null,
+      "evidence": "evidence.zip!commands/013.json",
+      "note": null
+    },
+    {
+      "id": "BB-08",
+      "priority": "P1",
+      "initial_result": "pass",
+      "final_result": "pass",
+      "defect_id": null,
+      "evidence": "evidence.zip!commands/014.json",
+      "note": null
+    },
+    {
+      "id": "BB-09",
+      "priority": "P1",
+      "initial_result": "pass",
+      "final_result": "pass",
+      "defect_id": null,
+      "evidence": "evidence.zip!commands/015.json",
+      "note": null
+    },
+    {
+      "id": "BB-10",
+      "priority": "P1",
+      "initial_result": "pass",
+      "final_result": "pass",
+      "defect_id": null,
+      "evidence": "evidence.zip!commands/016.json",
+      "note": null
+    },
+    {
+      "id": "BB-11",
+      "priority": "P1",
+      "initial_result": "pass",
+      "final_result": "pass",
+      "defect_id": null,
+      "evidence": "evidence.zip!commands/017.json",
+      "note": null
+    },
+    {
+      "id": "BB-12",
+      "priority": "P1",
+      "initial_result": "pass",
+      "final_result": "pass",
+      "defect_id": null,
+      "evidence": "evidence.zip!commands/018.json",
+      "note": null
+    },
+    {
+      "id": "BB-13",
+      "priority": "P1",
+      "initial_result": "pass",
+      "final_result": "pass",
+      "defect_id": null,
+      "evidence": "evidence.zip!commands/019.json",
+      "note": null
+    },
+    {
+      "id": "BB-14",
+      "priority": "P1",
+      "initial_result": "fail",
+      "final_result": "pass",
+      "defect_id": null,
+      "evidence": "evidence.zip!followup-results.json#BB-14-corrected",
+      "note": "初回の入力準備を修正し、計画済みの同じ期待結果で再確認"
+    },
+    {
+      "id": "BB-15",
+      "priority": "P1",
+      "initial_result": "pass",
+      "final_result": "pass",
+      "defect_id": null,
+      "evidence": "evidence.zip!commands/021.json",
+      "note": null
+    },
+    {
+      "id": "BB-16",
+      "priority": "P1",
+      "initial_result": "pass",
+      "final_result": "pass",
+      "defect_id": null,
+      "evidence": "evidence.zip!commands/022.json",
+      "note": null
+    },
+    {
+      "id": "BB-17",
+      "priority": "P1",
+      "initial_result": "pass",
+      "final_result": "pass",
+      "defect_id": null,
+      "evidence": "evidence.zip!commands/023.json",
+      "note": null
+    },
+    {
+      "id": "BB-18",
+      "priority": "P1",
+      "initial_result": "pass",
+      "final_result": "pass",
+      "defect_id": null,
+      "evidence": "evidence.zip!commands/024.json",
+      "note": null
+    },
+    {
+      "id": "BB-19",
+      "priority": "P1",
+      "initial_result": "pass",
+      "final_result": "pass",
+      "defect_id": null,
+      "evidence": "evidence.zip!commands/025.json",
+      "note": null
+    },
+    {
+      "id": "BB-20",
+      "priority": "P1",
+      "initial_result": "pass",
+      "final_result": "pass",
+      "defect_id": null,
+      "evidence": "evidence.zip!commands/026.json",
+      "note": null
+    },
+    {
+      "id": "BB-21",
+      "priority": "P1",
+      "initial_result": "pass",
+      "final_result": "pass",
+      "defect_id": null,
+      "evidence": "evidence.zip!commands/027.json",
+      "note": null
+    },
+    {
+      "id": "BB-22",
+      "priority": "P1",
+      "initial_result": "pass",
+      "final_result": "pass",
+      "defect_id": null,
+      "evidence": "evidence.zip!commands/028.json",
+      "note": null
+    },
+    {
+      "id": "BB-23",
+      "priority": "P1",
+      "initial_result": "pass",
+      "final_result": "pass",
+      "defect_id": null,
+      "evidence": "evidence.zip!commands/029.json",
+      "note": null
+    },
+    {
+      "id": "BB-24",
+      "priority": "P1",
+      "initial_result": "pass",
+      "final_result": "pass",
+      "defect_id": null,
+      "evidence": "evidence.zip!commands/030.json",
+      "note": null
+    },
+    {
+      "id": "BB-25",
+      "priority": "P1",
+      "initial_result": "pass",
+      "final_result": "pass",
+      "defect_id": null,
+      "evidence": "evidence.zip!commands/031.json",
+      "note": null
+    },
+    {
+      "id": "BB-26",
+      "priority": "P0",
+      "initial_result": "pass",
+      "final_result": "pass",
+      "defect_id": null,
+      "evidence": "evidence.zip!commands/032.json",
+      "note": null
+    },
+    {
+      "id": "BB-27",
+      "priority": "P0",
+      "initial_result": "pass",
+      "final_result": "pass",
+      "defect_id": null,
+      "evidence": "evidence.zip!commands/033.json",
+      "note": null
+    },
+    {
+      "id": "BB-28",
+      "priority": "P0",
+      "initial_result": "pass",
+      "final_result": "pass",
+      "defect_id": null,
+      "evidence": "evidence.zip!commands/034.json",
+      "note": null
+    },
+    {
+      "id": "BB-29",
+      "priority": "P1",
+      "initial_result": "pass",
+      "final_result": "pass",
+      "defect_id": null,
+      "evidence": "evidence.zip!commands/035.json",
+      "note": "初回runnerのconfirmationsは存在しないキー。保存されたissuesの存在と一致を追加照合した"
+    },
+    {
+      "id": "BB-30",
+      "priority": "P1",
+      "initial_result": "pass",
+      "final_result": "pass",
+      "defect_id": null,
+      "evidence": "evidence.zip!commands/036.json",
+      "note": null
+    },
+    {
+      "id": "BB-31",
+      "priority": "P2",
+      "initial_result": "fail",
+      "final_result": "fail",
+      "defect_id": "MBB-BB-001",
+      "evidence": "evidence.zip!commands/037.json",
+      "note": null
+    },
+    {
+      "id": "BB-32",
+      "priority": "P2",
+      "initial_result": "fail",
+      "final_result": "fail",
+      "defect_id": "MBB-BB-001",
+      "evidence": "evidence.zip!commands/038.json",
+      "note": "元の日本語名では取込エラー。ASCII名対照では予算停止・生成0回を確認"
+    },
+    {
+      "id": "BB-33",
+      "priority": "P0",
+      "initial_result": "pass",
+      "final_result": "pass",
+      "defect_id": null,
+      "evidence": "evidence.zip!commands/039.json",
+      "note": null
+    },
+    {
+      "id": "BB-34",
+      "priority": "P1",
+      "initial_result": "pass",
+      "final_result": "pass",
+      "defect_id": null,
+      "evidence": "evidence.zip!commands/040.json",
+      "note": null
+    },
+    {
+      "id": "BB-35",
+      "priority": "P1",
+      "initial_result": "fail",
+      "final_result": "pass",
+      "defect_id": null,
+      "evidence": "evidence.zip!followup-results.json#BB-35-corrected",
+      "note": "初回の入力準備を修正し、計画済みの同じ期待結果で再確認"
+    },
+    {
+      "id": "BB-36",
+      "priority": "P1",
+      "initial_result": "pass",
+      "final_result": "pass",
+      "defect_id": null,
+      "evidence": "evidence.zip!commands/042.json",
+      "note": null
+    },
+    {
+      "id": "BB-37",
+      "priority": "P0",
+      "initial_result": "pass",
+      "final_result": "pass",
+      "defect_id": null,
+      "evidence": "evidence.zip!commands/043.json",
+      "note": null
+    },
+    {
+      "id": "BB-38",
+      "priority": "P1",
+      "initial_result": "fail",
+      "final_result": "fail",
+      "defect_id": "MBB-BB-003",
+      "evidence": "evidence.zip!followup-results.json#BB-38-corrected-empty",
+      "note": "正式な--input導線でも証跡0件のno_goレポートが生成されない"
+    },
+    {
+      "id": "BB-39",
+      "priority": "P2",
+      "initial_result": "pass",
+      "final_result": "pass",
+      "defect_id": null,
+      "evidence": "evidence.zip!commands/046.json",
+      "note": null
+    },
+    {
+      "id": "BB-40",
+      "priority": "P2",
+      "initial_result": "pass",
+      "final_result": "pass",
+      "defect_id": null,
+      "evidence": "evidence.zip!commands/047.json",
+      "note": null
+    },
+    {
+      "id": "BB-41",
+      "priority": "P2",
+      "initial_result": "pass",
+      "final_result": "pass",
+      "defect_id": null,
+      "evidence": "evidence.zip!commands/048.json",
+      "note": null
+    },
+    {
+      "id": "BB-42",
+      "priority": "P2",
+      "initial_result": "pass",
+      "final_result": "pass",
+      "defect_id": null,
+      "evidence": "evidence.zip!commands/049.json",
+      "note": null
+    },
+    {
+      "id": "BB-43",
+      "priority": "P2",
+      "initial_result": "pass",
+      "final_result": "pass",
+      "defect_id": null,
+      "evidence": "evidence.zip!commands/050.json",
+      "note": null
+    },
+    {
+      "id": "BB-44",
+      "priority": "P2",
+      "initial_result": "pass",
+      "final_result": "pass",
+      "defect_id": null,
+      "evidence": "evidence.zip!commands/051.json",
+      "note": null
+    },
+    {
+      "id": "BB-45",
+      "priority": "P1",
+      "initial_result": "pass",
+      "final_result": "pass",
+      "defect_id": null,
+      "evidence": "evidence.zip!commands/052.json",
+      "note": null
+    }
+  ],
+  "limitations": [
+    "Windows/Python3.13だけを今回実行",
+    "実LLM生成品質は未検収を引継ぎ",
+    "実案件による採点policy校正は未実施",
+    "HATE/QEG全連携の再実行は今回の対象外",
+    "独立した人の手動受入ではない"
+  ]
+}

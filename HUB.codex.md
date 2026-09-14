@@ -4,12 +4,17 @@ owner: manual-bb-test-harness
 status: active
 last_reviewed_at: 2026-05-16
 next_review_due: 2026-10-11
-release_version: 2.0.0
+release_version: 4.1.1
 ---
 
 # manual-bb-test-harness HUB
 
 `HUB_SCOPE_DECLARATION`: 本ファイルの適用範囲は `manual-bb-test-harness/` 全体。
+
+HATE/QEGによるCI証跡の連携は[spec-08](docs/specs/spec-08-hate-qeg-ci.md)、実行結果は[検収記録](docs/acceptance/AC-20260911-hate-qeg-ci.md)を参照する。
+
+公開後検証は[release policy](docs/release-policy.md)、要件信頼度と実案件実績の比較は
+[調整手順](docs/requirements-calibration.md)を参照する。
 
 この repo は、手動ブラックボックス QA 設計 Skill の正本を管理する。  
 最初に [README](README.md) で概要と始め方を確認し、目的に応じて下記の正本へ進む。
@@ -30,6 +35,9 @@ release_version: 2.0.0
 | [docs/workflow-cookbook/](docs/workflow-cookbook/) | 知識マップ (index.json, hot.json, caps/) |
 | [docs/tasks/](docs/tasks/) | Task Seed |
 | [docs/acceptance/](docs/acceptance/) | 検収記録 |
+| [skills/manual-bb-test-harness/references/technique-coverage.md](skills/manual-bb-test-harness/references/technique-coverage.md) | 型付き技法・被覆検証・移行・実装上限 |
+| [skills/manual-bb-test-harness/references/requirements-confidence.md](skills/manual-bb-test-harness/references/requirements-confidence.md) | 要件定義信頼度・要確認集計・根拠付きレビュー・再評価 |
+| [docs/research/istqb-extension-adoption.md](docs/research/istqb-extension-adoption.md) | Deep Research原本の取得元と採用状況 |
 
 ## 2. 目的別の読み順
 
@@ -80,3 +88,11 @@ release_version: 2.0.0
 - `SPEC.md` は履歴を含む実装仕様メモとして扱い、運用導線は `RUNBOOK.md` へ寄せる。
 - mobile / domain pack のような拡張観点は `references/` に置き、Skill 本体は短く保つ。
 - 変更単位の正本は `docs/tasks/`、検収記録は `docs/acceptance/` に置く。
+
+## 生成効率・証跡版（2026-09-10）
+
+生成コスト・予算・版照合の改修は[spec-05](docs/specs/spec-05-efficient-generation-evidence-revisions.md)と[運用契約](skills/manual-bb-test-harness/references/efficient-generation.md)から読む。
+
+## 分割生成・完了判定（2026-09-10）
+
+分割生成・完了判定は[spec-06](docs/specs/spec-06-bounded-generation-readiness.md)と[生成効率の運用契約](skills/manual-bb-test-harness/references/efficient-generation.md)を読む。

@@ -4,7 +4,10 @@
   "title": "RiskRegister",
   "description": "Risk assessment artifact with impact, likelihood, and priority ratings. Produced by assess_risk workflow step.",
   "type": "object",
-  "required": ["feature_id", "risks"],
+  "required": [
+    "feature_id",
+    "risks"
+  ],
   "properties": {
     "feature_id": {
       "type": "string",
@@ -13,16 +16,33 @@
     },
     "risks": {
       "type": "array",
-      "items": {"$ref": "#/$defs/Risk"},
+      "items": {
+        "$ref": "#/$defs/Risk"
+      },
       "minItems": 1,
       "description": "List of identified risks with scoring and priority."
+    },
+    "schema_version": {
+      "const": "1.1.0"
+    },
+    "migration": {
+      "$ref": "shared_defs.schema.json#/$defs/Migration"
+    },
+    "generation": {
+      "$ref": "shared_defs.schema.json#/$defs/Generation"
     }
   },
   "additionalProperties": false,
   "$defs": {
     "Risk": {
       "type": "object",
-      "required": ["id", "scenario", "impact", "likelihood", "priority"],
+      "required": [
+        "id",
+        "scenario",
+        "impact",
+        "likelihood",
+        "priority"
+      ],
       "description": "Single risk entry with scoring.",
       "properties": {
         "id": {
@@ -49,7 +69,9 @@
         },
         "modifiers": {
           "type": "array",
-          "items": {"type": "string"},
+          "items": {
+            "type": "string"
+          },
           "description": "Risk modifiers, e.g., 'detectability_difficulty=2'."
         },
         "score": {
@@ -59,7 +81,12 @@
           "description": "Calculated risk score (0-100)."
         },
         "priority": {
-          "enum": ["P0", "P1", "P2", "P3"],
+          "enum": [
+            "P0",
+            "P1",
+            "P2",
+            "P3"
+          ],
           "description": "Risk priority: P0 (critical), P1 (high), P2 (medium), P3 (low)."
         },
         "rationale": {
@@ -68,7 +95,9 @@
         },
         "trace_to": {
           "type": "array",
-          "items": {"type": "string"},
+          "items": {
+            "type": "string"
+          },
           "description": "References to test cases or charters that cover this risk."
         }
       },

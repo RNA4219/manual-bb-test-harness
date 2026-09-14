@@ -77,6 +77,32 @@
         },
         "additionalProperties": false
       }
+    },
+    "schema_version": {
+      "const": "1.1.0"
+    },
+    "migration": {
+      "$ref": "shared_defs.schema.json#/$defs/Migration"
+    },
+    "generation": {
+      "$ref": "shared_defs.schema.json#/$defs/Generation"
+    },
+    "evidence_binding": {
+      "type": "object",
+      "properties": {
+        "mode": {
+          "const": "case_revision"
+        },
+        "model_hash": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        }
+      },
+      "required": [
+        "mode",
+        "model_hash"
+      ],
+      "additionalProperties": false
     }
   },
   "additionalProperties": false,
@@ -274,6 +300,62 @@
             "type": "string",
             "minLength": 1
           }
+        },
+        "technique_refs": {
+          "type": "array",
+          "items": {
+            "$ref": "shared_defs.schema.json#/$defs/TechniqueRef"
+          },
+          "minItems": 0
+        },
+        "coverage_obligation_ids": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "minItems": 0
+        },
+        "coverage_inputs": {
+          "type": "array",
+          "items": {
+            "$ref": "shared_defs.schema.json#/$defs/CoverageInput"
+          },
+          "minItems": 0
+        },
+        "test_data": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "parameter_id": {
+                "type": "string",
+                "minLength": 1
+              },
+              "value": {
+                "type": [
+                  "string",
+                  "number",
+                  "boolean",
+                  "null"
+                ]
+              },
+              "unit": {
+                "type": "string",
+                "minLength": 1
+              }
+            },
+            "required": [
+              "parameter_id",
+              "value"
+            ],
+            "additionalProperties": false
+          },
+          "minItems": 0
+        },
+        "case_revision": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
         }
       },
       "allOf": [
@@ -400,6 +482,73 @@
             "type": "string",
             "minLength": 1
           }
+        },
+        "technique_refs": {
+          "type": "array",
+          "items": {
+            "$ref": "shared_defs.schema.json#/$defs/TechniqueRef"
+          },
+          "minItems": 0
+        },
+        "basis_refs": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "minItems": 0
+        },
+        "mission": {
+          "type": "string",
+          "minLength": 1
+        },
+        "resources": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "minItems": 0
+        },
+        "entry_criteria": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "minItems": 0
+        },
+        "exit_criteria": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "minItems": 0
+        },
+        "environment": {
+          "type": "string",
+          "minLength": 1
+        },
+        "limitations": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "minItems": 0
+        },
+        "history_refs": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "minItems": 0
+        },
+        "case_revision": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
         }
       },
       "allOf": [

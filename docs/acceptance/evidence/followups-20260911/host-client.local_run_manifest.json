@@ -1,0 +1,74 @@
+{
+  "run_id": "local-20260911T055650Z-df43884a",
+  "status": "failed",
+  "profile": "qwen36",
+  "base_url": "http://127.0.0.1:8084/v1",
+  "model": "qwen3.6-27b",
+  "config_hash": "51458e4a784973a031dfb6c33948b821fc7dc2427a9f2e3cffc9bb24d64e7ebb",
+  "comparison_config_hash": "6ccc4b0648b6e27df69da4c647388f44bd49c31f9d172107039a65159989bfde",
+  "input_sha256": "6a49d0ab3fa58896cbe2c79c909e6f7b95390573ffdc88d5e63235b213eb56a9",
+  "started_at": "2026-09-11T05:56:50.255835Z",
+  "finished_at": "2026-09-11T05:56:52.370714Z",
+  "elapsed_seconds": 2.115,
+  "stages": [],
+  "artifacts": {
+    "feature_spec": {
+      "path": "feature_spec.json",
+      "sha256": "33b78d9438fef631d80b3f763f669623d04eaa1bcbd33461b04c73dfa02097ee",
+      "schema_valid": true
+    }
+  },
+  "generation_mode": "batched",
+  "design_status": "blocked",
+  "call_records": [
+    {
+      "stage": "test_model__core",
+      "repair": false,
+      "estimated_input_tokens": 8576,
+      "max_output_tokens": 3500,
+      "outcome": "runtime_error",
+      "elapsed_seconds": 2.079,
+      "prompt_tokens": null,
+      "completion_tokens": null,
+      "total_tokens": null,
+      "usage_status": "unknown",
+      "accounted_tokens": 12076,
+      "finish_reason": null,
+      "model": null
+    }
+  ],
+  "usage_summary": {
+    "calls": 1,
+    "repair_calls": 0,
+    "unreported_calls": 1,
+    "prompt_tokens": null,
+    "completion_tokens": null,
+    "total_tokens": null,
+    "reported_total_tokens": 0,
+    "accounted_tokens": 12076,
+    "budget_tokens": 150000,
+    "remaining_tokens": 137924,
+    "budget_exhausted": false,
+    "estimation_method": "utf8_bytes_plus_256_v1"
+  },
+  "stop_reason": "runtime_error",
+  "error": "LocalRuntimeError: Local API connection failed: <urlopen error [WinError 10061] 対象のコンピューターによって拒否されたため、接続できませんでした。>",
+  "generation": {
+    "generation_run_id": "local-20260911T055650Z-df43884a",
+    "prompt_template_id": "local-design",
+    "prompt_template_version": "batched-2",
+    "input_sha256": "6a49d0ab3fa58896cbe2c79c909e6f7b95390573ffdc88d5e63235b213eb56a9",
+    "output_schema_id": "local_run_manifest.schema.json",
+    "model": {
+      "provider": "openai-compatible",
+      "name": "qwen3.6-27b",
+      "version": null
+    },
+    "parameters": {
+      "temperature": 0.15,
+      "seed": null
+    },
+    "generated_at": "2026-09-11T05:56:50.255835Z",
+    "review_status": "pending"
+  }
+}

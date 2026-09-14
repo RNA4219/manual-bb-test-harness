@@ -2,13 +2,15 @@
   "id": "RUNBOOK.md",
   "role": "operations",
   "title": "Runbook",
-  "summary": "CLI の操作、RanD 取り込み、全体検証、Gate 入力・構成計画・欠陥台帳・独立承認・移行条件、障害切り分け、配布前検証を集約した運用手順。過去の検証結果は CHANGELOG と検収記録を参照する。",
+  "summary": "CLI と外部連携、RanD、Local Mode、検証、Gate 入力・構成計画・欠陥台帳・承認・移行、障害対応、配布前検証の操作手順。生成予算・被覆・要件信頼度の詳細契約と過去の検証記録へ案内する。",
   "public_api": [],
   "deps_out": [
     "BLUEPRINT.md",
     "EVALUATION.md",
     "docs/specs/spec-02-cli-integration.md",
-    "docs/specs/spec-04-test-result-import.md"
+    "docs/specs/spec-04-test-result-import.md",
+    "skills/manual-bb-test-harness/references/efficient-generation.md",
+    "skills/manual-bb-test-harness/references/requirements-confidence.md"
   ],
   "deps_in": [
     "HUB.codex.md"
@@ -17,5 +19,5 @@
   "tests": [
     "tests/test_cli_dryrun.py"
   ],
-  "last_verified": "2026-09-12"
+  "last_verified": "2026-09-14"
 }

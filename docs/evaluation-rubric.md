@@ -2,6 +2,8 @@
 
 Skill 出力を forward-test した後、この rubric で採点する。
 
+要件定義自体の信頼度は`evaluate requirements`と[専用policy](../skills/manual-bb-test-harness/references/requirements-confidence.md)で評価する。要件の要確認件数から得た点数を、このSkill出力品質の採点として流用しない。
+
 ## Score Bands
 
 | score | meaning |
@@ -25,6 +27,8 @@ Skill 出力を forward-test した後、この rubric で採点する。
 | Communication | 5 | Go/No-Go brief が短く、意思決定に使える |
 
 ## Pass Rule
+
+形式的な技法被覆を扱う出力は、入力値・条件・連続経路とexpectedの対応、計画の選択理由、統合後のrequired義務保持をレビューする。設計率、実施率、合格数、unknown、blocked、random/metamorphicの終了条件を分離していることを確認する。点数の配分と既存Gateの閾値は維持する。
 
 - 合計 80 点以上で pass。
 - 70-79 点は conditional pass。Skill または domain pack 改善候補を記録する。

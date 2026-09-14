@@ -1,0 +1,121 @@
+{
+  "feature_id": "DISCOUNT-01",
+  "schema_version": "1.1.0",
+  "flows": [
+    "金額と割引を入力し送料を確認する"
+  ],
+  "data_partitions": [],
+  "rule_columns": [],
+  "states": [],
+  "role_matrix": [],
+  "regression_edges": [],
+  "parameters": [
+    {
+      "id": "P",
+      "name": "注文金額",
+      "type": "integer",
+      "unit": "JPY",
+      "step": 1,
+      "minimum": 0
+    },
+    {
+      "id": "D",
+      "name": "割引",
+      "type": "integer",
+      "unit": "JPY",
+      "step": 1,
+      "minimum": 0
+    }
+  ],
+  "domain_models": [
+    {
+      "id": "DOMAIN-SHIPPING",
+      "source_refs": [
+        {
+          "id": "AC-1",
+          "kind": "ac",
+          "excerpt": "割引後金額P-Dが10000円以上なら送料0円、未満なら500円。PとDは0以上の整数円。"
+        }
+      ],
+      "observation_ids": [
+        "OBS-DATA-01"
+      ],
+      "risk_ids": [
+        "RISK-01"
+      ],
+      "rationale": "割引後金額の境界で送料が変わるため、割引を固定して境界と内外を確認する",
+      "variable_ids": [
+        "P",
+        "D"
+      ],
+      "partition_predicate": {
+        "op": "gte",
+        "args": [
+          {
+            "op": "sub",
+            "args": [
+              {
+                "var": "P"
+              },
+              {
+                "var": "D"
+              }
+            ]
+          },
+          {
+            "const": 10000
+          }
+        ]
+      },
+      "coverage_criterion": "reliable_domain",
+      "borders": [
+        {
+          "id": "BORDER-10000",
+          "operator": ">=",
+          "closed": true,
+          "predicate": {
+            "op": "gte",
+            "args": [
+              {
+                "op": "sub",
+                "args": [
+                  {
+                    "var": "P"
+                  },
+                  {
+                    "var": "D"
+                  }
+                ]
+              },
+              {
+                "const": 10000
+              }
+            ]
+          },
+          "axis": "P",
+          "anchor": {
+            "P": 12000,
+            "D": 2000
+          }
+        }
+      ]
+    }
+  ],
+  "coverage_items": [
+    {
+      "id": "COV-DOMAIN-SHIPPING",
+      "dimension": "data",
+      "technique": "equivalence_partitioning",
+      "applicability": "applicable",
+      "mandatory": true,
+      "coverage_criterion": "each_item",
+      "source_refs": [
+        {
+          "id": "AC-1",
+          "kind": "ac",
+          "excerpt": "割引後金額P-Dが10000円以上なら送料0円、未満なら500円。PとDは0以上の整数円。"
+        }
+      ]
+    }
+  ]
+}

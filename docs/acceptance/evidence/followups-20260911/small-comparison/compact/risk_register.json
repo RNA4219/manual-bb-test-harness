@@ -1,0 +1,102 @@
+{
+  "feature_id": "MINIMAL-CANCEL",
+  "risks": [
+    {
+      "id": "RISK-01",
+      "scenario": "pending状態の注文取消時に在庫が戻されず、販売可能在庫が不足する",
+      "impact": 5,
+      "likelihood": 4,
+      "modifiers": [
+        "detectability_difficulty=2",
+        "change_surface=2",
+        "externality=2",
+        "privilege=0",
+        "auto_coverage_credit=0"
+      ],
+      "score": 74.2,
+      "priority": "P0",
+      "rationale": "BR-1により在庫戻しは必須だが、外部サービス（inventory_service）との同期経路（ip_inventory_sync）が変更対象かつ自動テスト根拠が明記されていないため、整合性欠如のリスクが高い。在庫不足は業務に重大な影響（impact 5）を与える。",
+      "trace_to": [
+        "OBS-STATE-01",
+        "OBS-INTEG-04"
+      ]
+    },
+    {
+      "id": "RISK-02",
+      "scenario": "cancelled状態の注文を再取消しした際に、誤って在庫が追加される（冪等性違反）",
+      "impact": 5,
+      "likelihood": 4,
+      "modifiers": [
+        "detectability_difficulty=2",
+        "change_surface=2",
+        "externality=2",
+        "privilege=0",
+        "auto_coverage_credit=0"
+      ],
+      "score": 74.2,
+      "priority": "P0",
+      "rationale": "BR-1により再取消で在庫を追加しないことが規定されているが、冪等性処理が不備だと在庫が過剰に増加する。外部サービス連携を含むため検知が難しく（detectability 2）、在庫管理の整合性を損なう重大な不具合（impact 5）となる。",
+      "trace_to": [
+        "OBS-STATE-03",
+        "OBS-INTEG-04"
+      ]
+    },
+    {
+      "id": "RISK-03",
+      "scenario": "shipped状態の注文が誤ってcancelled状態に遷移し、配送処理と矛盾する",
+      "impact": 4,
+      "likelihood": 4,
+      "modifiers": [
+        "detectability_difficulty=1",
+        "change_surface=1",
+        "externality=0",
+        "privilege=0",
+        "auto_coverage_credit=0"
+      ],
+      "score": 54.8,
+      "priority": "P2",
+      "rationale": "AC-2によりshipped状態は取消不可と規定されているが、状態遷移ロジックの欠陥により誤遷移が発生する可能性がある。配送済み注文の取消は業務プロセスを混乱させる（impact 4）。変更対象領域であり、自動テスト網羅根拠がないためlikelihood 4とする。",
+      "trace_to": [
+        "OBS-STATE-02"
+      ]
+    },
+    {
+      "id": "RISK-04",
+      "scenario": "shipped状態の注文取消時に「取消不可」の表示が出ず、ユーザーが操作可能だと誤認する",
+      "impact": 2,
+      "likelihood": 3,
+      "modifiers": [
+        "detectability_difficulty=0",
+        "change_surface=1",
+        "externality=0",
+        "privilege=0",
+        "auto_coverage_credit=0"
+      ],
+      "score": 21.0,
+      "priority": "P3",
+      "rationale": "AC-2によりエラー表示が規定されているが、UI文言だけの不具合であるためimpactは低め（2）とする。変更対象領域だが、状態遷移自体は正しく機能する場合が多く、likelihoodは3とする。",
+      "trace_to": [
+        "OBS-STATE-02"
+      ]
+    },
+    {
+      "id": "RISK-05",
+      "scenario": "pending状態の注文取消後、UI上はcancelledと表示されるが、内部状態が更新されない",
+      "impact": 3,
+      "likelihood": 3,
+      "modifiers": [
+        "detectability_difficulty=1",
+        "change_surface=1",
+        "externality=0",
+        "privilege=0",
+        "auto_coverage_credit=0"
+      ],
+      "score": 32.3,
+      "priority": "P3",
+      "rationale": "AC-1により状態表示が規定されている。UIと内部状態の不一致はユーザー信頼を損なう（impact 3）。変更対象領域であり、自動テスト根拠が明記されていないためlikelihood 3とする。",
+      "trace_to": [
+        "OBS-STATE-01"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,84 @@
+{
+  "feature_id": "MINIMAL-CANCEL",
+  "observations": [
+    {
+      "id": "OBS-STATE-01",
+      "title": "pending状態の注文取消しと在庫戻し",
+      "view": "black",
+      "mandatory": true,
+      "techniques": [
+        "state_transition_testing",
+        "decision_table_testing"
+      ],
+      "rationale": "AC-1およびBR-1に基づき、pending状態からの取消しは有効な遷移であり、在庫戻しが発生する必須の正常系パスである。",
+      "source_refs": [
+        {
+          "id": "AC-1",
+          "kind": "ac",
+          "excerpt": "pending状態の注文は取消後にcancelledと表示される。"
+        },
+        {
+          "id": "BR-1",
+          "kind": "rule",
+          "excerpt": "pendingからcancelledへの取消成功時だけ在庫を注文数量分戻す。再取消で在庫を追加しない。"
+        }
+      ],
+      "confidence": "high",
+      "model_refs": [
+        "T1",
+        "R1"
+      ]
+    },
+    {
+      "id": "OBS-STATE-02",
+      "title": "shipped状態の注文取消し不可",
+      "view": "black",
+      "mandatory": true,
+      "techniques": [
+        "state_transition_testing",
+        "boundary_value_analysis"
+      ],
+      "rationale": "AC-2およびtest_modelのinvalid_transitionsに基づき、shipped状態からの取消しは不正遷移であり、状態が維持されることを検証する必要がある。",
+      "source_refs": [
+        {
+          "id": "AC-2",
+          "kind": "ac",
+          "excerpt": "shipped状態の注文は取消不可と表示され、状態はshippedのまま維持される。"
+        }
+      ],
+      "confidence": "high",
+      "model_refs": [
+        "T2",
+        "R2"
+      ]
+    },
+    {
+      "id": "OBS-STATE-03",
+      "title": "cancelled状態の再取消し（冪等性）",
+      "view": "black",
+      "mandatory": true,
+      "techniques": [
+        "state_transition_testing",
+        "decision_table_testing"
+      ],
+      "rationale": "AC-3およびBR-1に基づき、既にcancelled状態の注文を再度取消しても状態が変わらず、在庫が追加戻りしないことを検証する。",
+      "source_refs": [
+        {
+          "id": "AC-3",
+          "kind": "ac",
+          "excerpt": "cancelled状態の注文を再度取り消しても状態は変わらない。"
+        },
+        {
+          "id": "BR-1",
+          "kind": "rule",
+          "excerpt": "pendingからcancelledへの取消成功時だけ在庫を注文数量分戻す。再取消で在庫を追加しない。"
+        }
+      ],
+      "confidence": "high",
+      "model_refs": [
+        "T3",
+        "R3"
+      ]
+    }
+  ]
+}

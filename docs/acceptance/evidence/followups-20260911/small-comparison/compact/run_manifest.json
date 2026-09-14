@@ -1,0 +1,281 @@
+{
+  "run_id": "local-20260911T070632Z-cd74153f",
+  "status": "failed",
+  "profile": "qwen36",
+  "base_url": "http://127.0.0.1:8084/v1",
+  "model": "qwen3.6-27b",
+  "config_hash": "54c4caa5b913dcaca9b8a3241b7cd52d64994fd484ce1e43e7a62a16d791c163",
+  "comparison_config_hash": "6ccc4b0648b6e27df69da4c647388f44bd49c31f9d172107039a65159989bfde",
+  "input_sha256": "c9df1767a22b201de071dfaea45989011006ca01f8399ff8fe6ac4c269abb49f",
+  "started_at": "2026-09-11T07:06:32.354499Z",
+  "finished_at": "2026-09-11T07:15:43.813370Z",
+  "elapsed_seconds": 551.473,
+  "stages": [
+    {
+      "name": "test_model",
+      "elapsed_seconds": 185.816,
+      "repairs": 1,
+      "schema_valid": true,
+      "usage": {
+        "completion_tokens": 5956,
+        "prompt_tokens": 12133,
+        "total_tokens": 18089
+      }
+    },
+    {
+      "name": "observation_set",
+      "elapsed_seconds": 46.639,
+      "repairs": 0,
+      "schema_valid": true,
+      "usage": {
+        "completion_tokens": 1408,
+        "prompt_tokens": 4014,
+        "total_tokens": 5422
+      }
+    },
+    {
+      "name": "risk_candidates",
+      "elapsed_seconds": 35.875,
+      "repairs": 0,
+      "schema_valid": true,
+      "usage": {
+        "completion_tokens": 1042,
+        "prompt_tokens": 3946,
+        "total_tokens": 4988
+      }
+    },
+    {
+      "name": "manual_case_set",
+      "elapsed_seconds": 152.057,
+      "repairs": 1,
+      "schema_valid": true,
+      "usage": {
+        "completion_tokens": 4614,
+        "prompt_tokens": 11844,
+        "total_tokens": 16458
+      }
+    },
+    {
+      "name": "manual_case_remainder",
+      "elapsed_seconds": 80.944,
+      "repairs": 0,
+      "schema_valid": true,
+      "usage": {
+        "completion_tokens": 2565,
+        "prompt_tokens": 5482,
+        "total_tokens": 8047
+      }
+    },
+    {
+      "name": "manual_case_review",
+      "elapsed_seconds": 49.763,
+      "repairs": 1,
+      "schema_valid": false,
+      "usage": {
+        "completion_tokens": 1382,
+        "prompt_tokens": 7798,
+        "total_tokens": 9180
+      }
+    }
+  ],
+  "artifacts": {
+    "feature_spec": {
+      "path": "feature_spec.json",
+      "sha256": "55bb04ee00fe4f9c0ae1f2b4a1f4070e09d1e289393389f4685df4b0df6f0e98",
+      "schema_valid": true
+    },
+    "test_model": {
+      "path": "test_model.json",
+      "sha256": "c594df29be9bf23435c8a49673963f0e226100388004088580d1cf79093b7153",
+      "schema_valid": true
+    },
+    "observation_set": {
+      "path": "observation_set.json",
+      "sha256": "2c76108340e7517ac22975a18b0ff1de28f853316741a74b27207e8701ce4c12",
+      "schema_valid": true
+    },
+    "risk_register": {
+      "path": "risk_register.json",
+      "sha256": "ed39c0fefb51ca9c3e5baf15c014cbc2506122c0deb41d948fc06bb973a6ccdd",
+      "schema_valid": true
+    },
+    "technique_plan": {
+      "path": "technique_plan.json",
+      "sha256": "455e719df312363ab019b1949a2ef8401705e5f0a3db56b3f22e22a6707eb796",
+      "schema_valid": true
+    }
+  },
+  "generation_mode": "compact",
+  "design_status": "blocked",
+  "call_records": [
+    {
+      "stage": "test_model",
+      "repair": false,
+      "estimated_input_tokens": 24403,
+      "max_output_tokens": 3500,
+      "outcome": "invalid_artifact",
+      "elapsed_seconds": 88.109,
+      "prompt_tokens": 5456,
+      "completion_tokens": 2961,
+      "total_tokens": 8417,
+      "usage_status": "reported",
+      "accounted_tokens": 8417,
+      "finish_reason": "stop",
+      "model": "qwen3.6-27b"
+    },
+    {
+      "stage": "test_model_repair",
+      "repair": true,
+      "estimated_input_tokens": 28061,
+      "max_output_tokens": 3500,
+      "outcome": "succeeded",
+      "elapsed_seconds": 97.707,
+      "prompt_tokens": 6677,
+      "completion_tokens": 2995,
+      "total_tokens": 9672,
+      "usage_status": "reported",
+      "accounted_tokens": 9672,
+      "finish_reason": "stop",
+      "model": "qwen3.6-27b"
+    },
+    {
+      "stage": "observation_set",
+      "repair": false,
+      "estimated_input_tokens": 16550,
+      "max_output_tokens": 4500,
+      "outcome": "succeeded",
+      "elapsed_seconds": 46.639,
+      "prompt_tokens": 4014,
+      "completion_tokens": 1408,
+      "total_tokens": 5422,
+      "usage_status": "reported",
+      "accounted_tokens": 5422,
+      "finish_reason": "stop",
+      "model": "qwen3.6-27b"
+    },
+    {
+      "stage": "risk_candidates",
+      "repair": false,
+      "estimated_input_tokens": 14822,
+      "max_output_tokens": 3000,
+      "outcome": "succeeded",
+      "elapsed_seconds": 35.875,
+      "prompt_tokens": 3946,
+      "completion_tokens": 1042,
+      "total_tokens": 4988,
+      "usage_status": "reported",
+      "accounted_tokens": 4988,
+      "finish_reason": "stop",
+      "model": "qwen3.6-27b"
+    },
+    {
+      "stage": "manual_case_set",
+      "repair": false,
+      "estimated_input_tokens": 31861,
+      "max_output_tokens": 4000,
+      "outcome": "invalid_artifact",
+      "elapsed_seconds": 80.287,
+      "prompt_tokens": 7286,
+      "completion_tokens": 2380,
+      "total_tokens": 9666,
+      "usage_status": "reported",
+      "accounted_tokens": 9666,
+      "finish_reason": "stop",
+      "model": "qwen3.6-27b"
+    },
+    {
+      "stage": "manual_case_set_repair",
+      "repair": true,
+      "estimated_input_tokens": 19105,
+      "max_output_tokens": 4000,
+      "outcome": "succeeded",
+      "elapsed_seconds": 71.77,
+      "prompt_tokens": 4558,
+      "completion_tokens": 2234,
+      "total_tokens": 6792,
+      "usage_status": "reported",
+      "accounted_tokens": 6792,
+      "finish_reason": "stop",
+      "model": "qwen3.6-27b"
+    },
+    {
+      "stage": "manual_case_remainder",
+      "repair": false,
+      "estimated_input_tokens": 24375,
+      "max_output_tokens": 3500,
+      "outcome": "succeeded",
+      "elapsed_seconds": 80.944,
+      "prompt_tokens": 5482,
+      "completion_tokens": 2565,
+      "total_tokens": 8047,
+      "usage_status": "reported",
+      "accounted_tokens": 8047,
+      "finish_reason": "stop",
+      "model": "qwen3.6-27b"
+    },
+    {
+      "stage": "manual_case_review",
+      "repair": false,
+      "estimated_input_tokens": 28158,
+      "max_output_tokens": 5000,
+      "outcome": "invalid_artifact",
+      "elapsed_seconds": 28.553,
+      "prompt_tokens": 6564,
+      "completion_tokens": 691,
+      "total_tokens": 7255,
+      "usage_status": "reported",
+      "accounted_tokens": 7255,
+      "finish_reason": "stop",
+      "model": "qwen3.6-27b"
+    },
+    {
+      "stage": "manual_case_review_repair",
+      "repair": true,
+      "estimated_input_tokens": 5261,
+      "max_output_tokens": 5000,
+      "outcome": "invalid_artifact",
+      "elapsed_seconds": 21.21,
+      "prompt_tokens": 1234,
+      "completion_tokens": 691,
+      "total_tokens": 1925,
+      "usage_status": "reported",
+      "accounted_tokens": 1925,
+      "finish_reason": "stop",
+      "model": "qwen3.6-27b"
+    }
+  ],
+  "usage_summary": {
+    "calls": 9,
+    "repair_calls": 3,
+    "unreported_calls": 0,
+    "prompt_tokens": 45217,
+    "completion_tokens": 16967,
+    "total_tokens": 62184,
+    "reported_total_tokens": 62184,
+    "accounted_tokens": 62184,
+    "budget_tokens": 150000,
+    "remaining_tokens": 87816,
+    "budget_exhausted": false,
+    "estimation_method": "utf8_bytes_plus_256_v1"
+  },
+  "stop_reason": "generation_error",
+  "error": "ValueError: TC-004: coverage input references a missing step/expected result; TC-004: unverified coverage claims: ['COV-sm_order_cancel-2d9f3e982e7a97563789']; TC-005: coverage input references a missing step/expected result; TC-006: coverage input references a missing step/expected result",
+  "generation": {
+    "generation_run_id": "local-20260911T070632Z-cd74153f",
+    "prompt_template_id": "local-design",
+    "prompt_template_version": "efficient-2",
+    "input_sha256": "c9df1767a22b201de071dfaea45989011006ca01f8399ff8fe6ac4c269abb49f",
+    "output_schema_id": "local_run_manifest.schema.json",
+    "model": {
+      "provider": "openai-compatible",
+      "name": "qwen3.6-27b",
+      "version": null
+    },
+    "parameters": {
+      "temperature": 0.15,
+      "seed": null
+    },
+    "generated_at": "2026-09-11T07:06:32.354499Z",
+    "review_status": "pending"
+  }
+}
