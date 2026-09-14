@@ -1,10 +1,16 @@
 {
-  "run_id": "DEMO-3",
+  "run_id": "DEMO-SYNTHETIC-20260914-3",
   "feature_id": "DISCOUNT-01",
   "build_id": "demo-1",
-  "timestamp": "2026-09-10T00:03:00Z",
+  "timestamp": "2026-09-14T00:03:00Z",
   "tc_id": "TC-003",
   "result": "pass",
   "case_revision": "a56e86eb77bacc8cc592d856741f75435b7ceae511f8e735a5ed32aeacc43a2c",
-  "model_hash": "318d0e7a17cc30958cdb52f863989d4320add284a852f027861a9f3b5041ce83"
+  "model_hash": "561fbdb3c818fbe7f03131465e72c566d97c59c5b0edd155b750c8080131068d",
+  "case_content_hash": "sha256:a56e86eb77bacc8cc592d856741f75435b7ceae511f8e735a5ed32aeacc43a2c",
+  "oracle_revision": "875dbc122c4441abfcf0d513b724cb5b89bb2f619d06d400ee4c9844559464b1",
+  "oracle_refs": [
+    "AC-1"
+  ],
+  "spec_revision": "spec-discount-domain-rev-1"
 }

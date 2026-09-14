@@ -127,16 +127,14 @@ class TestIngestMarkdownSpec:
         assert "BR-1: First rule" in result["business_rules"]
         assert result["source_refs"][0]["kind"] == "spec"
 
-    def test_missing_ac_adds_assumption(self, tmp_path: Path) -> None:
+    def test_missing_ac_is_rejected(self, tmp_path: Path) -> None:
         md_file = tmp_path / "test.md"
         md_file.write_text(
             "---\nfeature_id: TEST-02\ntitle: Test\n---\n## Summary\nSome summary\n",
             encoding="utf-8",
         )
-        result = ingest_markdown_spec(md_file)
-
-        assert "[NO ACCEPTANCE CRITERIA FOUND]" in result["acceptance_criteria"]
-        assert any("No acceptance criteria" in a["text"] for a in result.get("assumptions", []))
+        with pytest.raises(ValueError, match="acceptance criteria"):
+            ingest_markdown_spec(md_file)
 
     def test_generates_feature_id_from_filename(self, tmp_path: Path) -> None:
         md_file = tmp_path / "order-cancel.md"

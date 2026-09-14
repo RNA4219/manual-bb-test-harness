@@ -14,15 +14,38 @@ from __future__ import annotations
 
 import argparse
 import csv
+import hashlib
 import json
 import sys
 from pathlib import Path
 from typing import Any
 
 from bb_harness import __version__
-
-# Add scripts/ to path for _shared imports
 from bb_harness.tools._shared.io_common import load_json
+
+
+def _case_identity(case_set: dict[str, Any], case: dict[str, Any]) -> dict[str, Any]:
+    """Build the immutable identity fields carried through external execution."""
+    case_id = str(case.get("tc_id") or "UNKNOWN")
+    case_revision = str(case.get("revision") or "unversioned")
+    canonical_case = {key: value for key, value in case.items() if key != "content_hash"}
+    content_hash = case.get("content_hash") or "sha256:" + hashlib.sha256(
+        json.dumps(canonical_case, sort_keys=True, ensure_ascii=False).encode("utf-8")
+    ).hexdigest()
+    oracle = case.get("oracle")
+    oracle_refs = (
+        case.get("oracle_refs")
+        or (oracle.get("refs") if isinstance(oracle, dict) else None)
+        or case.get("trace_to")
+        or [case_id]
+    )
+    return {
+        "case_revision": case_revision,
+        "spec_revision": str(case.get("spec_revision") or case_set.get("spec_revision") or "unversioned"),
+        "oracle_revision": str(case.get("oracle_revision") or case_revision),
+        "case_content_hash": str(content_hash),
+        "oracle_refs": [str(ref) for ref in oracle_refs],
+    }
 
 
 def convert_to_testrail(case_set: dict[str, Any]) -> dict[str, Any]:
@@ -56,9 +79,13 @@ def convert_to_testrail(case_set: dict[str, Any]) -> dict[str, Any]:
         steps = case.get("steps", [])
         expected = case.get("expected_results", [])
 
+        identity = _case_identity(case_set, case)
         testrail_case: dict[str, Any] = {
             "id": i,
             "section_id": 1,
+            "source_case_id": case.get("tc_id", ""),
+            "source_feature_id": feature_id,
+            **identity,
             "title": case.get("title", f"Test Case {i}"),
             "priority_id": priority_int,
             "estimate": f"{case.get('estimate_minutes', 10)}m",
@@ -66,6 +93,10 @@ def convert_to_testrail(case_set: dict[str, Any]) -> dict[str, Any]:
             "custom_expected": "\n".join(expected),
             "custom_preconds": "\n".join(case.get("preconditions", [])),
             "refs": ",".join(case.get("trace_to", [])),
+            "custom_status": case.get("status", "active"),
+            "custom_retired_reason": case.get("retired_reason", ""),
+            "custom_replacement_refs": ",".join(case.get("replacement_refs", [])),
+            "custom_placement_change_ref": case.get("placement_change_ref", ""),
         }
 
         testrail_data["cases"].append(testrail_case)
@@ -91,6 +122,17 @@ def export_testrail_csv(testrail_data: dict[str, Any], output: Path) -> None:
                 "Steps",
                 "Expected Result",
                 "Refs",
+                "Status",
+                "Retired Reason",
+                "Replacement Refs",
+                "Placement Change Ref",
+                "Source Case ID",
+                "Source Feature ID",
+                "Case Revision",
+                "Spec Revision",
+                "Oracle Revision",
+                "Case Content Hash",
+                "Oracle Refs",
             ]
         )
 
@@ -107,6 +149,17 @@ def export_testrail_csv(testrail_data: dict[str, Any], output: Path) -> None:
                     case["custom_steps"],
                     case["custom_expected"],
                     case.get("refs", ""),
+                    case.get("custom_status", "active"),
+                    case.get("custom_retired_reason", ""),
+                    case.get("custom_replacement_refs", ""),
+                    case.get("custom_placement_change_ref", ""),
+                    case.get("source_case_id", ""),
+                    case.get("source_feature_id", ""),
+                    case.get("case_revision", ""),
+                    case.get("spec_revision", ""),
+                    case.get("oracle_revision", ""),
+                    case.get("case_content_hash", ""),
+                    ",".join(case.get("oracle_refs", [])),
                 ]
             )
 

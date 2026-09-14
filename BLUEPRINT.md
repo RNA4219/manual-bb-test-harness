@@ -60,11 +60,14 @@ Web だけでなく iOS / Android も対象に含めるため、mobile 固有の
   - `risk_register`
   - `technique_plan`
   - `manual_case_set`
+  - `test_plan`
   - `coverage_report`
   - `effort_plan`
   - `gate_decision`
   - `release_brief`
   - `execution_evidence`
+  - `automation_evidence`
+  - `defect_register`
   - `local_run_manifest`
 
 ## 5. Minimal Flow
@@ -78,9 +81,10 @@ flowchart LR
   C --> D["observation_set"]
   D --> E["risk_register"]
   E --> F["manual_case_set"]
-  F --> G["effort_plan"]
-  G --> H["gate_decision"]
-  H --> I["release_brief"]
+  F --> G["test_plan"]
+  G --> H["effort_plan"]
+  H --> I["gate_decision"]
+  I --> J["release_brief"]
 ```
 
 ### Local model flow
@@ -102,6 +106,10 @@ flowchart LR
 ```
 
 LLM応答は既存artifact schemaで拘束する。失敗artifactだけを1回repairし、再失敗時は部分成果物とfailed manifestを残して非ゼロ終了する。raw promptとAPI keyはmanifestへ保存しない。
+
+## RanDとの責務境界
+
+RanDはR&D成果物を生成し、manual-bbは`import rand`で要求候補・監査・文書・handoffを取り込む。`rand_intake`で原文と不確実性、変更範囲、既知欠陥を保持し、既存のfeature_spec以降の設計へ渡す。[連携仕様](docs/tasks/task-rand-integration-20260912.md)を正本とする。
 
 ## 6. Interfaces
 

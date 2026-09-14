@@ -27,6 +27,9 @@
           "risk_ids",
           "reason",
           "owner",
+          "approver",
+          "approved_at",
+          "approval_ref",
           "expires_at",
           "containment",
           "rollback"
@@ -48,6 +51,18 @@
             "minLength": 1
           },
           "owner": {
+            "type": "string",
+            "minLength": 1
+          },
+          "approver": {
+            "type": "string",
+            "minLength": 1
+          },
+          "approved_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "approval_ref": {
             "type": "string",
             "minLength": 1
           },

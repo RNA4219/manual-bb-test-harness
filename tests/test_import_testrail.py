@@ -42,7 +42,8 @@ class TestStatusMap:
         status_map = module.STATUS_MAP
 
         assert status_map[1] == "pass"
-        assert status_map[4] == "fail"
+        assert status_map[5] == "fail"
+        assert status_map[4] == "skip"
         assert status_map[2] == "blocked"
         assert status_map[3] == "skip"
 
@@ -155,7 +156,7 @@ class TestConvertToExecutionEvidence:
         """Convert failed test with defect."""
         module = load_import_testrail_module()
 
-        test = {"id": 1, "case_id": 100, "status_id": 4}
+        test = {"id": 1, "case_id": 100, "status_id": 5}
         result = {"elapsed": "30s", "defects": ["BUG-001"], "comment": "Failed"}
         tester = "tester1"
         run_id = 1234
@@ -456,7 +457,7 @@ class TestDefectStubHandling:
         """Defects as string."""
         module = load_import_testrail_module()
 
-        test = {"id": 1, "case_id": 100, "status_id": 4}
+        test = {"id": 1, "case_id": 100, "status_id": 5}
         result = {"defects": "BUG-001"}
         evidence = module.convert_to_execution_evidence(test, result, "tester", 1234)
 
@@ -466,7 +467,7 @@ class TestDefectStubHandling:
         """Failed test without defects."""
         module = load_import_testrail_module()
 
-        test = {"id": 1, "case_id": 100, "status_id": 4}
+        test = {"id": 1, "case_id": 100, "status_id": 5}
         result = {}
         evidence = module.convert_to_execution_evidence(test, result, "tester", 1234)
 
@@ -557,8 +558,8 @@ class TestImportTestrailResultsMocked:
         )
 
         mock_tests = [
-            {"id": 1, "case_id": 100, "status_id": 1, "assigned_to_id": 5},
-            {"id": 2, "case_id": 101, "status_id": 4, "assigned_to_id": 5},
+            {"id": 1, "case_id": 100, "source_case_id": "TC-100", "status_id": 1, "assigned_to_id": 5},
+            {"id": 2, "case_id": 101, "source_case_id": "TC-101", "status_id": 5, "assigned_to_id": 5},
         ]
 
         mock_results = {"elapsed": "1m", "comment": "passed"}
@@ -597,7 +598,7 @@ class TestImportTestrailResultsErrorPaths:
         )
 
         mock_tests = [
-            {"id": 1, "case_id": 100, "status_id": 1, "assigned_to_id": 5},
+            {"id": 1, "case_id": 100, "source_case_id": "TC-100", "status_id": 1, "assigned_to_id": 5},
         ]
 
         def fetch_user_side_effect(*args, **kwargs):
@@ -615,7 +616,7 @@ class TestImportTestrailResultsErrorPaths:
                         assert results[0]["tester"] == "User_5"
 
     def test_import_with_fetch_test_results_exception(self) -> None:
-        """Fetch test results raises exception, use empty result."""
+        """結果詳細が取得できなければ、欠けた証跡を成功扱いせず中断する。"""
         from unittest import mock
 
         module = load_import_testrail_module()
@@ -627,7 +628,7 @@ class TestImportTestrailResultsErrorPaths:
         )
 
         mock_tests = [
-            {"id": 1, "case_id": 100, "status_id": 1, "assigned_to_id": 0},
+            {"id": 1, "case_id": 100, "source_case_id": "TC-100", "status_id": 1, "assigned_to_id": 0},
         ]
 
         def fetch_results_side_effect(*args, **kwargs):
@@ -636,11 +637,10 @@ class TestImportTestrailResultsErrorPaths:
         with mock.patch.object(module, "get_testrail_client", return_value=mock_client):
             with mock.patch.object(module, "fetch_tests", return_value=mock_tests):
                 with mock.patch.object(module, "fetch_test_results", side_effect=fetch_results_side_effect):
-                    results, stats = module.import_testrail_results(
-                        project_id=12, run_id=1234, dry_run=False
-                    )
-
-                    assert len(results) == 1
+                    with pytest.raises(ValueError, match="1"):
+                        module.import_testrail_results(
+                            project_id=12, run_id=1234, dry_run=False
+                        )
 
     def test_import_with_no_assigned_user(self) -> None:
         """Test with no assigned user, tester is 'unknown'."""
@@ -655,7 +655,7 @@ class TestImportTestrailResultsErrorPaths:
         )
 
         mock_tests = [
-            {"id": 1, "case_id": 100, "status_id": 1, "assigned_to_id": 0},
+            {"id": 1, "case_id": 100, "source_case_id": "TC-100", "status_id": 1, "assigned_to_id": 0},
         ]
 
         with mock.patch.object(module, "get_testrail_client", return_value=mock_client):
@@ -709,7 +709,7 @@ class TestConvertToExecutionEvidenceEdgeCases:
         """Defects as string instead of list."""
         module = load_import_testrail_module()
 
-        test = {"id": 1, "case_id": 100, "status_id": 4}
+        test = {"id": 1, "case_id": 100, "status_id": 5}
         result = {"defects": "BUG-001"}
         evidence = module.convert_to_execution_evidence(test, result, "tester", 1234)
 
@@ -753,11 +753,11 @@ class TestImportTestrailResultsAllStatuses:
         )
 
         mock_tests = [
-            {"id": 1, "case_id": 100, "status_id": 1, "assigned_to_id": 0},  # pass
-            {"id": 2, "case_id": 101, "status_id": 4, "assigned_to_id": 0},  # fail
-            {"id": 3, "case_id": 102, "status_id": 3, "assigned_to_id": 0},  # skip
-            {"id": 4, "case_id": 103, "status_id": 2, "assigned_to_id": 0},  # blocked
-            {"id": 5, "case_id": 104, "status_id": 5, "assigned_to_id": 0},  # retest (skip)
+            {"id": 1, "case_id": 100, "source_case_id": "TC-100", "status_id": 1, "assigned_to_id": 0},  # pass
+            {"id": 2, "case_id": 101, "source_case_id": "TC-101", "status_id": 5, "assigned_to_id": 0},  # Failed
+            {"id": 3, "case_id": 102, "source_case_id": "TC-102", "status_id": 3, "assigned_to_id": 0},  # skip
+            {"id": 4, "case_id": 103, "source_case_id": "TC-103", "status_id": 2, "assigned_to_id": 0},  # blocked
+            {"id": 5, "case_id": 104, "source_case_id": "TC-104", "status_id": 4, "assigned_to_id": 0},  # Retest
         ]
 
         with mock.patch.object(module, "get_testrail_client", return_value=mock_client):
@@ -785,7 +785,7 @@ class TestImportTestrailResultsAllStatuses:
         )
 
         mock_tests = [
-            {"id": 1, "case_id": 100, "status_id": 2, "assigned_to_id": 0},  # blocked
+            {"id": 1, "case_id": 100, "source_case_id": "TC-100", "status_id": 2, "assigned_to_id": 0},  # blocked
         ]
 
         with mock.patch.object(module, "get_testrail_client", return_value=mock_client):
@@ -810,7 +810,7 @@ class TestImportTestrailResultsAllStatuses:
         )
 
         mock_tests = [
-            {"id": 1, "case_id": 100, "status_id": 3, "assigned_to_id": 0},  # skip (untested)
+            {"id": 1, "case_id": 100, "source_case_id": "TC-100", "status_id": 3, "assigned_to_id": 0},  # skip (untested)
         ]
 
         with mock.patch.object(module, "get_testrail_client", return_value=mock_client):

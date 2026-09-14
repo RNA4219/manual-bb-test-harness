@@ -10,9 +10,18 @@
       "items": {
         "type": "object",
         "properties": {
-          "id": {"type": "integer", "description": "Section ID"},
-          "name": {"type": "string", "description": "Section name (feature_id)"},
-          "description": {"type": "string", "description": "Section description"}
+          "id": {
+            "type": "integer",
+            "description": "Section ID"
+          },
+          "name": {
+            "type": "string",
+            "description": "Section name (feature_id)"
+          },
+          "description": {
+            "type": "string",
+            "description": "Section description"
+          }
         }
       },
       "description": "TestRail sections (grouped by feature)"
@@ -22,16 +31,108 @@
       "items": {
         "type": "object",
         "properties": {
-          "id": {"type": "integer", "description": "Case ID"},
-          "section_id": {"type": "integer", "description": "Parent section ID"},
-          "title": {"type": "string", "description": "Test case title"},
-          "priority_id": {"type": "integer", "minimum": 1, "maximum": 5, "description": "Priority (5=Highest, 1=Lowest)"},
-          "estimate": {"type": "string", "description": "Time estimate (e.g., '10m')"},
-          "custom_steps": {"type": "string", "description": "Test steps as numbered list"},
-          "custom_expected": {"type": "string", "description": "Expected results"},
-          "custom_preconds": {"type": "string", "description": "Preconditions"},
-          "refs": {"type": "string", "description": "Trace references (comma-separated)"}
-        }
+          "id": {
+            "type": "integer",
+            "description": "Case ID"
+          },
+          "section_id": {
+            "type": "integer",
+            "description": "Parent section ID"
+          },
+          "source_case_id": {
+            "type": "string",
+            "minLength": 1,
+            "description": "Stable harness case ID"
+          },
+          "source_feature_id": {
+            "type": "string",
+            "minLength": 1,
+            "description": "Stable harness feature ID"
+          },
+          "case_revision": {
+            "type": "string",
+            "minLength": 1
+          },
+          "spec_revision": {
+            "type": "string",
+            "minLength": 1
+          },
+          "oracle_revision": {
+            "type": "string",
+            "minLength": 1
+          },
+          "case_content_hash": {
+            "type": "string",
+            "minLength": 1
+          },
+          "oracle_refs": {
+            "type": "array",
+            "minItems": 1,
+            "items": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          "title": {
+            "type": "string",
+            "description": "Test case title"
+          },
+          "priority_id": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 5,
+            "description": "Priority (5=Highest, 1=Lowest)"
+          },
+          "estimate": {
+            "type": "string",
+            "description": "Time estimate (e.g., '10m')"
+          },
+          "custom_steps": {
+            "type": "string",
+            "description": "Test steps as numbered list"
+          },
+          "custom_expected": {
+            "type": "string",
+            "description": "Expected results"
+          },
+          "custom_preconds": {
+            "type": "string",
+            "description": "Preconditions"
+          },
+          "refs": {
+            "type": "string",
+            "description": "Trace references (comma-separated)"
+          },
+          "custom_status": {
+            "type": "string",
+            "enum": [
+              "active",
+              "retired"
+            ],
+            "description": "Manual case lifecycle status"
+          },
+          "custom_retired_reason": {
+            "type": "string",
+            "description": "Reason the manual case was retired"
+          },
+          "custom_replacement_refs": {
+            "type": "string",
+            "description": "Replacement coverage references (comma-separated)"
+          },
+          "custom_placement_change_ref": {
+            "type": "string",
+            "description": "QEG placement change reference"
+          }
+        },
+        "required": [
+          "source_case_id",
+          "source_feature_id",
+          "case_revision",
+          "spec_revision",
+          "oracle_revision",
+          "case_content_hash",
+          "oracle_refs"
+        ]
       },
       "description": "Test cases"
     }

@@ -37,45 +37,56 @@ def parse_yaml_frontmatter(content: str) -> dict[str, str]:
 
 
 def extract_markdown_sections(content: str) -> dict[str, list[str]]:
-    """Extract Markdown sections and their list/paragraph content."""
+    """見出しの親子関係を保ち、同じ種別の項目を出現順に集める。"""
     sections: dict[str, list[str]] = {}
+    section_titles: dict[str, str] = {}
+    heading_stack: list[tuple[int, str]] = []
     current_section: str | None = None
-    current_items: list[str] = []
+    known_sections = {
+        "acceptance_criteria", "business_rules", "requirements", "actors", "summary",
+        "devices", "mobile_contexts", "changed_areas",
+    }
     lines = content.split("\n")
     frontmatter_end = _find_frontmatter_end(lines)
 
     for line in lines[frontmatter_end:]:
         stripped = line.strip()
-        section_match = re.match(r"^##+\s+(.+)$", stripped)
+        section_match = re.match(r"^(#{1,6})\s+(.+)$", stripped)
         if section_match:
-            if current_section and current_items:
-                sections[current_section] = current_items
-            current_section = section_match.group(1).strip()
-            current_items = []
+            level = len(section_match.group(1))
+            name = section_match.group(2).strip()
+            while heading_stack and heading_stack[-1][0] >= level:
+                heading_stack.pop()
+            if normalize_section_name(name) not in known_sections and heading_stack:
+                name = heading_stack[-1][1]
+            heading_stack.append((level, name))
+            normalized_name = normalize_section_name(name)
+            current_section = section_titles.setdefault(normalized_name, name)
+            continue
+
+        if not current_section or re.fullmatch(
+            r"(?:\*\s*){3,}|(?:-\s*){3,}|(?:_\s*){3,}", stripped
+        ):
             continue
 
         if stripped.startswith(("- ", "* ")) or re.match(r"^\d+\.\s", stripped):
             item_text = re.sub(r"^\d+\.\s*", "", stripped.lstrip("- *").strip())
             if item_text:
-                current_items.append(item_text)
+                sections.setdefault(current_section, []).append(item_text)
             continue
 
-        if stripped and current_section:
-            current_items.append(stripped)
+        if stripped:
+            sections.setdefault(current_section, []).append(stripped)
 
-    if current_section and current_items:
-        sections[current_section] = current_items
     return sections
 
 
 def _find_frontmatter_end(lines: list[str]) -> int:
-    in_frontmatter = False
-    for index, line in enumerate(lines):
-        if line.strip() != "---":
-            continue
-        if not in_frontmatter:
-            in_frontmatter = True
-        else:
+    # 本文の水平線を frontmatter の区切りとして扱わない。
+    if not lines or lines[0].strip() != "---":
+        return 0
+    for index, line in enumerate(lines[1:], start=1):
+        if line.strip() == "---":
             return index + 1
     return 0
 
@@ -85,13 +96,21 @@ def normalize_section_name(name: str) -> str:
     name_lower = name.lower().strip()
     exact_mappings = {
         "acceptance criteria": "acceptance_criteria",
+        "受入条件": "acceptance_criteria",
+        "受け入れ条件": "acceptance_criteria",
+        "受入基準": "acceptance_criteria",
+        "受け入れ基準": "acceptance_criteria",
+        "要件": "acceptance_criteria",
+        "機能要件": "acceptance_criteria",
         "ac": "acceptance_criteria",
         "business rules": "business_rules",
+        "業務ルール": "business_rules",
         "br": "business_rules",
         "requirements": "requirements",
         "actors": "actors",
         "summary": "summary",
         "devices": "devices",
+        "environments": "devices",
         "mobile contexts": "mobile_contexts",
         "changed areas": "changed_areas",
     }
@@ -113,10 +132,9 @@ def ingest_markdown_spec(path: Path) -> dict[str, Any]:
         raise ValueError(f"Cannot read {path}: {exc}") from exc
 
     frontmatter = parse_yaml_frontmatter(content)
-    normalized_sections = {
-        normalize_section_name(name): items
-        for name, items in extract_markdown_sections(content).items()
-    }
+    normalized_sections: dict[str, list[str]] = {}
+    for name, items in extract_markdown_sections(content).items():
+        normalized_sections.setdefault(normalize_section_name(name), []).extend(items)
     feature_id = frontmatter.get("feature_id", frontmatter.get("id", ""))
     if not feature_id:
         feature_id = re.sub(r"[^A-Z0-9-]", "", path.stem.upper().replace("-", "-"))
@@ -141,17 +159,9 @@ def ingest_markdown_spec(path: Path) -> dict[str, Any]:
 
 
 def _merge_markdown_sections(result: dict[str, Any], sections: dict[str, list[str]]) -> None:
-    if "acceptance_criteria" in sections:
-        result["acceptance_criteria"] = sections["acceptance_criteria"]
-    else:
-        result["acceptance_criteria"] = ["[NO ACCEPTANCE CRITERIA FOUND]"]
-        result.setdefault("assumptions", []).append(
-            {
-                "id": "ASM-1",
-                "text": "No acceptance criteria section found in source",
-                "severity": "high",
-            }
-        )
+    if not sections.get("acceptance_criteria"):
+        raise ValueError("No acceptance criteria found in Markdown source")
+    result["acceptance_criteria"] = sections["acceptance_criteria"]
 
     optional_fields = [
         "business_rules",

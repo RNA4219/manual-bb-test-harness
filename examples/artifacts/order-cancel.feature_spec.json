@@ -1,8 +1,12 @@
 {
   "feature_id": "ORD-CANCEL-01",
+  "revision": "spec-rev-20260912",
   "title": "注文キャンセル機能",
   "summary": "出荷前の注文のみキャンセル可能。成功時は在庫とクーポン残数を復元する。",
-  "actors": ["buyer", "cs_agent"],
+  "actors": [
+    "buyer",
+    "cs_agent"
+  ],
   "acceptance_criteria": [
     "出荷前の注文のみキャンセルできる",
     "出荷済み注文はキャンセル不可メッセージを表示する",
@@ -13,13 +17,52 @@
     "決済失敗注文はキャンセル済み扱いにしない",
     "二重キャンセルは不可"
   ],
-  "changed_areas": ["order_detail", "inventory_service", "coupon_service"],
-  "devices": ["Web", "iOS", "Android"],
-  "mobile_contexts": ["foreground", "background_resume", "offline"],
+  "changed_areas": [
+    "order_detail",
+    "inventory_service",
+    "coupon_service"
+  ],
+  "devices": [
+    "Web",
+    "iOS",
+    "Android"
+  ],
+  "mobile_contexts": [
+    "foreground",
+    "background_resume",
+    "offline"
+  ],
   "source_refs": [
-    {"id": "AC-1", "kind": "ac", "excerpt": "出荷前の注文のみキャンセルできる"},
-    {"id": "AC-2", "kind": "ac", "excerpt": "出荷済み注文はキャンセル不可メッセージを表示する"},
-    {"id": "BR-1", "kind": "rule", "excerpt": "決済失敗注文はキャンセル済み扱いにしない"}
+    {
+      "id": "AC-1",
+      "kind": "ac",
+      "excerpt": "出荷前の注文のみキャンセルできる"
+    },
+    {
+      "id": "AC-2",
+      "kind": "ac",
+      "excerpt": "出荷済み注文はキャンセル不可メッセージを表示する"
+    },
+    {
+      "id": "AC-3",
+      "kind": "ac",
+      "excerpt": "キャンセル成功時は在庫を戻す"
+    },
+    {
+      "id": "AC-4",
+      "kind": "ac",
+      "excerpt": "クーポン利用注文ではクーポン残数を復元する"
+    },
+    {
+      "id": "BR-1",
+      "kind": "rule",
+      "excerpt": "決済失敗注文はキャンセル済み扱いにしない"
+    },
+    {
+      "id": "BR-2",
+      "kind": "rule",
+      "excerpt": "二重キャンセルは不可"
+    }
   ],
   "assumptions": []
 }

@@ -13,6 +13,15 @@
     "二重キャンセルは防止されている",
     "再試行時は適切なエラー表示あり"
   ],
-  "attachments": ["s3://evidence/RUN-003/session_notes.md"],
-  "time_spent_minutes": 25
+  "attachments": [
+    "s3://evidence/RUN-003/session_notes.md"
+  ],
+  "time_spent_minutes": 25,
+  "case_revision": "charter-rev-1",
+  "spec_revision": "spec-rev-20260912",
+  "oracle_revision": "oracle-rev-1",
+  "case_content_hash": "sha256:ord-cancel-charter-001-rev-1",
+  "oracle_refs": [
+    "AC-1"
+  ]
 }

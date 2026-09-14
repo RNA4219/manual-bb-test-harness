@@ -23,6 +23,13 @@ Notion を主な保存先にする場合は `docs/notion-report-guide.md` と `d
 | Gate decision |  |
 | Communication |  |
 
+## Retired Case Check
+
+- retired cases:
+- replacement refs:
+- placement change refs:
+- gate output distinguishes retired from not run: yes | no
+
 ## Required Anchors
 
 - present:

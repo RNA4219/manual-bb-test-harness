@@ -80,6 +80,7 @@
               "boundary_value",
               "decision_table",
               "state_transition",
+              "checklist_based",
               "exploratory",
               "error_guessing",
               "use_case",
@@ -128,6 +129,88 @@
           ],
           "description": "Confidence level in this observation's validity."
         },
+        "support_count": {
+          "type": "integer",
+          "minimum": 1,
+          "description": "Number of independent derivation runs that proposed this observation. This is a confidence signal, not a mandatory/optional rule."
+        },
+        "run_count": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "mandatory_reason": {
+          "type": "string",
+          "minLength": 1
+        },
+        "checklist": {
+          "type": "object",
+          "required": [
+            "id",
+            "revision",
+            "items"
+          ],
+          "properties": {
+            "id": {
+              "type": "string",
+              "minLength": 1
+            },
+            "revision": {
+              "type": "string",
+              "minLength": 1
+            },
+            "items": {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": "object",
+                "required": [
+                  "id",
+                  "result"
+                ],
+                "properties": {
+                  "id": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "result": {
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "blocked",
+                      "not_applicable",
+                      "not_run"
+                    ]
+                  },
+                  "reason": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "notes": {
+                    "type": "string"
+                  }
+                },
+                "allOf": [
+                  {
+                    "if": {
+                      "properties": {
+                        "result": {
+                          "const": "not_applicable"
+                        }
+                      }
+                    },
+                    "then": {
+                      "required": [
+                        "reason"
+                      ]
+                    }
+                  }
+                ],
+                "additionalProperties": false
+              }
+            }
+          },
+          "additionalProperties": false
+        },
         "technique_refs": {
           "type": "array",
           "items": {
@@ -160,6 +243,24 @@
           "minItems": 0
         }
       },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "techniques": {
+                "contains": {
+                  "const": "checklist_based"
+                }
+              }
+            }
+          },
+          "then": {
+            "required": [
+              "checklist"
+            ]
+          }
+        }
+      ],
       "additionalProperties": false
     }
   }

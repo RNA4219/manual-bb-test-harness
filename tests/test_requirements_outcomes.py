@@ -145,7 +145,7 @@ def test_empty_dataset_produces_insufficient_data_and_protects_output(tmp_path):
     output = tmp_path / "analysis"
     args = ["--input", str(path), "--output", str(output)]
     study.main(args)
-    assert json.loads((output / "analysis.json").read_text())["status"] == "insufficient_data"
+    assert json.loads((output / "analysis.json").read_text(encoding="utf-8"))["status"] == "insufficient_data"
     assert "| calibration | 0 | 0 |" in (output / "summary.md").read_text(encoding="utf-8")
     with pytest.raises(ValueError, match="新規"):
         study.main(args)

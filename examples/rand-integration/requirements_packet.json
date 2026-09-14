@@ -1,0 +1,37 @@
+{
+  "schema_version": "2.0",
+  "id": "rand:packet:save-research",
+  "type": "requirements_packet",
+  "packet_id": "rand:packet:save-research",
+  "status": "ok",
+  "assumptions": [
+    "利用者反応の偏りがあり得る"
+  ],
+  "requirements": [
+    {
+      "requirement_id": "rand:REQ-1",
+      "statement": "結果を保存できる",
+      "acceptance_criteria": [
+        "保存操作後に結果ファイルが生成される"
+      ],
+      "confidence": 0.82,
+      "bias_note": "肯定的な公開反応への偏り",
+      "kill_condition": "保存結果が再利用されない",
+      "evidence_refs": [
+        "EV-1"
+      ],
+      "manual_bb_focus": [
+        "中断と再試行"
+      ],
+      "gate_verdict": "go"
+    },
+    {
+      "requirement_id": "rand:REQ-2",
+      "statement": "保存履歴を使いやすくする",
+      "acceptance_criteria": [],
+      "confidence": 0.45,
+      "bias_note": "対象利用者が未確認",
+      "kill_condition": "要求が確認されない"
+    }
+  ]
+}

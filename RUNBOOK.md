@@ -2,14 +2,14 @@
 intent_id: INT-MBB-001
 owner: manual-bb-test-harness
 release_version: 4.1.1
-test_count: 1168
-knowledge_map: 33 nodes, 45 edges, 33 capsules
 next_review_due: 2026-10-11
 status: active
 last_reviewed_at: 2026-05-16
 ---
 
 # Runbook
+
+利用の入口は [README](README.md)、変更履歴は [CHANGELOG](CHANGELOG.md)、検証結果は [レビュー記録](docs/istqb-review-round2-20260912.md)を参照してください。
 
 ## Environments
 
@@ -56,6 +56,8 @@ Get-Content .\goldens\mobile-session-resume.expected.md
 
 ### 3. 仕様取り込みを変えたとき
 
+Markdown 取り込みは、受入条件の子見出し・繰り返し節・水平線・環境を保持します。受入条件がない場合は終了コード 1 で中断し、既存の出力を保持します。
+
 ```powershell
 uv run pytest tests\test_spec_ingest.py
 uv run python .\scripts\spec-ingest.py --source markdown --input .\goldens\order-cancel.input.md --output .\exports\order-cancel.feature_spec.json
@@ -63,11 +65,22 @@ uv run python .\scripts\spec-ingest.py --source markdown --input .\goldens\order
 
 ### 4. repo 全体を検証する
 
+リポジトリのルートで実行します。検証結果の件数や実施条件は、変更ごとの [検収記録](docs/acceptance/)へ残します。
+
 ```powershell
+uv sync
 uv run pytest
-uv run python .\scripts\quick-validate-skill.py .\skills\manual-bb-test-harness
+uv run ruff check .
+uv run python scripts/quick-validate-skill.py skills/manual-bb-test-harness
 .\scripts\validate-skill.ps1
+uv run python scripts/validate-artifact.py --all examples/artifacts --strict
+uv run python scripts/validate-artifact.py --all examples/evidence-lifecycle --strict
+uv run python scripts/validate-spec.py --all
+uv run python tools/ci/check_workflow_cookbook_tier.py --repo .
+uv run python tools/ci/check_workflow_cookbook_freshness.py --repo . --strict
 ```
+
+文書を編集したときは capsule の要約も見直し、`uv run python tools/ci/sync_workflow_metadata.py --repo .` でメタデータを同期してから freshness を確認します。
 
 ### 5. 変更単位を記録する
 
@@ -101,7 +114,19 @@ uv run bb-harness --verbose ingest --source markdown --input spec.md --output fe
 uv run bb-harness --verbose gate --input artifacts --output gate.json
 ```
 
-### 7. ローカルモデルで設計する
+### 7. RanD の成果物を取り込む
+
+`bb-harness import rand` はローカルの要求候補・監査結果から、テスト設計入力と依頼文を新しい directory へ保存します。
+
+```powershell
+uv run bb-harness import rand --input path/to/requirements_packet.json --feature-id MY-FEATURE --output tmp/rand-review-01
+```
+
+生成された `test_design_prompt.md` を Skill への依頼文として使います。`--diff` で文書差分、`--defects` で既知欠陥を追加できます。仕様・対応形式・引き継ぎの詳細は [RanD 連携](skills/manual-bb-test-harness/references/rand-integration.md)を参照してください。
+
+正常保存は終了コード 0、入力・保存失敗は 1、公開後の lock 解放警告は参照を保持して 2 を返します。
+
+### 8. ローカルモデルで設計する
 
 llama.cppまたはLM StudioでOpenAI互換serverを起動し、先にmodel一覧を確認する。
 
@@ -355,17 +380,53 @@ uv run bb-harness import testrail --project 12 --run 1234 --output execution_evi
 
 **重要**: Secret は `.env` ファイルや CI secrets に保存し、repo に commit しない。
 
-## Gate 2.0 Operation
+## Gate の実行
 
-1. execution evidenceの`feature_id / build_id / timestamp`と、`tc_id`または`charter_id`の一方を確認する。
-2. 対象buildと一致する`automation_evidence`を用意する。
-3. waiverが必要なら、承認済み`waiver_set`へowner、期限、containment、rollbackを明記する。Gateはwaiverを自動生成しない。
-4. `bb-harness gate --input <artifact-dir> --build-id <build>`を実行する。
-5. `gate_decision`の`evidence_summary / waivers / unmet_conditions`をrelease evidenceへ保存する。
+既定 profile は `standard` です。Gate には同じ feature/build の入力を用意します。`--input` で一意に発見できない場合は、`--feature`、`--model`、`--observations` などで明示パスを指定します。
 
-P0非pass、open blocker/critical/high defect、未解決critical assumptionはwaiverできません。同一case/buildに同時刻の証跡が複数ある場合は入力を修正し、任意に選択しないでください。 automation証跡不足/閾値未達もwaiverできず、P1/mandatory observationのwaiverは未達からtraceできるrisk IDを全て覆う必要があります。
+| 入力 | 確認すること |
+|---|---|
+| `feature_spec` / `test_model` / `observation_set` | 受入条件、ID 付きの確認対象、1 件以上の観点がある |
+| `risk_register` / `manual_case_set` | リスクとケースの追跡関係、仕様・ケース・oracle の版と内容 hash が一致する |
+| `execution_evidence` | `feature_id`、`build_id`、`timestamp`、`tc_id` または `charter_id` と、定義に対応する版を記録する |
+| `automation_evidence` | カバレッジや静的解析に加え、実際の `test_suites` の結果がある |
+| `defect_register` / `waiver_set` | 欠陥履歴がある場合は台帳、例外適用が必要な場合は承認済み waiver を渡す |
 
-## Release 2.0 Validation
+```powershell
+uv run bb-harness gate --input examples/artifacts --build-id web-1.42.0+1289 --output tmp/gate.json
+```
+
+この例の期待値は `conditional_go` です。`gate_decision` の `evidence_summary`、`waivers`、`unmet_conditions` を確認し、リリース判断の証跡へ保存します。
+
+### 実行構成と欠陥履歴
+
+`manual_case_set.execution_configurations` で構成を定義し、必要に応じてケースの `configuration_ids` で対象を絞ります。証跡の `configuration_id` を計画と揃え、未実行の必須構成も結果に残します。
+
+未解決欠陥の履歴と確認証跡は `defect_register` に保存します。`--defects` または `--input` で台帳を渡してください。
+
+```powershell
+uv run bb-harness gate --input examples/evidence-lifecycle --defects examples/evidence-lifecycle/lifecycle.defect_register.json --output tmp/lifecycle.gate_decision.json
+uv run python scripts/validate-artifact.py --all examples/evidence-lifecycle --strict
+```
+
+この例の期待値は `no_go` です。iOS 未実行、未解決 high 欠陥、suite 失敗が理由に残ります。
+
+### 判定と例外承認
+
+- retired を除いた計画ケースを分母とし、証跡のないケースは `untested` とします。retired の理由と移管先も出力へ保持します。
+- 計画した P0 の非 pass、必須 suite の失敗・中断・未実行・skip・0 件実行、カバレッジ等の閾値未達は `no_go` です。リスク分析で P0 が存在しない場合は N/A とします。
+- 未解決の blocker/critical/high 欠陥と critical assumption は waiver で覆せません。`accepted` だけでは解消扱いにしません。
+- P1・mandatory observation・残余リスクへの waiver は、未達から追跡できる risk ID を覆う必要があります。owner と別の approver、承認日時、承認根拠、期限、containment、rollback を記録します。自己承認、未来の承認、期限切れは拒否します。
+
+### 入力エラーと移行
+
+`no_go` は正常な判定なので終了コードは 0 です。必須入力の欠落・schema 不正・feature/build 不一致・ID 重複・非有限数値・曖昧な重複証跡は終了コード 1 となり、既存の Gate 出力を保持します。
+
+2.0 より前の artifact はそのまま読み込めません。カバレッジだけの自動証跡には実際の suite 結果を補い、仕様・ケース・oracle の版と内容 hash を定義・実行証跡の両方へ追加します。詳細は [artifact 契約](skills/manual-bb-test-harness/references/artifact-contract.md)を参照してください。
+
+## 配布前の検証
+
+wheel と sdist を repo 外の一時 directory に隔離インストールし、主要 subcommand と配布成果物を確認します。
 
 ```powershell
 uv run ruff check src scripts tests tools

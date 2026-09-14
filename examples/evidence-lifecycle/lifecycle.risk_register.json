@@ -1,0 +1,15 @@
+{
+  "feature_id": "EVIDENCE-LIFECYCLE",
+  "risks": [
+    {
+      "id": "RISK-1",
+      "scenario": "保存失敗",
+      "impact": 5,
+      "likelihood": 3,
+      "priority": "P0",
+      "trace_to": [
+        "TC-1"
+      ]
+    }
+  ]
+}

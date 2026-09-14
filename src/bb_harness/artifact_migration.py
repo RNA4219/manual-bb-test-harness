@@ -12,10 +12,8 @@ CASE_ADDITIONS = {
     "coverage_obligation_ids",
     "coverage_inputs",
     "test_data",
-    "case_revision",
 }
 CHARTER_ADDITIONS = {
-    "case_revision",
     "technique_refs",
     "basis_refs",
     "mission",
@@ -28,7 +26,6 @@ CHARTER_ADDITIONS = {
 }
 OBS_ADDITIONS = {"technique_refs", "model_refs", "coverage_obligation_ids", "basis_refs"}
 EVIDENCE_ADDITIONS = {
-    "case_revision",
     "model_hash",
     "coverage_obligation_ids",
     "relation_evaluation",

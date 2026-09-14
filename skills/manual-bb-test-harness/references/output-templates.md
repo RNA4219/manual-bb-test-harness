@@ -63,6 +63,8 @@
 - regression_edges:
 - platform_matrix:
 - quality_lenses:
+  - id / lens / applicable / reason / owner / oracle:
+- improvement_feedback:
 
 ## リスク
 | id | scenario | I | L | modifiers | score | priority | rationale |
@@ -73,8 +75,16 @@
 |---|---|---|---|---|---|---|---|---:|
 
 ## 探索チャーター
-| id | priority | title | scope | questions | trace_to | minutes |
-|---|---|---|---|---|---|---:|
+| id | priority | title | scope | questions | timebox | session notes | findings | retrospective | trace_to |
+|---|---|---|---|---|---:|---|---|---|---|
+
+## テスト計画
+- objective / test_level:
+- entry_criteria:
+- stop_conditions:
+- resume_conditions:
+- data_readiness / environment_readiness:
+- estimate_basis / uncertainty:
 
 ## 工数
 - prep:
@@ -119,6 +129,9 @@
 ## Waivers
 - id:
 - owner:
+- approver:
+- approved_at:
+- approval_ref:
 - expires_at:
 - containment:
 
@@ -135,6 +148,10 @@
   "tc_id": "TC-001",
   "feature_id": "FEATURE-001",
   "build_id": "web-1.42.0+1289",
+  "case_revision": "case-rev-2",
+  "spec_revision": "spec-rev-7",
+  "oracle_revision": "oracle-rev-3",
+  "case_content_hash": "sha256:case-content",
   "timestamp": "2026-07-11T10:00:00+09:00",
   "env": "stg",
   "device": "iPhone 15 / iOS 18.4",

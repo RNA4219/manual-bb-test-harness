@@ -6,13 +6,19 @@
   "type": "object",
   "required": [
     "feature_id",
-    "manual_cases"
+    "manual_cases",
+    "spec_revision"
   ],
   "properties": {
     "feature_id": {
       "type": "string",
       "minLength": 1,
       "description": "Reference to the feature_spec feature_id these cases cover."
+    },
+    "spec_revision": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Feature specification revision used to design this case set and bind exported execution evidence."
     },
     "manual_cases": {
       "type": "array",
@@ -41,6 +47,36 @@
         "$ref": "#/$defs/RoleMatrixEntry"
       },
       "description": "Role-based access matrix: actor_role x target_role x action combinations."
+    },
+    "execution_configurations": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": [
+          "id",
+          "env"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "env": {
+            "type": "string",
+            "minLength": 1
+          },
+          "device": {
+            "type": "string",
+            "minLength": 1
+          },
+          "network_profile": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "additionalProperties": false
+      }
     },
     "schema_version": {
       "const": "1.1.0"
@@ -81,7 +117,10 @@
         "steps",
         "expected_results",
         "oracle",
-        "trace_to"
+        "trace_to",
+        "revision",
+        "content_hash",
+        "oracle_revision"
       ],
       "description": "Single scripted manual test case with complete execution instructions.",
       "properties": {
@@ -89,6 +128,20 @@
           "type": "string",
           "minLength": 1,
           "description": "Unique test case identifier, e.g., 'TC-001'. Should be sequential within feature."
+        },
+        "revision": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Version of the test case used to bind execution evidence."
+        },
+        "content_hash": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Stable digest of executable case content."
+        },
+        "oracle_revision": {
+          "type": "string",
+          "minLength": 1
         },
         "title": {
           "type": "string",
@@ -212,6 +265,42 @@
           "minItems": 1,
           "description": "Traceability to observations and risks, e.g., ['OBS-STATE-01', 'RISK-01']."
         },
+        "status": {
+          "enum": [
+            "active",
+            "retired"
+          ],
+          "default": "active",
+          "description": "Lifecycle status. active cases require manual execution; retired cases have moved to replacement automated evidence."
+        },
+        "retired_reason": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Reason this manual case was retired, e.g., moved to automated coverage."
+        },
+        "replacement_refs": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "minItems": 1,
+          "description": "References to replacement coverage, e.g., ['hate:AETE-123']."
+        },
+        "placement_change_ref": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Reference ID for the QEG placement change record."
+        },
+        "configuration_ids": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
         "technique_refs": {
           "type": "array",
           "items": {
@@ -269,6 +358,26 @@
           "pattern": "^[a-f0-9]{64}$"
         }
       },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "status": {
+                "const": "retired"
+              }
+            },
+            "required": [
+              "status"
+            ]
+          },
+          "then": {
+            "required": [
+              "retired_reason",
+              "replacement_refs"
+            ]
+          }
+        }
+      ],
       "additionalProperties": false
     },
     "ExploratoryCharter": {
@@ -278,7 +387,10 @@
         "title",
         "scope",
         "questions",
-        "trace_to"
+        "trace_to",
+        "revision",
+        "content_hash",
+        "oracle_revision"
       ],
       "description": "Exploratory testing charter for areas requiring investigation rather than scripted steps.",
       "properties": {
@@ -286,6 +398,18 @@
           "type": "string",
           "minLength": 1,
           "description": "Unique charter identifier, e.g., 'CHARTER-001'."
+        },
+        "revision": {
+          "type": "string",
+          "minLength": 1
+        },
+        "content_hash": {
+          "type": "string",
+          "minLength": 1
+        },
+        "oracle_revision": {
+          "type": "string",
+          "minLength": 1
         },
         "title": {
           "type": "string",
@@ -319,6 +443,29 @@
           "minimum": 0,
           "description": "Timebox for charter exploration in minutes."
         },
+        "timebox_minutes": {
+          "type": "number",
+          "exclusiveMinimum": 0,
+          "description": "Actual exploratory session timebox."
+        },
+        "session_notes": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "findings": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "retrospective": {
+          "type": "string",
+          "minLength": 1
+        },
         "trace_to": {
           "type": "array",
           "items": {
@@ -326,6 +473,15 @@
           },
           "minItems": 1,
           "description": "Traceability to observations, e.g., ['OBS-RECOVERY-01']."
+        },
+        "configuration_ids": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
         },
         "technique_refs": {
           "type": "array",
@@ -395,6 +551,37 @@
           "pattern": "^[a-f0-9]{64}$"
         }
       },
+      "allOf": [
+        {
+          "if": {
+            "anyOf": [
+              {
+                "required": [
+                  "session_notes"
+                ]
+              },
+              {
+                "required": [
+                  "findings"
+                ]
+              },
+              {
+                "required": [
+                  "retrospective"
+                ]
+              }
+            ]
+          },
+          "then": {
+            "required": [
+              "timebox_minutes",
+              "session_notes",
+              "findings",
+              "retrospective"
+            ]
+          }
+        }
+      ],
       "additionalProperties": false
     },
     "PlatformMatrixEntry": {

@@ -21,6 +21,7 @@ Example:
 from __future__ import annotations
 
 import argparse
+import hashlib
 import os
 import sys
 from datetime import datetime, timezone
@@ -43,8 +44,8 @@ STATUS_MAP = {
     1: "pass",  # Passed
     2: "blocked",  # Blocked
     3: "skip",  # Untested
-    4: "fail",  # Failed
-    5: "skip",  # Retest
+    4: "skip",  # Retest
+    5: "fail",  # Failed
 }
 
 # Priority ID to severity mapping
@@ -75,26 +76,58 @@ def get_testrail_client() -> tuple[str, dict[str, str], tuple[str, str] | None]:
     return base_url.rstrip("/"), headers, auth
 
 
+def _collection_items(payload: Any, key: str) -> list[dict[str, Any]]:
+    """現行のページ応答と旧形式の配列を共通のレコード列にする。"""
+    items = payload.get(key) if isinstance(payload, dict) else payload
+    if not isinstance(items, list) or any(not isinstance(item, dict) for item in items):
+        raise ValueError(f"Invalid TestRail {key} response: expected an array of objects")
+    return items
+
+
 def fetch_tests(
     base_url: str, headers: dict[str, str], auth: tuple[str, str], run_id: int
 ) -> list[dict[str, Any]]:
-    """Fetch tests from TestRail run."""
+    """同じ run の全ページを取得し、途中で失敗した場合は結果を返さない。"""
     requests = lazy_import_requests()
-    url = f"{base_url}/index.php?/api/v2/get_tests/{run_id}"
-    response = requests.get(url, headers=headers, auth=auth, timeout=30)
-    response.raise_for_status()
-    return response.json()
+    endpoint = f"/api/v2/get_tests/{run_id}"
+    api_url = f"{base_url.rstrip('/')}/index.php?"
+    url = api_url + endpoint
+    visited: set[str] = set()
+    tests: list[dict[str, Any]] = []
+    while True:
+        if url in visited:
+            raise ValueError(f"Repeated TestRail pagination link for run {run_id}")
+        visited.add(url)
+        response = requests.get(url, headers=headers, auth=auth, timeout=30)
+        response.raise_for_status()
+        payload = response.json()
+        tests.extend(_collection_items(payload, "tests"))
+        if isinstance(payload, list):
+            return tests
+
+        links = payload.get("_links")
+        if not isinstance(links, dict) or "next" not in links:
+            raise ValueError("Invalid TestRail tests response: missing pagination links")
+        next_link = links["next"]
+        if next_link is None:
+            return tests
+        # API が返す相対リンクだけを使い、別の run や接続先を取得しない。
+        if not isinstance(next_link, str) or not (
+            next_link == endpoint or next_link.startswith(endpoint + "&")
+        ):
+            raise ValueError(f"Invalid TestRail pagination link for run {run_id}")
+        url = api_url + next_link
 
 
 def fetch_test_results(
     base_url: str, headers: dict[str, str], auth: tuple[str, str], test_id: int
 ) -> dict[str, Any]:
-    """Fetch results for a single test."""
+    """新しい順に並ぶ結果から最新1件を取得する。正常な空配列は許容する。"""
     requests = lazy_import_requests()
     url = f"{base_url}/index.php?/api/v2/get_results/{test_id}"
     response = requests.get(url, headers=headers, auth=auth, timeout=30)
     response.raise_for_status()
-    results = response.json()
+    results = _collection_items(response.json(), "results")
     return results[0] if results else {}
 
 
@@ -114,6 +147,50 @@ def map_tc_id(case_id: int, case_prefix: str = "TC") -> str:
     return f"{case_prefix}-{case_id:03d}"
 
 
+def original_case_id(test: dict[str, Any], *, allow_synthesized: bool = False) -> str:
+    """Return the single harness case ID carried by the external mapping."""
+    single = _identity_value(test, "source_case_id")
+    candidates = test.get("source_case_ids", [])
+    if candidates and (
+        not isinstance(candidates, list)
+        or len(candidates) != 1
+        or not isinstance(candidates[0], str)
+        or not candidates[0].strip()
+    ):
+        raise ValueError("ambiguous original case mapping")
+    if candidates:
+        if single and single != candidates[0]:
+            raise ValueError("ambiguous original case mapping")
+        single = candidates[0]
+    if not isinstance(single, str) or not single.strip():
+        if allow_synthesized:
+            return map_tc_id(test.get("case_id", 0))
+        raise ValueError("original case mapping required")
+    return single.strip()
+
+
+def _identity_value(test: dict[str, Any], name: str) -> Any:
+    """Read one exported identity field from TestRail's supported custom-field shapes."""
+    values = [test.get(name), test.get(f"custom_{name}")]
+    custom_fields = test.get("custom_fields")
+    if isinstance(custom_fields, dict):
+        values.extend([custom_fields.get(name), custom_fields.get(f"custom_{name}")])
+    present = [value for value in values if value not in (None, "", [])]
+    if len({str(value) for value in present}) > 1:
+        raise ValueError(f"ambiguous {name} mapping")
+    return present[0] if present else None
+
+
+def _oracle_refs(value: Any, fallback: str) -> list[str]:
+    if value in (None, "", []):
+        return [fallback]
+    if isinstance(value, str):
+        return [part.strip() for part in value.split(",") if part.strip()]
+    if isinstance(value, list) and all(isinstance(item, str) and item.strip() for item in value):
+        return [item.strip() for item in value]
+    raise ValueError("oracle_refs must be a string or an array of non-empty strings")
+
+
 def convert_to_execution_evidence(
     test: dict[str, Any],
     result: dict[str, Any],
@@ -121,16 +198,40 @@ def convert_to_execution_evidence(
     run_id: int,
     tc_prefix: str = "TC",
     feature_id: str = "IMPORTED",
+    *,
+    require_original_mapping: bool = False,
 ) -> dict[str, Any]:
     """Convert TestRail test/result to execution_evidence format."""
     status_id = test.get("status_id", 3)
     result_status = STATUS_MAP.get(status_id, "unknown")
 
+    case_id = (
+        original_case_id(test)
+        if require_original_mapping
+        else test.get("source_case_id") or map_tc_id(test.get("case_id", 0), tc_prefix)
+    )
+    source_feature_id = _identity_value(test, "source_feature_id")
+    if source_feature_id and feature_id != "IMPORTED" and str(source_feature_id) != feature_id:
+        raise ValueError("source feature mapping does not match requested feature")
+    resolved_feature_id = str(source_feature_id or feature_id)
+    case_revision = str(_identity_value(test, "case_revision") or f"testrail-test-{test['id']}")
+    stable_fallback = f"testrail:{case_id}:{case_revision}".encode()
+
     evidence: dict[str, Any] = {
         "run_id": f"TR-RUN-{run_id}-{test['id']}",
-        "tc_id": map_tc_id(test.get("case_id", 0), tc_prefix),
-        "feature_id": feature_id,
+        "tc_id": case_id,
+        "feature_id": resolved_feature_id,
         "build_id": f"testrail-run-{run_id}",
+        "case_revision": case_revision,
+        "spec_revision": str(_identity_value(test, "spec_revision") or f"testrail-run-{run_id}"),
+        "oracle_revision": str(_identity_value(test, "oracle_revision") or case_revision),
+        "case_content_hash": str(
+            _identity_value(test, "case_content_hash")
+            or "sha256:" + hashlib.sha256(stable_fallback).hexdigest()
+        ),
+        "oracle_refs": _oracle_refs(
+            _identity_value(test, "oracle_refs"), "testrail:" + str(test["id"])
+        ),
         "timestamp": datetime.now(timezone.utc).isoformat(),
         "tester": tester_name,
         "result": result_status,
@@ -155,13 +256,12 @@ def convert_to_execution_evidence(
     if result_status == "fail":
         defects = result.get("defects", [])
         if defects:
-            # Get first defect
-            defect_id = defects[0] if isinstance(defects, list) else defects
-            evidence["defect_stub"] = {
-                "title": f"Defect {defect_id}",
-                "severity": "high",  # Default, could fetch from Jira
-                "status": "open",
-            }
+            from bb_harness.evidence_policy import imported_defect_reports
+
+            reports = imported_defect_reports(defects)
+            if reports:
+                evidence["defect_stub"] = reports[0]
+                evidence["defects"] = reports
 
     # Add custom fields
     custom_fields = result.get("custom_fields", {})
@@ -207,6 +307,11 @@ def import_testrail_results(
                 "tc_id": f"{tc_prefix}-001",
                 "feature_id": feature_id,
                 "build_id": f"testrail-run-{run_id}",
+                "case_revision": "preview-v1",
+                "spec_revision": f"testrail-run-{run_id}",
+                "oracle_revision": "preview-v1",
+                "case_content_hash": "sha256:preview-testrail-case",
+                "oracle_refs": [f"{tc_prefix}-001"],
                 "timestamp": datetime.now(timezone.utc).isoformat(),
                 "tester": "preview",
                 "result": "pass",
@@ -240,11 +345,10 @@ def import_testrail_results(
         tester_name = user_cache.get(assigned_to_id, "unknown")
 
         # Get latest result for this test
-        test_result: dict[str, Any] = {}
         try:
             test_result = fetch_test_results(base_url, headers, auth, test["id"])
-        except Exception:
-            pass  # Use empty result
+        except Exception as exc:
+            raise ValueError(f"Cannot fetch results for TestRail test {test['id']}") from exc
 
         evidence = convert_to_execution_evidence(
             test,
@@ -253,6 +357,7 @@ def import_testrail_results(
             run_id,
             tc_prefix,
             feature_id,
+            require_original_mapping=True,
         )
         results.append(evidence)
 

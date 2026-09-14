@@ -36,7 +36,7 @@ from bb_harness.efficient_generation import (
     remaining_work,
     review_patch_prompt,
 )
-from bb_harness.evidence_revisions import bind_case_set
+from bb_harness.evidence_revisions import bind_case_set, stamp_case_identity
 from bb_harness.gate_engine import load_evidence_files
 from bb_harness.gate_engine import main as evaluate_gate_main
 from bb_harness.local_runtime import LocalRuntimeConfig, OpenAICompatibleClient
@@ -688,6 +688,8 @@ class LocalDesignPipeline:
             str(evidence_path),
             "--risk",
             str(output_dir / "risk_register.json"),
+            "--model",
+            str(output_dir / "test_model.json"),
             "--cases",
             str(output_dir / "manual_case_set.json"),
             "--feature",
@@ -746,6 +748,17 @@ def normalize_feature_spec(path: Path) -> dict[str, Any]:
     for index, item in enumerate(sections.get("existing_evidence", []), 1):
         source_refs.append({"id": f"AUTO-{index}", "kind": "auto_test", "excerpt": item})
     feature["source_refs"] = source_refs
+    # Markdown intake は定義 artifact の一部なので、host が安定 revision を生成する。
+    # 入力に存在しない実行証跡へ identity を後付けする処理は行わない。
+    revision_payload = {
+        key: value for key, value in feature.items() if key != "revision"
+    }
+    feature.setdefault("summary", "")
+    feature["revision"] = hashlib.sha256(
+        json.dumps(
+            revision_payload, ensure_ascii=False, sort_keys=True, separators=(",", ":")
+        ).encode("utf-8")
+    ).hexdigest()
     validate_artifact(feature, "feature_spec.schema.json")
     return feature
 
@@ -1185,6 +1198,7 @@ def _normalize_cases(
     source_excerpts = {item["id"]: item.get("excerpt", "") for item in feature["source_refs"]}
     del observations
     value["feature_id"] = feature["feature_id"]
+    value["spec_revision"] = feature["revision"]
     raw_cases = value.get("manual_cases")
     if not isinstance(raw_cases, list):
         return value
@@ -1223,11 +1237,13 @@ def _normalize_cases(
                 source_ref["type"] = "acceptance"
             elif source_ref["refs"] and all(ref.startswith("BR-") for ref in source_ref["refs"]):
                 source_ref["type"] = "requirement"
+        stamp_case_identity(case)
     raw_charters = value.get("exploratory_charters")
     if isinstance(raw_charters, list):
         for index, charter in enumerate(raw_charters, 1):
             if isinstance(charter, dict):
                 charter["id"] = f"CHARTER-{index:03d}"
+                stamp_case_identity(charter)
     if _is_mobile(feature) and not value.get("platform_matrix"):
         value["platform_matrix"] = [
             {
@@ -1283,6 +1299,7 @@ def _merge_case_sets(
     """IDと表示名以外が一致するケースだけを統合し、異なる被覆を保持する。"""
     result: dict[str, Any] = {
         "feature_id": feature["feature_id"],
+        "spec_revision": feature["revision"],
         "manual_cases": [],
         "exploratory_charters": [],
     }

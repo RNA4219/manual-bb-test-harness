@@ -420,7 +420,7 @@ def test_normalization_repair_keeps_original_partition_context():
             self.last_prompt = kwargs["user"]
             return super().complete_json(**kwargs)
 
-    value = {"feature_id": "F", "manual_cases": []}
+    value = {"feature_id": "F", "spec_revision": "rev-1", "manual_cases": []}
     client = Client([value, value])
     pipeline = LocalDesignPipeline(
         resolve_config("generic", model="fake", generation_mode="batched"), client

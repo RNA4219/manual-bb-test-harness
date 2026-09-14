@@ -2,7 +2,7 @@
   "id": "HUB.codex.md",
   "role": "navigation",
   "title": "AI Navigation Hub",
-  "summary": "Central routing table for AI agents. Lists all core documents (BLUEPRINT, RUNBOOK, GUARDRAILS, EVALUATION, SPEC) with their roles. Defines reading order for different use cases: skill execution, repo maintenance, artifact changes, mobile testing. Collects canonical document relationships to prevent duplication. 型付き技法・被覆検証・非破壊移行はtechnique-coverage.mdを参照。 compact生成、予算・usage、証跡版の契約はefficient-generation.mdを参照。 batched生成・設計状態・比較再検証はspec-06とAC-20260910-batched.mdを参照。 要件定義信頼度・要確認集計・根拠付き再評価はrequirements-confidence.mdとspec-07を参照。",
+  "summary": "README・利用ガイド・設計・運用・品質基準・履歴の役割と、Skill、保守、artifact、mobile、RanD、Local Mode、技法別被覆、要件信頼度の読み順を示す。",
   "public_api": [],
   "deps_out": [
     "BLUEPRINT.md",
@@ -19,5 +19,5 @@
   ],
   "risks": [],
   "tests": [],
-  "last_verified": "2026-09-12"
+  "last_verified": "2026-09-14"
 }

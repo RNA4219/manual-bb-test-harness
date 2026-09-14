@@ -53,7 +53,10 @@
           ]
         }
       ],
-      "case_revision": "5d88868fbcae7da4f7e3cd5a66a82dbe57779de25e5a885a3f0dbb071f636e91"
+      "case_revision": "5d88868fbcae7da4f7e3cd5a66a82dbe57779de25e5a885a3f0dbb071f636e91",
+      "revision": "5d88868fbcae7da4f7e3cd5a66a82dbe57779de25e5a885a3f0dbb071f636e91",
+      "content_hash": "sha256:5d88868fbcae7da4f7e3cd5a66a82dbe57779de25e5a885a3f0dbb071f636e91",
+      "oracle_revision": "875dbc122c4441abfcf0d513b724cb5b89bb2f619d06d400ee4c9844559464b1"
     },
     {
       "tc_id": "TC-002",
@@ -107,7 +110,10 @@
           ]
         }
       ],
-      "case_revision": "87066132dd647141c8c310cfb5a3e82e3bb87b965b81d196757461f789963fea"
+      "case_revision": "87066132dd647141c8c310cfb5a3e82e3bb87b965b81d196757461f789963fea",
+      "revision": "87066132dd647141c8c310cfb5a3e82e3bb87b965b81d196757461f789963fea",
+      "content_hash": "sha256:87066132dd647141c8c310cfb5a3e82e3bb87b965b81d196757461f789963fea",
+      "oracle_revision": "875dbc122c4441abfcf0d513b724cb5b89bb2f619d06d400ee4c9844559464b1"
     },
     {
       "tc_id": "TC-003",
@@ -161,7 +167,10 @@
           ]
         }
       ],
-      "case_revision": "a56e86eb77bacc8cc592d856741f75435b7ceae511f8e735a5ed32aeacc43a2c"
+      "case_revision": "a56e86eb77bacc8cc592d856741f75435b7ceae511f8e735a5ed32aeacc43a2c",
+      "revision": "a56e86eb77bacc8cc592d856741f75435b7ceae511f8e735a5ed32aeacc43a2c",
+      "content_hash": "sha256:a56e86eb77bacc8cc592d856741f75435b7ceae511f8e735a5ed32aeacc43a2c",
+      "oracle_revision": "875dbc122c4441abfcf0d513b724cb5b89bb2f619d06d400ee4c9844559464b1"
     },
     {
       "tc_id": "TC-004",
@@ -215,11 +224,15 @@
           ]
         }
       ],
-      "case_revision": "9f87f9425e50b711d03fe96b9002e4e43617dc5e5893f96d7bfd319319da772e"
+      "case_revision": "9f87f9425e50b711d03fe96b9002e4e43617dc5e5893f96d7bfd319319da772e",
+      "revision": "9f87f9425e50b711d03fe96b9002e4e43617dc5e5893f96d7bfd319319da772e",
+      "content_hash": "sha256:9f87f9425e50b711d03fe96b9002e4e43617dc5e5893f96d7bfd319319da772e",
+      "oracle_revision": "875dbc122c4441abfcf0d513b724cb5b89bb2f619d06d400ee4c9844559464b1"
     }
   ],
   "evidence_binding": {
     "mode": "case_revision",
-    "model_hash": "318d0e7a17cc30958cdb52f863989d4320add284a852f027861a9f3b5041ce83"
-  }
+    "model_hash": "561fbdb3c818fbe7f03131465e72c566d97c59c5b0edd155b750c8080131068d"
+  },
+  "spec_revision": "spec-discount-domain-rev-1"
 }

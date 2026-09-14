@@ -23,5 +23,6 @@
     "order_detail",
     "inventory_service",
     "coupon_service"
-  ]
+  ],
+  "revision": "spec-rev-1"
 }

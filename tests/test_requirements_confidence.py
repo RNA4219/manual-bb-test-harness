@@ -21,6 +21,7 @@ ROOT = Path(__file__).resolve().parents[1]
 def feature(count=4):
     return {
         "feature_id": "CONF-1",
+        "revision": "spec-confidence-test-rev-1",
         "title": "要件評価",
         "acceptance_criteria": [
             f"AC-{i}: 状態{i}では注文を更新できる" for i in range(1, count + 1)
@@ -204,6 +205,7 @@ def test_phase_questions_gaps_and_blocking_flags():
     phase["open_questions"][0]["severity"] = "low"
     phase["confidence"] = "high"
     phase["readiness"]["status"] = "ok"
+    phase["readiness"]["decision"] = "ready"
     report = evaluate_requirements(value, phase=phase)
     assert report["status"] == "blocked"
     assert report["score"] <= 39

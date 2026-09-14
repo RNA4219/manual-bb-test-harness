@@ -38,7 +38,7 @@ def test_cli_empty_evidence_generates_untested_no_go(tmp_path, profile, input_mo
     artifacts = tmp_path / "artifacts"
     artifacts.mkdir()
     paths = {}
-    for kind in ("feature_spec", "risk_register", "manual_case_set"):
+    for kind in ("feature_spec", "test_model", "observation_set", "risk_register", "manual_case_set"):
         path = artifacts / f"order-cancel.{kind}.json"
         path.write_bytes((source / path.name).read_bytes())
         paths[kind] = path
@@ -48,6 +48,7 @@ def test_cli_empty_evidence_generates_untested_no_go(tmp_path, profile, input_mo
         empty = tmp_path / "evidence"
         empty.mkdir()
         args = ["--evidence", str(empty), "--feature", str(paths["feature_spec"]),
+                "--model", str(paths["test_model"]), "--observations", str(paths["observation_set"]),
                 "--risk", str(paths["risk_register"]), "--cases", str(paths["manual_case_set"])]
     output = tmp_path / "gate.json"
     assert main(["gate", *args, "--build-id", BUILD, "--profile", profile, "--output", str(output)]) == 0
@@ -56,8 +57,8 @@ def test_cli_empty_evidence_generates_untested_no_go(tmp_path, profile, input_mo
     assert report["status"] == "no_go"
     assert report["build_id"] == BUILD
     manual = report["evidence_summary"]["manual_by_priority"]
-    assert sum(row["total"] for row in manual.values()) == 4
-    assert sum(row["untested"] for row in manual.values()) == 4
+    assert sum(row["total"] for row in manual.values()) == 3
+    assert sum(row["untested"] for row in manual.values()) == 3
     assert sum(row["pass"] for row in manual.values()) == 0
     assert report["unmet_conditions"]
 
@@ -103,7 +104,7 @@ def test_gate_directory_resolves_remaining_artifact_after_explicit_override(tmp_
 
     source = Path(__file__).resolve().parents[1] / "examples/artifacts"
     paths = {}
-    for kind in ("risk_register", "manual_case_set"):
+    for kind in ("feature_spec", "test_model", "observation_set", "risk_register", "manual_case_set"):
         path = tmp_path / f"order-cancel.{kind}.json"
         path.write_bytes((source / path.name).read_bytes())
         paths[kind] = path
@@ -120,6 +121,11 @@ def evidence(**overrides: object) -> dict[str, object]:
         "tc_id": "TC-1",
         "feature_id": FEATURE,
         "build_id": BUILD,
+        "case_revision": "case-rev-1",
+        "spec_revision": "spec-rev-1",
+        "oracle_revision": "oracle-rev-1",
+        "case_content_hash": "sha256:test-case-1",
+        "oracle_refs": ["AC-1"],
         "timestamp": "2026-07-11T10:00:00+09:00",
         "result": "pass",
     }
@@ -180,6 +186,7 @@ def valid_automation(profile: str = "standard") -> dict[str, object]:
         "coverage_scope": limits["coverage_scope"],
         "coverage_percent": limits["auto_coverage"],
         "hotspot_review_percent": 100,
+        "test_suites": [{"suite_id": "regression", "status": "passed", "total": 1, "passed": 1, "failed": 0, "errors": 0, "skipped": 0, "source_refs": [{"id": "CI-1", "kind": "auto_test"}]}],
         "new_issues": {"blocker": 0, "critical": 0},
         "source_refs": [{"id": "CI-1", "kind": "auto_test"}],
     }
@@ -204,6 +211,8 @@ def valid_waiver(*risk_ids: str) -> dict[str, object]:
     return {"feature_id": FEATURE, "build_id": BUILD, "waivers": [{
         "id": "WAIVER-1", "risk_ids": list(risk_ids), "reason": "contained",
         "owner": "qa-lead", "expires_at": (datetime.now(timezone.utc) + timedelta(days=30)).isoformat(),
+        "approver": "release-lead", "approved_at": datetime.now(timezone.utc).isoformat(),
+        "approval_ref": "DECISION-1",
         "containment": "monitor", "rollback": "disable feature",
     }]}
 
@@ -221,7 +230,13 @@ def evaluate(
     }
     return evaluate_gate(
         feature_id=FEATURE, build_id=BUILD, profile="standard", counts=manual_counts or counts(),
-        defects=defects or [], blocking_risks=blocking_risks or [], feature_spec=feature_spec,
+        defects=defects or [], blocking_risks=blocking_risks or [],
+        feature_spec={
+            "feature_id": FEATURE,
+            "acceptance_criteria": ["正常な操作結果を確認できる"],
+            "assumptions": [],
+            **(feature_spec or {}),
+        },
         observations=observations or {"feature_id": FEATURE, "observations": [{"id": "OBS-1", "mandatory": True}]},
         automation=automation, waiver_set=waiver_set, results=effective_results,
         risk_register=risks or risk_register(),
@@ -424,8 +439,16 @@ def test_open_severe_defect_is_hard_failure_even_when_result_is_pass() -> None:
     assert status == "no_go"
 
 
-def test_observation_without_mandatory_items_is_complete() -> None:
-    assert observation_rate({"observations": []}, {}) == 100.0
+def test_empty_observation_set_is_missing_test_basis() -> None:
+    """空の観点集合は、対象外と明示した観点の集合とは異なる。"""
+    with pytest.raises(GateInputError, match="observation"):
+        observation_rate({"observations": []}, {})
+
+
+def test_nonempty_optional_observations_have_no_mandatory_work() -> None:
+    assert observation_rate(
+        {"observations": [{"id": "OBS-OPTIONAL-1", "mandatory": False}]}, {}
+    ) == 100.0
 
 
 def test_invalid_waivers_are_rejected() -> None:
@@ -455,6 +478,9 @@ def test_invalid_waivers_are_rejected() -> None:
                         "risk_ids": ["RISK-1"],
                         "reason": "x",
                         "owner": "x",
+                        "approver": "release-lead",
+                        "approved_at": datetime.now(timezone.utc).isoformat(),
+                        "approval_ref": "DECISION-EXPIRED",
                         "expires_at": "2000-01-01T00:00:00+00:00",
                         "containment": "x",
                         "rollback": "x",
@@ -490,7 +516,7 @@ def test_schema_and_discovery_ambiguity_are_rejected(tmp_path: Path) -> None:
 
 @pytest.mark.parametrize(
     ("profile", "expected"),
-    [("strict", "no_go"), ("standard", "no_go"), ("lean", "go")],
+    [("strict", "no_go"), ("standard", "no_go"), ("lean", "no_go")],
 )
 def test_profile_evaluates_residual_risk(profile: str, expected: str) -> None:
     results = {
@@ -505,15 +531,18 @@ def test_profile_evaluates_residual_risk(profile: str, expected: str) -> None:
         defects=[],
         blocking_risks=[],
         residual_risks=["RISK-P2: cosmetic degradation"],
-        feature_spec=None,
+        feature_spec={
+            "feature_id": FEATURE,
+            "acceptance_criteria": ["正常な操作結果を確認できる"],
+            "assumptions": [],
+        },
         observations={"observations": [{"id": "OBS-1", "mandatory": True}]},
         automation=valid_automation(profile),
         waiver_set=None,
         results=results,
     )
     assert status == expected
-    if profile != "lean":
-        assert any("residual risks exceed" in reason for reason in reasons)
+    assert any("residual risks exceed" in reason for reason in reasons)
 
 
 

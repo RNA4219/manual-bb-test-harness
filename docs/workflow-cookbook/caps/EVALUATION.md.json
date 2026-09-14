@@ -2,7 +2,7 @@
   "id": "EVALUATION.md",
   "role": "acceptance",
   "title": "Evaluation",
-  "summary": "Defines repository validation and the local 70-point benchmark: three fixtures by three runs, independent rubric scoring, no automatic fails, median at least 70, minimum 65, under ten minutes, and deterministic risk/effort/Gate checks. compact生成、予算・usage、証跡版の契約はefficient-generation.mdを参照。 batched生成・設計状態・比較再検証はspec-06とAC-20260910-batched.mdを参照。 要件定義信頼度・要確認集計・根拠付き再評価はrequirements-confidence.mdとspec-07を参照。",
+  "summary": "正本文書の役割、Skill/references の分離、contract/schema/example/golden/rubric の一致、scripted case の oracle/traceability、mobile の観点、変更単位の task/acceptance 追跡を受入条件とする。Documentation/Traceability/Contract/Skill/Mobile/Regression の品質ゲートと単体・回帰・Skill・artifact 検証手順を列挙する。チェックリストは2026-05-30の release 判定や2026-07-12の726テスト・coverage等の過去検証記録を含み、今回の変更の検証結果を表すものではない。 Defines repository validation and the local 70-point benchmark: three fixtures by three runs, independent rubric scoring, no automatic fails, median at least 70, minimum 65, under ten minutes, and deterministic risk/effort/Gate checks. compact生成、予算・usage、証跡版の契約はefficient-generation.mdを参照。 batched生成・設計状態・比較再検証はspec-06とAC-20260910-batched.mdを参照。 要件定義信頼度・要確認集計・根拠付き再評価はrequirements-confidence.mdとspec-07を参照。",
   "public_api": [],
   "deps_out": [
     "docs/evaluation-rubric.md",

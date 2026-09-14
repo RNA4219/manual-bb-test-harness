@@ -19,6 +19,7 @@ RISK_OBSERVATION_BATCH_SIZE = 4
 MAX_RISK_BATCHES = 8
 CORE_FIELDS = (
     "feature_id",
+    "coverage_items",
     "flows",
     "data_partitions",
     "boundaries",
@@ -241,7 +242,12 @@ def generate_cases(pipeline, feature: dict, model: dict, observations: dict, ris
         portable_schema,
     )
 
-    cases = {"feature_id": feature["feature_id"], "manual_cases": [], "exploratory_charters": []}
+    cases = {
+        "feature_id": feature["feature_id"],
+        "spec_revision": feature["revision"],
+        "manual_cases": [],
+        "exploratory_charters": [],
+    }
     schema = portable_schema("manual_case_set.schema.json")
     schema["properties"]["manual_cases"].update(minItems=0, maxItems=BATCH_SIZE)
     schema["properties"]["exploratory_charters"].update(maxItems=BATCH_SIZE)
@@ -320,6 +326,7 @@ def review_cases(
     for offset in range(0, size, BATCH_SIZE):
         subset = {
             "feature_id": feature["feature_id"],
+            "spec_revision": feature["revision"],
             "manual_cases": result["manual_cases"][offset : offset + BATCH_SIZE],
             "exploratory_charters": result.get("exploratory_charters", [])[
                 offset : offset + BATCH_SIZE

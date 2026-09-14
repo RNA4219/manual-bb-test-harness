@@ -1,14 +1,14 @@
 {
   "version": "4.1.1",
-  "generated_at": "2026-09-10T18:49:27.509380+00:00",
+  "generated_at": "2026-09-14T01:34:02.835908+00:00",
   "description": "manual-bb-test-harness Workflow Cookbook Hot List - Primary entry points",
   "project_status": {
     "tier": 3,
     "cli_status": "complete",
     "import_status": "complete",
-    "test_count": 1168,
-    "total_capsules": 33,
-    "last_updated": "2026-09-12"
+    "test_count": 1481,
+    "total_capsules": 34,
+    "last_updated": "2026-09-14"
   },
   "hot_nodes": [
     {
@@ -16,7 +16,7 @@
       "path": "./README.md",
       "role": "overview",
       "title": "Project Overview",
-      "summary": "Canonical entry point with Local Mode quick start and task classifier",
+      "summary": "プロジェクトの概要、CLI の導入、Skill と Local Mode の実行例、Gate の最小実行例、目的別の文書案内。変更履歴は CHANGELOG、詳細手順は利用ガイドと RUNBOOK にまとめ、AI 向けの読み順は折りたたみで案内する。",
       "priority": 1,
       "use_cases": [
         "Getting started with the repo",
@@ -29,7 +29,7 @@
       "path": "./HUB.codex.md",
       "role": "navigation",
       "title": "AI Navigation Hub",
-      "summary": "Document routing table and reading order for AI agents. Lists all core documents and their roles",
+      "summary": "README・利用ガイド・設計・運用・品質基準・履歴の役割と、Skill、保守、artifact、mobile、RanD、Local Mode、技法別被覆、要件信頼度の読み順を示す。",
       "priority": 2,
       "use_cases": [
         "Navigating documentation",
@@ -55,7 +55,7 @@
       "path": "./RUNBOOK.md",
       "role": "operations",
       "title": "Runbook",
-      "summary": "Execution procedures for skill validation, artifact changes, spec ingestion, CLI import/export/run, and update rules",
+      "summary": "CLI と外部連携、RanD、Local Mode、検証、Gate 入力・構成計画・欠陥台帳・承認・移行、障害対応、配布前検証の操作手順。生成予算・被覆・要件信頼度の詳細契約と過去の検証記録へ案内する。",
       "priority": 4,
       "use_cases": [
         "Running validation commands",
@@ -80,8 +80,8 @@
       "id": "docs/human-readme.md",
       "path": "./docs/human-readme.md",
       "role": "navigation",
-      "title": "Human Guide",
-      "summary": "User-facing overview and operating guide",
+      "title": "利用ガイド",
+      "summary": "入力の準備、Skill への依頼、設計結果の確認、注文・権限・モバイルのサンプル、forward-test と用語を説明する利用ガイド。セットアップは README、検証・障害対応は RUNBOOK を参照する。",
       "priority": 6,
       "use_cases": [
         "Navigating documentation",
@@ -129,6 +129,10 @@
       "docs/specs/spec-02-cli-integration.md",
       "docs/specs/spec-03-schema-extension.md",
       "docs/specs/spec-04-test-result-import.md"
+    ],
+    "rand_integration": [
+      "skills/manual-bb-test-harness/SKILL.md",
+      "skills/manual-bb-test-harness/references/rand-integration.md"
     ]
   }
 }

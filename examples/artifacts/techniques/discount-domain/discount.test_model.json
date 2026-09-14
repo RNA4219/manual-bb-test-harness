@@ -100,5 +100,22 @@
         }
       ]
     }
+  ],
+  "coverage_items": [
+    {
+      "id": "COV-DOMAIN-SHIPPING",
+      "dimension": "data",
+      "technique": "equivalence_partitioning",
+      "applicability": "applicable",
+      "mandatory": true,
+      "coverage_criterion": "each_item",
+      "source_refs": [
+        {
+          "id": "AC-1",
+          "kind": "ac",
+          "excerpt": "割引後金額P-Dが10000円以上なら送料0円、未満なら500円。PとDは0以上の整数円。"
+        }
+      ]
+    }
   ]
 }

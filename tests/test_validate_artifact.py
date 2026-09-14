@@ -2,18 +2,10 @@
 
 from __future__ import annotations
 
-import importlib.util
 import json
-import sys
 from pathlib import Path
 
-spec_validate_artifact = importlib.util.spec_from_file_location(
-    "validate_artifact",
-    Path(__file__).parent.parent / "scripts" / "validate-artifact.py",
-)
-validate_artifact_module = importlib.util.module_from_spec(spec_validate_artifact)
-sys.modules["validate_artifact"] = validate_artifact_module
-spec_validate_artifact.loader.exec_module(validate_artifact_module)
+from bb_harness.tools import validate_artifact as validate_artifact_module
 
 detect_artifact_type = validate_artifact_module.detect_artifact_type
 validate_all = validate_artifact_module.validate_all
@@ -67,3 +59,72 @@ class TestValidateArtifact:
         execution_evidence_files = [r for r in results if r.get("type") == "execution_evidence"]
         assert len(execution_evidence_files) >= 3  # TC-001, TC-002, CHARTER-001
         assert all(r["valid"] for r in execution_evidence_files)
+
+    def test_retired_case_with_replacement_refs_is_valid(self, tmp_path: Path) -> None:
+        artifact = tmp_path / "retired.manual_case_set.json"
+        artifact.write_text(
+            json.dumps(
+                {
+                    "feature_id": "RET-1",
+                    "spec_revision": "spec-rev-1",
+                    "manual_cases": [
+                        {
+                            "tc_id": "TC-RET-001",
+                            "revision": "case-rev-1",
+                            "content_hash": "sha256:tc-ret-001",
+                            "oracle_revision": "oracle-rev-1",
+                            "title": "Retired case",
+                            "priority": "P1",
+                            "primary_view": "black",
+                            "steps": ["移管先を確認"],
+                            "expected_results": ["自動テスト参照が存在する"],
+                            "oracle": {"type": "specified", "refs": ["AC-1"]},
+                            "trace_to": ["RISK-1"],
+                            "status": "retired",
+                            "retired_reason": "自動テストへ移管済み",
+                            "replacement_refs": ["hate:AETE-001"],
+                            "placement_change_ref": "qeg:PLC-001",
+                        }
+                    ],
+                }
+            ),
+            encoding="utf-8",
+        )
+
+        result = validate_artifact(artifact, "manual_case_set")
+
+        assert result["valid"] is True
+
+    def test_retired_case_without_replacement_refs_is_invalid(self, tmp_path: Path) -> None:
+        artifact = tmp_path / "bad-retired.manual_case_set.json"
+        artifact.write_text(
+            json.dumps(
+                {
+                    "feature_id": "RET-1",
+                    "spec_revision": "spec-rev-1",
+                    "manual_cases": [
+                        {
+                            "tc_id": "TC-RET-001",
+                            "revision": "case-rev-1",
+                            "content_hash": "sha256:tc-ret-001",
+                            "oracle_revision": "oracle-rev-1",
+                            "title": "Retired case",
+                            "priority": "P1",
+                            "primary_view": "black",
+                            "steps": ["移管先を確認"],
+                            "expected_results": ["自動テスト参照が存在する"],
+                            "oracle": {"type": "specified", "refs": ["AC-1"]},
+                            "trace_to": ["RISK-1"],
+                            "status": "retired",
+                            "retired_reason": "自動テストへ移管済み",
+                        }
+                    ],
+                }
+            ),
+            encoding="utf-8",
+        )
+
+        result = validate_artifact(artifact, "manual_case_set")
+
+        assert result["valid"] is False
+        assert any("replacement_refs" in error for error in result["errors"])

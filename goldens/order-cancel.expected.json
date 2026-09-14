@@ -42,20 +42,52 @@
         "steps",
         "expected_results",
         "oracle",
-        "trace_to"
+        "trace_to",
+        "status"
+      ],
+      "retired_must_have": [
+        "retired_reason",
+        "replacement_refs"
+      ],
+      "retired_optional_metadata": [
+        "placement_change_ref"
       ]
     },
     "gate_decision": {
       "status_allowed": [
         "go",
-        "conditional_go"
+        "conditional_go",
+        "no_go"
       ],
       "must_have": [
+        "feature_id",
         "build_id",
+        "status",
         "profile",
         "reasons",
-        "evidence_summary",
-        "unmet_conditions"
+        "evidence_summary"
+      ],
+      "conditional_go_requires": [
+        "explicit_risk_linked_waiver",
+        "owner",
+        "expires_at",
+        "containment",
+        "rollback"
+      ],
+      "no_go_when": [
+        "required_evidence_missing",
+        "mandatory_observation_unverified",
+        "unwaived_residual_risk",
+        "required_configuration_not_passed",
+        "unresolved_severe_defect",
+        "required_automation_suite_unsuccessful"
+      ],
+      "evidence_summary_must_have": [
+        "manual_by_priority",
+        "mandatory_observation_rate",
+        "manual_execution_results",
+        "open_defects",
+        "automation_test_suites"
       ]
     }
   },
@@ -63,6 +95,7 @@
     "Coverage modelが出ない",
     "P0/P1のscripted caseにoracle refsがない",
     "Gateがcoverage数値だけでGoになる",
+    "retired caseが未実施P0/P1として扱われる",
     "stateful featureでinvalid transitionがない"
   ]
 }

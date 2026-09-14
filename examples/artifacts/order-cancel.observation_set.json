@@ -1,0 +1,59 @@
+{
+  "feature_id": "ORD-CANCEL-01",
+  "observations": [
+    {
+      "id": "OBS-STATE-01",
+      "title": "出荷済み注文はキャンセル不可",
+      "view": "black",
+      "coverage_item_id": "COV-STATE-SHIPPED-CANCEL",
+      "mandatory": true,
+      "techniques": [
+        "state_transition"
+      ],
+      "source_refs": [
+        {
+          "id": "AC-2",
+          "kind": "ac",
+          "excerpt": "出荷済み注文はキャンセル不可メッセージを表示する"
+        }
+      ],
+      "rationale": "TC-001 が出荷済み状態からのキャンセル拒否を確認する。"
+    },
+    {
+      "id": "OBS-STATE-02",
+      "title": "出荷前注文はキャンセルできる",
+      "view": "black",
+      "coverage_item_id": "COV-STATE-PENDING-CANCEL",
+      "mandatory": true,
+      "techniques": [
+        "state_transition"
+      ],
+      "source_refs": [
+        {
+          "id": "AC-1",
+          "kind": "ac",
+          "excerpt": "出荷前の注文のみキャンセルできる"
+        }
+      ],
+      "rationale": "TC-002 が pending から cancelled への遷移を確認する。"
+    },
+    {
+      "id": "OBS-DATA-01",
+      "title": "クーポン利用注文のキャンセルで残数を復元する",
+      "view": "black",
+      "coverage_item_id": "COV-DATA-COUPON-RESTORE",
+      "mandatory": true,
+      "techniques": [
+        "equivalence_partitioning"
+      ],
+      "source_refs": [
+        {
+          "id": "AC-4",
+          "kind": "ac",
+          "excerpt": "クーポン利用注文ではクーポン残数を復元する"
+        }
+      ],
+      "rationale": "TC-003 の退役後も必須要件は残る。代替証跡参照だけではこの観点の実行完了を証明しない。"
+    }
+  ]
+}

@@ -7,6 +7,11 @@
     "run_id",
     "feature_id",
     "build_id",
+    "case_revision",
+    "spec_revision",
+    "oracle_revision",
+    "case_content_hash",
+    "oracle_refs",
     "timestamp",
     "result"
   ],
@@ -53,6 +58,22 @@
       "type": "string",
       "minLength": 1
     },
+    "case_revision": {
+      "type": "string",
+      "minLength": 1
+    },
+    "spec_revision": {
+      "type": "string",
+      "minLength": 1
+    },
+    "oracle_revision": {
+      "type": "string",
+      "minLength": 1
+    },
+    "case_content_hash": {
+      "type": "string",
+      "minLength": 1
+    },
     "timestamp": {
       "type": "string",
       "format": "date-time"
@@ -79,6 +100,7 @@
     },
     "oracle_refs": {
       "type": "array",
+      "minItems": 1,
       "items": {
         "type": "string"
       }
@@ -140,9 +162,17 @@
         "status": {
           "enum": [
             "open",
+            "in_progress",
+            "fixed",
+            "pending_confirmation",
+            "reopened",
             "resolved",
             "accepted"
           ]
+        },
+        "defect_id": {
+          "type": "string",
+          "minLength": 1
         }
       },
       "additionalProperties": false
@@ -156,6 +186,52 @@
     "time_spent_minutes": {
       "type": "number",
       "minimum": 0
+    },
+    "configuration_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "defects": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "title",
+          "severity",
+          "status"
+        ],
+        "properties": {
+          "title": {
+            "type": "string",
+            "minLength": 1
+          },
+          "severity": {
+            "enum": [
+              "blocker",
+              "critical",
+              "high",
+              "medium",
+              "low"
+            ]
+          },
+          "status": {
+            "enum": [
+              "open",
+              "in_progress",
+              "fixed",
+              "pending_confirmation",
+              "reopened",
+              "resolved",
+              "accepted"
+            ]
+          },
+          "defect_id": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "additionalProperties": false
+      }
     },
     "coverage_obligation_ids": {
       "type": "array",
@@ -206,10 +282,6 @@
           "null"
         ]
       }
-    },
-    "case_revision": {
-      "type": "string",
-      "pattern": "^[a-f0-9]{64}$"
     },
     "model_hash": {
       "type": "string",

@@ -1,12 +1,12 @@
 {
   "schema_version": "1.1.0",
-  "id": "COVREPORT-922090612a7da6cd13aa",
+  "id": "COVREPORT-b5677a5ea1e2f4c3323f",
   "feature_id": "DISCOUNT-01",
   "build_id": "demo-1",
-  "model_hash": "318d0e7a17cc30958cdb52f863989d4320add284a852f027861a9f3b5041ce83",
-  "case_hash": "aa3e1db620d786d6e83bb38181336852a1dfa19a99a423a11028de083e8c68f6",
+  "model_hash": "561fbdb3c818fbe7f03131465e72c566d97c59c5b0edd155b750c8080131068d",
+  "case_hash": "9a0e2ad56658372edcc1dfdf8aa106af7d8189790ac7954ea664fa97cf37cb68",
   "evidence_binding_mode": "case_revision",
-  "plan_hash": "c675bcc92cfebfd35a4168b8ba3f0698e5fbdc5c09b6663aed9a111ae4ad42f0",
+  "plan_hash": "3812bd834b37211ab328d4cc09ebd2ee9d23f76d792962ab597cd51764fd46ab",
   "mode": "shadow",
   "design": {
     "required_feasible": 4,

@@ -2,6 +2,32 @@
 
 ## Unreleased
 
+### Added
+
+- RanD の要求候補・監査・文書・handoff を取り込む `import rand` を追加。差分・原文・上流判断・任意の欠陥台帳を保存し、feature spec と設計依頼文を生成する。
+- 実行構成の計画と欠陥台帳を追加。ケースと構成の組で再実行を選び、未実行の必須構成・別環境の失敗・未解決欠陥の履歴を保持する。
+- ID 付きの網羅対象、3 値境界値、test plan、チェックリスト、探索記録、multi-run 統合、品質特性のフィードバックを契約化。
+
+### Changed
+
+- 定義・実行証跡の case/spec/oracle revision と内容 hash を必須化し、照合する。旧入力は [artifact 契約](skills/manual-bb-test-harness/references/artifact-contract.md)に沿って移行する。
+- 自動証跡に `test_suites` を必須化。失敗・中断・未実行・skip・0 件実行は No-Go とし、カバレッジだけの入力には実際の suite 結果の補完を求める。
+- waiver に独立した承認者・承認日時・承認根拠を要求。自己承認・未来の承認・期限切れを拒否し、`accepted` の重大欠陥を未解決として扱う。
+- README を概要・始め方・文書案内に整理。CLI の詳細と移行手順は RUNBOOK、変更内容は CHANGELOG、検証結果はレビュー・検収記録に集約。
+
+### Fixed
+
+- TestRail の標準 status ID `4=Retest` / `5=Failed` を修正。ページ応答と旧配列応答、全ページ取得、最新結果の抽出に対応し、取得失敗・不正応答・循環ページから不完全な証跡を出力しないようにした。
+- TestRail/Xray で元ケース・feature ID と版・hash・oracle 参照を保持。Xray の最終期待結果と探索チャーターの往復を修正し、複数欠陥 ID も維持する。
+- Gate の必須入力不足、空の受入条件、ID 重複、非有限数値を判定前に拒否。実績区分の二重集計を修正し、black-box 受入境界と P0 非該当の扱いを統一した。
+- retired ケース対応を package と script の共通実装へ統合。欠陥の確認 run と解決時刻を照合し、履歴上の未解決欠陥が消える問題を修正した。
+- Markdown の子見出し・繰り返し節・水平線前後・環境を保持し、受入条件なしの架空 AC 生成を廃止。単一トリガーの negative case、golden と Ready 契約の整合も修正した。
+
+### 検証記録
+
+- ISTQB 改修: 全 pytest 1002 件、coverage 88.22%、strict artifact 31 件、root/package schema 21 組を確認。実施条件と外部サービス未接続などの制約は [第2回レビュー](docs/istqb-review-round2-20260912.md)を参照。
+- 2026-09-12 の RanD 連携検証: 全 pytest 976 件、連携専用 63 件、公開 CLI 12 ケース、wheel/sdist 隔離 smoke が成功。[受入記録](docs/acceptance/AC-20260912-rand-integration.md)に条件別証跡を保存。
+
 ## [4.1.1] - 2026-09-12
 
 - CIとHATE/QEGへのcoverage判定を、行・分岐の合算値から実測分岐率へ訂正。全体85%・Gate専用90%を分岐の件数で検証し、行率・分岐率・合算値を別記する。旧合算値の収集証跡は分岐合格へ流用しない。

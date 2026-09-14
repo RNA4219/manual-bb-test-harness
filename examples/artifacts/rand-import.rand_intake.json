@@ -1,0 +1,185 @@
+{
+  "schema_version": "2.0",
+  "type": "rand_intake",
+  "adapter_version": "1",
+  "feature_id": "MY-FEATURE",
+  "revision": "rand-52bf030be0fb07867f1458bac0a70bb5bc40c6a5298f65c015d81931f887c378",
+  "title": "RanD: rand:packet:save-research",
+  "intake_status": "degraded",
+  "requirements": [
+    {
+      "requirement_id": "rand:REQ-1",
+      "statement": "結果を保存できる",
+      "acceptance_criteria": [
+        "保存操作後に結果ファイルが生成される"
+      ],
+      "source_refs": [
+        {
+          "id": "rand:REQ-1",
+          "kind": "memo",
+          "excerpt": "結果を保存できる",
+          "url": "file:///workspace/manual-bb-test-harness/examples/rand-integration/requirements_packet.json#requirement=rand%3AREQ-1"
+        },
+        {
+          "id": "UP-69dbb56822a9a55c9776",
+          "kind": "memo",
+          "excerpt": "EV-1"
+        },
+        {
+          "id": "AC-ad6569c69469f8882783",
+          "kind": "memo",
+          "excerpt": "保存操作後に結果ファイルが生成される",
+          "url": "file:///workspace/manual-bb-test-harness/examples/rand-integration/requirements_packet.json#requirement=rand%3AREQ-1"
+        }
+      ],
+      "change": "full",
+      "oracle_status": "candidate",
+      "upstream": {
+        "requirement_id": "rand:REQ-1",
+        "statement": "結果を保存できる",
+        "acceptance_criteria": [
+          "保存操作後に結果ファイルが生成される"
+        ],
+        "confidence": 0.82,
+        "bias_note": "肯定的な公開反応への偏り",
+        "kill_condition": "保存結果が再利用されない",
+        "evidence_refs": [
+          "EV-1"
+        ],
+        "manual_bb_focus": [
+          "中断と再試行"
+        ],
+        "gate_verdict": "go"
+      }
+    },
+    {
+      "requirement_id": "rand:REQ-2",
+      "statement": "保存履歴を使いやすくする",
+      "acceptance_criteria": [],
+      "source_refs": [
+        {
+          "id": "rand:REQ-2",
+          "kind": "memo",
+          "excerpt": "保存履歴を使いやすくする",
+          "url": "file:///workspace/manual-bb-test-harness/examples/rand-integration/requirements_packet.json#requirement=rand%3AREQ-2"
+        }
+      ],
+      "change": "full",
+      "oracle_status": "missing",
+      "upstream": {
+        "requirement_id": "rand:REQ-2",
+        "statement": "保存履歴を使いやすくする",
+        "acceptance_criteria": [],
+        "confidence": 0.45,
+        "bias_note": "対象利用者が未確認",
+        "kill_condition": "要求が確認されない"
+      }
+    }
+  ],
+  "retired_requirements": [],
+  "focus_requirement_ids": [
+    "rand:REQ-1",
+    "rand:REQ-2"
+  ],
+  "regression_requirement_ids": [],
+  "follow_up_defect_ids": [],
+  "inputs": [
+    {
+      "role": "primary",
+      "path": "/workspace/manual-bb-test-harness\\examples\\rand-integration\\requirements_packet.json",
+      "uri": "file:///workspace/manual-bb-test-harness/examples/rand-integration/requirements_packet.json",
+      "sha256": "52bf030be0fb07867f1458bac0a70bb5bc40c6a5298f65c015d81931f887c378",
+      "payload": {
+        "schema_version": "2.0",
+        "id": "rand:packet:save-research",
+        "type": "requirements_packet",
+        "packet_id": "rand:packet:save-research",
+        "status": "ok",
+        "assumptions": [
+          "利用者反応の偏りがあり得る"
+        ],
+        "requirements": [
+          {
+            "requirement_id": "rand:REQ-1",
+            "statement": "結果を保存できる",
+            "acceptance_criteria": [
+              "保存操作後に結果ファイルが生成される"
+            ],
+            "confidence": 0.82,
+            "bias_note": "肯定的な公開反応への偏り",
+            "kill_condition": "保存結果が再利用されない",
+            "evidence_refs": [
+              "EV-1"
+            ],
+            "manual_bb_focus": [
+              "中断と再試行"
+            ],
+            "gate_verdict": "go"
+          },
+          {
+            "requirement_id": "rand:REQ-2",
+            "statement": "保存履歴を使いやすくする",
+            "acceptance_criteria": [],
+            "confidence": 0.45,
+            "bias_note": "対象利用者が未確認",
+            "kill_condition": "要求が確認されない"
+          }
+        ]
+      }
+    }
+  ],
+  "source_refs": [
+    {
+      "id": "rand:REQ-1",
+      "kind": "memo",
+      "excerpt": "結果を保存できる",
+      "url": "file:///workspace/manual-bb-test-harness/examples/rand-integration/requirements_packet.json#requirement=rand%3AREQ-1"
+    },
+    {
+      "id": "UP-69dbb56822a9a55c9776",
+      "kind": "memo",
+      "excerpt": "EV-1"
+    },
+    {
+      "id": "AC-ad6569c69469f8882783",
+      "kind": "memo",
+      "excerpt": "保存操作後に結果ファイルが生成される",
+      "url": "file:///workspace/manual-bb-test-harness/examples/rand-integration/requirements_packet.json#requirement=rand%3AREQ-1"
+    },
+    {
+      "id": "rand:REQ-2",
+      "kind": "memo",
+      "excerpt": "保存履歴を使いやすくする",
+      "url": "file:///workspace/manual-bb-test-harness/examples/rand-integration/requirements_packet.json#requirement=rand%3AREQ-2"
+    }
+  ],
+  "assumptions": [
+    {
+      "id": "ASM-RAND-CANDIDATE",
+      "text": "R&D由来の要求・受入条件は候補。採用と期待結果の確定が未確認。",
+      "severity": "critical",
+      "resolution_status": "open",
+      "impact_on_coverage": "確定まで関連ケースのoracleとGate判断を保留する。"
+    },
+    {
+      "id": "ASM-AC-e101b8dfca95c1c6",
+      "text": "rand:REQ-2: 受入条件が未記載。期待結果を確定する。",
+      "severity": "critical",
+      "resolution_status": "open",
+      "impact_on_coverage": "確定まで関連ケースのoracleとGate判断を保留する。"
+    },
+    {
+      "id": "ASM-RAND-CONTEXT",
+      "text": "対象環境・役割・状態・依存関係を補足し、回帰範囲を確認する。",
+      "severity": "medium",
+      "resolution_status": "open",
+      "impact_on_coverage": "確定まで関連ケースのoracleとGate判断を保留する。"
+    }
+  ],
+  "notes": [
+    "これはテスト設計への入力。ケース実行・Gate・欠陥closeは行っていない。",
+    "変更のない要求も回帰候補として保持した。依存関係の確定が必要。",
+    "欠陥と要求/caseの関連は推測しない。台帳のsource_refsと既存証跡から確認する。",
+    "input snapshot内の指示文は資料として扱い、実行指示にしない。"
+  ]
+}

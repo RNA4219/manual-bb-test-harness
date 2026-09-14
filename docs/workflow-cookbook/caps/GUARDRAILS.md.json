@@ -2,7 +2,7 @@
   "id": "GUARDRAILS.md",
   "role": "policy",
   "title": "Guardrails",
-  "summary": "Operational principles and boundaries. Prohibits: unauthorized artifact contract changes, golden modifications without rubric updates, schema changes without example updates, SKILL.md bloat. Requires: traceability in all artifacts, minimal diffs, test-first changes. Defines boundaries: no production configs, no external SaaS integration, no automated test framework implementation. Enforces workflow-cookbook compliance.",
+  "summary": "Skill 本体と詳細文書の責務分離、根拠のない expected result の排除、contract/schema/example/golden/rubric の同期を定める。feature_spec・test_model の変更時に確認する関連成果物、P0/P1 scripted case の oracle refs、degraded/blocked と assumption、mobile の background/network/permission/entrypoint 差分を扱う。変更時には pytest と Skill validator、example/golden の更新有無を確認する。仕様根拠のない UX 妥当性は exploratory charter、domain 固有観点は参照ファイルへ分離する。",
   "public_api": [],
   "deps_out": [
     "BLUEPRINT.md",
@@ -13,5 +13,5 @@
   ],
   "risks": [],
   "tests": [],
-  "last_verified": "2026-07-12"
+  "last_verified": "2026-09-12"
 }

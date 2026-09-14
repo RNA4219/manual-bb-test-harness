@@ -35,5 +35,6 @@
     "payment_service",
     "notification_service",
     "refund_calculator"
-  ]
+  ],
+  "revision": "spec-rev-1"
 }

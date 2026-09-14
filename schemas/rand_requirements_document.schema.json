@@ -1,0 +1,200 @@
+{
+  "type": "object",
+  "required": [
+    "schema_version",
+    "id",
+    "type",
+    "producer",
+    "created_at",
+    "input_refs",
+    "source_refs",
+    "status",
+    "assumptions",
+    "limitations",
+    "review_required",
+    "downstream_allowed_uses",
+    "document_id",
+    "parser_version",
+    "source",
+    "requirements",
+    "extraction_diagnostics"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "2.0"
+    },
+    "id": {
+      "type": "string",
+      "pattern": "^rand:"
+    },
+    "type": {
+      "const": "requirements_document"
+    },
+    "producer": {},
+    "created_at": {},
+    "input_refs": {},
+    "source_refs": {},
+    "status": {
+      "const": "ok"
+    },
+    "assumptions": {},
+    "limitations": {},
+    "review_required": {
+      "const": true
+    },
+    "downstream_allowed_uses": {},
+    "document_id": {
+      "type": "string",
+      "pattern": "^rand:document:[A-Za-z0-9][A-Za-z0-9._-]{0,63}$"
+    },
+    "parser_version": {
+      "const": "1"
+    },
+    "source": {
+      "type": "object",
+      "required": [
+        "path",
+        "uri",
+        "sha256",
+        "line_count"
+      ],
+      "properties": {
+        "path": {
+          "type": "string",
+          "minLength": 1
+        },
+        "uri": {
+          "type": "string",
+          "format": "uri",
+          "pattern": "^file:"
+        },
+        "sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "line_count": {
+          "type": "integer",
+          "minimum": 0
+        }
+      },
+      "additionalProperties": false
+    },
+    "requirements": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "requirement_id",
+          "external_id",
+          "identity_basis",
+          "statement",
+          "acceptance_criteria",
+          "section_path",
+          "content_hash",
+          "source"
+        ],
+        "properties": {
+          "requirement_id": {
+            "type": "string",
+            "pattern": "^rand:req:[A-Za-z0-9][A-Za-z0-9._-]{0,63}:(?:[A-Za-z][A-Za-z0-9]*(?:[-_][A-Za-z0-9]+)+|auto-[0-9a-f]{20})$"
+          },
+          "external_id": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "pattern": "^[A-Za-z][A-Za-z0-9]*(?:[-_][A-Za-z0-9]+)+$"
+          },
+          "identity_basis": {
+            "enum": [
+              "explicit",
+              "content"
+            ]
+          },
+          "statement": {
+            "type": "string",
+            "minLength": 1
+          },
+          "acceptance_criteria": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          "section_path": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          "content_hash": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          },
+          "source": {
+            "type": "object",
+            "required": [
+              "path",
+              "uri",
+              "line_start",
+              "line_end",
+              "excerpt"
+            ],
+            "properties": {
+              "path": {
+                "type": "string",
+                "minLength": 1
+              },
+              "uri": {
+                "type": "string",
+                "format": "uri",
+                "pattern": "^file:"
+              },
+              "line_start": {
+                "type": "integer",
+                "minimum": 1
+              },
+              "line_end": {
+                "type": "integer",
+                "minimum": 1
+              },
+              "excerpt": {
+                "type": "string",
+                "minLength": 1
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    "extraction_diagnostics": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "code",
+          "message"
+        ],
+        "properties": {
+          "code": {
+            "type": "string",
+            "minLength": 1
+          },
+          "message": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "additionalProperties": false
+      }
+    }
+  },
+  "additionalProperties": false,
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/RNA4219/manual-bb-test-harness/schemas/rand_requirements_document.schema.json",
+  "title": "RanD requirements_document 2.0 / parser 1"
+}

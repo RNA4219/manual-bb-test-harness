@@ -1,6 +1,16 @@
 # SPEC: manual-bb-test-harness 改修仕様書
 
-現行契約: **4.1.1** / 検証済みテスト: **1168件** / Workflow Cookbook: **33 nodes・45 edges・33 capsules** / 次回レビュー: **2026-10-11**
+現行リリース系列: **4.1.1**。以下の追加契約は未リリース。変更履歴は [CHANGELOG](CHANGELOG.md)を参照。
+
+## RanD連携（2026-09-12）
+
+`import rand`と`rand_intake`を追加。R&D候補の未承認状態、文書差分の全体回帰範囲、欠陥台帳の履歴を保持してテスト設計へ引き継ぐ。詳細は[連携仕様](docs/tasks/task-rand-integration-20260912.md)。
+
+## 実行証跡の追加契約（2026-09-12）
+
+R1・R2・R18のGate誤判定を修正した。実行構成ごとの実績、欠陥ID付き台帳と解決時点の確認証跡、自動テストsuiteの成否と件数を扱う。旧自動証跡には実際の`test_suites`を補い、複数構成は`execution_configurations`で明示する。
+
+詳細は[artifact契約](skills/manual-bb-test-harness/references/artifact-contract.md#実行構成と欠陥履歴)と[検収記録](docs/acceptance/AC-20260912-evidence-lifecycle.md)を参照。以下の機能表と旧検証記録は各改修時点の履歴。
 
 ## 概要
 

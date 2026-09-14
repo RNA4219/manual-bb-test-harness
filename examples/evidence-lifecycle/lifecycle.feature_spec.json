@@ -1,0 +1,14 @@
+{
+  "feature_id": "EVIDENCE-LIFECYCLE",
+  "title": "保存",
+  "acceptance_criteria": [
+    "保存できる"
+  ],
+  "source_refs": [
+    {
+      "id": "AC-1",
+      "kind": "ac"
+    }
+  ],
+  "revision": "spec-rev-1"
+}

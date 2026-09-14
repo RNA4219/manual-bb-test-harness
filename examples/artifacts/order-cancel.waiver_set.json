@@ -7,6 +7,9 @@
       "risk_ids": ["RISK-03"],
       "reason": "Coupon restoration is manually verified for this release",
       "owner": "qa-lead",
+      "approver": "release-manager",
+      "approved_at": "2026-09-12T09:00:00+09:00",
+      "approval_ref": "DECISION-ORD-CANCEL-001",
       "expires_at": "2027-01-31T23:59:59+09:00",
       "containment": "Monitor coupon restoration failures",
       "rollback": "Disable order cancellation for coupon orders"

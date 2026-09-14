@@ -17,6 +17,7 @@ from bb_harness.evidence_revisions import (
     verify_execution_revision,
 )
 from bb_harness.gate_engine import main as gate_main
+from bb_harness.schema_validation import SchemaValidationError
 from bb_harness.techniques.common import ModelError, digest
 from tests.test_coverage_engine import case, cases, domain, evidence, plan
 
@@ -102,7 +103,8 @@ def test_coverage_rejects_wrong_revision(mutate):
             item.pop(key)
         else:
             item[key] = "0" * 64
-    with pytest.raises(ModelError):
+    expected_error = SchemaValidationError if mutate == "missing_case" else ModelError
+    with pytest.raises(expected_error):
         build_coverage_report(model, plan(model), bound, [item], build_id="B")
 
 
@@ -125,15 +127,37 @@ def test_binding_checks_feature_and_duplicate_ids():
         case_index(bound)
 
 
-def test_legacy_export_removes_revision_without_stamping_old_evidence():
+def test_legacy_export_preserves_identity_without_stamping_old_evidence():
     _, bound, item = bound_inputs()
     old = migrate_artifact(bound, "manual_case_set", artifact_version="legacy")
     assert "evidence_binding" not in old
-    assert "case_revision" not in old["manual_cases"][0]
+    assert old["manual_cases"][0]["case_revision"] == bound["manual_cases"][0]["case_revision"]
     old_item = migrate_artifact(item, "execution_evidence", artifact_version="legacy")
-    assert "case_revision" not in old_item and "model_hash" not in old_item
+    assert old_item["case_revision"] == item["case_revision"]
+    assert "model_hash" not in old_item
     upgraded = migrate_artifact(old_item, "execution_evidence")
-    assert "case_revision" not in upgraded
+    assert upgraded["case_revision"] == item["case_revision"]
+
+
+
+def test_legacy_charter_migration_preserves_identity_and_original_definition():
+    root = Path(__file__).resolve().parents[1] / "examples/artifacts"
+    case_set = json.loads(
+        (root / "order-cancel.manual_case_set.json").read_text(encoding="utf-8")
+    )
+    model = json.loads((root / "order-cancel.test_model.json").read_text(encoding="utf-8"))
+    case_set["exploratory_charters"][0]["mission"] = "追加の受入条件を調査する"
+    bound = bind_case_set(case_set, model)
+    charter = bound["exploratory_charters"][0]
+    original = copy.deepcopy(bound)
+
+    legacy = migrate_artifact(bound, "manual_case_set", artifact_version="legacy")
+
+    converted = legacy["exploratory_charters"][0]
+    assert "mission" not in converted
+    for key in ("id", "revision", "case_revision", "content_hash", "oracle_revision"):
+        assert converted[key] == charter[key]
+    assert bound == original
 
 
 def test_bind_cli_preserves_input_and_refuses_overwrite(tmp_path):
@@ -171,6 +195,10 @@ def test_gate_checks_current_case_and_report_model(tmp_path, wrong):
         "timestamp": "2026-09-10T00:00:00Z",
         "result": "pass",
         "case_revision": tc["case_revision"],
+        "spec_revision": bound["spec_revision"],
+        "oracle_revision": tc["oracle_revision"],
+        "case_content_hash": tc["content_hash"],
+        "oracle_refs": tc["oracle"]["refs"],
         "model_hash": bound["evidence_binding"]["model_hash"],
     }
     if wrong in {"case", "model"}:
@@ -184,6 +212,12 @@ def test_gate_checks_current_case_and_report_model(tmp_path, wrong):
         str(tmp_path / "cases.json"),
         "--risk",
         str(root / "order-cancel.risk_register.json"),
+        "--feature",
+        str(root / "order-cancel.feature_spec.json"),
+        "--model",
+        str(root / "order-cancel.test_model.json"),
+        "--observations",
+        str(root / "order-cancel.observation_set.json"),
         "--build-id",
         "B",
         "--output",

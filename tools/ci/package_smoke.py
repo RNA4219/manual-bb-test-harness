@@ -272,11 +272,32 @@ def smoke_artifact(artifact: Path, root: Path) -> None:
             "manual_case_set",
         ]
     )
+
     commands.extend(
         [
             [
                 cli,
-                "bind-cases",
+                "import",
+                "rand",
+                "--input",
+                str(REPO_ROOT / "examples/rand-integration/requirements_packet.json"),
+                "--output",
+                str(work / "rand-candidates"),
+            ],
+            [
+                cli,
+                "import",
+                "rand",
+                "--input",
+                str(REPO_ROOT / "examples/rand-integration/requirements_document.json"),
+                "--diff",
+                str(REPO_ROOT / "examples/rand-integration/requirements_diff.json"),
+                "--output",
+                str(work / "rand-document"),
+
+            ],
+            [
+                cli,                "bind-cases",
                 "--input",
                 str(examples / "order-cancel.manual_case_set.json"),
                 "--test-model",
@@ -297,6 +318,7 @@ def smoke_artifact(artifact: Path, root: Path) -> None:
                 "batched",
                 "--token-budget",
                 "1",
+
             ],
         ]
     )

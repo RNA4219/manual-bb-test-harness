@@ -17,9 +17,43 @@ COSMETIC_FIELDS = {
     "case_revision",
 }
 
+IDENTITY_FIELDS = {"revision", "content_hash", "oracle_revision", "case_revision"}
+
 
 def case_revision(case: dict) -> str:
-    return digest({key: value for key, value in case.items() if key not in COSMETIC_FIELDS})
+    """実行可能な定義本体から安定した実行 identity を作る。"""
+    return digest(
+        {
+            key: value
+            for key, value in case.items()
+            if key not in COSMETIC_FIELDS and key not in IDENTITY_FIELDS
+        }
+    )
+
+
+def _content_hash(case: dict) -> str:
+    return "sha256:" + digest(
+        {
+            key: value
+            for key, value in case.items()
+            if (
+                key not in IDENTITY_FIELDS
+                and key not in COSMETIC_FIELDS
+                and key not in {"tc_id", "id"}
+            )
+        }
+    )
+
+
+def stamp_case_identity(case: dict) -> dict:
+    """ホスト管理の identity fields を case/charter に付与する。"""
+    case["content_hash"] = _content_hash(case)
+    oracle = case.get("oracle", {"type": "human", "refs": []})
+    case["oracle_revision"] = digest(oracle)
+    revision = case_revision(case)
+    case["revision"] = revision
+    case["case_revision"] = revision
+    return case
 
 
 def model_revision(model: dict) -> str:
@@ -49,7 +83,7 @@ def bind_case_set(cases: dict, model: dict) -> dict:
     result = copy.deepcopy(cases)
     result["evidence_binding"] = {"mode": "case_revision", "model_hash": model_revision(model)}
     for case in case_index(result).values():
-        case["case_revision"] = case_revision(case)
+        stamp_case_identity(case)
     validate_artifact(result, "manual_case_set.schema.json")
     return result
 
@@ -61,7 +95,14 @@ def verify_case_set(cases: dict, model: dict | None = None) -> str:
     if model is not None and binding["model_hash"] != model_revision(model):
         raise ModelError("bound cases model hash mismatch; rebind and re-execute")
     for case in case_index(cases).values():
-        if case.get("case_revision") != case_revision(case):
+        expected = case_revision(case)
+        if (
+            case.get("revision") != expected
+            or case.get("case_revision") != expected
+            or case.get("content_hash") != _content_hash(case)
+            or case.get("oracle_revision")
+            != digest(case.get("oracle", {"type": "human", "refs": []}))
+        ):
             raise ModelError("case definition changed after binding; rebind and re-execute")
     return "case_revision"
 
@@ -73,7 +114,12 @@ def verify_execution_revision(evidence: dict, cases: dict) -> None:
     case = case_index(cases).get(key)
     if case is None:
         raise ModelError(f"execution references unknown bound case: {key}")
-    if evidence.get("case_revision") != case_revision(case):
+    expected = case_revision(case)
+    if (
+        evidence.get("case_revision") != expected
+        or case.get("revision") != expected
+        or case.get("case_revision") != expected
+    ):
         raise ModelError(f"execution case revision missing or stale: {key}")
     if evidence.get("model_hash") != cases["evidence_binding"]["model_hash"]:
         raise ModelError(f"execution model revision missing or stale: {key}")

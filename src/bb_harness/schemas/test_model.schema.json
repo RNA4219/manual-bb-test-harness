@@ -6,6 +6,7 @@
   "type": "object",
   "required": [
     "feature_id",
+    "coverage_items",
     "flows",
     "data_partitions",
     "rule_columns",
@@ -18,6 +19,209 @@
       "type": "string",
       "minLength": 1,
       "description": "Reference to the feature_spec feature_id this model covers."
+    },
+    "coverage_items": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": [
+          "id",
+          "dimension",
+          "technique",
+          "applicability",
+          "mandatory",
+          "coverage_criterion",
+          "source_refs"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^COV-[A-Z0-9-]+$"
+          },
+          "dimension": {
+            "enum": [
+              "flow",
+              "state",
+              "rule",
+              "data",
+              "role",
+              "regression",
+              "platform",
+              "quality"
+            ]
+          },
+          "technique": {
+            "enum": [
+              "equivalence_partitioning",
+              "boundary_value",
+              "decision_table",
+              "state_transition",
+              "checklist_based",
+              "exploratory",
+              "error_guessing",
+              "use_case",
+              "user_scenario"
+            ]
+          },
+          "applicability": {
+            "enum": [
+              "applicable",
+              "not_applicable"
+            ]
+          },
+          "mandatory": {
+            "type": "boolean"
+          },
+          "coverage_criterion": {
+            "enum": [
+              "each_item",
+              "each_state",
+              "each_valid_transition",
+              "each_transition",
+              "each_feasible_column",
+              "pairwise"
+            ]
+          },
+          "source_refs": {
+            "type": "array",
+            "minItems": 1,
+            "items": {
+              "$ref": "shared_defs.schema.json#/$defs/SourceRef"
+            }
+          },
+          "not_applicable_reason": {
+            "type": "string",
+            "minLength": 1
+          },
+          "boundary_spec": {
+            "type": "object",
+            "required": [
+              "analysis_type",
+              "partition",
+              "boundary_value",
+              "included",
+              "step",
+              "selected_values",
+              "rationale"
+            ],
+            "properties": {
+              "analysis_type": {
+                "enum": [
+                  "two_value",
+                  "three_value"
+                ]
+              },
+              "partition": {
+                "type": "string",
+                "minLength": 1
+              },
+              "boundary_value": {
+                "type": "string",
+                "minLength": 1
+              },
+              "included": {
+                "type": "boolean"
+              },
+              "step": {
+                "type": "string",
+                "minLength": 1
+              },
+              "selected_values": {
+                "type": "array",
+                "minItems": 2,
+                "uniqueItems": true,
+                "items": {
+                  "type": "string"
+                }
+              },
+              "rationale": {
+                "type": "string",
+                "minLength": 1
+              }
+            },
+            "additionalProperties": false
+          },
+          "decision_column": {
+            "type": "object",
+            "required": [
+              "conditions",
+              "actions",
+              "feasible"
+            ],
+            "properties": {
+              "conditions": {
+                "type": "object"
+              },
+              "actions": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "feasible": {
+                "type": "boolean"
+              },
+              "dont_care_conditions": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "infeasible_reason": {
+                "type": "string"
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "allOf": [
+          {
+            "if": {
+              "properties": {
+                "applicability": {
+                  "const": "not_applicable"
+                }
+              }
+            },
+            "then": {
+              "required": [
+                "not_applicable_reason"
+              ]
+            }
+          },
+          {
+            "if": {
+              "properties": {
+                "technique": {
+                  "const": "boundary_value"
+                }
+              }
+            },
+            "then": {
+              "required": [
+                "boundary_spec"
+              ]
+            }
+          },
+          {
+            "if": {
+              "properties": {
+                "technique": {
+                  "const": "decision_table"
+                }
+              }
+            },
+            "then": {
+              "required": [
+                "decision_column"
+              ]
+            }
+          }
+        ],
+        "additionalProperties": false
+      },
+      "description": "ID付きの設計網羅母集団。対象外項目も理由付きで保持する。"
     },
     "flows": {
       "type": "array",
@@ -92,9 +296,101 @@
     "quality_lenses": {
       "type": "array",
       "items": {
-        "type": "string"
+        "type": "object",
+        "required": [
+          "id",
+          "lens",
+          "applicable",
+          "reason",
+          "owner"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "lens": {
+            "type": "string",
+            "minLength": 1
+          },
+          "applicable": {
+            "type": "boolean"
+          },
+          "reason": {
+            "type": "string",
+            "minLength": 1
+          },
+          "owner": {
+            "type": "string",
+            "minLength": 1
+          },
+          "oracle": {
+            "$ref": "shared_defs.schema.json#/$defs/Oracle"
+          }
+        },
+        "allOf": [
+          {
+            "if": {
+              "properties": {
+                "applicable": {
+                  "const": true
+                }
+              }
+            },
+            "then": {
+              "required": [
+                "oracle"
+              ]
+            }
+          }
+        ],
+        "additionalProperties": false
       },
-      "description": "Quality characteristic perspectives to apply, e.g., 'usability', 'recovery', 'security'."
+      "description": "Quality characteristic applicability decisions with an owner and an oracle when applicable."
+    },
+    "improvement_feedback": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "id",
+          "source_refs",
+          "finding",
+          "action",
+          "target_refs"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "source_refs": {
+            "type": "array",
+            "minItems": 1,
+            "items": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          "finding": {
+            "type": "string",
+            "minLength": 1
+          },
+          "action": {
+            "type": "string",
+            "minLength": 1
+          },
+          "target_refs": {
+            "type": "array",
+            "minItems": 1,
+            "items": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        },
+        "additionalProperties": false
+      }
     },
     "parameters": {
       "type": "array",

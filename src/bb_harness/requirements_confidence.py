@@ -11,7 +11,7 @@ from pathlib import Path
 from typing import Any
 
 from bb_harness.schema_validation import validate_artifact
-from bb_harness.tools._shared.spec_ingest_markdown import read_markdown
+from bb_harness.tools._shared.spec_ingest_markdown import fallback_feature_id, read_markdown
 from bb_harness.tools.spec_ingest import extract_markdown_sections, ingest_markdown_spec
 
 WEIGHTS = {"critical": 8, "high": 4, "medium": 2, "low": 1}
@@ -52,7 +52,17 @@ def load_input(path: Path) -> tuple[dict, list[dict]]:
     if path.suffix.lower() not in {".md", ".markdown"}:
         raise ValueError("入力はMarkdownまたはfeature_spec JSONを指定してください")
     text = read_markdown(path)
-    feature = ingest_markdown_spec(path)
+    try:
+        feature = ingest_markdown_spec(path)
+    except ValueError as exc:
+        if "No acceptance criteria found" not in str(exc):
+            raise
+        feature = {
+            "feature_id": fallback_feature_id(path.stem),
+            "title": path.stem,
+            "source_refs": [{"id": f"MD-{path.stem}", "kind": "spec", "excerpt": text.strip()}],
+            "acceptance_criteria": [],
+        }
     aliases = {
         "受入条件": "acceptance_criteria",
         "受け入れ条件": "acceptance_criteria",
@@ -74,7 +84,9 @@ def load_input(path: Path) -> tuple[dict, list[dict]]:
                     for item in feature.get("assumptions", [])
                     if item["text"] != "No acceptance criteria section found in source"
                 ]
-            feature.setdefault(field, []).extend(items)
+            if not feature.get(field):
+                feature.setdefault(field, []).extend(items)
+    feature.setdefault("revision", "md-" + _digest(text))
     # 文書の未取込部分の変更でもレビューを失効させ、実内容を引用できるようにする。
     feature["source_refs"][0]["excerpt"] = text.strip()
     heading = re.search(r"^#\s+(.+)$", text, re.MULTILINE)

@@ -8,13 +8,19 @@
     "feature_id",
     "title",
     "acceptance_criteria",
-    "source_refs"
+    "source_refs",
+    "revision"
   ],
   "properties": {
     "feature_id": {
       "type": "string",
       "minLength": 1,
       "description": "Unique identifier for the feature, e.g., 'ORD-CANCEL-01'. Should be uppercase alphanumeric with hyphens."
+    },
+    "revision": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Specification revision used to bind execution evidence."
     },
     "title": {
       "type": "string",

@@ -2,7 +2,7 @@
   "id": "RUNBOOK.md",
   "role": "operations",
   "title": "Runbook",
-  "summary": "Execution procedures for validation, artifact changes, import/export, and local-design. Documents OpenAI-compatible model probe, qwen36 and generic invocation, manifest/lint triage, and the expected no_go behavior when execution evidence is absent. compact生成、予算・usage、証跡版の契約はefficient-generation.mdを参照。 batched生成・設計状態・比較再検証はspec-06とAC-20260910-batched.mdを参照。 要件定義信頼度・要確認集計・根拠付き再評価はrequirements-confidence.mdとspec-07を参照。",
+  "summary": "CLI と外部連携、RanD、Local Mode、検証、Gate 入力・構成計画・欠陥台帳・承認・移行、障害対応、配布前検証の操作手順。生成予算・被覆・要件信頼度の詳細契約と過去の検証記録へ案内する。",
   "public_api": [],
   "deps_out": [
     "BLUEPRINT.md",
@@ -19,5 +19,5 @@
   "tests": [
     "tests/test_cli_dryrun.py"
   ],
-  "last_verified": "2026-09-12"
+  "last_verified": "2026-09-14"
 }

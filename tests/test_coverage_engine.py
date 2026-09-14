@@ -15,6 +15,7 @@ from bb_harness.coverage_engine import (
     enumerate_coverage_obligations,
     validate_case_coverage,
 )
+from bb_harness.evidence_revisions import stamp_case_identity
 from bb_harness.local_pipeline import (
     _merge_case_sets,
     _preserve_review_cases,
@@ -24,7 +25,7 @@ from bb_harness.schema_validation import SchemaValidationError, validate_artifac
 from bb_harness.techniques.common import ModelError, evaluate
 
 SOURCE = {"id": "AC-1", "kind": "ac"}
-FEATURE = {"feature_id": "F", "source_refs": [SOURCE]}
+FEATURE = {"feature_id": "F", "title": "テスト対象", "acceptance_criteria": ["AC-1: テスト対象が利用できる"], "source_refs": [SOURCE], "revision": "spec-test-rev-1"}
 OBS = {"feature_id": "F", "observations": []}
 RISKS = {"feature_id": "F", "risks": []}
 
@@ -36,6 +37,7 @@ def expr(op, left, right):
 def model(**extra):
     return {
         "feature_id": "F",
+        "coverage_items": [{"id": "COV-TEST-SURFACE", "dimension": "quality", "technique": "exploratory", "applicability": "not_applicable", "mandatory": False, "coverage_criterion": "each_item", "source_refs": [SOURCE], "not_applicable_reason": "個別技法モデルのテストでは品質面を別途評価しない"}],
         "flows": [],
         "data_partitions": [],
         "rule_columns": [],
@@ -81,7 +83,7 @@ def obligations(value):
 
 
 def case(data=None, **extra):
-    return {
+    value = {
         "tc_id": "TC-1",
         "title": "境界",
         "priority": "P1",
@@ -91,15 +93,19 @@ def case(data=None, **extra):
         "oracle": {"type": "specified", "refs": ["AC-1"]},
         "source_ref": {"type": "acceptance", "refs": ["AC-1"]},
         "trace_to": ["OBS-DATA-1"],
+        "revision": "case-test-rev-1",
+        "content_hash": "sha256:case-test-rev-1",
+        "oracle_revision": "oracle-test-rev-1",
         "coverage_inputs": []
         if data is None
         else [{"model_ref": "D", "data": data, "step_refs": [1], "expected_result_refs": [1]}],
         **extra,
     }
+    return stamp_case_identity(value)
 
 
 def cases(*values):
-    return {"feature_id": "F", "manual_cases": list(values)}
+    return {"feature_id": "F", "manual_cases": list(values), "spec_revision": "spec-test-rev-1"}
 
 
 def evidence(tc_id="TC-1", result="pass", **extra):
@@ -110,6 +116,11 @@ def evidence(tc_id="TC-1", result="pass", **extra):
         "timestamp": "2026-09-10T00:00:00Z",
         "tc_id": tc_id,
         "result": result,
+        "case_revision": "case-test-rev-1",
+        "spec_revision": "spec-test-rev-1",
+        "oracle_revision": "oracle-test-rev-1",
+        "case_content_hash": "sha256:case-test-rev-1",
+        "oracle_refs": ["AC-1"],
         **extra,
     }
 

@@ -2,7 +2,7 @@
   "id": "docs/specs/spec-02-cli-integration.md",
   "role": "specification",
   "title": "Spec: CLI Integration",
-  "summary": "bb-harnessのvalidate、ingest、gate、export/import、run等のCLI仕様と実装済み計画を定義する。4.1.1の自己BB修正として、日本語名の安定した代替ID、UTF-8 BOMの先頭のみの除去、明示buildで証跡0件のno_go出力、入力不正・版不一致の拒否と対照試験を記載する。",
+  "summary": "scripts を単一の bb-harness CLI に統合する要件と設計。validate/ingest/state-diagram/regression-graph/heatmap/gate/export/run、共通 verbose/dry-run、パッケージ化、設定優先度、使用例とテスト観点を記載する。受入基準には PLAN-CLI-01 verbose、02 TestRail/Xray import、03 forward-test wrapper、04 docs/tests の2026-05-30時点の完了記録があり、今回の変更に対する検証結果とは区別する。 bb-harnessのvalidate、ingest、gate、export/import、run等のCLI仕様と実装済み計画を定義する。4.1.1の自己BB修正として、日本語名の安定した代替ID、UTF-8 BOMの先頭のみの除去、明示buildで証跡0件のno_go出力、入力不正・版不一致の拒否と対照試験を記載する。",
   "public_api": [
     "bb-harness CLI"
   ],

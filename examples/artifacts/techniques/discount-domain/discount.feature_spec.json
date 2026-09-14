@@ -10,5 +10,6 @@
       "kind": "ac",
       "excerpt": "割引後金額P-Dが10000円以上なら送料0円、未満なら500円。PとDは0以上の整数円。"
     }
-  ]
+  ],
+  "revision": "spec-discount-domain-rev-1"
 }

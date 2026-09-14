@@ -1,7 +1,7 @@
 {
   "schema_version": "1.1.0",
   "feature_id": "DISCOUNT-01",
-  "model_hash": "318d0e7a17cc30958cdb52f863989d4320add284a852f027861a9f3b5041ce83",
+  "model_hash": "561fbdb3c818fbe7f03131465e72c566d97c59c5b0edd155b750c8080131068d",
   "generator_version": "finite-coverage-1",
   "selections": [
     {

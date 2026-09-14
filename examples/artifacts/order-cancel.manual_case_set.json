@@ -1,14 +1,28 @@
 {
   "feature_id": "ORD-CANCEL-01",
+  "spec_revision": "spec-rev-20260912",
   "manual_cases": [
     {
       "tc_id": "TC-001",
+      "revision": "case-rev-1",
+      "content_hash": "sha256:ord-cancel-tc-001-rev-1",
+      "oracle_revision": "oracle-rev-1",
       "title": "出荷済み注文はキャンセル不可",
       "priority": "P1",
       "primary_view": "black",
-      "techniques": ["state_transition"],
-      "preconditions": ["注文状態=shipped"],
-      "source_ref": {"type": "spec", "refs": ["SPEC-ORD-CANCEL-01", "AC-2"]},
+      "techniques": [
+        "state_transition"
+      ],
+      "preconditions": [
+        "注文状態=shipped"
+      ],
+      "source_ref": {
+        "type": "spec",
+        "refs": [
+          "SPEC-ORD-CANCEL-01",
+          "AC-2"
+        ]
+      },
       "steps": [
         "注文詳細画面を開く",
         "キャンセル操作を行う"
@@ -17,18 +31,40 @@
         "キャンセル不可メッセージを表示",
         "注文状態は変化しない"
       ],
-      "oracle": {"type": "specified", "refs": ["AC-2"]},
+      "oracle": {
+        "type": "specified",
+        "refs": [
+          "AC-2"
+        ]
+      },
       "estimate_minutes": 8,
-      "trace_to": ["OBS-STATE-01", "RISK-01"]
+      "trace_to": [
+        "OBS-STATE-01",
+        "RISK-01"
+      ],
+      "status": "active"
     },
     {
       "tc_id": "TC-002",
+      "revision": "case-rev-1",
+      "content_hash": "sha256:ord-cancel-tc-002-rev-1",
+      "oracle_revision": "oracle-rev-1",
       "title": "pending注文はキャンセル可能",
       "priority": "P0",
       "primary_view": "black",
-      "techniques": ["state_transition"],
-      "preconditions": ["注文状態=pending"],
-      "source_ref": {"type": "spec", "refs": ["SPEC-ORD-CANCEL-01", "AC-1"]},
+      "techniques": [
+        "state_transition"
+      ],
+      "preconditions": [
+        "注文状態=pending"
+      ],
+      "source_ref": {
+        "type": "spec",
+        "refs": [
+          "SPEC-ORD-CANCEL-01",
+          "AC-1"
+        ]
+      },
       "steps": [
         "注文詳細画面を開く",
         "キャンセル操作を行う",
@@ -38,18 +74,41 @@
         "注文状態がcancelledに変更",
         "キャンセル完了メッセージを表示"
       ],
-      "oracle": {"type": "specified", "refs": ["AC-1"]},
+      "oracle": {
+        "type": "specified",
+        "refs": [
+          "AC-1"
+        ]
+      },
       "estimate_minutes": 10,
-      "trace_to": ["OBS-STATE-02", "RISK-02"]
+      "trace_to": [
+        "OBS-STATE-02",
+        "RISK-02"
+      ],
+      "status": "active"
     },
     {
       "tc_id": "TC-003",
+      "revision": "case-rev-1",
+      "content_hash": "sha256:ord-cancel-tc-003-rev-1",
+      "oracle_revision": "oracle-rev-1",
       "title": "クーポン利用注文キャンセル時はクーポン残数復元",
       "priority": "P1",
       "primary_view": "gray",
-      "techniques": ["data_partition"],
-      "preconditions": ["注文状態=pending", "クーポン使用済み"],
-      "source_ref": {"type": "spec", "refs": ["SPEC-ORD-CANCEL-01", "AC-4"]},
+      "techniques": [
+        "data_partition"
+      ],
+      "preconditions": [
+        "注文状態=pending",
+        "クーポン使用済み"
+      ],
+      "source_ref": {
+        "type": "spec",
+        "refs": [
+          "SPEC-ORD-CANCEL-01",
+          "AC-4"
+        ]
+      },
       "steps": [
         "クーポン残数を確認",
         "注文をキャンセル",
@@ -58,14 +117,31 @@
       "expected_results": [
         "クーポン残数が+1されている"
       ],
-      "oracle": {"type": "specified", "refs": ["AC-4"]},
+      "oracle": {
+        "type": "specified",
+        "refs": [
+          "AC-4"
+        ]
+      },
       "estimate_minutes": 15,
-      "trace_to": ["OBS-DATA-01"]
+      "trace_to": [
+        "OBS-DATA-01",
+        "RISK-03"
+      ],
+      "status": "retired",
+      "retired_reason": "QEG placement changeで自動統合テストへ移管済み",
+      "replacement_refs": [
+        "hate:AETE-COUPON-RESTORE-001"
+      ],
+      "placement_change_ref": "qeg:PLC-ORD-CANCEL-20260702-001"
     }
   ],
   "exploratory_charters": [
     {
       "id": "CHARTER-001",
+      "revision": "charter-rev-1",
+      "content_hash": "sha256:ord-cancel-charter-001-rev-1",
+      "oracle_revision": "oracle-rev-1",
       "title": "キャンセル操作のエラー表示と復帰性を探索する",
       "scope": "network loss and retry during cancellation",
       "questions": [
@@ -73,7 +149,9 @@
         "ユーザーに再試行可否が伝わるか"
       ],
       "estimate_minutes": 30,
-      "trace_to": ["OBS-RECOVERY-01"]
+      "trace_to": [
+        "OBS-RECOVERY-01"
+      ]
     }
   ]
 }

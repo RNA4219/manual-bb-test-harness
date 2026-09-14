@@ -2,7 +2,7 @@
   "schema_version": "1.0.0",
   "policy_version": "requirements-confidence-1",
   "feature_id": "ORD-CANCEL-01",
-  "input_sha256": "f042e9d727330c81fd426c1ef1e410f733ceceb259bcf31a946200cec337c787",
+  "input_sha256": "a630ec2c0b9b2ec268cda4d60e06a92efc9453b6108c025092251c66ab751588",
   "score": 35.0,
   "band": "low",
   "status": "blocked",
@@ -220,9 +220,24 @@
       "excerpt": "出荷済み注文はキャンセル不可メッセージを表示する"
     },
     {
+      "id": "AC-3",
+      "kind": "ac",
+      "excerpt": "キャンセル成功時は在庫を戻す"
+    },
+    {
+      "id": "AC-4",
+      "kind": "ac",
+      "excerpt": "クーポン利用注文ではクーポン残数を復元する"
+    },
+    {
       "id": "BR-1",
       "kind": "rule",
       "excerpt": "決済失敗注文はキャンセル済み扱いにしない"
+    },
+    {
+      "id": "BR-2",
+      "kind": "rule",
+      "excerpt": "二重キャンセルは不可"
     },
     {
       "id": "MEMO-1",

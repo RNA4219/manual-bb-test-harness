@@ -9,7 +9,8 @@
     "coverage_scope",
     "coverage_percent",
     "new_issues",
-    "source_refs"
+    "source_refs",
+    "test_suites"
   ],
   "properties": {
     "feature_id": {
@@ -59,6 +60,66 @@
       "minItems": 1,
       "items": {
         "$ref": "shared_defs.schema.json#/$defs/SourceRef"
+      }
+    },
+    "test_suites": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": [
+          "suite_id",
+          "status",
+          "total",
+          "passed",
+          "failed",
+          "errors",
+          "skipped",
+          "source_refs"
+        ],
+        "properties": {
+          "suite_id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "status": {
+            "enum": [
+              "passed",
+              "failed",
+              "error",
+              "cancelled",
+              "not_run"
+            ]
+          },
+          "total": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "passed": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "failed": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "errors": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "skipped": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "source_refs": {
+            "type": "array",
+            "minItems": 1,
+            "items": {
+              "$ref": "shared_defs.schema.json#/$defs/SourceRef"
+            }
+          }
+        },
+        "additionalProperties": false
       }
     },
     "schema_version": {

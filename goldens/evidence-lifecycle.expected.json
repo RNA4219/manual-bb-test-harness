@@ -1,0 +1,108 @@
+{
+  "feature_id": "EVIDENCE-LIFECYCLE",
+  "status": "no_go",
+  "profile": "standard",
+  "reasons": [
+    "P0 pass rate 0.0% < 100%",
+    "open blocker/critical/high defects: 1",
+    "automation suite required-regression did not pass every required test",
+    "P0 blocking risks unresolved: RISK-1",
+    "mandatory observation execution 0.0% < 95%",
+    "waiver missing for risks: RISK-1"
+  ],
+  "build_id": "build-1",
+  "evidence_summary": {
+    "manual_by_priority": {
+      "P0": {
+        "pass": 0,
+        "fail": 0,
+        "skip": 0,
+        "blocked": 0,
+        "unknown": 0,
+        "untested": 1,
+        "total": 1
+      },
+      "P1": {
+        "pass": 0,
+        "fail": 0,
+        "skip": 0,
+        "blocked": 0,
+        "unknown": 0,
+        "untested": 0,
+        "total": 0
+      },
+      "P2": {
+        "pass": 0,
+        "fail": 0,
+        "skip": 0,
+        "blocked": 0,
+        "unknown": 0,
+        "untested": 0,
+        "total": 0
+      },
+      "P3": {
+        "pass": 0,
+        "fail": 0,
+        "skip": 0,
+        "blocked": 0,
+        "unknown": 0,
+        "untested": 0,
+        "total": 0
+      }
+    },
+    "mandatory_observation_rate": 0.0,
+    "manual_execution_results": [
+      {
+        "case_id": "TC-1",
+        "result": "pass",
+        "run_id": "RUN-PASS",
+        "configuration_id": "android",
+        "env": "Android",
+        "timestamp": "2026-09-12T11:00:00Z"
+      },
+      {
+        "case_id": "TC-1",
+        "result": "untested",
+        "run_id": "",
+        "configuration_id": "ios",
+        "env": "iOS"
+      }
+    ],
+    "open_defects": [
+      {
+        "defect_id": "BUG-1",
+        "title": "保存データ消失",
+        "severity": "high",
+        "status": "fixed"
+      }
+    ],
+    "automation_test_suites": [
+      {
+        "suite_id": "required-regression",
+        "status": "failed",
+        "total": 2,
+        "passed": 1,
+        "failed": 1,
+        "errors": 0,
+        "skipped": 0,
+        "source_refs": [
+          {
+            "id": "CI-RUN-1",
+            "kind": "auto_test"
+          }
+        ]
+      }
+    ]
+  },
+  "blocking_risks": [
+    "RISK-1"
+  ],
+  "unmet_conditions": [
+    "P0 pass rate 0.0% < 100%",
+    "open blocker/critical/high defects: 1",
+    "automation suite required-regression did not pass every required test",
+    "P0 blocking risks unresolved: RISK-1",
+    "mandatory observation execution 0.0% < 95%",
+    "waiver missing for risks: RISK-1"
+  ]
+}

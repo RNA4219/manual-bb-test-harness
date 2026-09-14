@@ -65,6 +65,17 @@ pending注文を取消し、在庫を戻す。
 def _responses() -> list[dict[str, Any]]:
     valid_model = {
         "feature_id": "IGNORED",
+        "coverage_items": [
+            {
+                "id": "COV-FLOW-CANCEL",
+                "dimension": "flow",
+                "technique": "use_case",
+                "applicability": "applicable",
+                "mandatory": True,
+                "coverage_criterion": "each_item",
+                "source_refs": [{"id": "AC-1", "kind": "ac"}],
+            }
+        ],
         "flows": ["buyer cancellation"],
         "data_partitions": ["pending", "shipped"],
         "boundaries": ["pending/shipped"],
@@ -74,7 +85,16 @@ def _responses() -> list[dict[str, Any]]:
         "invalid_transitions": ["shipped -> cancelled", "cancelled -> cancelled"],
         "role_matrix": ["buyer x own order x cancel"],
         "regression_edges": ["inventory"],
-        "quality_lenses": ["recovery"],
+        "quality_lenses": [
+            {
+                "id": "QL-RECOVERY",
+                "lens": "recovery",
+                "applicable": True,
+                "reason": "取消処理の再試行を確認する",
+                "owner": "qa",
+                "oracle": {"type": "human", "refs": ["BR-1"]},
+            }
+        ],
     }
     observations = {
         "feature_id": "IGNORED",
@@ -84,6 +104,7 @@ def _responses() -> list[dict[str, Any]]:
                 "title": "取消可能状態と禁止状態",
                 "view": "black",
                 "mandatory": True,
+                "coverage_item_id": "COV-FLOW-CANCEL",
                 "techniques": ["state_transition", "boundary_value"],
                 "source_refs": [{"id": "AC-1", "kind": "ac"}],
             },
@@ -92,6 +113,7 @@ def _responses() -> list[dict[str, Any]]:
                 "title": "二重取消の副作用",
                 "view": "gray",
                 "mandatory": True,
+                "coverage_item_id": "COV-FLOW-CANCEL",
                 "techniques": ["error_guessing"],
                 "source_refs": [{"id": "BR-1", "kind": "rule"}],
             },
@@ -485,16 +507,24 @@ def test_execution_evidence_uses_existing_gate_engine(tmp_path: Path) -> None:
         ("charter_id", item["id"]) for item in cases.get("exploratory_charters", [])
     ]
     for index, (id_field, item_id) in enumerate(evidence_items, 1):
+        case_def = next(
+            item
+            for item in cases["manual_cases"] + cases.get("exploratory_charters", [])
+            if (item.get("tc_id") or item.get("id")) == item_id
+        )
         evidence = {
             "run_id": f"RUN-{index}",
             id_field: item_id,
             "feature_id": cases["feature_id"],
             "build_id": "build-evidence-1",
             "model_hash": cases["evidence_binding"]["model_hash"],
-            "case_revision": next(
-                item["case_revision"]
-                for item in cases["manual_cases"] + cases.get("exploratory_charters", [])
-                if (item.get("tc_id") or item.get("id")) == item_id
+            "case_revision": case_def["case_revision"],
+            "spec_revision": cases["spec_revision"],
+            "oracle_revision": case_def["oracle_revision"],
+            "case_content_hash": case_def["content_hash"],
+            "oracle_refs": (
+                case_def.get("oracle", {}).get("refs")
+                or case_def.get("trace_to", [])[:1]
             ),
             "timestamp": "2026-07-20T00:00:00Z",
             "result": "pass",
