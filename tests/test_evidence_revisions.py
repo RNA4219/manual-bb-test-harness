@@ -139,6 +139,27 @@ def test_legacy_export_preserves_identity_without_stamping_old_evidence():
     assert upgraded["case_revision"] == item["case_revision"]
 
 
+
+def test_legacy_charter_migration_preserves_identity_and_original_definition():
+    root = Path(__file__).resolve().parents[1] / "examples/artifacts"
+    case_set = json.loads(
+        (root / "order-cancel.manual_case_set.json").read_text(encoding="utf-8")
+    )
+    model = json.loads((root / "order-cancel.test_model.json").read_text(encoding="utf-8"))
+    case_set["exploratory_charters"][0]["mission"] = "追加の受入条件を調査する"
+    bound = bind_case_set(case_set, model)
+    charter = bound["exploratory_charters"][0]
+    original = copy.deepcopy(bound)
+
+    legacy = migrate_artifact(bound, "manual_case_set", artifact_version="legacy")
+
+    converted = legacy["exploratory_charters"][0]
+    assert "mission" not in converted
+    for key in ("id", "revision", "case_revision", "content_hash", "oracle_revision"):
+        assert converted[key] == charter[key]
+    assert bound == original
+
+
 def test_bind_cli_preserves_input_and_refuses_overwrite(tmp_path):
     model, bound, _ = bound_inputs()
     original = cases(case())

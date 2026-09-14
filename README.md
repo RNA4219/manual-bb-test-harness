@@ -82,7 +82,7 @@ uv run bb-harness gate --input examples/artifacts --build-id web-1.42.0+1289 --o
 
 変更対象とその前後 2 hop を起点に、必要な capsule を選んでください。Skill 実行は `skill_execution`、CLI 操作は `cli_operations`、品質確認は `quality_assurance` が入口です。作業時の指示は [AGENTS.md](https://github.com/RNA4219/manual-bb-test-harness/blob/main/AGENTS.md) を参照してください。
 
-現行リリース系列: **4.1.1** / 検証済みテスト: **1480件**。実施条件と制約は [検証記録](https://github.com/RNA4219/manual-bb-test-harness/blob/main/docs/istqb-review-round2-20260912.md)を参照してください。
+現行リリース系列: **4.1.1** / 検証済みテスト: **1481件**。実施条件と制約は [検証記録](https://github.com/RNA4219/manual-bb-test-harness/blob/main/docs/istqb-review-round2-20260912.md)を参照してください。
 <!-- /LLM-BOOTSTRAP -->
 
 </details>
