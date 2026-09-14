@@ -4,9 +4,16 @@
   "title": "Domain Pack: B2B SaaS / RBAC",
   "summary": "B2B SaaS role-based access control domain-specific test considerations for workspace, organization, membership, permission, role, invitation, audit log, admin settings. Role dimensions: owner, admin, editor, viewer, billing admin, suspended user, invited user, external guest. Risk hotspots: unauthorized privilege escalation, last owner removal/downgrade, stale permission after role change, invitation treated as active membership, audit log gaps, billing/security settings exposure, cross-tenant data access.",
   "public_api": [],
-  "deps_out": ["skills/manual-bb-test-harness/SKILL.md"],
+  "deps_out": [
+    "skills/manual-bb-test-harness/SKILL.md"
+  ],
   "deps_in": [],
-  "risks": ["Unauthorized privilege escalation", "Last owner removal or downgrade", "Stale permission after role change", "Cross-tenant data access"],
+  "risks": [
+    "Unauthorized privilege escalation",
+    "Last owner removal or downgrade",
+    "Stale permission after role change",
+    "Cross-tenant data access"
+  ],
   "tests": [],
-  "last_verified": "2026-05-30"
+  "last_verified": "2026-07-01"
 }

@@ -9,10 +9,22 @@
   "network_profile": "4g-lossy",
   "tester": "qa_a",
   "oracle_type": "specified",
-  "oracle_refs": ["AC-2"],
-  "expected": ["キャンセル不可メッセージを表示"],
-  "actual": ["キャンセル不可メッセージを表示"],
+  "oracle_refs": [
+    "AC-2"
+  ],
+  "expected": [
+    "キャンセル不可メッセージを表示"
+  ],
+  "actual": [
+    "キャンセル不可メッセージを表示"
+  ],
   "result": "pass",
-  "attachments": ["s3://evidence/RUN-001/step2.png"],
-  "anomaly_notes": []
+  "attachments": [
+    "s3://evidence/RUN-001/step2.png"
+  ],
+  "anomaly_notes": [],
+  "case_revision": "case-rev-1",
+  "spec_revision": "spec-rev-20260912",
+  "oracle_revision": "oracle-rev-1",
+  "case_content_hash": "sha256:ord-cancel-tc-001-rev-1"
 }

@@ -1,0 +1,91 @@
+{
+  "schema_version": "2.0",
+  "id": "rand:document-snapshot:sample:9de1570cd2e2cec811fe",
+  "type": "requirements_document",
+  "producer": {
+    "name": "RanD",
+    "version": "0.3.0"
+  },
+  "created_at": "2026-09-12T00:00:00Z",
+  "input_refs": [],
+  "source_refs": [],
+  "status": "ok",
+  "assumptions": [],
+  "limitations": [],
+  "review_required": true,
+  "downstream_allowed_uses": [
+    "review",
+    "test_design"
+  ],
+  "document_id": "rand:document:sample",
+  "parser_version": "1",
+  "source": {
+    "path": "/spec/requirements.md",
+    "uri": "file:///spec/requirements.md",
+    "sha256": "9de1570cd2e2cec811feba8cf19b8e97c6f3f575f5bfb74dcd2e2bacf89ac3a3",
+    "line_count": 3
+  },
+  "requirements": [
+    {
+      "requirement_id": "rand:req:sample:REQ-1",
+      "external_id": "REQ-1",
+      "identity_basis": "explicit",
+      "statement": "即時に保存する",
+      "acceptance_criteria": [
+        "結果が保存される"
+      ],
+      "section_path": [
+        "要求"
+      ],
+      "source": {
+        "path": "/spec/requirements.md",
+        "uri": "file:///spec/requirements.md#L1-L1",
+        "line_start": 1,
+        "line_end": 1,
+        "excerpt": "- REQ-1: 即時に保存する"
+      },
+      "content_hash": "41730c4a0a2a9c3d87eb76d49324c1cfd5f6b38329171cfa789a23e8a9234ed2"
+    },
+    {
+      "requirement_id": "rand:req:sample:REQ-2",
+      "external_id": "REQ-2",
+      "identity_basis": "explicit",
+      "statement": "表示する",
+      "acceptance_criteria": [
+        "結果が表示される"
+      ],
+      "section_path": [
+        "要求"
+      ],
+      "source": {
+        "path": "/spec/requirements.md",
+        "uri": "file:///spec/requirements.md#L2-L2",
+        "line_start": 2,
+        "line_end": 2,
+        "excerpt": "- REQ-2: 表示する"
+      },
+      "content_hash": "0fd59844c8c4dbe6a19eb3fc1c9d5f2fb22daa829c94268ec84522dce03aa22c"
+    },
+    {
+      "requirement_id": "rand:req:sample:REQ-4",
+      "external_id": "REQ-4",
+      "identity_basis": "explicit",
+      "statement": "通知する",
+      "acceptance_criteria": [
+        "通知が表示される"
+      ],
+      "section_path": [
+        "要求"
+      ],
+      "source": {
+        "path": "/spec/requirements.md",
+        "uri": "file:///spec/requirements.md#L3-L3",
+        "line_start": 3,
+        "line_end": 3,
+        "excerpt": "- REQ-4: 通知する"
+      },
+      "content_hash": "311e3c742611d028b323d0ef1e5cf30768291e0ce38e41f269a3f42beaa6eb2c"
+    }
+  ],
+  "extraction_diagnostics": []
+}

@@ -21,24 +21,32 @@ from pathlib import Path
 from typing import Any
 
 from bb_harness import __version__
-from bb_harness.schema_validation import build_format_checker
+from bb_harness.evidence_policy import artifact_contract_errors
+from bb_harness.schema_validation import (
+    SchemaValidationError,
+    build_format_checker,
+    validate_finite_numbers,
+)
 from bb_harness.tools._shared.io_common import load_json
 
 SCHEMA_DIR = Path(__file__).resolve().parents[1] / "schemas"
 
 # Mapping artifact type to schema
 ARTIFACT_SCHEMA_MAP = {
+    "rand_intake": "rand_intake.schema.json",
     "phase_contract": "phase_contract.schema.json",
     "feature_spec": "feature_spec.schema.json",
     "test_model": "test_model.schema.json",
     "observation_set": "observation_set.schema.json",
     "risk_register": "risk_register.schema.json",
     "manual_case_set": "manual_case_set.schema.json",
+    "test_plan": "test_plan.schema.json",
     "effort_plan": "effort_plan.schema.json",
     "gate_decision": "gate_decision.schema.json",
     "release_brief": "release_brief.schema.json",
     "execution_evidence": "execution_evidence.schema.json",
     "automation_evidence": "automation_evidence.schema.json",
+    "defect_register": "defect_register.schema.json",
     "waiver_set": "waiver_set.schema.json",
     "forward_test_report": "forward_test_report.schema.json",
 }
@@ -122,17 +130,20 @@ def validate_artifact_basic(artifact: dict[str, Any], schema_type: str) -> list[
 
     # Check required fields based on type
     required_fields: dict[str, list[str]] = {
+        "rand_intake": ["feature_id", "requirements", "inputs", "intake_status", "source_refs"],
         "phase_contract": ["contract_id", "feature_id", "readiness", "problem_owner"],
         "feature_spec": ["feature_id"],
         "test_model": ["feature_id", "flows"],
         "observation_set": ["feature_id", "observations"],
         "risk_register": ["feature_id", "risks"],
         "manual_case_set": ["feature_id", "manual_cases"],
+        "test_plan": ["plan_id", "feature_id", "entry_criteria", "estimate_basis"],
         "effort_plan": ["feature_id", "phases", "total_estimate_hours"],
         "gate_decision": ["feature_id", "status", "reasons"],
         "release_brief": ["feature_id", "decision", "summary"],
         "execution_evidence": ["run_id", "result"],
-        "automation_evidence": ["feature_id", "build_id", "coverage_scope", "coverage_percent"],
+        "automation_evidence": ["feature_id", "build_id", "coverage_scope", "coverage_percent", "test_suites"],
+        "defect_register": ["feature_id", "build_id", "defects"],
         "waiver_set": ["feature_id", "build_id", "waivers"],
     }
 
@@ -141,6 +152,24 @@ def validate_artifact_basic(artifact: dict[str, Any], schema_type: str) -> list[
         if field not in artifact:
             errors.append(f"Missing required field: '{field}'")
 
+    return errors
+
+
+def validate_manual_case_set_semantics(artifact: dict[str, Any]) -> list[str]:
+    """退役ケースには移管理由と代替証跡の参照を要求する。"""
+    errors: list[str] = []
+    for index, case in enumerate(artifact.get("manual_cases", [])):
+        if not isinstance(case, dict) or case.get("status", "active") != "retired":
+            continue
+        path = f"/manual_cases/{index}"
+        reason = case.get("retired_reason")
+        if not isinstance(reason, str) or not reason.strip():
+            errors.append(f"{path}: retired case requires retired_reason")
+        refs = case.get("replacement_refs")
+        if not isinstance(refs, list) or not refs or any(
+            not isinstance(ref, str) or not ref.strip() for ref in refs
+        ):
+            errors.append(f"{path}: retired case requires replacement_refs")
     return errors
 
 
@@ -198,11 +227,21 @@ def validate_artifact(artifact_path: Path, schema_type: str | None = None) -> di
     schema = load_json(schema_path)
     schema = resolve_schema_refs(schema, SCHEMA_DIR)
 
-    # Validate
+    # Gate と同じ有限数値の制約を、jsonschema の有無にかかわらず適用する。
+    errors: list[str] = []
+    try:
+        validate_finite_numbers(artifact)
+    except SchemaValidationError as exc:
+        errors.append(str(exc))
     if HAS_JSONSCHEMA:
-        errors = validate_artifact_jsonschema(artifact, schema)
+        errors.extend(validate_artifact_jsonschema(artifact, schema))
     else:
-        errors = validate_artifact_basic(artifact, schema_type)
+        errors.extend(validate_artifact_basic(artifact, schema_type))
+
+    if schema_type == "manual_case_set":
+        errors.extend(validate_manual_case_set_semantics(artifact))
+    if not errors:
+        errors.extend(artifact_contract_errors(artifact, schema_type))
 
     return {
         "valid": len(errors) == 0,

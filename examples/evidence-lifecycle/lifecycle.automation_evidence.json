@@ -1,0 +1,34 @@
+{
+  "feature_id": "EVIDENCE-LIFECYCLE",
+  "build_id": "build-1",
+  "coverage_scope": "changed_code",
+  "coverage_percent": 100,
+  "hotspot_review_percent": 100,
+  "new_issues": {
+    "blocker": 0,
+    "critical": 0
+  },
+  "source_refs": [
+    {
+      "id": "CI-1",
+      "kind": "auto_test"
+    }
+  ],
+  "test_suites": [
+    {
+      "suite_id": "required-regression",
+      "status": "failed",
+      "total": 2,
+      "passed": 1,
+      "failed": 1,
+      "errors": 0,
+      "skipped": 0,
+      "source_refs": [
+        {
+          "id": "CI-RUN-1",
+          "kind": "auto_test"
+        }
+      ]
+    }
+  ]
+}

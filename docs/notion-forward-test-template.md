@@ -29,6 +29,7 @@
 | Required observations | present |  |
 | Required risk shape | present |  |
 | Required case shape | present |  |
+| Retired case handling | present | replacement_refs と placement_change_ref が保持され、未実施と区別される |
 | Gate expectations | present |  |
 
 ## Failure Modes
@@ -42,6 +43,7 @@
 | Missing invalid paths | no |  |
 | Hidden role gaps | no |  |
 | Weak regression scope | no |  |
+| Retired case treated as not run | no |  |
 
 ## Decision Rationale
 

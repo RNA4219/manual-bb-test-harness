@@ -6,6 +6,7 @@ import argparse
 import sys
 from pathlib import Path
 
+from bb_harness.commands import import_rand
 from bb_harness.commands._invoke import invoke_tool
 from bb_harness.tools.import_testrail import main as import_testrail_main
 from bb_harness.tools.import_xray import main as import_xray_main
@@ -16,7 +17,7 @@ def add_subparser(subparsers: argparse._SubParsersAction) -> None:
     parser = subparsers.add_parser(
         "import",
         help="Import test results from external systems",
-        description="Import test results from TestRail or Xray",
+        description="Import RanD design inputs or TestRail/Xray test results",
     )
 
     import_subparsers = parser.add_subparsers(
@@ -24,6 +25,8 @@ def add_subparser(subparsers: argparse._SubParsersAction) -> None:
         dest="source",
         help="Import source system",
     )
+
+    import_rand.add_subparser(import_subparsers)
 
     # TestRail
     testrail_parser = import_subparsers.add_parser(
@@ -95,8 +98,11 @@ def add_subparser(subparsers: argparse._SubParsersAction) -> None:
 def run(args: argparse.Namespace) -> int:
     """Run import command."""
     if args.source is None:
-        print("Error: import source required (testrail, xray)", file=sys.stderr)
+        print("Error: import source required (rand, testrail, xray)", file=sys.stderr)
         return 1
+
+    if args.source == "rand":
+        return import_rand.run(args)
 
     if args.source == "testrail":
         extra_args = [

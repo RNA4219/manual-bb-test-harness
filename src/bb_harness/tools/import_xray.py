@@ -21,6 +21,7 @@ Example:
 from __future__ import annotations
 
 import argparse
+import hashlib
 import os
 import sys
 from datetime import datetime, timezone
@@ -56,6 +57,28 @@ JIRA_PRIORITY_MAP = {
     "Low": "medium",
     "Lowest": "low",
 }
+
+
+def _identity_value(testrun: dict[str, Any], name: str) -> Any:
+    """Read one exported identity field and reject conflicting Xray copies."""
+    values = [testrun.get(name)]
+    custom_fields = testrun.get("customFields")
+    if isinstance(custom_fields, dict):
+        values.append(custom_fields.get(name))
+    present = [value for value in values if value not in (None, "", [])]
+    if len({str(value) for value in present}) > 1:
+        raise ValueError(f"ambiguous {name} mapping")
+    return present[0] if present else None
+
+
+def _oracle_refs(value: Any, fallback: str) -> list[str]:
+    if value in (None, "", []):
+        return [fallback]
+    if isinstance(value, str):
+        return [part.strip() for part in value.split(",") if part.strip()]
+    if isinstance(value, list) and all(isinstance(item, str) and item.strip() for item in value):
+        return [item.strip() for item in value]
+    raise ValueError("oracle_refs must be a string or an array of non-empty strings")
 
 
 def get_jira_client() -> tuple[str, dict[str, str], tuple[str, str] | None]:
@@ -104,16 +127,48 @@ def convert_to_execution_evidence(
     exec_key: str,
     test_key: str,
     feature_id: str = "IMPORTED",
+    *,
+    require_original_mapping: bool = False,
 ) -> dict[str, Any]:
     """Convert Xray testrun to execution_evidence format."""
     status = testrun.get("status", "TODO")
     result_status = XRAY_STATUS_MAP.get(status, "unknown")
 
+    source_case_id = _identity_value(testrun, "source_case_id")
+    source_charter_id = _identity_value(testrun, "source_charter_id")
+    if source_case_id and source_charter_id:
+        raise ValueError("ambiguous original case/charter mapping")
+    source_id = source_charter_id or source_case_id
+    identity_field = "charter_id" if source_charter_id else "tc_id"
+    if source_id is None:
+        if require_original_mapping:
+            raise ValueError("original case or charter mapping required")
+        source_id = test_key
+        identity_field = "tc_id"
+    if not isinstance(source_id, str) or not source_id.strip():
+        raise ValueError("original case or charter mapping must be a non-empty string")
+    source_id = source_id.strip()
+
+    source_feature_id = _identity_value(testrun, "source_feature_id")
+    if source_feature_id and feature_id != "IMPORTED" and str(source_feature_id) != feature_id:
+        raise ValueError("source feature mapping does not match requested feature")
+    resolved_feature_id = str(source_feature_id or feature_id)
+    case_revision = str(_identity_value(testrun, "case_revision") or f"xray-test-{test_key}")
+    stable_fallback = f"xray:{source_id}:{case_revision}".encode()
+
     evidence: dict[str, Any] = {
         "run_id": f"XRAY-{exec_key}-{test_key}",
-        "tc_id": test_key,
-        "feature_id": feature_id,
+        **{identity_field: source_id},
+        "feature_id": resolved_feature_id,
         "build_id": f"xray-exec-{exec_key}",
+        "case_revision": case_revision,
+        "spec_revision": str(_identity_value(testrun, "spec_revision") or f"xray-exec-{exec_key}"),
+        "oracle_revision": str(_identity_value(testrun, "oracle_revision") or case_revision),
+        "case_content_hash": str(
+            _identity_value(testrun, "case_content_hash")
+            or "sha256:" + hashlib.sha256(stable_fallback).hexdigest()
+        ),
+        "oracle_refs": _oracle_refs(_identity_value(testrun, "oracle_refs"), "xray:" + test_key),
         "timestamp": testrun.get("startedOn") or datetime.now(timezone.utc).isoformat(),
         "tester": testrun.get("executedBy", "unknown"),
         "result": result_status,
@@ -136,12 +191,12 @@ def convert_to_execution_evidence(
     if result_status == "fail":
         defects = testrun.get("defects", [])
         if defects:
-            defect_key = defects[0] if isinstance(defects, list) else defects
-            evidence["defect_stub"] = {
-                "title": f"Defect {defect_key}",
-                "severity": "high",  # Default
-                "status": "open",
-            }
+            from bb_harness.evidence_policy import imported_defect_reports
+
+            reports = imported_defect_reports(defects)
+            if reports:
+                evidence["defect_stub"] = reports[0]
+                evidence["defects"] = reports
 
     # Add evidences/attachments
     attachments = testrun.get("evidences", [])
@@ -178,6 +233,11 @@ def import_xray_results(
                 "tc_id": "PROJ-TC-001",
                 "feature_id": feature_id,
                 "build_id": f"xray-exec-{exec_key}",
+                "case_revision": "preview-v1",
+                "spec_revision": f"xray-exec-{exec_key}",
+                "oracle_revision": "preview-v1",
+                "case_content_hash": "sha256:preview-xray-case",
+                "oracle_refs": ["PROJ-TC-001"],
                 "timestamp": datetime.now(timezone.utc).isoformat(),
                 "tester": "preview",
                 "result": "pass",
@@ -202,7 +262,13 @@ def import_xray_results(
         if not test_key:
             continue
 
-        evidence = convert_to_execution_evidence(testrun, exec_key, test_key, feature_id)
+        evidence = convert_to_execution_evidence(
+            testrun,
+            exec_key,
+            test_key,
+            feature_id,
+            require_original_mapping=True,
+        )
         results.append(evidence)
 
         # Update stats

@@ -4,9 +4,16 @@
   "title": "Domain Pack: Finance / Payment Flow",
   "summary": "Finance domain-specific test considerations for payment, transaction, account, authentication, compliance, audit, settlement, refund, fraud detection. States: transaction initiated, payment pending/authorized/captured/failed/refunded, settlement pending/completed/failed, account active/suspended/closed/frozen. Risk hotspots: payment/settlement state divergence, double capture/refund, partial refund excess, authentication bypass, compliance check skipped, fraud detection imbalance, timeout duplicate, currency rounding errors.",
   "public_api": [],
-  "deps_out": ["skills/manual-bb-test-harness/SKILL.md"],
+  "deps_out": [
+    "skills/manual-bb-test-harness/SKILL.md"
+  ],
   "deps_in": [],
-  "risks": ["Payment state and settlement state divergence", "Double capture or double refund", "Authentication bypass or session hijacking", "Compliance check skipped or bypassed"],
+  "risks": [
+    "Payment state and settlement state divergence",
+    "Double capture or double refund",
+    "Authentication bypass or session hijacking",
+    "Compliance check skipped or bypassed"
+  ],
   "tests": [],
-  "last_verified": "2026-05-30"
+  "last_verified": "2026-07-01"
 }

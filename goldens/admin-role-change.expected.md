@@ -14,6 +14,7 @@
 - admin は owner を変更できない。
 - viewer/editor は変更操作できない。
 - 最後の owner 降格は禁止。
+- 複数 owner のときも自分自身の owner 降格は禁止。
 - invited user は招待更新へ誘導される。
 - 監査ログに before/after が残る。
 - 変更後の対象ユーザー権限が即時反映される。
@@ -29,4 +30,4 @@
 - role x action x resource_state x ownership_context が明示される。
 - 最後の owner は境界値として扱われる。
 - invited user は通常 member と分ける。
-- audit_log は gray evidence として補助扱いにする。
+- 管理者向け監査ログ画面は black-box の受入対象にし、内部保存先の診断ログだけを gray evidence として補助扱いにする。

@@ -1,0 +1,12 @@
+[
+  {
+    "source": "research-runtime\\src\\rand_research\\schemas\\requirements-document.schema.json",
+    "sha256": "b9edc1216588b766584555f33e55ff23a56deb2c5baf2cdb1e58e92cd112fead",
+    "packaged_as": "rand_requirements_document.schema.json"
+  },
+  {
+    "source": "research-runtime\\src\\rand_research\\schemas\\requirements-diff.schema.json",
+    "sha256": "0e5bc7312ebc88a7eab609af27e041aee9205b665790d0ca1a9394b18aa1825c",
+    "packaged_as": "rand_requirements_diff.schema.json"
+  }
+]

@@ -1,0 +1,19 @@
+{
+  "feature_id": "EVIDENCE-LIFECYCLE",
+  "build_id": "build-1",
+  "defects": [
+    {
+      "defect_id": "BUG-1",
+      "title": "保存データ消失",
+      "severity": "high",
+      "status": "fixed",
+      "updated_at": "2026-09-12T11:30:00Z",
+      "source_refs": [
+        {
+          "id": "BUG-1",
+          "kind": "bug"
+        }
+      ]
+    }
+  ]
+}

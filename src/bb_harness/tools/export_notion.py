@@ -28,8 +28,6 @@ from pathlib import Path
 from typing import Any
 
 from bb_harness import __version__
-
-# Add scripts/ to path for _shared imports
 from bb_harness.tools._shared.io_common import load_json
 
 
@@ -76,6 +74,7 @@ def create_notion_page(
     rubric_breakdown = report.get("rubric_breakdown", {})
     findings = report.get("findings", [])
     notes = report.get("notes", "")
+    manual_cases = report.get("manual_cases", [])
 
     # Build page properties
     properties: dict[str, Any] = {
@@ -255,6 +254,50 @@ def create_notion_page(
                                 "text": {
                                     "content": f"[{finding_type}] {finding_text}",
                                 },
+                            },
+                        ],
+                    },
+                }
+            )
+
+    # Manual case lifecycle status, when a report embeds manual_case_set data.
+    if manual_cases:
+        children.append(
+            {
+                "object": "block",
+                "type": "header",
+                "header": {
+                    "rich_text": [
+                        {
+                            "type": "text",
+                            "text": {"content": "Manual Case Status"},
+                        },
+                    ],
+                },
+            }
+        )
+
+        for case in manual_cases:
+            status = case.get("status", "active")
+            refs = ", ".join(case.get("replacement_refs", []))
+            placement_ref = case.get("placement_change_ref", "")
+            retired_reason = case.get("retired_reason", "")
+            detail_parts = [f"{case.get('tc_id', '')}: {status}"]
+            if retired_reason:
+                detail_parts.append(f"retired_reason={retired_reason}")
+            if refs:
+                detail_parts.append(f"replacement_refs={refs}")
+            if placement_ref:
+                detail_parts.append(f"placement_change_ref={placement_ref}")
+            children.append(
+                {
+                    "object": "block",
+                    "type": "bulleted_list_item",
+                    "bulleted_list_item": {
+                        "rich_text": [
+                            {
+                                "type": "text",
+                                "text": {"content": " | ".join(detail_parts)},
                             },
                         ],
                     },

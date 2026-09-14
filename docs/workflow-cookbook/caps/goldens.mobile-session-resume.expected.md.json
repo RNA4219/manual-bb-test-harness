@@ -4,9 +4,17 @@
   "title": "Golden: Mobile Session Resume Expected",
   "summary": "Review anchors for mobile session resume scenario. Required coverage includes platform_matrix (iOS/Android), foreground/background_resume, offline/online recovery, push entry. Required observations: background resume, duplicate submit prevention, camera denied handling, push/launch state consistency. Gate expectations: iOS/Android execution evidence required for Go, push entry oracle uncertainty leads to degraded/conditional_go.",
   "public_api": [],
-  "deps_out": ["goldens/mobile-session-resume.input.md"],
-  "deps_in": ["skills/manual-bb-test-harness/references/platform-pack-mobile.md", "skills/manual-bb-test-harness/SKILL.md"],
-  "risks": ["Missing iOS/Android execution evidence blocks Go decision", "Push entry oracle uncertainty requires degraded status"],
+  "deps_out": [
+    "goldens/mobile-session-resume.input.md"
+  ],
+  "deps_in": [
+    "skills/manual-bb-test-harness/references/platform-pack-mobile.md",
+    "skills/manual-bb-test-harness/SKILL.md"
+  ],
+  "risks": [
+    "Missing iOS/Android execution evidence blocks Go decision",
+    "Push entry oracle uncertainty requires degraded status"
+  ],
   "tests": [],
-  "last_verified": "2026-05-30"
+  "last_verified": "2026-07-01"
 }

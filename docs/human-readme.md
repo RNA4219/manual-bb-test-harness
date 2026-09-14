@@ -1,112 +1,71 @@
-# manual-bb-test-harness 人間向け概要
+# 利用ガイド
 
-`manual-bb-test-harness` は、手動ブラックボックス前提のテスト設計を、根拠付き観点、リスク、手動ケース、工数、品質ゲート、Go/No-Go brief まで一気通貫で作る Codex Skill リポジトリです。
+セットアップと最小の実行例は [README](../README.md#はじめる) を参照してください。このガイドでは、設計の依頼に必要な情報と、結果の確認方法を説明します。
 
-## 何をするものか
+## 入力を用意する
 
-仕様、受入条件、変更点、不具合履歴、自動テスト証跡を入力にして、いきなり「それっぽいテストケース」を量産するのではなく、先に確認対象の広がりを整理します。そのうえで、根拠付き観点、リスク、手動ケース、探索チャーター、Gate 判定へ段階的につなぎます。
+| 入力 | 記載すること |
+|---|---|
+| 仕様・受入条件 | 利用者の操作と期待する結果、その根拠となる文書や ID |
+| 業務ルール・変更点 | 上限・期限・権限・状態遷移、今回変わる範囲と影響先 |
+| 対象環境 | Web / iOS / Android、端末、ネットワーク、実行が必要な構成 |
+| 既知の不具合 | 症状、重大度、再発条件、修正・再確認の状況 |
+| 実行済みの証跡 | 対象 build、自動テストの suite 結果、手動結果、未実行範囲 |
 
-主な利用場面:
+仕様が決まっていない部分は、そのまま未決事項として渡します。期待結果の根拠を作り足さず、要確認事項・探索チャーター・判定を止める条件として扱います。
 
-- QA / 開発者が手動ブラックボックスのテスト観点を洗い出す。
-- リリース前に P0/P1 の手動確認範囲と残余リスクを整理する。
-- 仕様不足、期待結果の根拠不足、権限や状態遷移の抜けを早めに見つける。
-- Web に加えて iOS / Android アプリの中断復帰、権限、通知入口、ネットワーク差分を含む手動設計を行う。
-- forward-test の結果を記録し、Skill の出力品質を継続的に改善する。
+RanD の要求候補や文書監査を使う場合は、[RanD 連携](../skills/manual-bb-test-harness/references/rand-integration.md)で設計入力と依頼文を生成できます。
 
-- 
-## 15分 Quick Start (人間向け)
+## Skill へ依頼する
 
-初めて触る利用者は、まずこの順で動かす。目的は「環境が作れる」「代表コマンドが通る」「失敗時の入口が分かる」を 15 分以内に確認すること。
-
-### 0-3分: セットアップ
-
-```powershell
-uv sync
-uv run bb-harness --help
+```text
+./skills/manual-bb-test-harness の $manual-bb-test-harness を使い、
+./goldens/order-cancel.input.md の手動ブラックボックステストを設計してください。
+根拠付き観点、リスク、優先度、手動ケース、工数、Gate 判定、Go/No-Go brief を作成してください。
+仕様が不足している部分は未決事項として残し、確認が必要な内容を示してください。
 ```
 
-期待結果:
+Skill はテスト設計を作成します。CLI は仕様の取り込み、成果物の検証、実行証跡の集計や外部ツールとの入出力を支えます。手動テストの実行結果は、実際に確認してから記録します。
 
-- `uv sync` が依存関係を解決する。
-- `bb-harness --help` に `validate / ingest / gate / export / import / run` が表示される。
+## 設計結果を確認する
 
-### 3-8分: 最小検証
+出力は「根拠付き観点 → リスク → 優先度 → 手動ケース → 工数 → Gate 判定 → Go/No-Go brief」の順に読みます。
 
-```powershell
-uv run pytest tests\test_cli_unit.py tests\test_spec_ingest.py
-uv run ruff check .
-uv run python .\scripts\quick-validate-skill.py .\skills\manual-bb-test-harness
-```
+- **根拠と網羅範囲**: 仕様・受入条件から、フロー、状態、ルール、データ、権限、回帰影響まで追跡できるか。
+- **ケースと期待結果**: 同値分割・境界値・条件の組合せ・状態遷移が具体化され、期待結果の根拠があるか。
+- **優先度と工数**: リスクに応じた実行順になり、準備・実行・証跡保存・再実行の時間が見積もられているか。
+- **判断材料**: 未実行、未解決欠陥、未決事項、承認が必要な残余リスクが判断理由に残っているか。
 
-期待結果:
+CLI の Gate に渡す JSON は [artifact 契約](../skills/manual-bb-test-harness/references/artifact-contract.md)に従います。入力の版・実行構成・欠陥履歴の扱いは [RUNBOOK](../RUNBOOK.md#gate-の実行)を参照してください。
 
-- pytest が pass する。
-- ruff が `All checks passed!` を返す。
-- Skill validator が pass する。
+## サンプルを選ぶ
 
-### 8-12分: サンプル入出力を確認
+| 対象 | 入力 | 出力例 |
+|---|---|---|
+| 注文キャンセル・期限・状態遷移 | [order-cancel](../goldens/order-cancel.input.md) | [設計例](../goldens/order-cancel.expected.md) |
+| 管理者の権限変更 | [admin-role-change](../goldens/admin-role-change.input.md) | [設計例](../goldens/admin-role-change.expected.md) |
+| モバイルの中断復帰 | [mobile-session-resume](../goldens/mobile-session-resume.input.md) | [設計例](../goldens/mobile-session-resume.expected.md) |
 
-```powershell
-uv run bb-harness ingest --source markdown --input .\goldens\order-cancel.input.md --output .\tmp-onboarding.feature_spec.json
-uv run python .\scripts\validate-artifact.py --artifact .\tmp-onboarding.feature_spec.json --type feature_spec --strict
-uv run bb-harness run forward-test --input .\goldens\order-cancel.input.md
-```
+`goldens/` の出力例はレビュー時の基準です。対象仕様が異なる場合は、根拠と網羅範囲に合わせて設計を調整します。iOS / Android が対象なら [mobile pack](../skills/manual-bb-test-harness/references/platform-pack-mobile.md)も参照してください。
 
-期待結果:
+## 出力品質を評価する
 
-- `tmp-onboarding.feature_spec.json` が生成される。
-- 生成 artifact が `feature_spec` として valid になる。
-- forward-test が Skill 評価用プロンプトを出力する。
-
-### 12-15分: 全体検証に進む
+Skill を改修したときは、[forward-test の手順](../skills/manual-bb-test-harness/references/forward-test.md)と[評価基準](evaluation-rubric.md)を使います。
 
 ```powershell
-uv run pytest
-uv run python .\scripts\validate-artifact.py --all examples\artifacts --strict
-uv run python .\scripts\validate-spec.py --all
-uv run python .\scripts\validate-release-bundle.py --dry-run
+uv run bb-harness run forward-test --input goldens/order-cancel.input.md
 ```
 
-期待結果:
+このコマンドは評価用プロンプトを出力します。生成した設計を採点し、[記録テンプレート](forward-test-report-template.md)に沿って結果を残します。
 
-- 全テストが pass する。
-- artifact / spec / release bundle の検証が pass する。
-
-失敗した場合は [RUNBOOK.md](RUNBOOK.md) の「Failure Triage」を見る。
+環境・CLI・成果物検証の失敗は [Failure Triage](../RUNBOOK.md#failure-triage)、全体検証は [RUNBOOK](../RUNBOOK.md#4-repo-全体を検証する)を参照してください。
 
 ## 用語
 
-- coverage model: 何を確認すべきかを、フロー、状態、ルール、データ、権限、回帰影響に分けたもの。
-- oracle: expected result の根拠。仕様、受入条件、業務ルールなど。
-- artifact: Skill が段階ごとに作る構造化された成果物。
-- Gate: リリースしてよいかを、テスト結果、欠陥状態、残余リスクから判断すること。
-- golden: 出力品質を確認するための例。完全一致 snapshot ではなく review anchor として扱う。
-
-## 入口
-
-- AI 向け README: `README.md`
-- Agent 向けハブ: `HUB.codex.md`
-- 設計正本: `BLUEPRINT.md`
-- 実行手順: `RUNBOOK.md`
-- 運用原則: `GUARDRAILS.md`
-- 検収基準: `EVALUATION.md`
-- Skill 本体: `skills/manual-bb-test-harness/SKILL.md`
-- 詳細参照: `skills/manual-bb-test-harness/references/`
-- Golden examples: `goldens/`
-- JSON Schema: `schemas/`
-- Export examples: `exports/`
-
-## 評価資材
-
-`goldens/` は完全一致 snapshot ではなく、出力品質を見るための review anchors です。
-
-- `goldens/order-cancel.input.md`
-- `goldens/order-cancel.expected.md`
-- `goldens/admin-role-change.input.md`
-- `goldens/admin-role-change.expected.md`
-- `goldens/mobile-session-resume.input.md`
-- `goldens/mobile-session-resume.expected.md`
-- `docs/release-review-20260516.md`
-
-Forward test の投げ方は `skills/manual-bb-test-harness/references/forward-test.md` を参照してください。出力品質の採点は `docs/evaluation-rubric.md` を使います。
+| 用語 | 意味 |
+|---|---|
+| coverage model | 確認対象をフロー、状態、ルール、データ、権限、回帰影響に分けたモデル |
+| oracle | 期待結果を判断する根拠。仕様、受入条件、業務ルールなど |
+| artifact | 設計や実行の段階ごとに作る構造化された成果物 |
+| Gate | テスト結果、欠陥状態、残余リスクから行うリリース可否の判定 |
+| golden | 出力品質をレビューするための入力と出力の例 |

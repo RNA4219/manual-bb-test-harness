@@ -1,0 +1,178 @@
+{
+  "schema_version": "2.0",
+  "id": "rand:diff:sample",
+  "type": "requirements_diff",
+  "producer": {
+    "name": "RanD",
+    "version": "0.3.0"
+  },
+  "created_at": "2026-09-12T00:00:00Z",
+  "input_refs": [],
+  "source_refs": [],
+  "status": "ok",
+  "assumptions": [],
+  "limitations": [],
+  "review_required": true,
+  "downstream_allowed_uses": [
+    "review",
+    "test_design"
+  ],
+  "document_id": "rand:document:sample",
+  "parser_version": "1",
+  "current_ref": "rand:document-snapshot:sample:9de1570cd2e2cec811fe",
+  "baseline_ref": "rand:document-snapshot:sample:a960b706cefc70a7905e",
+  "current_source_sha256": "9de1570cd2e2cec811feba8cf19b8e97c6f3f575f5bfb74dcd2e2bacf89ac3a3",
+  "baseline_source_sha256": "a960b706cefc70a7905e527cc2e879a5c59619611d166e0c550af597fb9e599c",
+  "added": [
+    {
+      "requirement_id": "rand:req:sample:REQ-4",
+      "external_id": "REQ-4",
+      "identity_basis": "explicit",
+      "statement": "通知する",
+      "acceptance_criteria": [
+        "通知が表示される"
+      ],
+      "section_path": [
+        "要求"
+      ],
+      "source": {
+        "path": "/spec/requirements.md",
+        "uri": "file:///spec/requirements.md#L3-L3",
+        "line_start": 3,
+        "line_end": 3,
+        "excerpt": "- REQ-4: 通知する"
+      },
+      "content_hash": "311e3c742611d028b323d0ef1e5cf30768291e0ce38e41f269a3f42beaa6eb2c"
+    }
+  ],
+  "removed": [
+    {
+      "requirement_id": "rand:req:sample:REQ-3",
+      "external_id": "REQ-3",
+      "identity_basis": "explicit",
+      "statement": "履歴を保存する",
+      "acceptance_criteria": [
+        "履歴が生成される"
+      ],
+      "section_path": [
+        "要求"
+      ],
+      "source": {
+        "path": "/spec/requirements.md",
+        "uri": "file:///spec/requirements.md#L3-L3",
+        "line_start": 3,
+        "line_end": 3,
+        "excerpt": "- REQ-3: 履歴を保存する"
+      },
+      "content_hash": "764b17d243b0837a6b05ff3da09bfadc8d07dd20c056ef77ab5c566ef45f1772"
+    }
+  ],
+  "modified": [
+    {
+      "requirement_id": "rand:req:sample:REQ-1",
+      "before": {
+        "requirement_id": "rand:req:sample:REQ-1",
+        "external_id": "REQ-1",
+        "identity_basis": "explicit",
+        "statement": "保存する",
+        "acceptance_criteria": [
+          "結果が生成される"
+        ],
+        "section_path": [
+          "要求"
+        ],
+        "source": {
+          "path": "/spec/requirements.md",
+          "uri": "file:///spec/requirements.md#L1-L1",
+          "line_start": 1,
+          "line_end": 1,
+          "excerpt": "- REQ-1: 保存する"
+        },
+        "content_hash": "93f2ffd60a3a645600716b0d8bf5a0063877af6cefe5323fbef40c029faa23e2"
+      },
+      "after": {
+        "requirement_id": "rand:req:sample:REQ-1",
+        "external_id": "REQ-1",
+        "identity_basis": "explicit",
+        "statement": "即時に保存する",
+        "acceptance_criteria": [
+          "結果が保存される"
+        ],
+        "section_path": [
+          "要求"
+        ],
+        "source": {
+          "path": "/spec/requirements.md",
+          "uri": "file:///spec/requirements.md#L1-L1",
+          "line_start": 1,
+          "line_end": 1,
+          "excerpt": "- REQ-1: 即時に保存する"
+        },
+        "content_hash": "41730c4a0a2a9c3d87eb76d49324c1cfd5f6b38329171cfa789a23e8a9234ed2"
+      },
+      "changed_fields": [
+        "statement",
+        "acceptance_criteria"
+      ]
+    }
+  ],
+  "unchanged": [
+    "rand:req:sample:REQ-2"
+  ],
+  "summary": {
+    "added": 1,
+    "removed": 1,
+    "modified": 1,
+    "unchanged": 1
+  },
+  "test_candidates": [
+    {
+      "test_id": "rand:req:sample:REQ-1:test:draft",
+      "requirement_id": "rand:req:sample:REQ-1",
+      "status": "draft",
+      "action": "review_new_or_changed",
+      "focus": [
+        "原文を確認する"
+      ],
+      "acceptance_criteria": [
+        "結果が保存される"
+      ],
+      "source_refs": [
+        "file:///spec/requirements.md#L1-L1"
+      ],
+      "review_required": true
+    },
+    {
+      "test_id": "rand:req:sample:REQ-4:test:draft",
+      "requirement_id": "rand:req:sample:REQ-4",
+      "status": "draft",
+      "action": "review_new_or_changed",
+      "focus": [
+        "原文を確認する"
+      ],
+      "acceptance_criteria": [
+        "通知が表示される"
+      ],
+      "source_refs": [
+        "file:///spec/requirements.md#L3-L3"
+      ],
+      "review_required": true
+    },
+    {
+      "test_id": "rand:req:sample:REQ-3:test:draft",
+      "requirement_id": "rand:req:sample:REQ-3",
+      "status": "draft",
+      "action": "review_retirement",
+      "focus": [
+        "原文を確認する"
+      ],
+      "acceptance_criteria": [
+        "履歴が生成される"
+      ],
+      "source_refs": [
+        "file:///spec/requirements.md#L3-L3"
+      ],
+      "review_required": true
+    }
+  ]
+}

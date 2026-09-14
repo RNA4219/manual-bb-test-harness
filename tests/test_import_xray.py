@@ -504,9 +504,10 @@ class TestImportXrayResultsMocked:
 
         mock_exec_data = {
             "tests": [
-                {"testKey": "PROJ-TC-001", "status": "PASS", "executedBy": "tester1"},
+                {"testKey": "PROJ-TC-001", "source_case_id": "TC-001", "status": "PASS", "executedBy": "tester1"},
                 {
                     "testKey": "PROJ-TC-002",
+                    "source_case_id": "TC-002",
                     "status": "FAIL",
                     "executedBy": "tester2",
                     "defects": ["BUG-1"],
@@ -590,7 +591,7 @@ class TestImportXrayResultsErrorPaths:
 
         mock_exec_data = {
             "tests": [
-                {"testKey": "PROJ-TC-001", "status": "TODO", "executedBy": "tester1"},
+                {"testKey": "PROJ-TC-001", "source_case_id": "TC-001", "status": "TODO", "executedBy": "tester1"},
             ]
         }
 
@@ -614,7 +615,7 @@ class TestImportXrayResultsErrorPaths:
 
         mock_exec_data = {
             "tests": [
-                {"testKey": "PROJ-TC-001", "status": "ABORTED", "executedBy": "tester1"},
+                {"testKey": "PROJ-TC-001", "source_case_id": "TC-001", "status": "ABORTED", "executedBy": "tester1"},
             ]
         }
 
@@ -734,12 +735,12 @@ class TestImportXrayResultsAllStatuses:
 
         mock_exec_data = {
             "tests": [
-                {"testKey": "TC-001", "status": "PASS", "executedBy": "tester"},
-                {"testKey": "TC-002", "status": "FAIL", "executedBy": "tester"},
-                {"testKey": "TC-003", "status": "TODO", "executedBy": "tester"},
-                {"testKey": "TC-004", "status": "ABORTED", "executedBy": "tester"},
-                {"testKey": "TC-005", "status": "PENDING", "executedBy": "tester"},
-                {"testKey": "TC-006", "status": "EXECUTING", "executedBy": "tester"},
+                {"testKey": "TC-001", "source_case_id": "TC-001", "status": "PASS", "executedBy": "tester"},
+                {"testKey": "TC-002", "source_case_id": "TC-002", "status": "FAIL", "executedBy": "tester"},
+                {"testKey": "TC-003", "source_case_id": "TC-003", "status": "TODO", "executedBy": "tester"},
+                {"testKey": "TC-004", "source_case_id": "TC-004", "status": "ABORTED", "executedBy": "tester"},
+                {"testKey": "TC-005", "source_case_id": "TC-005", "status": "PENDING", "executedBy": "tester"},
+                {"testKey": "TC-006", "source_case_id": "TC-006", "status": "EXECUTING", "executedBy": "tester"},
             ]
         }
 
@@ -766,7 +767,7 @@ class TestImportXrayResultsAllStatuses:
 
         mock_exec_data = {
             "tests": [
-                {"test": {"key": "PROJ-TC-001"}, "status": "PASS", "executedBy": "tester1"},
+                {"test": {"key": "PROJ-TC-001"}, "source_case_id": "TC-001", "status": "PASS", "executedBy": "tester1"},
             ]
         }
 
@@ -775,7 +776,7 @@ class TestImportXrayResultsAllStatuses:
                 results, stats = module.import_xray_results(exec_key="PROJ-TE-123", dry_run=False)
 
                 assert len(results) == 1
-                assert results[0]["tc_id"] == "PROJ-TC-001"
+                assert results[0]["tc_id"] == "TC-001"
 
 
 class TestImportXrayMainErrorPaths:

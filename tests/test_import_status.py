@@ -34,7 +34,10 @@ _spec_xr.loader.exec_module(import_xray)
 
 
 class TestTestRailStatusMap:
-    """TestRail STATUS_MAP covers all documented status IDs."""
+    """公式Statuses APIの標準IDを基準にし、実装の対応表を正解にしない。
+
+    https://support.testrail.com/hc/en-us/articles/7077935129364-Statuses
+    """
 
     def test_passed(self) -> None:
         assert import_testrail.STATUS_MAP[1] == "pass"
@@ -46,10 +49,10 @@ class TestTestRailStatusMap:
         assert import_testrail.STATUS_MAP[3] == "skip"
 
     def test_failed(self) -> None:
-        assert import_testrail.STATUS_MAP[4] == "fail"
+        assert import_testrail.STATUS_MAP[5] == "fail"
 
     def test_retest(self) -> None:
-        assert import_testrail.STATUS_MAP[5] == "skip"
+        assert import_testrail.STATUS_MAP[4] == "skip"
 
     def test_unknown_defaults_to_unknown(self) -> None:
         assert import_testrail.STATUS_MAP.get(99, "unknown") == "unknown"
@@ -92,7 +95,7 @@ class TestTestRailConversion:
     def test_fail_result_with_defect(self) -> None:
         result = {"defects": ["BUG-123"]}
         evidence = import_testrail.convert_to_execution_evidence(
-            self._make_test(status_id=4), result, "tester_b", 999
+            self._make_test(status_id=5), result, "tester_b", 999
         )
         assert evidence["result"] == "fail"
         assert evidence["defect_stub"]["title"] == "Defect BUG-123"
@@ -311,8 +314,10 @@ class TestTestRailEvidenceSchema:
         schema = _load_evidence_schema()
         result = {"defects": ["BUG-1"]}
         evidence = import_testrail.convert_to_execution_evidence(
-            {"id": 1, "case_id": 42, "status_id": 4}, result, "tester_a", 999
+            {"id": 1, "case_id": 42, "status_id": 5}, result, "tester_a", 999
         )
+        assert evidence["result"] == "fail"
+        assert evidence["defect_stub"]["title"] == "Defect BUG-1"
         errors = _validate_schema(evidence, schema)
         assert errors == []
 

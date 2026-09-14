@@ -1,0 +1,573 @@
+{
+  "type": "object",
+  "required": [
+    "schema_version",
+    "id",
+    "type",
+    "producer",
+    "created_at",
+    "input_refs",
+    "source_refs",
+    "status",
+    "assumptions",
+    "limitations",
+    "review_required",
+    "downstream_allowed_uses",
+    "document_id",
+    "parser_version",
+    "baseline_ref",
+    "current_ref",
+    "baseline_source_sha256",
+    "current_source_sha256",
+    "added",
+    "removed",
+    "modified",
+    "unchanged",
+    "summary",
+    "test_candidates"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "2.0"
+    },
+    "id": {
+      "type": "string",
+      "pattern": "^rand:"
+    },
+    "type": {
+      "const": "requirements_diff"
+    },
+    "producer": {},
+    "created_at": {},
+    "input_refs": {},
+    "source_refs": {},
+    "status": {
+      "const": "ok"
+    },
+    "assumptions": {},
+    "limitations": {},
+    "review_required": {
+      "const": true
+    },
+    "downstream_allowed_uses": {},
+    "document_id": {
+      "type": "string",
+      "pattern": "^rand:document:[A-Za-z0-9][A-Za-z0-9._-]{0,63}$"
+    },
+    "parser_version": {
+      "const": "1"
+    },
+    "baseline_ref": {
+      "type": "string",
+      "pattern": "^rand:"
+    },
+    "current_ref": {
+      "type": "string",
+      "pattern": "^rand:"
+    },
+    "baseline_source_sha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "current_source_sha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "added": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "requirement_id",
+          "external_id",
+          "identity_basis",
+          "statement",
+          "acceptance_criteria",
+          "section_path",
+          "content_hash",
+          "source"
+        ],
+        "properties": {
+          "requirement_id": {
+            "type": "string",
+            "pattern": "^rand:req:[A-Za-z0-9][A-Za-z0-9._-]{0,63}:(?:[A-Za-z][A-Za-z0-9]*(?:[-_][A-Za-z0-9]+)+|auto-[0-9a-f]{20})$"
+          },
+          "external_id": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "pattern": "^[A-Za-z][A-Za-z0-9]*(?:[-_][A-Za-z0-9]+)+$"
+          },
+          "identity_basis": {
+            "enum": [
+              "explicit",
+              "content"
+            ]
+          },
+          "statement": {
+            "type": "string",
+            "minLength": 1
+          },
+          "acceptance_criteria": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          "section_path": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          "content_hash": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          },
+          "source": {
+            "type": "object",
+            "required": [
+              "path",
+              "uri",
+              "line_start",
+              "line_end",
+              "excerpt"
+            ],
+            "properties": {
+              "path": {
+                "type": "string",
+                "minLength": 1
+              },
+              "uri": {
+                "type": "string",
+                "format": "uri",
+                "pattern": "^file:"
+              },
+              "line_start": {
+                "type": "integer",
+                "minimum": 1
+              },
+              "line_end": {
+                "type": "integer",
+                "minimum": 1
+              },
+              "excerpt": {
+                "type": "string",
+                "minLength": 1
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    "removed": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "requirement_id",
+          "external_id",
+          "identity_basis",
+          "statement",
+          "acceptance_criteria",
+          "section_path",
+          "content_hash",
+          "source"
+        ],
+        "properties": {
+          "requirement_id": {
+            "type": "string",
+            "pattern": "^rand:req:[A-Za-z0-9][A-Za-z0-9._-]{0,63}:(?:[A-Za-z][A-Za-z0-9]*(?:[-_][A-Za-z0-9]+)+|auto-[0-9a-f]{20})$"
+          },
+          "external_id": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "pattern": "^[A-Za-z][A-Za-z0-9]*(?:[-_][A-Za-z0-9]+)+$"
+          },
+          "identity_basis": {
+            "enum": [
+              "explicit",
+              "content"
+            ]
+          },
+          "statement": {
+            "type": "string",
+            "minLength": 1
+          },
+          "acceptance_criteria": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          "section_path": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          "content_hash": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          },
+          "source": {
+            "type": "object",
+            "required": [
+              "path",
+              "uri",
+              "line_start",
+              "line_end",
+              "excerpt"
+            ],
+            "properties": {
+              "path": {
+                "type": "string",
+                "minLength": 1
+              },
+              "uri": {
+                "type": "string",
+                "format": "uri",
+                "pattern": "^file:"
+              },
+              "line_start": {
+                "type": "integer",
+                "minimum": 1
+              },
+              "line_end": {
+                "type": "integer",
+                "minimum": 1
+              },
+              "excerpt": {
+                "type": "string",
+                "minLength": 1
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    "modified": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "requirement_id",
+          "before",
+          "after",
+          "changed_fields"
+        ],
+        "properties": {
+          "requirement_id": {
+            "type": "string",
+            "pattern": "^rand:req:[A-Za-z0-9][A-Za-z0-9._-]{0,63}:(?:[A-Za-z][A-Za-z0-9]*(?:[-_][A-Za-z0-9]+)+|auto-[0-9a-f]{20})$"
+          },
+          "before": {
+            "type": "object",
+            "required": [
+              "requirement_id",
+              "external_id",
+              "identity_basis",
+              "statement",
+              "acceptance_criteria",
+              "section_path",
+              "content_hash",
+              "source"
+            ],
+            "properties": {
+              "requirement_id": {
+                "type": "string",
+                "pattern": "^rand:req:[A-Za-z0-9][A-Za-z0-9._-]{0,63}:(?:[A-Za-z][A-Za-z0-9]*(?:[-_][A-Za-z0-9]+)+|auto-[0-9a-f]{20})$"
+              },
+              "external_id": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "pattern": "^[A-Za-z][A-Za-z0-9]*(?:[-_][A-Za-z0-9]+)+$"
+              },
+              "identity_basis": {
+                "enum": [
+                  "explicit",
+                  "content"
+                ]
+              },
+              "statement": {
+                "type": "string",
+                "minLength": 1
+              },
+              "acceptance_criteria": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "section_path": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "content_hash": {
+                "type": "string",
+                "pattern": "^[0-9a-f]{64}$"
+              },
+              "source": {
+                "type": "object",
+                "required": [
+                  "path",
+                  "uri",
+                  "line_start",
+                  "line_end",
+                  "excerpt"
+                ],
+                "properties": {
+                  "path": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "uri": {
+                    "type": "string",
+                    "format": "uri",
+                    "pattern": "^file:"
+                  },
+                  "line_start": {
+                    "type": "integer",
+                    "minimum": 1
+                  },
+                  "line_end": {
+                    "type": "integer",
+                    "minimum": 1
+                  },
+                  "excerpt": {
+                    "type": "string",
+                    "minLength": 1
+                  }
+                },
+                "additionalProperties": false
+              }
+            },
+            "additionalProperties": false
+          },
+          "after": {
+            "type": "object",
+            "required": [
+              "requirement_id",
+              "external_id",
+              "identity_basis",
+              "statement",
+              "acceptance_criteria",
+              "section_path",
+              "content_hash",
+              "source"
+            ],
+            "properties": {
+              "requirement_id": {
+                "type": "string",
+                "pattern": "^rand:req:[A-Za-z0-9][A-Za-z0-9._-]{0,63}:(?:[A-Za-z][A-Za-z0-9]*(?:[-_][A-Za-z0-9]+)+|auto-[0-9a-f]{20})$"
+              },
+              "external_id": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "pattern": "^[A-Za-z][A-Za-z0-9]*(?:[-_][A-Za-z0-9]+)+$"
+              },
+              "identity_basis": {
+                "enum": [
+                  "explicit",
+                  "content"
+                ]
+              },
+              "statement": {
+                "type": "string",
+                "minLength": 1
+              },
+              "acceptance_criteria": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "section_path": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "content_hash": {
+                "type": "string",
+                "pattern": "^[0-9a-f]{64}$"
+              },
+              "source": {
+                "type": "object",
+                "required": [
+                  "path",
+                  "uri",
+                  "line_start",
+                  "line_end",
+                  "excerpt"
+                ],
+                "properties": {
+                  "path": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "uri": {
+                    "type": "string",
+                    "format": "uri",
+                    "pattern": "^file:"
+                  },
+                  "line_start": {
+                    "type": "integer",
+                    "minimum": 1
+                  },
+                  "line_end": {
+                    "type": "integer",
+                    "minimum": 1
+                  },
+                  "excerpt": {
+                    "type": "string",
+                    "minLength": 1
+                  }
+                },
+                "additionalProperties": false
+              }
+            },
+            "additionalProperties": false
+          },
+          "changed_fields": {
+            "type": "array",
+            "items": {
+              "enum": [
+                "statement",
+                "acceptance_criteria"
+              ]
+            },
+            "uniqueItems": true,
+            "minItems": 1
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    "unchanged": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "pattern": "^rand:req:[A-Za-z0-9][A-Za-z0-9._-]{0,63}:(?:[A-Za-z][A-Za-z0-9]*(?:[-_][A-Za-z0-9]+)+|auto-[0-9a-f]{20})$"
+      },
+      "uniqueItems": true
+    },
+    "summary": {
+      "type": "object",
+      "required": [
+        "added",
+        "removed",
+        "modified",
+        "unchanged"
+      ],
+      "properties": {
+        "added": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "removed": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "modified": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "unchanged": {
+          "type": "integer",
+          "minimum": 0
+        }
+      },
+      "additionalProperties": false
+    },
+    "test_candidates": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "test_id",
+          "requirement_id",
+          "status",
+          "focus",
+          "acceptance_criteria",
+          "source_refs",
+          "review_required",
+          "action"
+        ],
+        "properties": {
+          "test_id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "requirement_id": {
+            "type": "string",
+            "pattern": "^rand:req:[A-Za-z0-9][A-Za-z0-9._-]{0,63}:(?:[A-Za-z][A-Za-z0-9]*(?:[-_][A-Za-z0-9]+)+|auto-[0-9a-f]{20})$"
+          },
+          "status": {
+            "const": "draft"
+          },
+          "focus": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1
+            },
+            "minItems": 1
+          },
+          "acceptance_criteria": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          "source_refs": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "uri",
+              "pattern": "^file:"
+            },
+            "minItems": 1,
+            "uniqueItems": true
+          },
+          "review_required": {
+            "const": true
+          },
+          "action": {
+            "enum": [
+              "review_new_or_changed",
+              "review_retirement"
+            ]
+          }
+        },
+        "additionalProperties": false
+      }
+    }
+  },
+  "additionalProperties": false,
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/RNA4219/manual-bb-test-harness/schemas/rand_requirements_diff.schema.json",
+  "title": "RanD requirements_diff 2.0 / parser 1"
+}

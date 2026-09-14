@@ -15,9 +15,14 @@ description: 手動ブラックボックス前提で、仕様・受入条件・�
 2. リスク
 3. 優先度
 4. 手動テストケース
-5. 工数
-6. Gate 判定
-7. Go/No-Go brief
+5. テスト計画と開始・停止・再開条件
+6. 工数
+7. Gate 判定
+8. Go/No-Go brief
+
+## RanD連携
+
+RanDのR&D成果物・要求候補・文書監査・前回差分を使う場合は、`references/rand-integration.md`を読む。`bb-harness import rand`で設計入力と依頼文を作り、任意の欠陥台帳を次の探索へ引き継ぐ。
 
 ## 基本ワークフロー
 
@@ -25,19 +30,20 @@ description: 手動ブラックボックス前提で、仕様・受入条件・�
 
 1. `normalize_intake`: 仕様、受入条件、業務ルール、変更点、対象環境、既存証跡を `feature_spec` に正規化する。不足情報は `ok / degraded / blocked` で分類し、推測は assumption として残す。
 2. `model_test_surface`: `flow / state / rule / data / role / regression impact` に分解し、coverage item の母集合を作る。
-3. `derive_observations`: 同値分割、境界値、デシジョンテーブル、状態遷移、経験ベース探索チャーターから観点を作る。
+3. `derive_observations`: 同値分割、境界値、デシジョンテーブル、状態遷移、チェックリストベース、探索、エラー推測から観点を作る。
 4. `assess_risk`: impact x likelihood を基底に、検出困難性、変更波及、外部依存、権限感度、自動テスト信用を補正して `P0..P3` を付ける。
 5. `synthesize_manual_cases`: 高リスク観点を優先し、重複を減らした最小の手動ケース集合へ圧縮する。各 scripted case には oracle と source_ref を必須にする。
-6. `estimate_effort`: prep、execution、evidence、retry buffer を分けて見積もり、実行順を出す。
-7. `evaluate_gates`: 自動テスト証跡、手動 P0/P1 結果、欠陥状態、残余リスク、waiver を合わせて `go / conditional_go / no_go` を判定する。
-8. `assemble_release_brief`: ステークホルダー向けに 1 ページ相当の判断材料へ整える。
+6. `plan_test`: 目的、テストレベル、開始条件、停止・再開条件、データ・環境準備、見積根拠を `test_plan` にする。
+7. `estimate_effort`: prep、execution、evidence、retry buffer を分けて見積もり、実行順を出す。
+8. `evaluate_gates`: 自動テスト証跡、手動 P0/P1 結果、欠陥状態、残余リスク、waiver を合わせて `go / conditional_go / no_go` を判定する。
+9. `assemble_release_brief`: ステークホルダー向けに 1 ページ相当の判断材料へ整える。
 
 ## Artifact 方針
 
 - 共有メモリではなく型付き artifact でつなぐ。
 - 全 artifact に `source_refs`、`assumptions`、`confidence` または根拠文を持たせる。
 - `black` を release acceptance の主役にし、`gray` はログや DB など限定内部情報による補助、`white` は自動テスト evidence の受け皿にする。
-- P0/P1 相当 feature だけ multi-run を検討する。3 run を目安に `normalized_title + technique + trace_to` で merge し、support_count が低い観点は optional に落とす。
+- P0/P1 相当 feature だけ multi-run を検討する。3 run を目安に安定IDでmergeし、`support_count`は抽出安定性のシグナルとして残す。mandatoryとpriorityはAC、業務ルール、リスク根拠で決め、少数runだけを理由に降格しない。
 - 出力をレビューするときは、典型的な失敗モードを `references/failure-modes.md` で確認する。
 
 詳細な artifact と schema の形は `references/artifact-contract.md` を読む。
@@ -47,7 +53,7 @@ description: 手動ブラックボックス前提で、仕様・受入条件・�
 
 - Foundation の芯は同値分割、境界値分析、デシジョンテーブル、状態遷移に置く。
 - 観点抽出は「仕様を読む」ではなく、coverage item を発見する作業として扱う。
-- 経験ベース技法は scripted case を補完する探索チャーターとして扱う。
+- チェックリストベースは版と項目別結果を持つ独立技法として扱う。探索チャーターはtimebox、session notes、findings、retrospectiveを残し、エラー推測も仮説を明示する。
 - 状態遷移、権限、回帰影響は first-class に扱う。注文、申請、承認、返金、解約、招待、認証は stateful とみなして確認する。
 - テストデータは coverage を運ぶ主役として、`canonical_valid`、`invalid_single_fault`、`boundary3`、`rule_combo`、`state_seed`、`history_seed` に分ける。
 - 仕様根拠のない expected result は scripted case にしない。`[要確認]` を付け、探索チャーターまたは blocker に降格する。

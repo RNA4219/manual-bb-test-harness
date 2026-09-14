@@ -1,0 +1,3 @@
+# RanD要求候補を使った保存機能のテスト設計
+
+examples/rand-integration/requirements_packet.jsonをMY-FEATUREとしてimport randに渡す。生成された設計依頼文に沿ってmanual-bbを使用する。原文の保存条件、候補の偏り、受入条件なしの要求を区別し、追加確認の観点を根拠付きで作る。

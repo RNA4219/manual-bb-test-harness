@@ -10,32 +10,215 @@
       "items": {
         "type": "object",
         "properties": {
-          "summary": {"type": "string", "description": "Test summary/title"},
+          "summary": {
+            "type": "string",
+            "description": "Test summary/title"
+          },
+          "source_case_id": {
+            "type": "string",
+            "description": "Stable harness manual case ID"
+          },
+          "source_charter_id": {
+            "type": "string",
+            "description": "Stable harness exploratory charter ID"
+          },
+          "source_feature_id": {
+            "type": "string",
+            "minLength": 1,
+            "description": "Stable harness feature ID"
+          },
+          "case_revision": {
+            "type": "string",
+            "minLength": 1
+          },
+          "spec_revision": {
+            "type": "string",
+            "minLength": 1
+          },
+          "oracle_revision": {
+            "type": "string",
+            "minLength": 1
+          },
+          "case_content_hash": {
+            "type": "string",
+            "minLength": 1
+          },
+          "oracle_refs": {
+            "type": "array",
+            "minItems": 1,
+            "items": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
           "steps": {
             "type": "array",
             "items": {
               "type": "object",
               "properties": {
-                "action": {"type": "string", "description": "Step action"},
-                "result": {"type": "string", "description": "Expected result"}
+                "action": {
+                  "type": "string",
+                  "description": "Step action"
+                },
+                "result": {
+                  "type": "string",
+                  "description": "Expected result"
+                }
               }
             },
             "description": "Test steps with expected results"
           },
           "labels": {
             "type": "array",
-            "items": {"type": "string"},
+            "items": {
+              "type": "string"
+            },
             "description": "Labels for categorization (feature_id, trace_to)"
           },
-          "priority": {"type": "string", "enum": ["Highest", "High", "Medium", "Low", "Lowest"], "description": "Priority level"},
-          "testType": {"type": "string", "enum": ["Manual", "Exploratory"], "description": "Test type"},
+          "priority": {
+            "type": "string",
+            "enum": [
+              "Highest",
+              "High",
+              "Medium",
+              "Low",
+              "Lowest"
+            ],
+            "description": "Priority level"
+          },
+          "testType": {
+            "type": "string",
+            "enum": [
+              "Manual",
+              "Exploratory"
+            ],
+            "description": "Test type"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "active",
+              "retired"
+            ],
+            "description": "Manual case lifecycle status"
+          },
+          "customFields": {
+            "type": "object",
+            "properties": {
+              "retired_reason": {
+                "type": "string",
+                "description": "Reason the manual case was retired"
+              },
+              "source_case_id": {
+                "type": "string",
+                "description": "Stable harness manual case ID"
+              },
+              "source_charter_id": {
+                "type": "string",
+                "description": "Stable harness exploratory charter ID"
+              },
+              "source_feature_id": {
+                "type": "string",
+                "description": "Stable harness feature ID"
+              },
+              "case_revision": {
+                "type": "string",
+                "minLength": 1
+              },
+              "spec_revision": {
+                "type": "string",
+                "minLength": 1
+              },
+              "oracle_revision": {
+                "type": "string",
+                "minLength": 1
+              },
+              "case_content_hash": {
+                "type": "string",
+                "minLength": 1
+              },
+              "oracle_refs": {
+                "type": "array",
+                "minItems": 1,
+                "items": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "replacement_refs": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                },
+                "description": "Replacement coverage references"
+              },
+              "placement_change_ref": {
+                "type": "string",
+                "description": "QEG placement change reference"
+              }
+            },
+            "description": "Lifecycle metadata preserved for import mapping"
+          },
           "preconditions": {
             "type": "array",
-            "items": {"type": "string"},
+            "items": {
+              "type": "string"
+            },
             "description": "Precondition summaries"
           },
-          "estimate": {"type": "string", "description": "Time estimate (optional, for exploratory)"}
-        }
+          "estimate": {
+            "type": "string",
+            "description": "Time estimate (optional, for exploratory)"
+          }
+        },
+        "allOf": [
+          {
+            "if": {
+              "properties": {
+                "testType": {
+                  "const": "Manual"
+                }
+              },
+              "required": [
+                "testType"
+              ]
+            },
+            "then": {
+              "required": [
+                "source_case_id",
+                "source_feature_id",
+                "case_revision",
+                "spec_revision",
+                "oracle_revision",
+                "case_content_hash",
+                "oracle_refs"
+              ]
+            }
+          },
+          {
+            "if": {
+              "properties": {
+                "testType": {
+                  "const": "Exploratory"
+                }
+              },
+              "required": [
+                "testType"
+              ]
+            },
+            "then": {
+              "required": [
+                "source_charter_id",
+                "source_feature_id",
+                "case_revision",
+                "spec_revision",
+                "oracle_revision",
+                "case_content_hash",
+                "oracle_refs"
+              ]
+            }
+          }
+        ]
       },
       "description": "Test issues"
     },
@@ -44,8 +227,14 @@
       "items": {
         "type": "object",
         "properties": {
-          "summary": {"type": "string", "description": "Precondition description"},
-          "tests": {"type": "array", "description": "Linked tests (populated on import)"}
+          "summary": {
+            "type": "string",
+            "description": "Precondition description"
+          },
+          "tests": {
+            "type": "array",
+            "description": "Linked tests (populated on import)"
+          }
         }
       },
       "description": "Precondition items"

@@ -2,7 +2,7 @@
   "id": "BLUEPRINT.md",
   "role": "specification",
   "title": "Blueprint",
-  "summary": "Defines problem statement: manual black-box QA design skill for generating test cases, risks, and gate decisions. Scope includes skill distribution, artifact contracts, schemas, goldens. Excludes automated test frameworks and production SaaS configs. I/O contract specifies 7-step output chain (observations → risks → priorities → test cases → effort → gate → brief). Lists 12+ artifact types with JSON schemas. References artifact-contract.md for detailed I/O requirements.",
+  "summary": "手動ブラックボックスQAの設計正本。仕様から観点、risk、case、gate、release briefへつなぐ。Web/API/mobileを対象とし、schema・例・goldenの同期を要求する。I/Oには実行証跡、自動証跡、欠陥台帳を含める。",
   "public_api": [],
   "deps_out": [
     "skills/manual-bb-test-harness/references/artifact-contract.md",
@@ -15,5 +15,5 @@
   ],
   "risks": [],
   "tests": [],
-  "last_verified": "2026-07-12"
+  "last_verified": "2026-09-12"
 }

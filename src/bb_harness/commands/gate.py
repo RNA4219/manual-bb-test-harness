@@ -20,9 +20,11 @@ def add_subparser(subparsers: argparse._SubParsersAction) -> None:
     parser.add_argument("--risk", type=Path, help="Risk register JSON file")
     parser.add_argument("--cases", type=Path, help="Manual case set JSON file")
     parser.add_argument("--feature", type=Path, help="Feature spec JSON file")
+    parser.add_argument("--model", type=Path, help="Test model JSON file")
     parser.add_argument("--observations", type=Path, help="Observation set JSON file")
     parser.add_argument("--automation", type=Path, help="Automation evidence JSON file")
     parser.add_argument("--waivers", type=Path, help="Waiver set JSON file")
+    parser.add_argument("--defects", type=Path, help="Defect register JSON file")
     parser.add_argument("--build-id", help="Build identifier to evaluate")
     parser.add_argument("--output", type=Path, required=True, help="Output gate decision file")
     parser.add_argument(
@@ -54,9 +56,11 @@ def run(args: argparse.Namespace) -> int:
 
     for option, value in (
         ("--feature", args.feature),
+        ("--model", args.model),
         ("--observations", args.observations),
         ("--automation", args.automation),
         ("--waivers", args.waivers),
+        ("--defects", args.defects),
         ("--build-id", args.build_id),
     ):
         if value is not None:

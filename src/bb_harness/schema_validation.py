@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+import math
 from datetime import datetime
 from pathlib import Path
 from typing import Any
@@ -28,6 +29,18 @@ def build_format_checker() -> FormatChecker:
 
 class SchemaValidationError(ValueError):
     """Raised when an artifact does not conform to its JSON Schema."""
+
+
+def validate_finite_numbers(value: Any, path: str = "$") -> None:
+    """JSON の数値として不正な NaN/Infinity を入れ子も含めて拒否する。"""
+    if isinstance(value, float) and not math.isfinite(value):
+        raise SchemaValidationError(f"Non-finite JSON number at {path}")
+    if isinstance(value, dict):
+        for key, item in value.items():
+            validate_finite_numbers(item, f"{path}.{key}")
+    elif isinstance(value, list):
+        for index, item in enumerate(value):
+            validate_finite_numbers(item, f"{path}[{index}]")
 
 
 def schema_directory() -> Path:
@@ -69,6 +82,7 @@ def load_schema(schema_name: str) -> tuple[dict[str, Any], Registry]:
 
 def validate_artifact(value: dict[str, Any], schema_name: str) -> None:
     """Validate one artifact with local $ref and date-time format support."""
+    validate_finite_numbers(value)
     schema, registry = load_schema(schema_name)
     validator = Draft202012Validator(
         schema,
@@ -77,5 +91,13 @@ def validate_artifact(value: dict[str, Any], schema_name: str) -> None:
     )
     errors = sorted(validator.iter_errors(value), key=lambda error: list(error.path))
     if errors:
-        detail = "; ".join(error.message for error in errors[:5])
+        detail = "; ".join(
+            f"{'.'.join(str(part) for part in error.absolute_path) or '$'}: {error.message}"
+            for error in errors[:5]
+        )
         raise SchemaValidationError(f"Schema validation failed ({schema_name}): {detail}")
+    from bb_harness.evidence_policy import artifact_contract_errors
+
+    contract_errors = artifact_contract_errors(value, schema_name.removesuffix(".schema.json"))
+    if contract_errors:
+        raise SchemaValidationError("; ".join(contract_errors))

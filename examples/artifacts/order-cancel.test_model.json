@@ -1,17 +1,183 @@
 {
   "feature_id": "ORD-CANCEL-01",
-  "flows": ["buyer cancellation", "cs delegated cancellation"],
-  "data_partitions": ["coupon_used", "coupon_not_used", "payment_failed"],
-  "boundaries": ["last cancellable state before shipped", "already cancelled"],
-  "rule_columns": ["order_state x coupon_used x actor"],
-  "states": ["pending", "shipped", "cancelled", "payment_failed"],
-  "valid_transitions": ["pending -> cancelled"],
-  "invalid_transitions": ["shipped -> cancelled", "cancelled -> cancelled", "payment_failed -> cancelled"],
-  "role_matrix": ["buyer x cancel x own_order x pending", "cs_agent x cancel x delegated_order x pending"],
-  "regression_edges": ["direct:order_detail", "external:inventory_service", "external:coupon_service"],
+  "coverage_items": [
+    {
+      "id": "COV-STATE-SHIPPED-CANCEL",
+      "dimension": "state",
+      "technique": "state_transition",
+      "applicability": "applicable",
+      "mandatory": true,
+      "coverage_criterion": "each_transition",
+      "source_refs": [
+        {
+          "id": "AC-2",
+          "kind": "ac"
+        }
+      ]
+    },
+    {
+      "id": "COV-STATE-PENDING-CANCEL",
+      "dimension": "state",
+      "technique": "state_transition",
+      "applicability": "applicable",
+      "mandatory": true,
+      "coverage_criterion": "each_transition",
+      "source_refs": [
+        {
+          "id": "AC-1",
+          "kind": "ac"
+        }
+      ]
+    },
+    {
+      "id": "COV-DATA-COUPON-RESTORE",
+      "dimension": "data",
+      "technique": "equivalence_partitioning",
+      "applicability": "applicable",
+      "mandatory": true,
+      "coverage_criterion": "each_item",
+      "source_refs": [
+        {
+          "id": "AC-4",
+          "kind": "ac"
+        }
+      ]
+    },
+    {
+      "id": "COV-STATE-CANCELLABLE-BOUNDARY",
+      "dimension": "state",
+      "technique": "boundary_value",
+      "applicability": "applicable",
+      "mandatory": false,
+      "coverage_criterion": "each_item",
+      "source_refs": [
+        {
+          "id": "AC-1",
+          "kind": "ac"
+        },
+        {
+          "id": "AC-2",
+          "kind": "ac"
+        }
+      ],
+      "boundary_spec": {
+        "analysis_type": "three_value",
+        "partition": "キャンセル可能状態と出荷済み状態の境界",
+        "boundary_value": "shipped",
+        "included": true,
+        "step": "one lifecycle transition",
+        "selected_values": [
+          "pending",
+          "shipped",
+          "cancelled"
+        ],
+        "rationale": "状態順序の境界と両隣を個別に確認する"
+      }
+    }
+  ],
+  "flows": [
+    "buyer cancellation",
+    "cs delegated cancellation"
+  ],
+  "data_partitions": [
+    "coupon_used",
+    "coupon_not_used",
+    "payment_failed"
+  ],
+  "boundaries": [
+    "last cancellable state before shipped",
+    "already cancelled"
+  ],
+  "rule_columns": [
+    "order_state x coupon_used x actor"
+  ],
+  "states": [
+    "pending",
+    "shipped",
+    "cancelled",
+    "payment_failed"
+  ],
+  "valid_transitions": [
+    "pending -> cancelled"
+  ],
+  "invalid_transitions": [
+    "shipped -> cancelled",
+    "cancelled -> cancelled",
+    "payment_failed -> cancelled"
+  ],
+  "role_matrix": [
+    "buyer x cancel x own_order x pending",
+    "cs_agent x cancel x delegated_order x pending"
+  ],
+  "regression_edges": [
+    "direct:order_detail",
+    "external:inventory_service",
+    "external:coupon_service"
+  ],
   "platform_matrix": [
     "iOS x background_resume x 4g-lossy",
     "Android x offline_to_online x foreground"
   ],
-  "quality_lenses": ["idempotency", "recovery", "error messaging", "compatibility"]
+  "quality_lenses": [
+    {
+      "id": "QL-IDEMPOTENCY",
+      "lens": "idempotency",
+      "applicable": true,
+      "reason": "二重キャンセル禁止の規則がある",
+      "owner": "QA",
+      "oracle": {
+        "type": "specified",
+        "refs": [
+          "BR-2"
+        ]
+      }
+    },
+    {
+      "id": "QL-RECOVERY",
+      "lens": "recovery",
+      "applicable": true,
+      "reason": "キャンセル中断後の状態を確認する",
+      "owner": "QA",
+      "oracle": {
+        "type": "derived",
+        "refs": [
+          "AC-1"
+        ]
+      }
+    },
+    {
+      "id": "QL-ERROR",
+      "lens": "error messaging",
+      "applicable": true,
+      "reason": "キャンセル不可理由を利用者へ示す",
+      "owner": "Product",
+      "oracle": {
+        "type": "specified",
+        "refs": [
+          "AC-2"
+        ]
+      }
+    },
+    {
+      "id": "QL-COMPAT",
+      "lens": "compatibility",
+      "applicable": false,
+      "reason": "対象リリースに個別の互換性要件がない",
+      "owner": "PM"
+    }
+  ],
+  "improvement_feedback": [
+    {
+      "id": "FB-ORDER-1",
+      "source_refs": [
+        "CHARTER-001"
+      ],
+      "finding": "再試行時の案内を継続監視する",
+      "action": "復帰性チェックリストへ反映する",
+      "target_refs": [
+        "QL-RECOVERY",
+        "QL-ERROR"
+      ]
+    }
+  ]
 }

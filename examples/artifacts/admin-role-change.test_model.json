@@ -1,17 +1,213 @@
 {
-  "feature_id": "RBAC-01",
-  "flows": ["admin permission change", "super_admin elevation", "self-change prevention"],
-  "data_partitions": ["role=admin", "role=super_admin", "role=user"],
-  "boundaries": ["super_admin threshold", "self-change boundary"],
-  "rule_columns": ["actor_role x target_role x action x ownership_context"],
-  "states": ["user", "admin", "super_admin"],
-  "valid_transitions": ["user -> admin", "admin -> user", "admin -> super_admin"],
-  "invalid_transitions": ["user -> super_admin (requires super_admin actor)", "any -> any (self-change)"],
-  "role_matrix": [
-    "admin x change_role x other_user x any_role_below_admin",
-    "super_admin x change_role x other_user x any_role",
-    "any x change_role x self x denied"
+  "feature_id": "ADMIN-ROLE-CHANGE-01",
+  "coverage_items": [
+    {
+      "id": "COV-ROLE-OWNER-CHANGE",
+      "dimension": "role",
+      "technique": "use_case",
+      "applicability": "applicable",
+      "mandatory": true,
+      "coverage_criterion": "each_item",
+      "source_refs": [
+        {
+          "id": "AC-1",
+          "kind": "ac"
+        }
+      ]
+    },
+    {
+      "id": "COV-ROLE-ADMIN-DENY-OWNER",
+      "dimension": "role",
+      "technique": "use_case",
+      "applicability": "applicable",
+      "mandatory": true,
+      "coverage_criterion": "each_item",
+      "source_refs": [
+        {
+          "id": "AC-2",
+          "kind": "ac"
+        }
+      ]
+    },
+    {
+      "id": "COV-ROLE-NONADMIN-DENY",
+      "dimension": "role",
+      "technique": "use_case",
+      "applicability": "applicable",
+      "mandatory": true,
+      "coverage_criterion": "each_item",
+      "source_refs": [
+        {
+          "id": "AC-3",
+          "kind": "ac"
+        }
+      ]
+    },
+    {
+      "id": "COV-DATA-LAST-OWNER",
+      "dimension": "data",
+      "technique": "boundary_value",
+      "applicability": "applicable",
+      "mandatory": true,
+      "coverage_criterion": "each_item",
+      "source_refs": [
+        {
+          "id": "AC-4",
+          "kind": "ac"
+        }
+      ],
+      "boundary_spec": {
+        "analysis_type": "three_value",
+        "partition": "owner_countの最後の1人境界",
+        "boundary_value": "1",
+        "included": true,
+        "step": "1 owner",
+        "selected_values": [
+          "0",
+          "1",
+          "2"
+        ],
+        "rationale": "最後のownerと両側のクラスを確認する"
+      }
+    },
+    {
+      "id": "COV-RULE-SELF-DEMOTION",
+      "dimension": "rule",
+      "technique": "use_case",
+      "applicability": "applicable",
+      "mandatory": true,
+      "coverage_criterion": "each_item",
+      "source_refs": [
+        {
+          "id": "BR-1",
+          "kind": "rule"
+        }
+      ]
+    },
+    {
+      "id": "COV-STATE-INVITED",
+      "dimension": "state",
+      "technique": "state_transition",
+      "applicability": "applicable",
+      "mandatory": true,
+      "coverage_criterion": "each_transition",
+      "source_refs": [
+        {
+          "id": "BR-2",
+          "kind": "rule"
+        }
+      ]
+    },
+    {
+      "id": "COV-QUALITY-AUDIT",
+      "dimension": "quality",
+      "technique": "use_case",
+      "applicability": "applicable",
+      "mandatory": true,
+      "coverage_criterion": "each_item",
+      "source_refs": [
+        {
+          "id": "BR-3",
+          "kind": "rule"
+        }
+      ]
+    }
   ],
-  "regression_edges": ["direct:user_management", "external:auth_service", "external:audit_log"],
-  "quality_lenses": ["security", "auditability", "session_management"]
+  "flows": [
+    "owner role change",
+    "admin role change",
+    "self-owner-demotion prevention",
+    "invitation update guidance"
+  ],
+  "data_partitions": [
+    "role=owner",
+    "role=admin",
+    "role=editor",
+    "role=viewer",
+    "role=member"
+  ],
+  "boundaries": [
+    "last owner",
+    "multiple owners",
+    "self-owner-demotion"
+  ],
+  "rule_columns": [
+    "actor_role x target_role x action x ownership_context"
+  ],
+  "states": [
+    "invited",
+    "active",
+    "suspended"
+  ],
+  "valid_transitions": [
+    "active member role -> editor",
+    "active editor role -> viewer"
+  ],
+  "invalid_transitions": [
+    "last owner -> member",
+    "owner -> member (self-change)",
+    "invited role -> active role change"
+  ],
+  "role_matrix": [
+    "owner x change_role x other_member x own_workspace",
+    "admin x change_role x viewer_or_editor x own_workspace",
+    "admin x change_role x owner x denied",
+    "owner x demote_owner x self x denied"
+  ],
+  "regression_edges": [
+    "direct:workspace_members",
+    "shared:role_policy",
+    "external:audit_log",
+    "external:invitation_flow"
+  ],
+  "quality_lenses": [
+    {
+      "id": "QL-SECURITY",
+      "lens": "security",
+      "applicable": true,
+      "reason": "権限外のロール変更を拒否する",
+      "owner": "Security QA",
+      "oracle": {
+        "type": "specified",
+        "refs": [
+          "BR-1",
+          "BR-2"
+        ]
+      }
+    },
+    {
+      "id": "QL-AUDIT",
+      "lens": "auditability",
+      "applicable": true,
+      "reason": "ロール変更を管理画面で追跡する",
+      "owner": "QA",
+      "oracle": {
+        "type": "specified",
+        "refs": [
+          "AC-5",
+          "BR-3"
+        ]
+      }
+    },
+    {
+      "id": "QL-SESSION",
+      "lens": "session management",
+      "applicable": false,
+      "reason": "この変更にセッション更新要件は定義されていない",
+      "owner": "PM"
+    }
+  ],
+  "improvement_feedback": [
+    {
+      "id": "FB-ADMIN-1",
+      "source_refs": [
+        "TC-ADMIN-007"
+      ],
+      "finding": "複数owner時の自己降格を継続回帰する",
+      "action": "境界値ケースを回帰セットに固定する",
+      "target_refs": [
+        "QL-SECURITY"
+      ]
+    }
+  ]
 }

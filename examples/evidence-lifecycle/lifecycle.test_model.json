@@ -1,0 +1,25 @@
+{
+  "feature_id": "EVIDENCE-LIFECYCLE",
+  "coverage_items": [
+    {
+      "id": "COV-FLOW-SAVE",
+      "dimension": "flow",
+      "technique": "use_case",
+      "applicability": "applicable",
+      "mandatory": true,
+      "coverage_criterion": "each_item",
+      "source_refs": [
+        {
+          "id": "AC-1",
+          "kind": "ac"
+        }
+      ]
+    }
+  ],
+  "flows": ["save"],
+  "data_partitions": [],
+  "rule_columns": [],
+  "states": [],
+  "role_matrix": [],
+  "regression_edges": []
+}

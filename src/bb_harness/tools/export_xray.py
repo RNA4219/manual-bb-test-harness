@@ -12,15 +12,38 @@ Example:
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
 import sys
 from pathlib import Path
 from typing import Any
 
 from bb_harness import __version__
-
-# Add scripts/ to path for _shared imports
 from bb_harness.tools._shared.io_common import load_json
+
+
+def _case_identity(case_set: dict[str, Any], case: dict[str, Any]) -> dict[str, Any]:
+    """Build the immutable identity fields carried through external execution."""
+    case_id = str(case.get("tc_id") or case.get("id") or "UNKNOWN")
+    case_revision = str(case.get("revision") or "unversioned")
+    canonical_case = {key: value for key, value in case.items() if key != "content_hash"}
+    content_hash = case.get("content_hash") or "sha256:" + hashlib.sha256(
+        json.dumps(canonical_case, sort_keys=True, ensure_ascii=False).encode("utf-8")
+    ).hexdigest()
+    oracle = case.get("oracle")
+    oracle_refs = (
+        case.get("oracle_refs")
+        or (oracle.get("refs") if isinstance(oracle, dict) else None)
+        or case.get("trace_to")
+        or [case_id]
+    )
+    return {
+        "case_revision": case_revision,
+        "spec_revision": str(case.get("spec_revision") or case_set.get("spec_revision") or "unversioned"),
+        "oracle_revision": str(case.get("oracle_revision") or case_revision),
+        "case_content_hash": str(content_hash),
+        "oracle_refs": [str(ref) for ref in oracle_refs],
+    }
 
 
 def convert_to_xray(case_set: dict[str, Any]) -> dict[str, Any]:
@@ -61,25 +84,39 @@ def convert_to_xray(case_set: dict[str, Any]) -> dict[str, Any]:
         steps = case.get("steps", [])
         expected = case.get("expected_results", [])
 
-        # Xray expects steps as action-result pairs
-        xray_steps: list[dict[str, Any]] = []
-        for i, action in enumerate(steps):
-            step: dict[str, Any] = {
-                "action": action,
-                "result": expected[i] if i < len(expected) else "",
-            }
-            xray_steps.append(step)
+        # Equal-length lists are explicit step pairs. Otherwise the schema only
+        # guarantees case-level outcomes, so attach them to the final action.
+        if len(expected) == len(steps):
+            step_results = list(expected)
+        else:
+            step_results = [""] * len(steps)
+            if steps:
+                step_results[-1] = "\n".join(expected)
+        xray_steps = [
+            {"action": action, "result": step_results[index]}
+            for index, action in enumerate(steps)
+        ]
 
-        # If more expected than steps, add to last step
-        if len(expected) > len(steps) and steps:
-            xray_steps[-1]["result"] = "\n".join(expected[len(steps) - 1 :])
-
+        identity = _case_identity(case_set, case)
         xray_test: dict[str, Any] = {
+            "source_case_id": case.get("tc_id", ""),
+            "source_feature_id": feature_id,
+            **identity,
             "summary": case.get("title", case.get("tc_id", "Test")),
             "steps": xray_steps,
-            "labels": [feature_id] + case.get("trace_to", []),
+            "labels": [feature_id, f"status:{case.get('status', 'active')}"]
+            + case.get("trace_to", []),
             "priority": priority_xray,
             "testType": "Manual",
+            "status": case.get("status", "active"),
+            "customFields": {
+                "source_case_id": case.get("tc_id", ""),
+                "source_feature_id": feature_id,
+                **identity,
+                "retired_reason": case.get("retired_reason", ""),
+                "replacement_refs": case.get("replacement_refs", []),
+                "placement_change_ref": case.get("placement_change_ref", ""),
+            },
         }
 
         # Link precondition if present
@@ -91,7 +128,11 @@ def convert_to_xray(case_set: dict[str, Any]) -> dict[str, Any]:
 
     # Add exploratory charters as tests with special type
     for charter in charters:
+        identity = _case_identity(case_set, charter)
         charter_test: dict[str, Any] = {
+            **identity,
+            "source_charter_id": charter.get("id", ""),
+            "source_feature_id": feature_id,
             "summary": charter.get("title", charter.get("id", "Exploratory")),
             "steps": [
                 {
@@ -103,6 +144,11 @@ def convert_to_xray(case_set: dict[str, Any]) -> dict[str, Any]:
             "priority": "Medium",
             "testType": "Exploratory",
             "estimate": f"{charter.get('estimate_minutes', 30)}m",
+            "customFields": {
+                **identity,
+                "source_charter_id": charter.get("id", ""),
+                "source_feature_id": feature_id,
+            },
         }
         xray_data["tests"].append(charter_test)
 

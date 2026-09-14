@@ -1,0 +1,252 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/RNA4219/manual-bb-test-harness/schemas/rand_intake.schema.json",
+  "title": "RandIntake",
+  "type": "object",
+  "required": [
+    "schema_version",
+    "type",
+    "adapter_version",
+    "feature_id",
+    "revision",
+    "title",
+    "intake_status",
+    "requirements",
+    "retired_requirements",
+    "focus_requirement_ids",
+    "regression_requirement_ids",
+    "follow_up_defect_ids",
+    "inputs",
+    "source_refs",
+    "assumptions",
+    "notes"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "2.0"
+    },
+    "type": {
+      "const": "rand_intake"
+    },
+    "adapter_version": {
+      "const": "1"
+    },
+    "feature_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "revision": {
+      "type": "string",
+      "minLength": 1
+    },
+    "title": {
+      "type": "string",
+      "minLength": 1
+    },
+    "intake_status": {
+      "enum": [
+        "degraded",
+        "blocked"
+      ]
+    },
+    "requirements": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "requirement_id",
+          "statement",
+          "acceptance_criteria",
+          "source_refs",
+          "change",
+          "oracle_status",
+          "upstream"
+        ],
+        "properties": {
+          "requirement_id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "statement": {
+            "type": "string",
+            "minLength": 1
+          },
+          "acceptance_criteria": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          "source_refs": {
+            "type": "array",
+            "minItems": 1,
+            "items": {
+              "$ref": "shared_defs.schema.json#/$defs/SourceRef"
+            }
+          },
+          "change": {
+            "enum": [
+              "full",
+              "added",
+              "removed",
+              "modified",
+              "unchanged"
+            ]
+          },
+          "oracle_status": {
+            "enum": [
+              "specified",
+              "candidate",
+              "missing"
+            ]
+          },
+          "upstream": {
+            "type": "object"
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    "retired_requirements": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "requirement_id",
+          "statement",
+          "acceptance_criteria",
+          "source_refs",
+          "change",
+          "oracle_status",
+          "upstream"
+        ],
+        "properties": {
+          "requirement_id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "statement": {
+            "type": "string",
+            "minLength": 1
+          },
+          "acceptance_criteria": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          "source_refs": {
+            "type": "array",
+            "minItems": 1,
+            "items": {
+              "$ref": "shared_defs.schema.json#/$defs/SourceRef"
+            }
+          },
+          "change": {
+            "enum": [
+              "full",
+              "added",
+              "removed",
+              "modified",
+              "unchanged"
+            ]
+          },
+          "oracle_status": {
+            "enum": [
+              "specified",
+              "candidate",
+              "missing"
+            ]
+          },
+          "upstream": {
+            "type": "object"
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    "focus_requirement_ids": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "regression_requirement_ids": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "follow_up_defect_ids": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "inputs": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": [
+          "role",
+          "path",
+          "uri",
+          "sha256",
+          "payload"
+        ],
+        "properties": {
+          "role": {
+            "enum": [
+              "primary",
+              "diff",
+              "defects"
+            ]
+          },
+          "path": {
+            "type": "string",
+            "minLength": 1
+          },
+          "uri": {
+            "type": "string",
+            "format": "uri"
+          },
+          "sha256": {
+            "type": "string",
+            "pattern": "^[a-f0-9]{64}$"
+          },
+          "payload": {
+            "type": "object"
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    "source_refs": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "$ref": "shared_defs.schema.json#/$defs/SourceRef"
+      }
+    },
+    "assumptions": {
+      "type": "array",
+      "items": {
+        "$ref": "shared_defs.schema.json#/$defs/Assumption"
+      }
+    },
+    "notes": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    }
+  },
+  "additionalProperties": false
+}

@@ -1,0 +1,22 @@
+{
+  "id": "skills/manual-bb-test-harness/references/rand-integration.md",
+  "role": "reference",
+  "title": "RanD Integration",
+  "summary": "import randで候補/監査/文書/handoffを取り込み、source snapshotと不確実性を保持する。変更重点・全体回帰・欠陥履歴を既存Skillへ接続する。",
+  "deps_out": [
+    "schemas/rand_intake.schema.json",
+    "docs/tasks/task-rand-integration-20260912.md"
+  ],
+  "deps_in": [
+    "README.md",
+    "skills/manual-bb-test-harness/SKILL.md"
+  ],
+  "risks": [
+    "候補の無断確定",
+    "回帰範囲の過剰な縮小"
+  ],
+  "tests": [
+    "tests/test_rand_import.py"
+  ],
+  "last_verified": "2026-09-12"
+}

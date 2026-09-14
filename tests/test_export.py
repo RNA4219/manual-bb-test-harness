@@ -2,29 +2,17 @@
 
 from __future__ import annotations
 
-import importlib.util
 import json
 import sys
 from pathlib import Path
 from unittest import mock
 
 import pytest
+from jsonschema import Draft202012Validator
 
-# Load modules dynamically
-spec_testrail = importlib.util.spec_from_file_location(
-    "export_testrail", Path(__file__).parent.parent / "scripts" / "export-testrail.py"
-)
-export_testrail = importlib.util.module_from_spec(spec_testrail)
-sys.modules["export_testrail"] = export_testrail
-spec_testrail.loader.exec_module(export_testrail)
-
-spec_xray = importlib.util.spec_from_file_location(
-    "export_xray", Path(__file__).parent.parent / "scripts" / "export-xray.py"
-)
-export_xray = importlib.util.module_from_spec(spec_xray)
-sys.modules["export_xray"] = export_xray
-spec_xray.loader.exec_module(export_xray)
-
+from bb_harness.tools import export_notion, export_testrail, export_xray
+from bb_harness.tools.import_testrail import convert_to_execution_evidence as import_testrail_case
+from bb_harness.tools.import_xray import convert_to_execution_evidence as import_xray_case
 
 # ============== TestRail Tests ==============
 
@@ -92,6 +80,61 @@ class TestConvertToTestrail:
         result = convert_to_testrail(case_set)
         assert result["cases"] == []
 
+    def test_retired_status_preserved(self) -> None:
+        case_set = {
+            "feature_id": "TEST",
+            "manual_cases": [
+                {
+                    "title": "Retired Case",
+                    "status": "retired",
+                    "retired_reason": "自動テストへ移管済み",
+                    "replacement_refs": ["hate:AETE-001"],
+                    "placement_change_ref": "qeg:PLC-001",
+                }
+            ],
+        }
+        result = convert_to_testrail(case_set)
+        exported = result["cases"][0]
+        assert exported["custom_status"] == "retired"
+        assert exported["custom_retired_reason"] == "自動テストへ移管済み"
+        assert exported["custom_replacement_refs"] == "hate:AETE-001"
+        assert exported["custom_placement_change_ref"] == "qeg:PLC-001"
+
+    def test_evidence_identity_round_trip(self) -> None:
+        case_set = {
+            "feature_id": "TEST-01",
+            "spec_revision": "spec-7",
+            "manual_cases": [
+                {
+                    "tc_id": "TC-101",
+                    "title": "Identity contract",
+                    "revision": "case-3",
+                    "oracle_revision": "oracle-2",
+                    "content_hash": "sha256:manual-case-101",
+                    "oracle": {"type": "specified", "refs": ["AC-101"]},
+                    "trace_to": ["OBS-101"],
+                }
+            ],
+        }
+
+        exported = convert_to_testrail(case_set)["cases"][0]
+        exported.update({"id": 501, "case_id": 101, "status_id": 1})
+        evidence = import_testrail_case(
+            exported,
+            {},
+            "tester",
+            12,
+            require_original_mapping=True,
+        )
+
+        assert evidence["tc_id"] == "TC-101"
+        assert evidence["feature_id"] == "TEST-01"
+        assert evidence["case_revision"] == "case-3"
+        assert evidence["spec_revision"] == "spec-7"
+        assert evidence["oracle_revision"] == "oracle-2"
+        assert evidence["case_content_hash"] == "sha256:manual-case-101"
+        assert evidence["oracle_refs"] == ["AC-101"]
+
 
 class TestExportTestrailCsv:
     """Tests for CSV export."""
@@ -116,6 +159,31 @@ class TestExportTestrailCsv:
         assert "Section" in content
         assert "TEST-01" in content
         assert "Test" in content
+
+    def test_csv_includes_retired_columns(self, tmp_path: Path) -> None:
+        testrail_data = {
+            "sections": [{"name": "TEST-01"}],
+            "cases": [
+                {
+                    "title": "Retired",
+                    "priority_id": 4,
+                    "estimate": "0m",
+                    "custom_steps": "",
+                    "custom_expected": "",
+                    "custom_status": "retired",
+                    "custom_retired_reason": "自動テストへ移管済み",
+                    "custom_replacement_refs": "hate:AETE-001",
+                    "custom_placement_change_ref": "qeg:PLC-001",
+                }
+            ],
+        }
+        output = tmp_path / "output.csv"
+        export_testrail_csv(testrail_data, output)
+
+        content = output.read_text(encoding="utf-8")
+        assert "Status" in content
+        assert "retired" in content
+        assert "hate:AETE-001" in content
 
 
 class TestMainTestrail:
@@ -217,11 +285,106 @@ class TestConvertToXray:
         assert result["tests"][0]["testType"] == "Exploratory"
         assert "exploratory" in result["tests"][0]["labels"]
 
+    def test_exploratory_charter_identity_round_trip(self) -> None:
+        case_set = {
+            "feature_id": "TEST-CHARTER",
+            "spec_revision": "spec-charter-1",
+            "manual_cases": [],
+            "exploratory_charters": [
+                {
+                    "id": "CHARTER-101",
+                    "revision": "charter-2",
+                    "content_hash": "sha256:charter-101",
+                    "oracle_revision": "oracle-charter-3",
+                    "title": "Explore recovery",
+                    "scope": "network recovery",
+                    "questions": ["Can the user retry safely?"],
+                    "trace_to": ["OBS-RECOVERY-1"],
+                }
+            ],
+        }
+
+        payload = convert_to_xray(case_set)
+        schema = json.loads(
+            (Path(__file__).resolve().parents[1] / "schemas" / "xray-export.schema.json").read_text(
+                encoding="utf-8"
+            )
+        )
+        Draft202012Validator(schema).validate(payload)
+        exported = payload["tests"][0]
+        exported.update({"status": "PASS", "testKey": "QA-CHARTER-101"})
+        evidence = import_xray_case(
+            exported,
+            "QA-EXEC-CHARTER",
+            "QA-CHARTER-101",
+            require_original_mapping=True,
+        )
+
+        assert evidence["charter_id"] == "CHARTER-101"
+        assert "tc_id" not in evidence
+        assert evidence["case_revision"] == "charter-2"
+        assert evidence["spec_revision"] == "spec-charter-1"
+        assert evidence["oracle_revision"] == "oracle-charter-3"
+        assert evidence["case_content_hash"] == "sha256:charter-101"
+        assert evidence["oracle_refs"] == ["OBS-RECOVERY-1"]
+
     def test_preconditions_extracted(self) -> None:
         case_set = {"feature_id": "TEST", "manual_cases": [{"preconditions": ["State=A"]}]}
         result = convert_to_xray(case_set)
         assert len(result["preconditions"]) == 1
         assert result["preconditions"][0]["summary"] == "State=A"
+
+    def test_retired_status_preserved(self) -> None:
+        case_set = {
+            "feature_id": "TEST",
+            "manual_cases": [
+                {
+                    "title": "Retired",
+                    "status": "retired",
+                    "replacement_refs": ["hate:AETE-001"],
+                    "placement_change_ref": "qeg:PLC-001",
+                }
+            ],
+        }
+        result = convert_to_xray(case_set)
+        exported = result["tests"][0]
+        assert exported["status"] == "retired"
+        assert "status:retired" in exported["labels"]
+        assert exported["customFields"]["replacement_refs"] == ["hate:AETE-001"]
+
+    def test_evidence_identity_round_trip(self) -> None:
+        case_set = {
+            "feature_id": "TEST-02",
+            "spec_revision": "spec-8",
+            "manual_cases": [
+                {
+                    "tc_id": "TC-202",
+                    "title": "Identity contract",
+                    "revision": "case-4",
+                    "oracle_revision": "oracle-5",
+                    "content_hash": "sha256:manual-case-202",
+                    "oracle": {"type": "specified", "refs": ["AC-202"]},
+                    "trace_to": ["OBS-202"],
+                }
+            ],
+        }
+
+        exported = convert_to_xray(case_set)["tests"][0]
+        exported.update({"status": "PASS", "testKey": "QA-202"})
+        evidence = import_xray_case(
+            exported,
+            "QA-EXEC-9",
+            "QA-202",
+            require_original_mapping=True,
+        )
+
+        assert evidence["tc_id"] == "TC-202"
+        assert evidence["feature_id"] == "TEST-02"
+        assert evidence["case_revision"] == "case-4"
+        assert evidence["spec_revision"] == "spec-8"
+        assert evidence["oracle_revision"] == "oracle-5"
+        assert evidence["case_content_hash"] == "sha256:manual-case-202"
+        assert evidence["oracle_refs"] == ["AC-202"]
 
 
 class TestMainXray:
@@ -257,16 +420,80 @@ class TestMainXray:
             assert "tests" in data
 
 
+def test_external_identity_fallback_hash_ignores_result_status() -> None:
+    tr_base = {"id": 501, "case_id": 101, "source_case_id": "TC-101", "status_id": 1}
+    tr_pass = import_testrail_case(tr_base, {}, "tester", 12)
+    tr_fail = import_testrail_case({**tr_base, "status_id": 5}, {}, "tester", 12)
+    assert tr_pass["case_content_hash"] == tr_fail["case_content_hash"]
+
+    xr_base = {"source_case_id": "TC-202", "status": "PASS"}
+    xr_pass = import_xray_case(xr_base, "QA-EXEC-9", "QA-202")
+    xr_fail = import_xray_case({**xr_base, "status": "FAIL"}, "QA-EXEC-9", "QA-202")
+    assert xr_pass["case_content_hash"] == xr_fail["case_content_hash"]
+
+
+def test_testrail_custom_fields_restore_original_identity() -> None:
+    evidence = import_testrail_case(
+        {
+            "id": 777,
+            "case_id": 777,
+            "status_id": 1,
+            "custom_source_case_id": "TC-777",
+            "custom_source_feature_id": "FEATURE-777",
+        },
+        {},
+        "tester",
+        77,
+        require_original_mapping=True,
+    )
+    assert evidence["tc_id"] == "TC-777"
+    assert evidence["feature_id"] == "FEATURE-777"
+
+
+@pytest.mark.parametrize(
+    ("converter", "schema_name", "collection"),
+    [
+        (convert_to_testrail, "testrail-export.schema.json", "cases"),
+        (convert_to_xray, "xray-export.schema.json", "tests"),
+    ],
+)
+def test_exported_manual_case_satisfies_identity_schema(
+    converter: object, schema_name: str, collection: str
+) -> None:
+    case_set = {
+        "feature_id": "FEATURE-IDENTITY",
+        "spec_revision": "spec-9",
+        "manual_cases": [
+            {
+                "tc_id": "TC-909",
+                "title": "Identity schema",
+                "revision": "case-9",
+                "oracle_revision": "oracle-9",
+                "content_hash": "sha256:case-909",
+                "oracle": {"type": "specified", "refs": ["AC-909"]},
+            }
+        ],
+    }
+    payload = converter(case_set)  # type: ignore[operator]
+    schema = json.loads(
+        (Path(__file__).resolve().parents[1] / "schemas" / schema_name).read_text(
+            encoding="utf-8"
+        )
+    )
+    Draft202012Validator(schema).validate(payload)
+
+    without_revision = json.loads(json.dumps(payload))
+    del without_revision[collection][0]["case_revision"]
+    assert any(
+        error.validator == "required"
+        for error in Draft202012Validator(schema).iter_errors(without_revision)
+    )
+
+
 # ============== Export Notion Tests ==============
 
-spec_notion = importlib.util.spec_from_file_location(
-    "export_notion", Path(__file__).parent.parent / "scripts" / "export-notion.py"
-)
-export_notion = importlib.util.module_from_spec(spec_notion)
-sys.modules["export_notion"] = export_notion
-spec_notion.loader.exec_module(export_notion)
-
 main_notion = export_notion.main
+create_notion_page = export_notion.create_notion_page
 
 
 class TestExportNotionDryRun:
@@ -319,3 +546,32 @@ class TestExportNotionDryRun:
             with pytest.raises(SystemExit) as exc_info:
                 main_notion()
             assert exc_info.value.code == 0
+
+    def test_manual_case_status_in_payload(self) -> None:
+        fake_response = mock.Mock()
+        fake_response.json.return_value = {"id": "page-1", "url": "https://notion.test/page-1"}
+        fake_response.raise_for_status.return_value = None
+        fake_requests = mock.Mock()
+        fake_requests.post.return_value = fake_response
+        report = {
+            "feature_id": "TEST",
+            "score": 90,
+            "pass_status": "pass",
+            "manual_cases": [
+                {
+                    "tc_id": "TC-RET-001",
+                    "status": "retired",
+                    "replacement_refs": ["hate:AETE-001"],
+                    "placement_change_ref": "qeg:PLC-001",
+                }
+            ],
+        }
+
+        with mock.patch.dict(sys.modules, {"requests": fake_requests}):
+            create_notion_page("db", "Title", report, "token")
+
+        payload = fake_requests.post.call_args.kwargs["json"]
+        payload_text = json.dumps(payload, ensure_ascii=False)
+        assert "Manual Case Status" in payload_text
+        assert "TC-RET-001: retired" in payload_text
+        assert "hate:AETE-001" in payload_text

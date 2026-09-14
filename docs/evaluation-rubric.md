@@ -21,7 +21,7 @@ Skill 出力を forward-test した後、この rubric で採点する。
 | Risk quality | 15 | impact/likelihood/modifier の根拠があり、P0/P1 の乱発がない |
 | Manual cases | 20 | scripted case に oracle refs、observable expected、trace_to、工数がある |
 | Exploratory charters | 10 | oracle が薄い領域を scope/questions/timebox 付きで切り出している |
-| Gate decision | 15 | automation/manual/defect/residual risk/waiver を分けて判断している |
+| Gate decision | 15 | automation/manual/defect/residual risk/waiver を分け、retired case を未実施と区別して判断している |
 | Communication | 5 | Go/No-Go brief が短く、意思決定に使える |
 
 ## Pass Rule
@@ -30,11 +30,16 @@ Skill 出力を forward-test した後、この rubric で採点する。
 - 70-79 点は conditional pass。Skill または domain pack 改善候補を記録する。
 - 69 点以下は fail。golden expected を直接直すのではなく、Skill 本体か references を改善する。
 
+## RanD連携の評価
+
+元要求ID・原文参照・上流不確実性を保持すること。候補ACの無断確定、AC欠損の補作、未変更要求の回帰検討漏れ、削除要求/caseの無断retire、上流goの転記、台帳からの欠陥closeの捏造を失敗とする。goldens/rand-integration.expected.mdをreview anchorとして使う。
+
 ## Automatic Fail Conditions
 
 - Coverage model が出ない。
 - P0/P1 の scripted case に oracle refs がない。
 - Gate が coverage 数値だけで Go になる。
+- retired case が P0/P1 未実施として扱われ、`retired_cases` や replacement refs が落ちる。
 - 権限 feature で ownership context がない。
 - stateful feature で invalid transition がない。
 - mobile feature で platform_matrix がなく、background / network / permission の差分が考慮されていない。

@@ -1,0 +1,21 @@
+{
+  "feature_id": "EVIDENCE-LIFECYCLE",
+  "observations": [
+    {
+      "id": "OBS-SAVE-1",
+      "title": "保存結果",
+      "view": "black",
+      "coverage_item_id": "COV-FLOW-SAVE",
+      "mandatory": true,
+      "techniques": [
+        "use_case"
+      ],
+      "source_refs": [
+        {
+          "id": "AC-1",
+          "kind": "ac"
+        }
+      ]
+    }
+  ]
+}

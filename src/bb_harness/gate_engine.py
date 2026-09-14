@@ -10,7 +10,23 @@ from pathlib import Path
 from typing import Any
 
 from bb_harness import __version__
-from bb_harness.schema_validation import SchemaValidationError, validate_artifact
+from bb_harness.evidence_policy import (
+    UNRESOLVED_STATES,
+    GateInputError,
+    case_execution_results,
+    case_was_executed,
+    execution_identity,
+    extract_open_defects,
+    parse_timestamp,
+    suite_failures,
+    validate_evidence_configurations,
+    validate_evidence_identity,
+)
+from bb_harness.schema_validation import (
+    SchemaValidationError,
+    validate_artifact,
+    validate_finite_numbers,
+)
 
 GATE_THRESHOLDS = {
     "strict": {
@@ -44,14 +60,11 @@ GATE_THRESHOLDS = {
 }
 
 
-class GateInputError(ValueError):
-    """Gate input is missing, ambiguous, or invalid."""
-
-
 def load_json(path: Path) -> dict[str, Any]:
     try:
         value = json.loads(path.read_text(encoding="utf-8"))
-    except (OSError, json.JSONDecodeError) as exc:
+        validate_finite_numbers(value)
+    except (OSError, json.JSONDecodeError, SchemaValidationError) as exc:
         raise GateInputError(f"Cannot load {path}: {exc}") from exc
     if not isinstance(value, dict):
         raise GateInputError(f"Expected JSON object: {path}")
@@ -72,20 +85,10 @@ def load_evidence_files(path: Path) -> list[dict[str, Any]]:
     return evidence
 
 
-def parse_timestamp(value: Any, source: str) -> datetime:
-    if not isinstance(value, str) or not value:
-        raise GateInputError(f"timestamp required: {source}")
-    try:
-        timestamp = datetime.fromisoformat(value.replace("Z", "+00:00"))
-    except ValueError as exc:
-        raise GateInputError(f"Invalid timestamp in {source}: {value}") from exc
-    if timestamp.tzinfo is None:
-        raise GateInputError(f"timestamp must include timezone: {source}")
-    return timestamp
-
-
 def validate_and_select_evidence(
-    evidence: list[dict[str, Any]], feature_id: str, build_id: str | None
+    evidence: list[dict[str, Any]], feature_id: str, build_id: str | None,
+    manual_cases: dict[str, Any] | None = None,
+    feature_spec: dict[str, Any] | None = None,
 ) -> tuple[list[dict[str, Any]], str]:
     matching = []
     builds: set[str] = set()
@@ -101,6 +104,8 @@ def validate_and_select_evidence(
         if build_id is not None and current_build != build_id:
             raise GateInputError(f"Evidence build_id mismatch: {source}")
         parse_timestamp(item.get("timestamp"), source)
+        if manual_cases is not None and feature_spec is not None:
+            validate_evidence_identity(item, manual_cases, feature_spec)
         builds.add(current_build)
         matching.append(item)
 
@@ -112,31 +117,51 @@ def validate_and_select_evidence(
     if not matching:
         raise GateInputError(f"No evidence for feature={feature_id}, build={build_id}")
 
-    latest: dict[str, tuple[datetime, dict[str, Any]]] = {}
+    validate_evidence_configurations(matching, manual_cases)
+    latest: dict[tuple[str, ...], tuple[datetime, dict[str, Any]]] = {}
     for item in matching:
         case_id = str(item.get("tc_id") or item.get("charter_id"))
         stamp = parse_timestamp(item["timestamp"], str(item.get("_source_path", case_id)))
-        previous = latest.get(case_id)
+        identity = execution_identity(item)
+        previous = latest.get(identity)
         if previous and previous[0] == stamp:
             raise GateInputError(f"Ambiguous duplicate evidence: {case_id} at {item['timestamp']}")
         if previous is None or stamp > previous[0]:
-            latest[case_id] = (stamp, item)
+            latest[identity] = (stamp, item)
     return [entry[1] for entry in latest.values()], build_id
 
 
 def extract_case_results(
     evidence_list: list[dict[str, Any]], manual_cases: dict[str, Any]
 ) -> dict[str, dict[str, Any]]:
+    # 辞書へ入れる前に検査し、定義の上書きでケースを失わないようにする。
+    identifiers: set[str] = set()
+    for collection, field in (("manual_cases", "tc_id"), ("exploratory_charters", "id")):
+        for definition in manual_cases.get(collection, []):
+            identifier = definition.get(field)
+            if not isinstance(identifier, str) or not identifier.strip():
+                raise GateInputError(f"Nonempty {field} required in {collection}")
+            if identifier in identifiers:
+                raise GateInputError(f"Duplicate case or charter ID: {identifier}")
+            identifiers.add(identifier)
     results: dict[str, dict[str, Any]] = {}
     for case in manual_cases.get("manual_cases", []):
+        retired = case.get("status") == "retired"
         results[str(case.get("tc_id", ""))] = {
             "priority": case.get("priority", "P2"),
             "trace_to": case.get("trace_to", []),
             "type": "scripted",
-            "result": "untested",
+            "result": "retired" if retired else "untested",
             "run_id": "",
             "defect_stub": None,
+            "primary_view": case.get("primary_view", "black"),
         }
+        if retired:
+            results[str(case["tc_id"])].update(
+                retired_reason=case.get("retired_reason", ""),
+                replacement_refs=case.get("replacement_refs", []),
+                placement_change_ref=case.get("placement_change_ref", ""),
+            )
     for charter in manual_cases.get("exploratory_charters", []):
         results[str(charter.get("id", ""))] = {
             "priority": charter.get("priority", "P2"),
@@ -145,16 +170,30 @@ def extract_case_results(
             "result": "untested",
             "run_id": "",
             "defect_stub": None,
+            "primary_view": charter.get("primary_view", "black"),
         }
     for evidence in evidence_list:
         case_id = str(evidence.get("tc_id") or evidence.get("charter_id") or "")
-        if case_id in results:
+        if case_id in results and results[case_id]["result"] != "retired":
             results[case_id].update(
                 result=str(evidence.get("result", "unknown")).lower(),
                 run_id=evidence.get("run_id", ""),
                 defect_stub=evidence.get("defect_stub"),
                 timestamp=evidence.get("timestamp"),
             )
+    executions = case_execution_results(evidence_list, manual_cases)
+    severity_order = ("fail", "blocked", "unknown", "skip", "untested", "pass")
+    for case_id, units in executions.items():
+        result = results[case_id]
+        result["execution_results"] = units
+        result["result"] = min(
+            (unit["result"] for unit in units),
+            key=lambda outcome: severity_order.index(outcome),
+        )
+        representative = next(unit for unit in units if unit["result"] == result["result"])
+        result["run_id"] = representative["run_id"]
+        if "timestamp" in representative:
+            result["timestamp"] = representative["timestamp"]
     return {key: value for key, value in results.items() if key}
 
 
@@ -165,34 +204,30 @@ def count_results_by_priority(results: dict[str, dict[str, Any]]) -> dict[str, d
         for priority in ("P0", "P1", "P2", "P3")
     }
     for item in results.values():
+        if str(item.get("result", "")).lower() == "retired":
+            continue
         priority = str(item.get("priority", "P2"))
         priority = priority if priority in counts else "P2"
         outcome = str(item.get("result", "unknown")).lower()
         outcome = outcome if outcome in names else "unknown"
         counts[priority]["total"] += 1
         counts[priority][outcome] += 1
-        if outcome not in ("pass", "fail", "skip"):
-            counts[priority]["skip"] += 1
     return counts
 
 
-def extract_open_defects(evidence: list[dict[str, Any]]) -> list[dict[str, Any]]:
-    defects = []
-    for item in evidence:
-        defect = item.get("defect_stub")
-        if (
-            isinstance(defect, dict)
-            and defect.get("status", "open") == "open"
-        ):
-            defects.append(
-                {
-                    "tc_id": item.get("tc_id", item.get("charter_id", "")),
-                    "title": defect.get("title", "Untitled defect"),
-                    "severity": defect.get("severity", "unknown"),
-                    "status": "open",
-                }
-            )
-    return defects
+def extract_retired_cases(results: dict[str, dict[str, Any]]) -> list[dict[str, Any]]:
+    """手動実行から除外したケースの理由と移管先を保持する。"""
+    return [
+        {
+            "id": case_id,
+            "priority": item.get("priority", "P2"),
+            "replacement_refs": item.get("replacement_refs", []),
+            "placement_change_ref": item.get("placement_change_ref", ""),
+            "retired_reason": item.get("retired_reason", ""),
+        }
+        for case_id, item in results.items()
+        if item.get("result") == "retired"
+    ]
 
 
 def assess_residual_risks(
@@ -208,10 +243,15 @@ def assess_residual_risks(
         cases = list(reverse.get(risk_id, []))
         cases.extend(str(ref) for ref in risk.get("trace_to", []) if str(ref) in results)
         cases = list(dict.fromkeys(cases))
-        passed = bool(cases) and all(results[case].get("result") == "pass" for case in cases)
-        if risk.get("priority") in ("P0", "P1") and not passed:
+        primary_cases = [
+            case for case in cases if results[case].get("primary_view", "black") == "black"
+        ]
+        manual_work_complete = bool(primary_cases) and all(
+            results[case].get("result") in ("pass", "retired") for case in primary_cases
+        )
+        if risk.get("priority") in ("P0", "P1") and not manual_work_complete:
             blocking.append(risk_id)
-        elif risk.get("priority") in ("P2", "P3") and not passed:
+        elif risk.get("priority") in ("P2", "P3") and not manual_work_complete:
             residual.append(f"{risk_id}: {risk.get('scenario', '')}")
     return residual, blocking
 
@@ -232,12 +272,10 @@ def determine_gate_status(
         defect
         for defect in defects
         if defect.get("severity") in ("blocker", "critical", "high")
-        and defect.get("status", "open") == "open"
+        and defect.get("status", "open") in UNRESOLVED_STATES
     ]
     if severe:
         return "no_go", [f"Blocker/critical/high defects: {len(severe)}"], []
-    if counts["P0"]["total"] == 0:
-        return "no_go", ["P0 evidence is missing"], []
     for priority, key in (("P0", "p0_pass"), ("P1", "p1_pass")):
         rate = pass_rate(counts[priority])
         if rate < thresholds[key]:
@@ -248,10 +286,13 @@ def determine_gate_status(
             )
     if blocking_risks:
         return "no_go", [f"Blocking risks unresolved: {len(blocking_risks)}"], []
-    reasons = [
-        f"P0 pass rate: {pass_rate(counts['P0']):.1f}% "
-        f"({counts['P0']['pass']}/{counts['P0']['total']})"
-    ]
+    if counts["P0"]["total"]:
+        reasons = [
+            f'P0 pass rate: {pass_rate(counts["P0"]):.1f}% '
+            f'({counts["P0"]["pass"]}/{counts["P0"]["total"]})'
+        ]
+    else:
+        reasons = ["P0: not planned (N/A)"]
     if counts["P1"]["total"]:
         reasons.append(
             f"P1 pass rate: {pass_rate(counts['P1']):.1f}% "
@@ -266,7 +307,8 @@ def critical_open_assumptions(feature_spec: dict[str, Any] | None) -> list[str]:
     return [
         str(item.get("id", "UNKNOWN"))
         for item in feature_spec.get("assumptions", [])
-        if item.get("severity") == "critical" and item.get("resolution_status", "open") == "open"
+        if item.get("severity") == "critical"
+        and item.get("resolution_status", "open") != "resolved"
     ]
 
 
@@ -275,10 +317,14 @@ def automation_failures(
 ) -> list[str]:
     if automation is None:
         return ["automation evidence missing"]
+    try:
+        validate_finite_numbers(automation)
+    except SchemaValidationError as exc:
+        raise GateInputError(str(exc)) from exc
     if automation.get("feature_id") != feature_id or automation.get("build_id") != build_id:
         return ["automation evidence feature/build mismatch"]
     limits = GATE_THRESHOLDS[profile]
-    failures = []
+    failures = suite_failures(automation)
     if automation.get("coverage_scope") != limits["coverage_scope"]:
         failures.append(f"coverage_scope must be {limits['coverage_scope']}")
     if float(automation.get("coverage_percent", -1)) < limits["auto_coverage"]:
@@ -299,18 +345,18 @@ def automation_failures(
 def observation_rate(
     observations: dict[str, Any] | None, results: dict[str, dict[str, Any]]
 ) -> float:
-    if not observations:
-        return 0.0
+    if not observations or not observations.get("observations"):
+        raise GateInputError("Nonempty observations required for gate evaluation")
     required = {
         str(item.get("id"))
         for item in observations.get("observations", [])
-        if item.get("mandatory") is True
+        if item.get("mandatory") is True and item.get("view", "black") == "black"
     }
     if not required:
         return 100.0
     executed: set[str] = set()
     for result in results.values():
-        if result.get("result") in ("pass", "fail"):
+        if case_was_executed(result) and result.get("primary_view", "black") == "black":
             executed.update(str(ref) for ref in result.get("trace_to", []))
     return len(required & executed) / len(required) * 100
 
@@ -323,9 +369,18 @@ def valid_waivers(
     validate_schema(waiver_set, "waiver_set.schema.json")
     if waiver_set.get("feature_id") != feature_id or waiver_set.get("build_id") != build_id:
         raise GateInputError("waiver feature/build mismatch")
+    now = datetime.now(timezone.utc)
     for waiver in waiver_set.get("waivers", []):
-        if parse_timestamp(waiver["expires_at"], str(waiver["id"])) <= datetime.now(timezone.utc):
-            raise GateInputError(f"Expired waiver: {waiver['id']}")
+        approved_at = parse_timestamp(waiver["approved_at"], str(waiver["id"]))
+        expires_at = parse_timestamp(waiver["expires_at"], str(waiver["id"]))
+        if waiver["owner"].strip().casefold() == waiver["approver"].strip().casefold():
+            raise GateInputError(f'Waiver requires an independent approver: {waiver["id"]}')
+        if expires_at <= now:
+            raise GateInputError(f'Expired waiver: {waiver["id"]}')
+        if approved_at > now:
+            raise GateInputError(f'Waiver approval is in the future: {waiver["id"]}')
+        if approved_at >= expires_at:
+            raise GateInputError(f'Waiver approval must precede expiry: {waiver["id"]}')
     return list(waiver_set["waivers"])
 
 
@@ -352,12 +407,12 @@ def missing_mandatory_observations(
     required = {
         str(item.get("id"))
         for item in observations.get("observations", [])
-        if item.get("mandatory") is True
+        if item.get("mandatory") is True and item.get("view", "black") == "black"
     }
     executed = {
         str(reference)
         for result in results.values()
-        if result.get("result") in ("pass", "fail")
+        if case_was_executed(result) and result.get("primary_view", "black") == "black"
         for reference in result.get("trace_to", [])
     }
     return required - executed
@@ -387,7 +442,8 @@ def derive_waivable_conditions(
         failed_cases = [
             case_id
             for case_id, result in results.items()
-            if result.get("priority") == "P1" and result.get("result") != "pass"
+            if result.get("priority") == "P1"
+            and result.get("result") not in ("pass", "retired")
         ]
         risk_ids = set().union(
             *(risk_ids_for_case(case_id, results, risk_register) for case_id in failed_cases)
@@ -445,7 +501,7 @@ def derive_waivable_conditions(
     if p1_blocking:
         conditions["P1 blocking risks unresolved"] = p1_blocking
 
-    if profile in ("strict", "standard") and residual_risks:
+    if residual_risks:
         conditions[f"residual risks exceed {profile} profile"] = {
             risk.split(":", 1)[0] for risk in residual_risks
         }
@@ -484,20 +540,36 @@ def evaluate_gate(
     risk_register: dict[str, Any] | None = None,
 ) -> tuple[str, list[str], list[dict[str, Any]], list[str], float]:
     """Evaluate hard failures and risk-linked waivable release conditions."""
+    if not feature_spec or not feature_spec.get("acceptance_criteria"):
+        raise GateInputError("feature specification with acceptance_criteria required")
     limits = GATE_THRESHOLDS[profile]
-    p0_rate, p1_rate = pass_rate(counts["P0"]), pass_rate(counts["P1"])
+    if any("primary_view" in result for result in results.values()):
+        primary_results = {
+            case_id: result
+            for case_id, result in results.items()
+            if result.get("primary_view", "black") == "black"
+        }
+        primary_counts = count_results_by_priority(primary_results)
+    else:
+        # Historical direct callers supply precomputed counts without case
+        # definitions. Their counts already represent the primary manual set.
+        primary_counts = counts
+    p0_rate, p1_rate = pass_rate(primary_counts["P0"]), pass_rate(primary_counts["P1"])
     severe = [
         defect
         for defect in defects
         if defect.get("severity") in ("blocker", "critical", "high")
-        and defect.get("status", "open") == "open"
+        and defect.get("status", "open") in UNRESOLVED_STATES
     ]
     assumptions = critical_open_assumptions(feature_spec)
     obs_rate = observation_rate(observations, results)
     waivers = valid_waivers(waiver_set, feature_id, build_id)
 
     hard_failures = []
-    if counts["P0"]["total"] == 0:
+    p0_is_planned = any(
+        risk.get("priority") == "P0" for risk in (risk_register or {}).get("risks", [])
+    ) or any(result.get("priority") == "P0" for result in results.values())
+    if p0_is_planned and primary_counts["P0"]["total"] == 0:
         hard_failures.append("P0 evidence is missing")
     if p0_rate < limits["p0_pass"]:
         hard_failures.append(f"P0 pass rate {p0_rate:.1f}% < {limits['p0_pass']}%")
@@ -557,12 +629,13 @@ def generate_gate_decision(
     build_id: str | None = None,
     evidence_summary: dict[str, Any] | None = None,
     unmet_conditions: list[str] | None = None,
+    retired_cases: list[dict[str, Any]] | None = None,
 ) -> dict[str, Any]:
     gate: dict[str, Any] = {
         "feature_id": feature_id,
         "status": status,
         "profile": profile,
-        "reasons": reasons or ["Gate evaluation produced no supporting reason"],
+        "reasons": list(reasons) if reasons else ["Gate evaluation produced no supporting reason"],
     }
     optional = {
         "build_id": build_id,
@@ -571,8 +644,13 @@ def generate_gate_decision(
         "waivers": waivers or None,
         "residual_risks": residual_risks or None,
         "unmet_conditions": unmet_conditions or None,
+        "retired_cases": retired_cases or None,
     }
     gate.update({key: value for key, value in optional.items() if value is not None})
+    if retired_cases:
+        gate["reasons"].append(
+            f"Retired cases excluded from manual execution counts: {len(retired_cases)}"
+        )
     follow_up = [
         f"Monitor {defect.get('title', 'defect')} post-release"
         for defect in defects
@@ -591,6 +669,87 @@ def validate_schema(value: dict[str, Any], schema_name: str) -> None:
         validate_artifact(value, schema_name)
     except SchemaValidationError as exc:
         raise GateInputError(str(exc)) from exc
+
+
+def validate_coverage_contract(
+    test_model: dict[str, Any],
+    observations: dict[str, Any],
+    manual_cases: dict[str, Any],
+    feature_spec: dict[str, Any],
+) -> dict[str, int]:
+    """Validate design-population IDs and cross-artifact traceability."""
+    feature_id = feature_spec.get("feature_id")
+    for label, artifact in (
+        ("test model", test_model),
+        ("observations", observations),
+        ("manual cases", manual_cases),
+    ):
+        if artifact.get("feature_id") != feature_id:
+            raise GateInputError(f"{label} feature_id mismatch")
+
+    source_ids = {
+        str(item.get("id")) for item in feature_spec.get("source_refs", []) if item.get("id")
+    }
+    items = test_model.get("coverage_items", [])
+    item_ids = [str(item.get("id", "")) for item in items]
+    if len(item_ids) != len(set(item_ids)):
+        raise GateInputError("duplicate coverage item ID")
+    for item in items:
+        unknown_sources = {
+            str(ref.get("id")) for ref in item.get("source_refs", [])
+        } - source_ids
+        if unknown_sources:
+            raise GateInputError(
+                f"coverage source reference is undefined: {', '.join(sorted(unknown_sources))}"
+            )
+
+    observation_ids: list[str] = []
+    covered_items: set[str] = set()
+    for observation in observations.get("observations", []):
+        observation_id = str(observation.get("id", ""))
+        observation_ids.append(observation_id)
+        coverage_id = observation.get("coverage_item_id")
+        if coverage_id not in item_ids:
+            raise GateInputError(
+                f"observation {observation_id} has undefined coverage_item_id: {coverage_id}"
+            )
+        covered_items.add(str(coverage_id))
+    if len(observation_ids) != len(set(observation_ids)):
+        raise GateInputError("duplicate observation ID")
+
+    mandatory_items = {
+        str(item["id"])
+        for item in items
+        if item.get("mandatory") is True and item.get("applicability") == "applicable"
+    }
+    if mandatory_items - covered_items:
+        raise GateInputError(
+            "mandatory coverage items lack observations: "
+            + ", ".join(sorted(mandatory_items - covered_items))
+        )
+    traced_observations = {
+        str(reference)
+        for collection in ("manual_cases", "exploratory_charters")
+        for case in manual_cases.get(collection, [])
+        for reference in case.get("trace_to", [])
+        if str(reference) in set(observation_ids)
+    }
+    mandatory_observations = {
+        str(item["id"])
+        for item in observations.get("observations", [])
+        if item.get("mandatory") is True
+    }
+    if mandatory_observations - traced_observations:
+        raise GateInputError(
+            "mandatory coverage observations lack case trace: "
+            + ", ".join(sorted(mandatory_observations - traced_observations))
+        )
+    return {
+        "defined": len(items),
+        "mandatory": len(mandatory_items),
+        "observed": len(covered_items),
+        "case_traced": len(traced_observations),
+    }
 
 
 def first_matching(directory: Path, patterns: tuple[str, ...]) -> Path | None:
@@ -636,9 +795,11 @@ def create_parser() -> argparse.ArgumentParser:
     parser.add_argument("--risk", type=Path)
     parser.add_argument("--cases", type=Path)
     parser.add_argument("--feature", type=Path)
+    parser.add_argument("--model", type=Path)
     parser.add_argument("--observations", type=Path)
     parser.add_argument("--automation", type=Path)
     parser.add_argument("--waivers", type=Path)
+    parser.add_argument("--defects", type=Path)
     parser.add_argument("--build-id")
     parser.add_argument("--input", type=Path)
     parser.add_argument("--output", type=Path, required=True)
@@ -651,8 +812,9 @@ def main(argv: list[str] | None = None) -> int:
     args = create_parser().parse_args(argv)
     try:
         evidence_path, risk_path, cases_path = args.evidence, args.risk, args.cases
-        feature_path, observations_path = args.feature, args.observations
+        feature_path, model_path, observations_path = args.feature, args.model, args.observations
         automation_path, waivers_path = args.automation, args.waivers
+        defects_path = args.defects
         directory: Path | None = None
         if args.input:
             directory = args.input
@@ -679,6 +841,9 @@ def main(argv: list[str] | None = None) -> int:
             feature_path = feature_path or artifact_for_feature(
                 directory, ("*feature_spec*.json",), feature_id
             )
+            model_path = model_path or artifact_for_feature(
+                directory, ("*test_model*.json",), feature_id
+            )
             observations_path = observations_path or artifact_for_feature(
                 directory, ("*observation*.json",), feature_id
             )
@@ -688,20 +853,37 @@ def main(argv: list[str] | None = None) -> int:
             waivers_path = waivers_path or artifact_for_feature(
                 directory, ("*waiver*.json",), feature_id
             )
-        feature = load_json(feature_path) if feature_path else None
-        observations = load_json(observations_path) if observations_path else None
+            defects_path = defects_path or artifact_for_feature(
+                directory, ("*defect_register*.json",), feature_id
+            )
+        if feature_path is None:
+            raise GateInputError("Feature spec file required (--feature or --input)")
+        if model_path is None:
+            raise GateInputError("Test model file required (--model or --input)")
+        if observations_path is None:
+            raise GateInputError("Observation set file required (--observations or --input)")
+        feature = load_json(feature_path)
+        test_model = load_json(model_path)
+        observations = load_json(observations_path)
         automation = load_json(automation_path) if automation_path else None
         waiver_set = load_json(waivers_path) if waivers_path else None
+        defect_register = load_json(defects_path) if defects_path else None
         for artifact, schema_name, label in (
             (feature, "feature_spec.schema.json", "feature"),
+            (test_model, "test_model.schema.json", "model"),
             (observations, "observation_set.schema.json", "observations"),
             (automation, "automation_evidence.schema.json", "automation"),
             (waiver_set, "waiver_set.schema.json", "waivers"),
+            (defect_register, "defect_register.schema.json", "defects"),
         ):
             if artifact is not None:
                 validate_schema(artifact, schema_name)
                 if artifact.get("feature_id") != feature_id:
                     raise GateInputError(f"{label} feature_id mismatch")
+
+        coverage_summary = validate_coverage_contract(
+            test_model, observations, cases, feature
+        )
 
         raw_evidence = load_evidence_files(evidence_path)
         for item in raw_evidence:
@@ -710,11 +892,13 @@ def main(argv: list[str] | None = None) -> int:
                 "execution_evidence.schema.json",
             )
         evidence, build_id = validate_and_select_evidence(
-            raw_evidence, feature_id, args.build_id
+            raw_evidence, feature_id, args.build_id, cases, feature
         )
+        if defect_register is not None and defect_register.get("build_id") != build_id:
+            raise GateInputError("defect_register build_id mismatch")
         results = extract_case_results(evidence, cases)
         counts = count_results_by_priority(results)
-        defects = extract_open_defects(evidence)
+        defects = extract_open_defects(raw_evidence, defect_register)
         residual, blocking = assess_residual_risks(risks, results)
         status, reasons, waivers, unmet, obs_rate = evaluate_gate(
             feature_id=feature_id,
@@ -744,8 +928,16 @@ def main(argv: list[str] | None = None) -> int:
             evidence_summary={
                 "manual_by_priority": counts,
                 "mandatory_observation_rate": obs_rate,
+                "coverage_population": coverage_summary,
+                "manual_execution_results": [
+                    unit for result in results.values()
+                    for unit in result.get("execution_results", [])
+                ],
+                "open_defects": defects,
+                "automation_test_suites": (automation or {}).get("test_suites", []),
             },
             unmet_conditions=unmet,
+            retired_cases=extract_retired_cases(results),
         )
         validate_schema(gate, "gate_decision.schema.json")
         args.output.parent.mkdir(parents=True, exist_ok=True)

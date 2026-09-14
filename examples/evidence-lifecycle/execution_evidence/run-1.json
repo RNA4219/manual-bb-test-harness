@@ -1,0 +1,17 @@
+{
+  "feature_id": "EVIDENCE-LIFECYCLE",
+  "build_id": "build-1",
+  "run_id": "RUN-PASS",
+  "tc_id": "TC-1",
+  "timestamp": "2026-09-12T11:00:00Z",
+  "result": "pass",
+  "configuration_id": "android",
+  "env": "Android",
+  "case_revision": "case-rev-1",
+  "spec_revision": "spec-rev-1",
+  "oracle_revision": "oracle-rev-1",
+  "case_content_hash": "sha256:evidence-lifecycle-tc-1",
+  "oracle_refs": [
+    "AC-1"
+  ]
+}

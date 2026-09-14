@@ -2,7 +2,7 @@
   "id": "README.md",
   "role": "overview",
   "title": "Project Overview",
-  "summary": "AI-first entry point for manual-bb-test-harness. Contains Quick Start commands for validation (pytest, ruff, validate-artifact, validate-spec) and CLI usage examples (import, export, run forward-test). Includes task classifier table routing to HUB.codex.md, BLUEPRINT.md, RUNBOOK.md, and SKILL.md. Links to human-readme.md for human readers.",
+  "summary": "プロジェクトの概要、セットアップ、Skill の依頼例、Gate の最小実行例、目的別の文書案内。変更履歴・運用詳細は正本文書へ案内し、AI 向けナビゲーションは折りたたみにまとめる。",
   "public_api": [],
   "deps_out": [
     "HUB.codex.md",
@@ -12,5 +12,5 @@
   "deps_in": [],
   "risks": [],
   "tests": [],
-  "last_verified": "2026-07-12"
+  "last_verified": "2026-09-12"
 }

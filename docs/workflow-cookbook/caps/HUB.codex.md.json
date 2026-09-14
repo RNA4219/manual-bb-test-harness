@@ -2,7 +2,7 @@
   "id": "HUB.codex.md",
   "role": "navigation",
   "title": "AI Navigation Hub",
-  "summary": "Central routing table for AI agents. Lists all core documents (BLUEPRINT, RUNBOOK, GUARDRAILS, EVALUATION, SPEC) with their roles. Defines reading order for different use cases: skill execution, repo maintenance, artifact changes, mobile testing. Collects canonical document relationships to prevent duplication.",
+  "summary": "README・利用ガイド・設計・運用・品質基準・履歴の役割を整理し、Skill 実行、保守、artifact 変更、mobile、RanD 連携の読み順を示す。",
   "public_api": [],
   "deps_out": [
     "BLUEPRINT.md",
@@ -16,5 +16,5 @@
   ],
   "risks": [],
   "tests": [],
-  "last_verified": "2026-07-12"
+  "last_verified": "2026-09-12"
 }

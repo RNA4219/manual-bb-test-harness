@@ -1,0 +1,57 @@
+{
+  "feature_id": "MY-FEATURE",
+  "revision": "rand-52bf030be0fb07867f1458bac0a70bb5bc40c6a5298f65c015d81931f887c378",
+  "title": "RanD: rand:packet:save-research",
+  "summary": "RanD成果物からの設計入力。原文と上流判断はrand_intakeで追跡する。",
+  "acceptance_criteria": [
+    "保存操作後に結果ファイルが生成される"
+  ],
+  "source_refs": [
+    {
+      "id": "rand:REQ-1",
+      "kind": "memo",
+      "excerpt": "結果を保存できる",
+      "url": "file:///workspace/manual-bb-test-harness/examples/rand-integration/requirements_packet.json#requirement=rand%3AREQ-1"
+    },
+    {
+      "id": "UP-69dbb56822a9a55c9776",
+      "kind": "memo",
+      "excerpt": "EV-1"
+    },
+    {
+      "id": "AC-ad6569c69469f8882783",
+      "kind": "memo",
+      "excerpt": "保存操作後に結果ファイルが生成される",
+      "url": "file:///workspace/manual-bb-test-harness/examples/rand-integration/requirements_packet.json#requirement=rand%3AREQ-1"
+    },
+    {
+      "id": "rand:REQ-2",
+      "kind": "memo",
+      "excerpt": "保存履歴を使いやすくする",
+      "url": "file:///workspace/manual-bb-test-harness/examples/rand-integration/requirements_packet.json#requirement=rand%3AREQ-2"
+    }
+  ],
+  "assumptions": [
+    {
+      "id": "ASM-RAND-CANDIDATE",
+      "text": "R&D由来の要求・受入条件は候補。採用と期待結果の確定が未確認。",
+      "severity": "critical",
+      "resolution_status": "open",
+      "impact_on_coverage": "確定まで関連ケースのoracleとGate判断を保留する。"
+    },
+    {
+      "id": "ASM-AC-e101b8dfca95c1c6",
+      "text": "rand:REQ-2: 受入条件が未記載。期待結果を確定する。",
+      "severity": "critical",
+      "resolution_status": "open",
+      "impact_on_coverage": "確定まで関連ケースのoracleとGate判断を保留する。"
+    },
+    {
+      "id": "ASM-RAND-CONTEXT",
+      "text": "対象環境・役割・状態・依存関係を補足し、回帰範囲を確認する。",
+      "severity": "medium",
+      "resolution_status": "open",
+      "impact_on_coverage": "確定まで関連ケースのoracleとGate判断を保留する。"
+    }
+  ]
+}

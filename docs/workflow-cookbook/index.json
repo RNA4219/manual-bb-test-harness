@@ -1,14 +1,14 @@
 {
   "version": "2.0.0",
-  "generated_at": "2026-07-11T15:12:57.518101+00:00",
+  "generated_at": "2026-09-14T00:39:49.022689+00:00",
   "description": "manual-bb-test-harness Workflow Cookbook Knowledge Map",
   "metadata": {
     "repo": "manual-bb-test-harness",
     "tier": 3,
-    "last_updated": "2026-07-12",
-    "total_nodes": 33,
-    "total_edges": 45,
-    "total_capsules": 33
+    "last_updated": "2026-09-14",
+    "total_nodes": 34,
+    "total_edges": 48,
+    "total_capsules": 34
   },
   "nodes": [
     {
@@ -16,14 +16,14 @@
       "path": "./README.md",
       "role": "overview",
       "title": "Project Overview",
-      "description": "AI-first entry point with task classifier and quick start"
+      "description": "プロジェクトの概要、セットアップ、Skill の依頼例、Gate の最小実行例、目的別の文書案内。変更履歴・運用詳細は正本文書へ案内し、AI 向けナビゲーションは折りたたみにまとめる。"
     },
     {
       "id": "HUB.codex.md",
       "path": "./HUB.codex.md",
       "role": "navigation",
       "title": "AI Navigation Hub",
-      "description": "Document routing and reading order for AI agents"
+      "description": "README・利用ガイド・設計・運用・品質基準・履歴の役割を整理し、Skill 実行、保守、artifact 変更、mobile、RanD 連携の読み順を示す。"
     },
     {
       "id": "BLUEPRINT.md",
@@ -37,7 +37,7 @@
       "path": "./RUNBOOK.md",
       "role": "operations",
       "title": "Runbook",
-      "description": "Execution procedures, validation commands, update rules"
+      "description": "CLI の操作、RanD 取り込み、全体検証、Gate 入力・構成計画・欠陥台帳・独立承認・移行条件、障害切り分け、配布前検証を集約した運用手順。過去の検証結果は CHANGELOG と検収記録を参照する。"
     },
     {
       "id": "GUARDRAILS.md",
@@ -65,7 +65,7 @@
       "path": "./CHANGELOG.md",
       "role": "history",
       "title": "Changelog",
-      "description": "Version history in Keep a Changelog format"
+      "description": "リリースごとの変更履歴。Unreleased は追加・変更・修正に分類し、ISTQB と RanD の検証記録への参照を保持する。"
     },
     {
       "id": "AGENTS.md",
@@ -155,8 +155,8 @@
       "id": "docs/human-readme.md",
       "path": "./docs/human-readme.md",
       "role": "overview",
-      "title": "Human README",
-      "description": "Project overview and usage for human readers"
+      "title": "利用ガイド",
+      "description": "入力の準備、Skill への依頼、設計結果の確認、注文・権限・モバイルのサンプル、forward-test と用語を説明する利用ガイド。セットアップは README、検証・障害対応は RUNBOOK を参照する。"
     },
     {
       "id": "docs/improvement-notes.md",
@@ -241,6 +241,13 @@
       "role": "reference",
       "title": "Failure Modes",
       "description": "Common failure modes and review questions for skill output quality"
+    },
+    {
+      "id": "skills/manual-bb-test-harness/references/rand-integration.md",
+      "path": "./skills/manual-bb-test-harness/references/rand-integration.md",
+      "role": "reference",
+      "title": "RanD Integration",
+      "description": "R&D成果物と文書差分・欠陥台帳をテスト設計へ渡す"
     }
   ],
   "edges": [
@@ -468,6 +475,21 @@
       "from": "skills/manual-bb-test-harness/references/failure-modes.md",
       "to": "skills/manual-bb-test-harness/references/case-design-policy.md",
       "type": "supplements"
+    },
+    {
+      "from": "README.md",
+      "to": "skills/manual-bb-test-harness/references/rand-integration.md",
+      "type": "references"
+    },
+    {
+      "from": "skills/manual-bb-test-harness/SKILL.md",
+      "to": "skills/manual-bb-test-harness/references/rand-integration.md",
+      "type": "references"
+    },
+    {
+      "from": "skills/manual-bb-test-harness/references/artifact-contract.md",
+      "to": "skills/manual-bb-test-harness/references/rand-integration.md",
+      "type": "references"
     }
   ]
 }

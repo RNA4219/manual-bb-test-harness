@@ -1,19 +1,115 @@
 {
   "feature_id": "ORD-CANCEL-01",
-  "build_id": "web-1.42.0+1289",
   "status": "no_go",
   "profile": "standard",
-  "reasons": ["P1 case TC-003 is untested", "automation evidence is required"],
+  "reasons": [
+    "mandatory observation execution 66.7% < 95%",
+    "waiver missing for risks: RISK-03",
+    "Retired cases excluded from manual execution counts: 1"
+  ],
+  "build_id": "web-1.42.0+1289",
   "evidence_summary": {
     "manual_by_priority": {
-      "P0": {"pass": 1, "fail": 0, "skip": 0, "blocked": 0, "unknown": 0, "untested": 0, "total": 1},
-      "P1": {"pass": 1, "fail": 0, "skip": 1, "blocked": 0, "unknown": 0, "untested": 1, "total": 2},
-      "P2": {"pass": 1, "fail": 0, "skip": 0, "blocked": 0, "unknown": 0, "untested": 0, "total": 1},
-      "P3": {"pass": 0, "fail": 0, "skip": 0, "blocked": 0, "unknown": 0, "untested": 0, "total": 0}
+      "P0": {
+        "pass": 1,
+        "fail": 0,
+        "skip": 0,
+        "blocked": 0,
+        "unknown": 0,
+        "untested": 0,
+        "total": 1
+      },
+      "P1": {
+        "pass": 1,
+        "fail": 0,
+        "skip": 0,
+        "blocked": 0,
+        "unknown": 0,
+        "untested": 0,
+        "total": 1
+      },
+      "P2": {
+        "pass": 1,
+        "fail": 0,
+        "skip": 0,
+        "blocked": 0,
+        "unknown": 0,
+        "untested": 0,
+        "total": 1
+      },
+      "P3": {
+        "pass": 0,
+        "fail": 0,
+        "skip": 0,
+        "blocked": 0,
+        "unknown": 0,
+        "untested": 0,
+        "total": 0
+      }
     },
-    "mandatory_observation_rate": 75
+    "mandatory_observation_rate": 66.66666666666666,
+    "manual_execution_results": [
+      {
+        "case_id": "TC-001",
+        "result": "pass",
+        "run_id": "RUN-2026-05-04-001",
+        "env": "stg",
+        "device": "iPhone 15 / iOS 18.4",
+        "network_profile": "4g-lossy",
+        "timestamp": "2026-05-04T10:00:00+09:00"
+      },
+      {
+        "case_id": "TC-002",
+        "result": "pass",
+        "run_id": "RUN-2026-05-04-002",
+        "env": "stg",
+        "device": "iPhone 15 / iOS 18.4",
+        "network_profile": "4g-lossy",
+        "timestamp": "2026-05-04T10:15:00+09:00"
+      },
+      {
+        "case_id": "CHARTER-001",
+        "result": "pass",
+        "run_id": "RUN-2026-05-04-003",
+        "env": "stg",
+        "device": "iPhone 15 / iOS 18.4",
+        "network_profile": "4g-lossy",
+        "timestamp": "2026-05-04T10:30:00+09:00"
+      }
+    ],
+    "open_defects": [],
+    "automation_test_suites": [
+      {
+        "suite_id": "example-regression",
+        "status": "passed",
+        "total": 2,
+        "passed": 2,
+        "failed": 0,
+        "errors": 0,
+        "skipped": 0,
+        "source_refs": [
+          {
+            "id": "EXAMPLE-REQUIRED-SUITE",
+            "kind": "auto_test",
+            "excerpt": "説明用の架空suite実績。実行証跡ではない。"
+          }
+        ]
+      }
+    ]
   },
-  "blocking_risks": ["RISK-03"],
-  "unmet_conditions": ["P1 pass rate below standard threshold", "automation evidence missing"],
-  "required_follow_up": ["Execute TC-003 and attach automation evidence"]
+  "unmet_conditions": [
+    "mandatory observation execution 66.7% < 95%",
+    "waiver missing for risks: RISK-03"
+  ],
+  "retired_cases": [
+    {
+      "id": "TC-003",
+      "priority": "P1",
+      "replacement_refs": [
+        "hate:AETE-COUPON-RESTORE-001"
+      ],
+      "placement_change_ref": "qeg:PLC-ORD-CANCEL-20260702-001",
+      "retired_reason": "QEG placement changeで自動統合テストへ移管済み"
+    }
+  ]
 }

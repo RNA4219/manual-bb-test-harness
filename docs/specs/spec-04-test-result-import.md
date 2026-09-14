@@ -40,7 +40,7 @@ TestRail/Xrayから実行結果をインポートし、execution_evidence.json�
 | R3.1 | execution_evidence.json形式出力 | P0 |
 | R3.2 | 複数run結果を配列出力 | P0 |
 | R3.3 | tc_id/charter_id mapping | P0 |
-| R3.4 | defect_stub生成（fail時） | P1 |
+| R3.4 | 欠陥ID単位のdefects配列と互換stub生成（fail時） | P1 |
 
 ### R4: 設定・認証
 
@@ -58,21 +58,38 @@ TestRail/Xrayから実行結果をインポートし、execution_evidence.json�
 ```
 TestRail API                        execution_evidence.json
 ────────────────────────────────────────────────────────────────
-GET /get_test/{test_id}            → run_id, tc_id
-  .status_id                       → result
+GET /get_tests/{run_id}            → 各テストの run_id, tc_id
+  .tests[].status_id               → result
     1=passed    → pass
     2=blocked   → blocked  
     3=untested  → skip
-    4=failed    → fail
-    5=retest    → skip
+    4=retest    → skip
+    5=failed    → fail
     
-  .assigned_to_id                  → tester (lookup user)
+  .tests[].assigned_to_id          → tester (lookup user)
+
+GET /get_results/{test_id}         → 最新結果1件（results[0]）
   .custom_fields                   → device, env, network_profile
   .elapsed                         → time_spent_minutes
-  . defects[]                      → defect_stub
+  .defects[]                       → defects[] / defect_stub（先頭互換）
   
-GET /get_attachments/{test_id}     → attachments[]
+GET /get_attachments/{test_id}     → attachments[]（将来要件・未実装）
 ```
+
+標準ステータス ID は [TestRail Statuses API](https://support.testrail.com/hc/en-us/articles/7077935129364-Statuses) に従う。
+Retest を `skip` へ変換するのは本ツールの証跡形式への対応であり、再テスト完了を意味しない。
+
+`get_tests` は `tests` 配列を含むページ応答を読み、`_links.next` がなくなるまで同じ run の全ページを取得する。
+次ページは同じ API endpoint の相対リンクだけを受け入れ、循環リンクはエラーとする。
+`get_results` は `results` 配列を含む応答を読み、API が新しい順に返す先頭1件を採用する。
+両 API とも旧形式の配列応答を許容する。
+詳細は [Tests API](https://support.testrail.com/hc/en-us/articles/7077990441108-Tests) と
+[Results API](https://support.testrail.com/hc/en-us/articles/7077819312404-Results) を参照。
+
+通信失敗、JSON 解析失敗、想定外の応答構造は取り込みエラーとして中断する。
+全テストと必要な結果詳細の取得が成功した後に証跡を書き出し、取得途中の失敗では既存の出力を変更しない。
+正常な空の結果配列は許容する。担当ユーザー名の取得失敗時は、従来どおりユーザー ID で代替する。
+この中断・出力方針は本ツールの契約である。
 
 ### Xray API Mapping
 
@@ -90,111 +107,49 @@ GET /testexec/{exec_key}/tests     → run_id, tc_id
   .executed_by                     → tester
   .startedOn/finishedOn            → timestamp
   .testRun.evidences[]              → attachments[]
-  .testRun.defects[]               → defect_stub
+  .testRun.defects[]               → defects[] / defect_stub（先頭互換）
   
 GET /test/{test_key}               → oracle_refs, trace_to
 ```
 
 ### import-testrail.py設計
 
+変換の正本は`src/bb_harness/tools/import_testrail.py`。以下は取得済みの説明用データを変換する例で、APIへの接続は行わない。
+
 ```python
-"""Import TestRail test results to execution_evidence format.
+from bb_harness.tools.import_testrail import convert_to_execution_evidence
 
-Usage:
-    python scripts/import-testrail.py --project <id> --run <id> --output <dir>
-    python scripts/import-testrail.py --project <id> --date-range <start> <end> --output <dir>
-
-Environment:
-    TESTRAIL_URL: https://example.testrail.io
-    TESTRAIL_USER: username
-    TESTRAIL_API_KEY: API token
-
-Example:
-    python scripts/import-testrail.py \
-        --project 12 \
-        --run 1234 \
-        --output examples/artifacts/execution_evidence/
-"""
-
-def import_testrail_results(project_id: int, run_id: int) -> list[dict]:
-    """Fetch TestRail results and convert to execution_evidence."""
-    results = []
-    
-    # Fetch tests in run
-    tests = get_tests(run_id)
-    
-    for test in tests:
-        evidence = {
-            "run_id": f"TR-RUN-{run_id}-{test['id']}",
-            "tc_id": map_tc_id(test['case_id']),  # Map to TC-XXX
-            "feature_id": map_feature_id(test['case_id']),
-            "tester": get_username(test['assigned_to_id']),
-            "result": map_status(test['status_id']),
-            ...
-        }
-        
-        # Add defect if failed
-        if evidence['result'] == 'fail':
-            defects = get_test_defects(test['id'])
-            if defects:
-                evidence['defect_stub'] = {
-                    'title': defects[0]['title'],
-                    'severity': map_severity(defects[0]['priority_id'])
-                }
-        
-        results.append(evidence)
-    
-    return results
+evidence = convert_to_execution_evidence(
+    {"id": 100, "case_id": 42, "status_id": 5},
+    {"defects": ["BUG-1", "BUG-2"]},
+    tester_name="qa",
+    run_id=1234,
+    feature_id="ORDER-CANCEL",
+)
+assert evidence["result"] == "fail"
+assert [item["defect_id"] for item in evidence["defects"]] == ["BUG-1", "BUG-2"]
 ```
 
 ### import-xray.py設計
 
+変換の正本は`src/bb_harness/tools/import_xray.py`。
+
 ```python
-"""Import Xray test results to execution_evidence format.
+from bb_harness.tools.import_xray import convert_to_execution_evidence
 
-Usage:
-    python scripts/import-xray.py --exec <key> --output <dir>
-    python scripts/import-xray.py --project <key> --date-range <start> <end> --output <dir>
-
-Environment:
-    JIRA_URL: https://example.atlassian.net
-    JIRA_USER: username
-    JIRA_API_KEY: API token
-
-Example:
-    python scripts/import-xray.py \
-        --exec PROJ-TE-123 \
-        --output examples/artifacts/execution_evidence/
-"""
-
-def import_xray_results(exec_key: str) -> list[dict]:
-    """Fetch Xray results and convert to execution_evidence."""
-    results = []
-    
-    # Fetch test execution
-    exec_data = get_test_execution(exec_key)
-    
-    for testrun in exec_data['tests']:
-        evidence = {
-            "run_id": f"XRAY-{exec_key}-{testrun['test']['key']}",
-            "tc_id": testrun['test']['key'],  # Jira test issue key
-            "feature_id": map_feature_id(testrun['test']['key']),
-            "tester": testrun['executed_by'],
-            "result": map_xray_status(testrun['status']),
-            ...
-        }
-        
-        # Add defect if failed
-        if evidence['result'] == 'fail' and testrun.get('defects'):
-            evidence['defect_stub'] = {
-                'title': get_jira_issue_title(testrun['defects'][0]),
-                'severity': map_jira_priority(testrun['defects'][0])
-            }
-        
-        results.append(evidence)
-    
-    return results
+evidence = convert_to_execution_evidence(
+    {"status": "FAIL", "defects": ["BUG-1", "BUG-2"]},
+    exec_key="QA-EXEC-1",
+    test_key="QA-TEST-1",
+    feature_id="ORDER-CANCEL",
+)
+assert evidence["result"] == "fail"
+assert [item["defect_id"] for item in evidence["defects"]] == ["BUG-1", "BUG-2"]
 ```
+
+両importerともfailで受領した全欠陥IDを`defects[]`へ保持し、先頭を互換用`defect_stub`にも出す。重複IDは除き、文字列の場合はカンマ区切りも受け付ける。欠陥の重大度は従来どおり既定high、状態はopen。
+
+importは受領した実行結果の変換であり、外部trackerの全未解決欠陥を自動同期する機能ではない。継続する欠陥と解決確認は`defect_register`で管理し、履歴・確認証跡とともにGateへ渡す。詳しくは[artifact契約](../../skills/manual-bb-test-harness/references/artifact-contract.md#実行構成と欠陥履歴)を参照。
 
 ## インターフェース
 
@@ -228,7 +183,7 @@ python scripts/import-testrail.py \
 
 # Gate判定連携
 python scripts/import-testrail.py --project 12 --run 1234 --output /tmp/
-python scripts/evaluate-gate.py --input /tmp/ --risk risk.json --cases cases.json --output gate.json
+python scripts/evaluate-gate.py --evidence /tmp/ --risk risk.json --cases cases.json --feature feature.json --observations observations.json --automation automation.json --defects defects.defect_register.json --output gate.json
 ```
 
 ### 出力ファイル構造

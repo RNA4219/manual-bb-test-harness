@@ -152,6 +152,30 @@ def smoke_artifact(artifact: Path, root: Path) -> None:
             ],
         ]
     )
+    commands.extend(
+        [
+            [
+                cli,
+                "import",
+                "rand",
+                "--input",
+                str(REPO_ROOT / "examples/rand-integration/requirements_packet.json"),
+                "--output",
+                str(work / "rand-candidates"),
+            ],
+            [
+                cli,
+                "import",
+                "rand",
+                "--input",
+                str(REPO_ROOT / "examples/rand-integration/requirements_document.json"),
+                "--diff",
+                str(REPO_ROOT / "examples/rand-integration/requirements_diff.json"),
+                "--output",
+                str(work / "rand-document"),
+            ],
+        ]
+    )
     for command in commands:
         run(command, work)
 
