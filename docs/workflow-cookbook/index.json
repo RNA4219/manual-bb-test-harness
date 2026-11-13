@@ -1,11 +1,11 @@
 {
   "version": "4.1.1",
-  "generated_at": "2026-09-14T01:34:02.835908+00:00",
+  "generated_at": "2026-11-13T02:33:52.070103+00:00",
   "description": "manual-bb-test-harness Workflow Cookbook Knowledge Map",
   "metadata": {
     "repo": "manual-bb-test-harness",
     "tier": 3,
-    "last_updated": "2026-09-14",
+    "last_updated": "2026-11-13",
     "total_nodes": 34,
     "total_edges": 48,
     "total_capsules": 34
@@ -25,7 +25,7 @@
       "role": "navigation",
       "title": "AI Navigation Hub",
       "description": "README・利用ガイド・設計・運用・品質基準・履歴の役割を整理し、Skill 実行、保守、artifact 変更、mobile、RanD 連携の読み順を示す。",
-      "summary": "README・利用ガイド・設計・運用・品質基準・履歴の役割と、Skill、保守、artifact、mobile、RanD、Local Mode、技法別被覆、要件信頼度の読み順を示す。"
+      "summary": "README・利用ガイド・設計・運用・品質基準・履歴の役割と、Skill、保守、artifact、mobile、RanD、Local Mode、技法別被覆、要件信頼度の読み順を示す。 実施の仕分け・脆弱性の観点・リスク表の検算の読み順を含む。"
     },
     {
       "id": "BLUEPRINT.md",
@@ -40,7 +40,7 @@
       "role": "operations",
       "title": "Runbook",
       "description": "CLI の操作、RanD 取り込み、全体検証、Gate 入力・構成計画・欠陥台帳・独立承認・移行条件、障害切り分け、配布前検証を集約した運用手順。過去の検証結果は CHANGELOG と検収記録を参照する。",
-      "summary": "CLI と外部連携、RanD、Local Mode、検証、Gate 入力・構成計画・欠陥台帳・承認・移行、障害対応、配布前検証の操作手順。生成予算・被覆・要件信頼度の詳細契約と過去の検証記録へ案内する。"
+      "summary": "CLI と外部連携、RanD、Local Mode、検証、Gate 入力・構成計画・欠陥台帳・承認・移行、障害対応、配布前検証の操作手順。生成予算・被覆・要件信頼度の詳細契約と過去の検証記録へ案内する。 Markdown のリスク表の検算（check risk）と、pwsh が無い環境での検証の扱いを含む。"
     },
     {
       "id": "GUARDRAILS.md",
@@ -69,7 +69,7 @@
       "role": "history",
       "title": "Changelog",
       "description": "リリースごとの変更履歴。Unreleased は追加・変更・修正に分類し、ISTQB と RanD の検証記録への参照を保持する。",
-      "summary": "リリースごとの変更履歴。Unreleased の追加・変更・修正、4.1.1 までの既存リリース、検収記録と未達条件への参照を保持する。"
+      "summary": "リリースごとの変更履歴。Unreleased の追加・変更・修正、4.1.1 までの既存リリース、検収記録と未達条件への参照を保持する。 Unreleased に、リスク表の検算、SKILL.md の仕事ごとの並べ直し、実施の仕分け、脆弱性の pack を記録。"
     },
     {
       "id": "AGENTS.md",

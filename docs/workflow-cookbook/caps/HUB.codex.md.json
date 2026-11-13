@@ -2,7 +2,7 @@
   "id": "HUB.codex.md",
   "role": "navigation",
   "title": "AI Navigation Hub",
-  "summary": "README・利用ガイド・設計・運用・品質基準・履歴の役割と、Skill、保守、artifact、mobile、RanD、Local Mode、技法別被覆、要件信頼度の読み順を示す。",
+  "summary": "README・利用ガイド・設計・運用・品質基準・履歴の役割と、Skill、保守、artifact、mobile、RanD、Local Mode、技法別被覆、要件信頼度の読み順を示す。 実施の仕分け・脆弱性の観点・リスク表の検算の読み順を含む。",
   "public_api": [],
   "deps_out": [
     "BLUEPRINT.md",
@@ -19,5 +19,5 @@
   ],
   "risks": [],
   "tests": [],
-  "last_verified": "2026-09-14"
+  "last_verified": "2026-11-13"
 }

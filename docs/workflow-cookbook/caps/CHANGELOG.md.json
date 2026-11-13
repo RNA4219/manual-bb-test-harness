@@ -2,7 +2,7 @@
   "id": "CHANGELOG.md",
   "role": "history",
   "title": "Changelog",
-  "summary": "リリースごとの変更履歴。Unreleased の追加・変更・修正、4.1.1 までの既存リリース、検収記録と未達条件への参照を保持する。",
+  "summary": "リリースごとの変更履歴。Unreleased の追加・変更・修正、4.1.1 までの既存リリース、検収記録と未達条件への参照を保持する。 Unreleased に、リスク表の検算、SKILL.md の仕事ごとの並べ直し、実施の仕分け、脆弱性の pack を記録。",
   "deps_out": [
     "skills/manual-bb-test-harness/references/requirements-confidence.md"
   ],
@@ -12,5 +12,5 @@
   ],
   "risks": [],
   "tests": [],
-  "last_verified": "2026-09-14"
+  "last_verified": "2026-11-13"
 }

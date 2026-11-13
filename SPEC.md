@@ -2,6 +2,10 @@
 
 現行リリース系列: **4.1.1**。以下の追加契約は未リリース。変更履歴は [CHANGELOG](CHANGELOG.md)を参照。
 
+## リスク表の検算（2026-11-13）
+
+`check risk`を追加。Markdownのリスク表のI・L・補正から点数と優先度を計算し直し、書かれた値と比べる。欠けた補正を0で補わず、検算できない行として終了コード2にする。詳細は[リスクとGateの方針](skills/manual-bb-test-harness/references/risk-and-gate-policy.md#点数の検算)。
+
 ## RanD連携（2026-09-12）
 
 `import rand`と`rand_intake`を追加。R&D候補の未承認状態、文書差分の全体回帰範囲、欠陥台帳の履歴を保持してテスト設計へ引き継ぐ。詳細は[連携仕様](docs/tasks/task-rand-integration-20260912.md)。

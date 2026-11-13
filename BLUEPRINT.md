@@ -2,8 +2,8 @@
 intent_id: INT-MBB-001
 owner: manual-bb-test-harness
 status: active
-last_reviewed_at: 2026-05-16
-next_review_due: 2026-10-11
+last_reviewed_at: 2026-11-13
+next_review_due: 2027-02-12
 ---
 
 # Blueprint
@@ -26,6 +26,8 @@ Web だけでなく iOS / Android も対象に含めるため、mobile 固有の
   - Web / API / iOS / Android をまたぐ対象環境差分
   - TestRail / Xray / Notion 連携用の export / import 補助
   - OpenAI互換のllama.cpp / LM Studioを使う明示的なlocal-design経路
+  - Markdown の設計書のリスク表を式で検算する `check risk`
+  - 手動ケースの実施の仕分け（LLM と手動）と、脆弱性の観点からの観点・ケース化
 - Out:
   - 実機クラウドや MDM など mobile 実行基盤の構築
   - 自動テストフレームワークそのものの実装
@@ -43,6 +45,8 @@ Web だけでなく iOS / Android も対象に含めるため、mobile 固有の
 - mobile 対象では `platform_matrix` を必須 lens として扱う。
 - golden は厳密 snapshot ではなく review anchor として扱う。
 - local modelは意味候補の生成器であり、risk/effort算術とGate権限はhostが持つ。
+- Skill を読んで直接書く設計書でも、リスクの点数は `check risk` で検算する。
+- LLM が実施した結果は手動の実行結果として扱い、自動証跡と補正 A には数えない。
 - local endpointは既定でloopbackに限定し、artifact repairは1段階につき最大1回とする。
 
 ## 4. I/O Contract

@@ -9,7 +9,8 @@
 
 ```
 examples/
-└── artifacts/       # JSON artifact example files
+├── artifacts/       # JSON artifact example files
+└── markdown/        # Markdown の検算の例
 ```
 
 ## artifacts/ の内容
@@ -27,6 +28,12 @@ examples/
 | `order-cancel-partial.feature_spec.json` | spec-ingest の取り込み例 |
 | `gate_decision_new.json` | evaluate-gate の出力例 |
 | `test_spec.feature_spec.json` | spec-ingest の生成例 |
+
+## markdown/ の内容
+
+| file | 用途 |
+|---|---|
+| `order-cancel.risk-table.md` | `bb-harness check risk` が終了コード 0 になるリスク表の例 |
 
 ## 使い方
 

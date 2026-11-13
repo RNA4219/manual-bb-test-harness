@@ -2,7 +2,7 @@
   "id": "skills/manual-bb-test-harness/SKILL.md",
   "role": "skill",
   "title": "Skill Definition",
-  "summary": "Main skill execution flow. Generates manual test design artifacts from specifications: observations, risks, priorities, test cases, effort estimates, gate decisions, Go/No-Go brief. References artifact-contract.md for I/O schema, case-design-policy.md for test design principles, risk-and-gate-policy.md for classification. Uses goldens/ as review anchors. Supports mobile platform pack and domain packs (EC, finance, SaaS RBAC). 型付き技法・被覆検証・非破壊移行はtechnique-coverage.mdを参照。 compact生成、予算・usage、証跡版の契約はefficient-generation.mdを参照。 要件定義信頼度・要確認集計・根拠付き再評価はrequirements-confidence.mdとspec-07を参照。",
+  "summary": "Main skill execution flow. Generates manual test design artifacts from specifications: observations, risks, priorities, test cases, effort estimates, gate decisions, Go/No-Go brief. References artifact-contract.md for I/O schema, case-design-policy.md for test design principles, risk-and-gate-policy.md for classification. Uses goldens/ as review anchors. Supports mobile platform pack and domain packs (EC, finance, SaaS RBAC). 型付き技法・被覆検証・非破壊移行はtechnique-coverage.mdを参照。 compact生成、予算・usage、証跡版の契約はefficient-generation.mdを参照。 要件定義信頼度・要確認集計・根拠付き再評価はrequirements-confidence.mdとspec-07を参照。 2026-11-13 に仕事ごとの節（テスト設計、Gate、Ready と要件定義の信頼度、RanD連携、技法被覆と Local Mode、Skill の評価）へ並べ直し、冒頭に仕事の入口の表を置いた。実施の仕分けは execution-routing.md、脆弱性の観点は security-pack.md、ひな形・軽い版・レビューの形は output-templates.md を参照。",
   "public_api": [
     "skill execution",
     "artifact generation"
@@ -26,5 +26,5 @@
     "goldens/order-cancel.expected.md",
     "goldens/mobile-session-resume.expected.md"
   ],
-  "last_verified": "2026-09-14"
+  "last_verified": "2026-11-13"
 }

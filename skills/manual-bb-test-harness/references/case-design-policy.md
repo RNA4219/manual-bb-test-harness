@@ -28,6 +28,7 @@ Treat observation extraction as coverage item discovery. Do not jump directly fr
 7. For mobile targets, extract platform candidates from OS, app lifecycle, install/update state, notification entry, permission state, and network condition.
 8. Mark each coverage item as mandatory or optional before synthesizing cases.
 9. Record each quality lens as applicable or not applicable. Give applicable lenses an oracle and owner; give excluded lenses a reason and owner.
+10. When the security lens applies, or a vulnerability finding is given, use [security-pack.md](security-pack.md) to derive observations and to route each finding.
 
 Minimum `test_model` coverage items:
 
@@ -69,6 +70,8 @@ Minimum `test_model` coverage items:
 
 Scripted case requires `oracle.type` and `oracle.refs`. If no acceptable oracle exists, create an exploratory charter or a blocker instead.
 
+実装から読んだ動きを `derived` にするときは、下の「`[要確認]` の仕分け」に従い、追認待ちと書く。
+
 ## Multi-run merge
 
 Merge independently derived observations by stable ID and preserve `support_count` and total `run_count`. Use support as a review and confidence signal. Keep mandatory and priority decisions grounded in acceptance criteria, business rules, and product risk; a critical observation found in only one run stays mandatory when its source requires it.
@@ -106,6 +109,16 @@ those boundaries uses `-1, 0, 1, 2, 99, 100, 101, 102`; duplicate points may be
 merged after recording which boundaries they cover. For dates, decimals, and ordered
 states, use the declared step instead of applying a numeric `+/-1` mechanically.
 
+## 自動テストと重なる観点
+
+既存の自動テストがある変更では、ケースを作る前に自動テストを読み、同じ振る舞いを観測している観点を手動ケースから外す。自動テストの証跡は black-box の受け入れを置き換えないので、次の条件を守る。
+
+- 外すのは、自動テストの本文で、同じ入力・条件・期待結果を観測していると確かめた観点だけ。テストの名前や件数だけで外さない。自動テストを読めないとき、根拠を示せないときは外さない。
+- 外した観点、根拠（テストのファイルと行、テスト名）、手動に残したものを、出力の冒頭の表に書く。
+- 外した観点のリスクは、補正 A にその根拠を書く。根拠のない A を付けない。
+- 優先度が P0 の観点の主経路は、自動テストがあっても手動の scripted case を残す。
+- 手動には、自動テストが観測していないものを残す。実際の画面や端末での挙動、外部や他システムへ実際に届いた値、目視でしか判定できない結果など。
+
 ## Case Quality Bar
 
 A manual scripted case is acceptable only when it has:
@@ -119,6 +132,8 @@ A manual scripted case is acceptable only when it has:
 
 If a case is useful but lacks an oracle, convert it to an exploratory charter and label the open question.
 
+ケースの優先度をリスクより上げる・下げるときの決まりは、[risk-and-gate-policy.md](risk-and-gate-policy.md#ケースの優先度と昇格) に従う。
+
 ## Missing Information
 
 Classify sufficiency as:
@@ -128,3 +143,23 @@ Classify sufficiency as:
 - `blocked`: critical rule oracle, permission matrix, state model, or change scope is missing.
 
 Keep `[要確認]` in titles or notes for assumptions that affect coverage, expected results, or gate readiness.
+
+### `[要確認]` の仕分け
+
+`[要確認]` を質問に回す前に、1 件ずつ次の 4 つに分ける。分けた結果と、根拠（出典の場所と引用）を残す。
+
+| 分け方 | 扱い |
+|---|---|
+| 資料で決まる | 入力の資料に答えがある。期待結果を書き、`[要確認]` を外す |
+| 書き方で解ける | 期待結果の書き方を変えれば、決まっていない点に頼らずに判定できる。書き直して `[要確認]` を外す |
+| 実装だけが示す | 資料に記載が無く、実装の動きだけが分かる。実装の動きを仮の期待結果にする |
+| 質問する | 上の 3 つに当たらない。未決事項の表に載せ、`[要確認]` は残す |
+
+- 実装だけが示すものは、oracle の種類を `derived` とし、根拠に実装の場所を書く。期待結果に「実装どおり・追認待ち」と、追認する人を書く。実装が要件や仕様と食い違うときは、この分け方にせず質問する。
+- 資料どうしが食い違うときは、新しいほうの決定を仮の期待結果にしてよい。ただし `[要確認]` は残して質問する。
+- 質問は、同じ決定で片付くものを 1 件にまとめる。「A にするか、B にするか」のように選べる形で書き、今わかっていることと、決まらないと止まるケースを添える。
+- 追認を待つものは、質問と分けて並べる。
+- 追認待ちの期待結果が P0 のケースにあるときは、未解決の critical assumption として扱う。追認が付くまで Go にしない。
+- 回答が来たら、期待結果に反映して `[要確認]` を外す。回答の出典（誰が・いつ・どこで）を根拠に残す。
+
+表と質問の下書きの形は [output-templates.md](output-templates.md) を使う。

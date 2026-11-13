@@ -2,8 +2,8 @@
 intent_id: INT-MBB-001
 owner: manual-bb-test-harness
 status: active
-last_reviewed_at: 2026-05-16
-next_review_due: 2026-10-11
+last_reviewed_at: 2026-11-13
+next_review_due: 2027-02-12
 release_version: 4.1.1
 ---
 
@@ -36,6 +36,8 @@ HATE/QEGによるCI証跡の連携は[spec-08](docs/specs/spec-08-hate-qeg-ci.md
 | [docs/tasks/](docs/tasks/) | Task Seed |
 | [docs/acceptance/](docs/acceptance/) | 検収記録 |
 | [skills/manual-bb-test-harness/references/technique-coverage.md](skills/manual-bb-test-harness/references/technique-coverage.md) | 型付き技法・被覆検証・移行・実装上限 |
+| [skills/manual-bb-test-harness/references/security-pack.md](skills/manual-bb-test-harness/references/security-pack.md) | 脆弱性の観点、所見の振り分け（ケース・単体テストの案・範囲外） |
+| [skills/manual-bb-test-harness/references/execution-routing.md](skills/manual-bb-test-harness/references/execution-routing.md) | 手動ケースの実施の仕分け（LLM と手動）、書き換え、証跡 |
 | [skills/manual-bb-test-harness/references/requirements-confidence.md](skills/manual-bb-test-harness/references/requirements-confidence.md) | 要件定義信頼度・要確認集計・根拠付きレビュー・再評価 |
 | [docs/research/istqb-extension-adoption.md](docs/research/istqb-extension-adoption.md) | Deep Research原本の取得元と採用状況 |
 
@@ -74,6 +76,12 @@ HATE/QEGによるCI証跡の連携は[spec-08](docs/specs/spec-08-hate-qeg-ci.md
 2. `skills/manual-bb-test-harness/references/platform-pack-mobile.md`
 3. `goldens/mobile-session-resume.input.md`
 4. `goldens/mobile-session-resume.expected.md`
+
+### 実施の仕分けや脆弱性の観点を使いたい
+
+1. `skills/manual-bb-test-harness/references/execution-routing.md`
+2. `skills/manual-bb-test-harness/references/security-pack.md`
+3. `skills/manual-bb-test-harness/references/risk-and-gate-policy.md` の「点数の検算」と `examples/markdown/order-cancel.risk-table.md`
 
 ### RanDと連携したい
 
