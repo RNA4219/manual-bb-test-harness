@@ -122,6 +122,13 @@ def smoke_artifact(artifact: Path, root: Path) -> None:
         [cli, "validate", str(REPO_ROOT / "skills" / "manual-bb-test-harness")],
         [
             cli,
+            "check",
+            "risk",
+            "--input",
+            str(REPO_ROOT / "examples" / "markdown" / "order-cancel.risk-table.md"),
+        ],
+        [
+            cli,
             "ingest",
             "--source",
             "markdown",

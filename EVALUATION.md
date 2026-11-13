@@ -4,9 +4,9 @@ owner: manual-bb-test-harness
 release_version: 4.1.1
 test_count: 1168
 knowledge_map: 33 nodes, 45 edges, 33 capsules
-next_review_due: 2026-10-11
+next_review_due: 2027-02-12
 status: active
-last_reviewed_at: 2026-05-16
+last_reviewed_at: 2026-11-13
 ---
 
 # Evaluation
@@ -43,7 +43,11 @@ last_reviewed_at: 2026-05-16
 
 ## Test Outline
 
+リスク表の検算は`tests/test_markdown_risk_check.py`で、補正の書き方、列を分けた表とraw、点数・優先度の不一致、欠けた補正・範囲外・読めないセル、コードブロックの除外、CLIの終了コード、例の一致を検証する。検算は式との一致だけを確かめ、I・L・補正の値の妥当性は人のレビューで確かめる。
+
 要件定義の信頼度は`tests/test_requirements_confidence.py`で、未レビュー・重大未解決の上限、重複、密度、解決根拠、入力版照合、CLI・例を検証する。採点policyの充足と仕様の意味的正しさは分け、実案件データによる校正は未実施として扱う。[spec-07](docs/specs/spec-07-requirements-confidence.md)を参照。
+
+`tests/test_validate_skill_ps1.py` のうち PowerShell を呼ぶ 10 件は、`pwsh` が無いローカル環境では skip になる。CI では省かず、`pwsh` が無ければ失敗する。
 
 - 単体:
   - `tests/test_spec_ingest.py`

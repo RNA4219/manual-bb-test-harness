@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import os
 import shutil
 import subprocess
 from pathlib import Path
@@ -10,13 +11,18 @@ import pytest
 
 SCRIPT_PATH = Path(__file__).parent.parent / "scripts" / "validate-skill.ps1"
 REPO_ROOT = Path(__file__).parent.parent
+PWSH = shutil.which("pwsh")
+# CI では省かない。pwsh が無ければ失敗させ、検証が抜けたことに気づけるようにする。
+RUNNING_IN_CI = os.environ.get("CI", "").lower() in {"1", "true", "yes"}
 
 
 def run_powershell_script(
     script_args: list[str] | None = None, cwd: Path | None = None
 ) -> subprocess.CompletedProcess:
     """Run PowerShell script and return result."""
-    args = ["pwsh", "-File", str(SCRIPT_PATH)]
+    if PWSH is None and not RUNNING_IN_CI:
+        pytest.skip("pwsh (PowerShell 7) が見つからない。ローカルでは省き、CI で検証する")
+    args = [PWSH or "pwsh", "-File", str(SCRIPT_PATH)]
     if script_args:
         args.extend(script_args)
     return subprocess.run(

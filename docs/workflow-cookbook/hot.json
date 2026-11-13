@@ -1,6 +1,6 @@
 {
   "version": "4.1.1",
-  "generated_at": "2026-09-14T01:34:02.835908+00:00",
+  "generated_at": "2026-11-13T02:33:52.070103+00:00",
   "description": "manual-bb-test-harness Workflow Cookbook Hot List - Primary entry points",
   "project_status": {
     "tier": 3,
@@ -8,7 +8,7 @@
     "import_status": "complete",
     "test_count": 1481,
     "total_capsules": 34,
-    "last_updated": "2026-09-14"
+    "last_updated": "2026-11-13"
   },
   "hot_nodes": [
     {
@@ -29,7 +29,7 @@
       "path": "./HUB.codex.md",
       "role": "navigation",
       "title": "AI Navigation Hub",
-      "summary": "README・利用ガイド・設計・運用・品質基準・履歴の役割と、Skill、保守、artifact、mobile、RanD、Local Mode、技法別被覆、要件信頼度の読み順を示す。",
+      "summary": "README・利用ガイド・設計・運用・品質基準・履歴の役割と、Skill、保守、artifact、mobile、RanD、Local Mode、技法別被覆、要件信頼度の読み順を示す。 実施の仕分け・脆弱性の観点・リスク表の検算の読み順を含む。",
       "priority": 2,
       "use_cases": [
         "Navigating documentation",
@@ -55,7 +55,7 @@
       "path": "./RUNBOOK.md",
       "role": "operations",
       "title": "Runbook",
-      "summary": "CLI と外部連携、RanD、Local Mode、検証、Gate 入力・構成計画・欠陥台帳・承認・移行、障害対応、配布前検証の操作手順。生成予算・被覆・要件信頼度の詳細契約と過去の検証記録へ案内する。",
+      "summary": "CLI と外部連携、RanD、Local Mode、検証、Gate 入力・構成計画・欠陥台帳・承認・移行、障害対応、配布前検証の操作手順。生成予算・被覆・要件信頼度の詳細契約と過去の検証記録へ案内する。 Markdown のリスク表の検算（check risk）と、pwsh が無い環境での検証の扱いを含む。",
       "priority": 4,
       "use_cases": [
         "Running validation commands",

@@ -7,6 +7,7 @@ import sys
 
 from bb_harness import __version__
 from bb_harness.commands import (
+    check,
     coverage,
     evaluate,
     export,
@@ -69,6 +70,7 @@ def create_parser() -> argparse.ArgumentParser:
     run.add_subparser(subparsers)
     coverage.add_subparser(subparsers)
     evaluate.add_subparser(subparsers)
+    check.add_subparser(subparsers)
 
     return parser
 
@@ -100,6 +102,7 @@ def main(argv: list[str] | None = None) -> int:
         "run": run.run,
         "coverage": coverage.run,
         "evaluate": evaluate.run,
+        "check": check.run,
         "migrate": coverage.run,
         "bind-cases": coverage.run,
     }

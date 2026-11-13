@@ -2,8 +2,8 @@
 intent_id: INT-MBB-001
 owner: manual-bb-test-harness
 status: active
-last_reviewed_at: 2026-05-16
-next_review_due: 2026-10-11
+last_reviewed_at: 2026-11-13
+next_review_due: 2027-02-12
 ---
 
 # Guardrails
@@ -30,6 +30,8 @@ next_review_due: 2026-10-11
 - P0/P1 の scripted case には oracle refs を必須にする。
 - `degraded` と `blocked` の閾値を曖昧にせず、missing info を assumption として残す。
 - mobile 対象では background、network、permission、entrypoint の差分を無視しない。
+- Skill と references に入れる決まりは、特定の組織・製品・案件に固有の名前や運用を含めない。固有の運用は、利用する側の overlay や wrapper に置く。
+- LLM が実施した結果を自動証跡や補正 A に数えない。Markdown のリスク表の点数は、検算してから出す。
 
 ## 変更時チェック
 

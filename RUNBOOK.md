@@ -2,9 +2,9 @@
 intent_id: INT-MBB-001
 owner: manual-bb-test-harness
 release_version: 4.1.1
-next_review_due: 2026-10-11
+next_review_due: 2027-02-12
 status: active
-last_reviewed_at: 2026-05-16
+last_reviewed_at: 2026-11-13
 ---
 
 # Runbook
@@ -15,7 +15,7 @@ last_reviewed_at: 2026-05-16
 
 - Local: repo 内で Skill / schema / script を編集して検証する
 - CI: `.github/workflows/validate.yml` で repo 構造と Skill を検証する。`HATE and QEG evidence gate`では、同一run/attemptの実pytest結果から証跡を検証する。`ci-raw-evidence-*`と`hate-qeg-evidence-*`を失敗時も14日間保存する。QEGのgoはCI範囲だけに適用する。[仕様・ローカル実行手順](docs/specs/spec-08-hate-qeg-ci.md)を参照。
-- Consumer: Codex Skill として利用し、Markdown または JSON artifact を生成する
+- Consumer: Codex や Claude などのエージェントの Skill として利用し、Markdown または JSON artifact を生成する
 - PyPI: `publish-pypi.yml`をmainから手動起動する。GitHub Releaseの既存配布物を検証して公開する。[公開仕様・初回設定](docs/release-policy.md#pypi公開仕様)を参照。
 
 公開後は同workflowの`verify-publication`が配布物hashと新規PyPIインストールを確認する。
@@ -26,6 +26,10 @@ last_reviewed_at: 2026-05-16
 ### 要件定義の信頼度を評価する
 
 `bb-harness evaluate requirements --input spec.md --output tmp/requirements-first`で、LLMを呼ばずに要確認・重大度・レビュー率を採点する。出力のレビュー雛形へ実際の確認結果を記入し、`--review reviewed.json`と新しい出力先で再評価する。`--fail-under 85`で閾値未達を終了コード2にできる。[契約・入力形式・採点式](skills/manual-bb-test-harness/references/requirements-confidence.md)を参照。
+
+### リスク表の点数を検算する
+
+`bb-harness check risk --input design.md`で、Markdownのリスク表の点数と優先度をI・L・補正から計算し直して比べる。全行一致で終了コード0、不一致・検算できない行・リスク表なしで2、入力エラーで1。`--format json`で行ごとの結果を出す。Skillを読んで設計書を直接書いたときは、提出前に実行する。[表の書き方と判定](skills/manual-bb-test-harness/references/risk-and-gate-policy.md#点数の検算)を参照。
 
 ### 1. Skill 出力を確認する
 
@@ -79,6 +83,8 @@ uv run python scripts/validate-spec.py --all
 uv run python tools/ci/check_workflow_cookbook_tier.py --repo .
 uv run python tools/ci/check_workflow_cookbook_freshness.py --repo . --strict
 ```
+
+`pwsh` が無い環境では、`.\scripts\validate-skill.ps1` を実行できない。`tests/test_validate_skill_ps1.py` のうち PowerShell を呼ぶ 10 件は、ローカルでは skip になる。CI（環境変数 `CI` がある実行）では省かず、`pwsh` が無ければ失敗する。
 
 文書を編集したときは capsule の要約も見直し、`uv run python tools/ci/sync_workflow_metadata.py --repo .` でメタデータを同期してから freshness を確認します。
 
@@ -321,7 +327,7 @@ uv run ruff check .
 uv lock --check
 ```
 
-結果: **Resolved 30 packages** (再現性確認 OK)
+結果: **Resolved 26 packages** (再現性確認 OK、2026-11-13 時点)
 
 ### 依存関係 Audit
 
@@ -346,12 +352,7 @@ uv pip list
 
 ### GitHub Actions Action Version 方針
 
-`.github/workflows/validate.yml` で pinned version を使用:
-- `actions/checkout@v5`
-- `actions/setup-python@v6`
-- `codecov/codecov-action@v5`
-
-方針: major version pinning を採用。月次で version 更新を確認。
+`.github/workflows/` の Action は、完全な commit SHA へ固定し、行末のコメントに version を書く（例: `actions/checkout@<SHA> # v6.0.2`）。更新は Dependabot で行う。version tag だけへの pin に戻さない。
 
 ### Secret 境界
 

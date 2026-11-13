@@ -2,7 +2,7 @@
   "id": "RUNBOOK.md",
   "role": "operations",
   "title": "Runbook",
-  "summary": "CLI と外部連携、RanD、Local Mode、検証、Gate 入力・構成計画・欠陥台帳・承認・移行、障害対応、配布前検証の操作手順。生成予算・被覆・要件信頼度の詳細契約と過去の検証記録へ案内する。",
+  "summary": "CLI と外部連携、RanD、Local Mode、検証、Gate 入力・構成計画・欠陥台帳・承認・移行、障害対応、配布前検証の操作手順。生成予算・被覆・要件信頼度の詳細契約と過去の検証記録へ案内する。 Markdown のリスク表の検算（check risk）と、pwsh が無い環境での検証の扱いを含む。",
   "public_api": [],
   "deps_out": [
     "BLUEPRINT.md",
@@ -17,7 +17,8 @@
   ],
   "risks": [],
   "tests": [
-    "tests/test_cli_dryrun.py"
+    "tests/test_cli_dryrun.py",
+    "tests/test_markdown_risk_check.py"
   ],
-  "last_verified": "2026-09-14"
+  "last_verified": "2026-11-13"
 }
