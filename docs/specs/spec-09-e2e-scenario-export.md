@@ -55,6 +55,9 @@ SHA-256を持つ。入力値やsecretは生成しない。Playwrightコードは
 - [x] AC-2: unknown oracle、改訂/入力hash不一致、未承認caseを拒否する。
 - [x] AC-3: 同一入力の生成byteは決定的で出力manifestと一致する。
 
+契約schema: `schemas/e2e_binding.schema.json`、`schemas/e2e_scenario.schema.json`、`schemas/e2e_export.schema.json`。
+承認済みサンプル: `examples/artifacts/e2e-sample.*.json`。WindowsでもUTF-8原バイト列を直接保存し、manifestのSHA-256と一致させる。
+
 ## 未検証事項（現段階では受入の対象外）
 
 - 実target上のLakda replayと独立したreal evidenceの検証。

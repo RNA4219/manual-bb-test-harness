@@ -1,0 +1,13 @@
+{
+  "caseId": "TC-001",
+  "filesSha256": {
+    "action-sequence.json": "317d5ba883c29d01868b5cd8b0bb8ca68a791e136ba1d9f439bb1ccdb8ff3147",
+    "lakda.config.json": "8273e82f83089d22ee4f07f09a0188b6e17a6a0646d03bec76e7febfbfb1da68",
+    "scenario.json": "01f80f270ad7975aa211998e7a2d2b2c2197e08bfcb9f8d73bc126bf0bbdc609",
+    "scenario.md": "87eb99e762249ee7e3ec55d2e937a7212d7aeb079081eec9ebf03fa426d3c958",
+    "scenario.spec.ts": "a5958ed7a838cea1b12a82db1140dc0af2dc1a9b8eea5d9766fe66bf1b83503d"
+  },
+  "schemaVersion": "manual-bb/e2e-export/v1",
+  "sourceCaseSetSha256": "87860051d3300c3b8c0153d7200670b414acc497b58e05ed3f769d3cca15cdd0",
+  "sourceFeatureSha256": "b15d29ed6629e663748b515548ab3033233aad3d0fdd868dd05a83e93b6da3ea"
+}

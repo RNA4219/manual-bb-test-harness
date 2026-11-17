@@ -1,0 +1,250 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/RNA4219/manual-bb-test-harness/schemas/e2e_binding.schema.json",
+  "title": "Reviewed E2E Binding",
+  "type": "object",
+  "required": [
+    "schemaVersion",
+    "featureId",
+    "specRevision",
+    "baseUrl",
+    "featureSha256",
+    "caseSetSha256",
+    "seed",
+    "cases"
+  ],
+  "properties": {
+    "schemaVersion": {
+      "const": "manual-bb/e2e-binding/v1"
+    },
+    "featureId": {
+      "type": "string",
+      "minLength": 1
+    },
+    "specRevision": {
+      "type": "string",
+      "minLength": 1
+    },
+    "baseUrl": {
+      "type": "string",
+      "format": "uri"
+    },
+    "featureSha256": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "caseSetSha256": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "seed": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 4294967295
+    },
+    "cases": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": [
+          "caseId",
+          "revision",
+          "contentHash",
+          "oracleRevision",
+          "reviewedBy",
+          "reviewRef",
+          "actions",
+          "checks"
+        ],
+        "properties": {
+          "caseId": {
+            "type": "string",
+            "pattern": "^[A-Za-z][A-Za-z0-9_-]{0,79}$"
+          },
+          "revision": {
+            "type": "string",
+            "minLength": 1
+          },
+          "contentHash": {
+            "type": "string",
+            "minLength": 1
+          },
+          "oracleRevision": {
+            "type": "string",
+            "minLength": 1
+          },
+          "reviewedBy": {
+            "type": "string",
+            "minLength": 1
+          },
+          "reviewRef": {
+            "type": "string",
+            "minLength": 1
+          },
+          "actions": {
+            "type": "array",
+            "minItems": 1,
+            "items": {
+              "type": "object",
+              "required": [
+                "id",
+                "kind"
+              ],
+              "properties": {
+                "id": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "kind": {
+                  "type": "string",
+                  "enum": [
+                    "navigate",
+                    "goto",
+                    "click",
+                    "fill",
+                    "check",
+                    "select",
+                    "press"
+                  ]
+                },
+                "path": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "locator": {
+                  "type": "object",
+                  "properties": {
+                    "testId": {
+                      "type": "string",
+                      "minLength": 1
+                    },
+                    "role": {
+                      "type": "string",
+                      "enum": [
+                        "button",
+                        "link",
+                        "textbox",
+                        "checkbox",
+                        "combobox",
+                        "option",
+                        "menuitem",
+                        "tab"
+                      ]
+                    },
+                    "name": {
+                      "type": "string",
+                      "minLength": 1
+                    }
+                  },
+                  "additionalProperties": false,
+                  "anyOf": [
+                    {
+                      "required": [
+                        "testId"
+                      ]
+                    },
+                    {
+                      "required": [
+                        "role",
+                        "name"
+                      ]
+                    }
+                  ]
+                },
+                "inputProfileId": {
+                  "type": "string",
+                  "pattern": "^[A-Za-z][A-Za-z0-9_-]{0,79}$"
+                },
+                "key": {
+                  "type": "string",
+                  "enum": [
+                    "Enter",
+                    "Escape",
+                    "Space",
+                    "Tab"
+                  ]
+                },
+                "mutates": {
+                  "type": "boolean"
+                }
+              },
+              "additionalProperties": false
+            }
+          },
+          "checks": {
+            "type": "array",
+            "minItems": 1,
+            "items": {
+              "type": "object",
+              "required": [
+                "text",
+                "kind"
+              ],
+              "properties": {
+                "kind": {
+                  "type": "string",
+                  "enum": [
+                    "url",
+                    "visible"
+                  ]
+                },
+                "value": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "locator": {
+                  "type": "object",
+                  "properties": {
+                    "testId": {
+                      "type": "string",
+                      "minLength": 1
+                    },
+                    "role": {
+                      "type": "string",
+                      "enum": [
+                        "button",
+                        "link",
+                        "textbox",
+                        "checkbox",
+                        "combobox",
+                        "option",
+                        "menuitem",
+                        "tab"
+                      ]
+                    },
+                    "name": {
+                      "type": "string",
+                      "minLength": 1
+                    }
+                  },
+                  "additionalProperties": false,
+                  "anyOf": [
+                    {
+                      "required": [
+                        "testId"
+                      ]
+                    },
+                    {
+                      "required": [
+                        "role",
+                        "name"
+                      ]
+                    }
+                  ]
+                },
+                "text": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            }
+          }
+        },
+        "additionalProperties": false
+      }
+    }
+  },
+  "additionalProperties": false
+}

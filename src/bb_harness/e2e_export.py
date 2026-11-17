@@ -73,7 +73,8 @@ def _action(raw: object, case_id: str, index: int) -> dict:
             _require(locator.get("role") in LOCATOR_ROLES, "invalid locator role")
             _text(locator.get("name"), "locator name")
     if kind in {"fill", "select"}:
-        _text(raw.get("inputProfileId"), "input profile ID")
+        input_profile_id = _text(raw.get("inputProfileId"), "input profile ID")
+        _require(bool(CASE_ID.fullmatch(input_profile_id)), "invalid input profile ID")
     else:
         _require("inputProfileId" not in raw, "unexpected input profile")
     if kind == "press":
@@ -92,7 +93,7 @@ def _check(raw: object, expected: str, base_url: str) -> tuple[dict, dict]:
         _require(set(raw) == {"text", "kind", "value"}, "invalid URL oracle binding")
         target = _text(raw.get("value"), "expected URL")
         resolved = urljoin(base_url, target)
-        _require(urlsplit(resolved).hostname == urlsplit(base_url).hostname
+        _require(urlsplit(resolved).netloc == urlsplit(base_url).netloc
                  and urlsplit(resolved).scheme == urlsplit(base_url).scheme,
                  "expected URL must remain on approved target")
         return {"expectedUrl": resolved}, {"kind": "url", "value": resolved}
@@ -138,9 +139,11 @@ def _playwright_script(actions: list[dict], checks: list[dict], base_url: str) -
         else:
             # Input values are supplied from the consuming product's environment, not generated.
             name = "E2E_INPUT_" + action["inputProfileId"].upper().replace("-", "_")
+            lines.append("  {")
             lines.append("  const value = process.env[" + q(name) + "];")
             lines.append("  if (value === undefined) throw new Error(" + q("missing input profile: " + name) + ");")
-            lines.append("  await " + target + (" .fill(value);" if kind == "fill" else ".selectOption(value);"))
+            lines.append("  await " + target + (".fill(value);" if kind == "fill" else ".selectOption(value);"))
+            lines.append("  }")
     for check in checks:
         if check["kind"] == "url":
             lines.append("  await expect(page).toHaveURL(" + q(check["value"]) + ");")
@@ -201,9 +204,12 @@ def export_e2e(feature_spec: str | Path, case_set: str | Path, binding_path: str
                  "case/oracle revision mismatch")
         _text(entry.get("reviewRef"), "review reference")
         _text(entry.get("reviewedBy"), "reviewer")
+        _text(case.get("title"), "case title")
         _require(isinstance(case.get("steps"), list) and len(case["steps"]) > 0, "missing steps")
         _require(isinstance(case.get("expected_results"), list)
                  and len(case["expected_results"]) > 0, "missing expected results")
+        for raw_text in [*case["steps"], *case["expected_results"]]:
+            _text(raw_text, "case content")
         _require(isinstance(entry.get("actions"), list)
                  and len(entry["actions"]) == len(case["steps"]), "step bindings must be complete")
         _require(isinstance(entry.get("checks"), list)
@@ -253,5 +259,5 @@ def export_e2e(feature_spec: str | Path, case_set: str | Path, binding_path: str
         folder = destination / case_id
         folder.mkdir()
         for name, data in artifacts.items():
-            (folder / name).write_text(data, encoding="utf-8")
+            (folder / name).write_bytes(data.encode("utf-8"))
     return [case_id for case_id, _ in prepared]

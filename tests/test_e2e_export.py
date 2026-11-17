@@ -3,6 +3,9 @@ from __future__ import annotations
 
 import hashlib
 import json
+from pathlib import Path
+
+from jsonschema import Draft202012Validator
 
 import pytest
 
@@ -86,3 +89,74 @@ def test_fails_closed(tmp_path, mutation):
     with pytest.raises(E2EExportError):
         export_e2e(*paths, tmp_path / "output")
     assert not (tmp_path / "output").exists()
+
+
+def test_reviewed_expected_urls_must_use_exact_origin(tmp_path):
+    paths, binding = inputs(tmp_path)
+    binding["cases"][0]["checks"] = [{
+        "text": "Confirmation is visible", "kind": "url",
+        "value": "https://app.example.test:8443/order",
+    }]
+    paths[2].write_text(json.dumps(binding), encoding="utf-8")
+    with pytest.raises(E2EExportError, match="approved target"):
+        export_e2e(*paths, tmp_path / "out")
+
+
+def test_secret_in_human_steps_must_not_enter_generated_artifacts(tmp_path):
+    paths, binding = inputs(tmp_path)
+    cases = json.loads(paths[1].read_text(encoding="utf-8"))
+    cases["manual_cases"][0]["steps"][0] = "password=abc123"
+    paths[1].write_text(json.dumps(cases), encoding="utf-8")
+    binding["caseSetSha256"] = digest(cases)
+    paths[2].write_text(json.dumps(binding), encoding="utf-8")
+    with pytest.raises(E2EExportError, match="possible secret"):
+        export_e2e(*paths, tmp_path / "out")
+    assert not (tmp_path / "out").exists()
+
+
+def test_invalid_input_profile_identifier_is_rejected(tmp_path):
+    paths, binding = inputs(tmp_path)
+    binding["cases"][0]["actions"][1] = {
+        "id": "confirm", "kind": "fill",
+        "locator": {"role": "textbox", "name": "Recipient"},
+        "inputProfileId": "../secret",
+    }
+    paths[2].write_text(json.dumps(binding), encoding="utf-8")
+    with pytest.raises(E2EExportError, match="invalid input profile"):
+        export_e2e(*paths, tmp_path / "out")
+
+
+def test_reviewed_example_round_trip_and_all_published_contracts(tmp_path):
+    root = Path(__file__).resolve().parents[1]
+    sample = root / "examples" / "artifacts"
+    schema_root = root / "schemas"
+    packaged = root / "src" / "bb_harness" / "schemas"
+    inputs = [
+        sample / "e2e-sample.feature_spec.json",
+        sample / "e2e-sample.manual_case_set.json",
+        sample / "e2e-sample.e2e-binding.json",
+    ]
+    output = tmp_path / "example-output"
+    assert export_e2e(*inputs, output) == ["TC-001"]
+    for schema_name, artifact in [
+        ("e2e_binding", inputs[2]),
+        ("e2e_scenario", output / "TC-001" / "scenario.json"),
+        ("e2e_export", output / "TC-001" / "manifest.json"),
+    ]:
+        root_schema = json.loads((schema_root / (schema_name + ".schema.json")).read_text())
+        package_schema = json.loads((packaged / (schema_name + ".schema.json")).read_text())
+        assert root_schema == package_schema
+        Draft202012Validator.check_schema(root_schema)
+        Draft202012Validator(root_schema).validate(json.loads(artifact.read_text()))
+    for artifact, example in [
+        ("scenario.json", "e2e-sample.e2e-scenario.json"),
+        ("manifest.json", "e2e-sample.e2e-export.json"),
+    ]:
+        assert json.loads((output / "TC-001" / artifact).read_text()) == json.loads(
+            (sample / example).read_text()
+        )
+    manifest = json.loads((output / "TC-001" / "manifest.json").read_text())
+    for filename, expected in manifest["filesSha256"].items():
+        saved_bytes = (output / "TC-001" / filename).read_bytes()
+        assert hashlib.sha256(saved_bytes).hexdigest() == expected
+        assert b"\r\n" not in saved_bytes  # Windows byte-level stability

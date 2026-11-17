@@ -1,0 +1,35 @@
+{
+  "schemaVersion": "manual-bb/e2e-binding/v1",
+  "featureId": "E2E-SAMPLE",
+  "specRevision": "spec-1",
+  "baseUrl": "https://example.invalid/",
+  "featureSha256": "b15d29ed6629e663748b515548ab3033233aad3d0fdd868dd05a83e93b6da3ea",
+  "caseSetSha256": "87860051d3300c3b8c0153d7200670b414acc497b58e05ed3f769d3cca15cdd0",
+  "seed": 4219,
+  "cases": [
+    {
+      "caseId": "TC-001",
+      "revision": "case-rev-1",
+      "contentHash": "sha256:review-anchor-1",
+      "oracleRevision": "oracle-rev-1",
+      "reviewedBy": "example-reviewer",
+      "reviewRef": "PR-EXAMPLE",
+      "actions": [
+        {
+          "id": "navigate-root",
+          "kind": "navigate",
+          "path": "/"
+        }
+      ],
+      "checks": [
+        {
+          "text": "ホーム画面が表示される",
+          "kind": "visible",
+          "locator": {
+            "testId": "home-root"
+          }
+        }
+      ]
+    }
+  ]
+}
