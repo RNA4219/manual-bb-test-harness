@@ -156,3 +156,150 @@ def test_unbound_run_rejected_and_zero_runs_not_run(tmp_path: Path) -> None:
           {"mode": "regression-replay", "outcome": "passed"})
     with pytest.raises(ValueError, match="Unbound"):
         import_replay(tmp_path / "runs", traces, "promoted", merge, tmp_path / "no")
+
+
+@pytest.mark.parametrize(
+    ("field", "value"),
+    [
+        ("schemaVersion", "unknown"),
+        ("platform", ""),
+    ],
+)
+def test_export_rejects_invalid_template(tmp_path: Path, field: str, value: object) -> None:
+    case = write(tmp_path / "cases.json", case_set())
+    template_data = template()
+    template_data[field] = value
+    source = write(tmp_path / "template.json", template_data)
+    with pytest.raises(ValueError):
+        export_charter(case, "CH-1", source, tmp_path / "reject")
+    assert not (tmp_path / "reject").exists()
+
+
+@pytest.mark.parametrize(
+    "minutes",
+    [True, 0, -1, "0.5", float("inf"), 0.000001],
+)
+def test_export_rejects_invalid_timebox(tmp_path: Path, minutes: object) -> None:
+    case = case_set()
+    case["exploratory_charters"][0]["timebox_minutes"] = minutes
+    source = write(tmp_path / "cases.json", case)
+    template_path = write(tmp_path / "template.json", template())
+    with pytest.raises(ValueError):
+        export_charter(source, "CH-1", template_path, tmp_path / "reject")
+    assert not (tmp_path / "reject").exists()
+
+
+def test_export_missing_charter_and_no_timebox(tmp_path: Path) -> None:
+    source = case_set()
+    source["exploratory_charters"][0].pop("estimate_minutes")
+    path = write(tmp_path / "source.json", source)
+    template_path = write(tmp_path / "template.json", template())
+    export_charter(path, "CH-1", template_path, tmp_path / "valid")
+    assert json.loads((tmp_path / "valid/charter.json").read_text())["budget"]["durationMs"] == 1000
+    with pytest.raises(ValueError, match="Unknown exploratory charter"):
+        export_charter(path, "UNKNOWN", template_path, tmp_path / "reject")
+
+
+@pytest.mark.parametrize(
+    "mutation",
+    [
+        "no-origin", "wrong-tool", "wrong-charter-id", "session-id",
+        "digest", "feature-id", "revision", "oracle-revision",
+        "bad-findings", "bad-finding", "bad-oracle", "bad-evidence",
+        "bad-duration", "unknown-case",
+    ],
+)
+def test_report_rejects_broken_evidence(
+    tmp_path: Path, mutation: str
+) -> None:
+    rep, sess, cases = report(), session(), case_set()
+    if mutation == "no-origin":
+        rep.pop("origin")
+    elif mutation == "wrong-tool":
+        rep["origin"]["tool"] = "unknown"
+    elif mutation == "wrong-charter-id":
+        rep["charterId"] = "wrong"
+    elif mutation == "session-id":
+        sess["sessionId"] = "wrong"
+    elif mutation == "digest":
+        sess["charterDigest"] = "wrong"
+    elif mutation == "feature-id":
+        rep["origin"]["featureId"] = "other"
+    elif mutation == "revision":
+        rep["origin"]["revision"] = "wrong"
+    elif mutation == "oracle-revision":
+        rep["origin"]["oracleRevision"] = "wrong"
+    elif mutation == "bad-findings":
+        rep["findings"] = None
+    elif mutation == "bad-finding":
+        rep["findings"] = [0]
+    elif mutation == "bad-oracle":
+        rep["findings"][0]["oracleRefs"] = [0]
+    elif mutation == "bad-evidence":
+        rep["findings"][0]["evidenceRefs"] = [None]
+    elif mutation == "bad-duration":
+        sess["activeDurationMs"] = -1
+    elif mutation == "unknown-case":
+        cases["exploratory_charters"] = []
+    report_path = write(tmp_path / "report.json", rep)
+    session_path = write(tmp_path / "session.json", sess)
+    case_path = write(tmp_path / "cases.json", cases)
+    with pytest.raises((ValueError, TypeError, KeyError)):
+        import_report(report_path, session_path, case_path, "F-1", "b1", "v1", tmp_path / "reject")
+    assert not (tmp_path / "reject").exists()
+
+
+def test_report_rejects_unauthorized_configuration(tmp_path: Path) -> None:
+    rep = write(tmp_path / "report.json", report())
+    sess = write(tmp_path / "session.json", session())
+    cases = case_set()
+    cases["execution_configurations"] = [{"id": "c1", "env": "test"}]
+    cases["exploratory_charters"][0]["configuration_ids"] = ["c1"]
+    case = write(tmp_path / "cases.json", cases)
+    with pytest.raises(ValueError, match="configuration"):
+        import_report(rep, sess, case, "F-1", "b1", "v1", tmp_path / "reject", "other")
+    assert not (tmp_path / "reject").exists()
+
+
+@pytest.mark.parametrize("mutation", ["duplicate-suite", "no-traces", "missing-digest", "unknown-digest",
+                                      "duplicate-run", "no-manifest", "unknown-outcome", "fixture-run"])
+def test_replay_rejects_ambiguous_or_untrusted_run(tmp_path: Path, mutation: str) -> None:
+    source = {"feature_id": "F-1", "build_id": "b1", "coverage_scope": "changed_code",
+              "coverage_percent": 81, "new_issues": {"blocker": 0, "critical": 0},
+              "source_refs": [{"id": "ci-1", "kind": "auto_test"}],
+              "test_suites": [{"suite_id": "unit", "status": "passed", "total": 1,
+                               "passed": 1, "failed": 0, "errors": 0, "skipped": 0,
+                               "source_refs": [{"id": "unit", "kind": "auto_test"}]}]}
+    merged = write(tmp_path / "automation.json", source)
+    traces = tmp_path / "traces"
+    trace = write(traces / "p1/action-sequence.json", {"actions": [1]})
+    if mutation == "no-traces":
+        trace.unlink()
+    if mutation == "duplicate-suite":
+        suite_id = "unit"
+    else:
+        suite_id = "promoted"
+    run = tmp_path / "runs" / "r1"
+    metadata = {
+        "mode": "regression-replay", "outcome": "passed", "executionMode": "real",
+        "replayInputSha256": hashlib.sha256(trace.read_bytes()).hexdigest()
+        if trace.exists() else "0" * 64,
+    }
+    if mutation == "missing-digest":
+        metadata.pop("replayInputSha256")
+    elif mutation == "unknown-digest":
+        metadata["replayInputSha256"] = "0" * 64
+    elif mutation == "unknown-outcome":
+        metadata["outcome"] = "aborted"
+    elif mutation == "fixture-run":
+        metadata["executionMode"] = "fixture"
+    write(run / "run-metadata.json", metadata)
+    if mutation != "no-manifest":
+        write(run / "exports/artifact-manifest.json", {"schemaVersion": "hate/v1"})
+    if mutation == "duplicate-run":
+        write(tmp_path / "runs" / "r2/run-metadata.json", metadata)
+        write(tmp_path / "runs" / "r2/exports/artifact-manifest.json",
+              {"schemaVersion": "hate/v1"})
+    with pytest.raises(ValueError):
+        import_replay(tmp_path / "runs", traces, suite_id, merged, tmp_path / "reject")
+    assert not (tmp_path / "reject").exists()
