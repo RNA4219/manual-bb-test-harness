@@ -11,6 +11,7 @@ from bb_harness.commands import (
     coverage,
     evaluate,
     export,
+    export_e2e,
     gate,
     heatmap,
     import_results,
@@ -66,6 +67,7 @@ def create_parser() -> argparse.ArgumentParser:
     heatmap.add_subparser(subparsers)
     gate.add_subparser(subparsers)
     export.add_subparser(subparsers)
+    export_e2e.add_subparser(subparsers)
     import_results.add_subparser(subparsers)
     run.add_subparser(subparsers)
     coverage.add_subparser(subparsers)
@@ -98,6 +100,7 @@ def main(argv: list[str] | None = None) -> int:
         "heatmap": heatmap.run,
         "gate": gate.run,
         "export": export.run,
+        "export-e2e": export_e2e.run,
         "import": import_results.run,
         "run": run.run,
         "coverage": coverage.run,
