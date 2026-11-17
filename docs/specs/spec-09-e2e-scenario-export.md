@@ -1,57 +1,64 @@
-# Spec 09: reviewed E2E scenario export
+# Spec: 承認済みE2Eシナリオ出力
 
-Status: implementation candidate (E2E binding v1). No automatic approval, Gate evaluation, or LLM oracle.
+## 概要
 
-## Inputs and rule
-The product owns the requirements and reviews its binding JSON. The input consists of:
-- feature_spec JSON: feature_id and revision
-- manual_case_set JSON: matching feature_id / spec_revision, active scripted cases, steps, expected_results, specified oracle references, case/oracle revisions
-- explicit reviewer-authored binding: schemaVersion manual-bb/e2e-binding/v1, featureId, specRevision, baseUrl, seed, featureSha256, caseSetSha256 and cases[]
+手動設計ケースの原文・期待値・根拠・改訂を維持したまま、レビュー済みbindingからLakda replay入力を決定的に生成する。出力は新規ディレクトリのみ。
 
-Each binding case specifies caseId, revision, contentHash, oracleRevision, reviewedBy,
-reviewRef, an ordered actions[] array (one-to-one with human steps), and ordered
-checks[] (one-to-one with expected_results). Each check repeats the exact approved
-expected text. Binding hashes are SHA-256 over canonical JSON with recursively sorted
-keys and no whitespace (UTF-8). No natural-language to selector inference is done.
+## 目的
 
-Only URL equality and visible locator final-state checks are compiled to current
-Lakda obligations. Other checks or unapproved human/derived oracles fail closed.
-For intermediate checks, a distinct case must be authored: Lakda's v1 replay
-obligations are evaluated at end of execution, not between actions. No fixture,
-mock or emulator result is promoted to real evidence.
+生成物を元AC/ケース/レビューに追跡できるようにし、LLMによる期待値推測やpass/fail判定を排除する。
 
-## Output
-Command:
+## 要件
+
+| ID | 要件 | 優先度 |
+|---|---|---|
+| MBB-E2E-R01 | feature_specのACとsource refs、およびcase版とoracle refsを要求する | P0 |
+| MBB-E2E-R02 | 手順と期待値の一対一bindingを要求し、未知oracleを拒否する | P0 |
+| MBB-E2E-R03 | 許可済みActionPlanと最終obligations、reviewableなPlaywright codeを生成する | P0 |
+| MBB-E2E-R04 | 入力hash、レビュー、ケースとoracleの版を照合する | P0 |
+| MBB-E2E-R05 | 保存済み証跡を変更しない | P0 |
+
+## 設計
+
+入力はfeature_spec JSON、manual_case_set JSON、reviewer binding JSON。
+bindingのschemaVersionはmanual-bb/e2e-binding/v1であり、
+featureId、specRevision、featureSha256、caseSetSha256、
+baseUrl、seedとcases配列を持つ。各caseはcaseId、revision、
+contentHash、oracleRevision、reviewedBy、reviewRef、
+全手順に対応するactions配列と全文一致するchecks配列を持つ。
+hashはUTF-8、キーsortのcanonical JSONでSHA-256を計算する。
+
+既存manual_case_setの指定期待結果を変更しない。oracle.type=specified
+のみ対応。URLとvisibleの最終状態をLakdaの既存obligationsに変換する。
+中間assertion、金額・件数・任意テキスト、visual、未知predicate、
+未承認derived/human/implicitは対応外として拒否する。
+
+出力はcaseごとにscenario.md、scenario.json、action-sequence.json、
+lakda.config.json、scenario.spec.ts、manifest.json。後者は各生成物の
+SHA-256を持つ。入力値やsecretは生成しない。Playwrightコードは
+人がレビューする補助形式でありLakdaに任意コードとして渡さない。
+
+## インターフェース
 
     bb-harness export-e2e --feature-spec feature.json --manual-case-set cases.json --binding binding.json --out new-output
+    lakda replay --input new-output/TC-001/action-sequence.json --config new-output/TC-001/lakda.config.json --base-url https://app.example.test/
 
-For each case under a NEW output directory:
-- scenario.md: human-readable reviewed steps and expectations
-- scenario.json: version, source hashes, reviewer, traceability and machine checks
-- action-sequence.json: Lakda replay action-plan/v1, declarative allowlisted actions only
-- lakda.config.json: target host scope, seed, final-state obligations
-- scenario.spec.ts: reviewable optional Playwright source, NOT interpreted by Lakda
-- manifest.json: SHA-256 of each exported file and input hashes
+## テスト観点
 
-The product must supply runtime inputProfiles and approved authenticated target
-configuration; no credentials or input values are serialized. Generated code is
-only a second representation, not proof that an E2E execution occurred.
+正常、再生成同一hash、出力先再利用、改竄/古いcase revision、
+未知oracle、秘匿値、危険action、retired case、step/check不足、
+旧artifact読み込み互換性を確認する。
 
-Replay is executed externally by the product CI:
+## 受入条件
 
-    lakda replay --input output/TC-001/action-sequence.json --base-url https://app.example.test/ --config output/TC-001/lakda.config.json
+- [x] AC-1: 人手指定bindingからreview IDと期待値・手順を紐づけて新規出力する。
+- [x] AC-2: unknown oracle、改訂/入力hash不一致、未承認caseを拒否する。
+- [x] AC-3: 同一入力の生成byteは決定的で出力manifestと一致する。
+- [ ] AC-4: 実target上でのLakda replay、独立したreal evidenceを確認する。
+- [ ] AC-5: 利用製品2件の実workflow導入を検証する。
 
-Do NOT claim real acceptance without a matching authenticated real target,
-verified run artifact, and target approval. Execution and CI success are
-distinct from QEG/Gate judgments. Generated output cannot overwrite old runs.
+## 制約
 
-## Acceptance
-- successful export, repeatable bytes and manifest digests
-- unreviewed, stale-hash, retired, unsupported, unsafe action and duplicate case rejected
-- no existing schema required fields changed; no previous evidence changed
-- CLI and Python regression tests on Linux; P0 real target acceptance remains external
-
-## Known boundary
-Current Lakda uses chromium.launch() in the existing execution path.
-This command does not add any process launch or outbound connection. Strict
-"no external process" interpretation remains unresolved for existing Lakda.
+K-01〜K-07のcharter、Gate、定期実行とスターターセットを扱わない。
+Lakdaの外部process起動/外部送信の禁止は緩めない。
+この変換処理はブラウザ・ネットワーク・LLMを呼び出さない。

@@ -15,7 +15,9 @@ def digest(value):
 
 
 def inputs(tmp_path):
-    feature = {"feature_id": "ORDER", "revision": "spec-1"}
+    feature = {"feature_id": "ORDER", "revision": "spec-1",
+               "acceptance_criteria": ["Confirmation is visible"],
+               "source_refs": [{"id": "AC-1", "kind": "ac"}]}
     cases = {"feature_id": "ORDER", "spec_revision": "spec-1", "manual_cases": [
         {"tc_id": "TC-001", "title": "Order confirmation", "revision": "rev-1",
          "content_hash": "case-hash-1", "oracle_revision": "oracle-1",
@@ -36,7 +38,7 @@ def inputs(tmp_path):
                                 "locator": {"testId": "confirmation"}}]}
                ]}
     paths = [tmp_path / "feature.json", tmp_path / "cases.json", tmp_path / "binding.json"]
-    for path, item in zip(paths, [feature, cases, binding]):
+    for path, item in zip(paths, [feature, cases, binding], strict=True):
         path.write_text(json.dumps(item), encoding="utf-8")
     return paths, binding
 

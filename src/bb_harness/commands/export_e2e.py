@@ -7,7 +7,9 @@ from bb_harness.e2e_export import E2EExportError, export_e2e
 
 
 def add_subparser(subparsers: argparse._SubParsersAction) -> None:
-    parser = subparsers.add_parser("export-e2e", help="Export approved cases to Lakda replay inputs")
+    parser = subparsers.add_parser(
+        "export-e2e", help="Export approved cases to Lakda replay inputs"
+    )
     parser.add_argument("--feature-spec", required=True)
     parser.add_argument("--manual-case-set", required=True)
     parser.add_argument("--binding", required=True)

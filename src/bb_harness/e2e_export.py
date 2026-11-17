@@ -113,7 +113,8 @@ def _check(raw: object, expected: str, base_url: str) -> tuple[dict, dict]:
 
 
 def _playwright_script(actions: list[dict], checks: list[dict], base_url: str) -> str:
-    q = lambda value: json.dumps(value, ensure_ascii=False)
+    def q(value: object) -> str:
+        return json.dumps(value, ensure_ascii=False)
     lines = [
         'import { test, expect } from "@playwright/test";',
         "",
@@ -159,6 +160,9 @@ def export_e2e(feature_spec: str | Path, case_set: str | Path, binding_path: str
     cases = _read(case_set)
     binding = _read(binding_path)
     _require(binding.get("schemaVersion") == "manual-bb/e2e-binding/v1", "unsupported binding schema")
+    _require(isinstance(feature.get("acceptance_criteria"), list)
+             and len(feature["acceptance_criteria"]) > 0 and isinstance(feature.get("source_refs"), list)
+             and len(feature["source_refs"]) > 0, "source acceptance criteria are required")
     _require(feature.get("feature_id") == cases.get("feature_id") == binding.get("featureId"),
              "feature mismatch")
     _require(feature.get("revision") == cases.get("spec_revision") == binding.get("specRevision"),
@@ -207,7 +211,7 @@ def export_e2e(feature_spec: str | Path, case_set: str | Path, binding_path: str
                  "expectation bindings must be complete")
         actions = [_action(a, case_id, i) for i, a in enumerate(entry["actions"])]
         _require(len({a["id"] for a in actions}) == len(actions), "duplicate action ID")
-        mapped = [_check(ch, text, base_url) for ch, text in zip(entry["checks"], case["expected_results"])]
+        mapped = [_check(ch, text, base_url) for ch, text in zip(entry["checks"], case["expected_results"], strict=True)]
         obligations = [p[0] for p in mapped]
         checks = [p[1] for p in mapped]
         plan = {"schemaVersion": "lakda/action-plan/v1", "mode": "regression-replay",
