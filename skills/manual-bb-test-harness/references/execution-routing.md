@@ -53,3 +53,12 @@ LLM の実施は、次の変更でも同じ確認がくり返されることを�
 - LLM と手動の件数、手動に残した理由を、テスト計画に書く。
 
 JSON の `manual_case_set` には実施の仕分けを入れる項目が無い。Markdown のケースの表と、実行証跡の `tester` に書く。
+
+
+## Lakda exploration and replay classification
+
+- `lakda explore run` and `adaptive-explore` are classified as **LLM-assisted execution**, never as automatic coverage. They produce a `charter_id` execution evidence draft; the import command outputs only `unknown` or `blocked`. A human must inspect the findings, answer the charter questions in `session_log`, and explicitly set `pass` or `fail`. P0 pass requires human-reviewed evidence.
+- Non-real Lakda execution (fixture, mock, emulator) is **not** Gate evidence. Reject it on import.
+- Promoted immutable traces checked into the product repository and replayed on every change or recurring CI may be counted as automatic **suite** evidence only with an exact replay input SHA-256 binding and a run-specific HATE manifest. A run lacking explicit `executionMode: real` is rejected. This is **not code coverage**; preserve the original `coverage_percent`, `coverage_scope`, and `new_issues` from real code-level test evidence. No partial/failed/skipped/unrun suite can pass Gate.
+- `bb-harness import lakda-replay --runs-dir ... --traces-dir ... --suite-id ... --merge-into automation_evidence.json --output NEW_DIR` copies the existing coverage evidence and appends a required suite. The original remains unchanged.
+- For a retired manual case: `status: retired`, `retired_reason` includes suite ID and date, `replacement_refs` uses the HATE-registered `hate:...` ID (not a `lakda:` ID), and `placement_change_ref` uses the external QEG placement-change record. Every suite in `test_suites` is required for Gate by existing policy.
