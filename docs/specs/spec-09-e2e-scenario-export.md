@@ -49,7 +49,7 @@ SHA-256を持つ。入力値やsecretは生成しない。Playwrightコードは
 未知oracle、秘匿値、危険action、retired case、step/check不足、
 旧artifact読み込み互換性を確認する。
 
-## 受入条件
+## 受入基準
 
 - [x] AC-1: 人手指定bindingからreview IDと期待値・手順を紐づけて新規出力する。
 - [x] AC-2: unknown oracle、改訂/入力hash不一致、未承認caseを拒否する。
