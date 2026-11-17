@@ -8,7 +8,7 @@ from pathlib import Path
 
 import pytest
 
-from bb_harness.lakda_bridge import export_charter, import_report, import_replay
+from bb_harness.lakda_bridge import export_charter, import_replay, import_report
 from bb_harness.schema_validation import validate_artifact
 
 

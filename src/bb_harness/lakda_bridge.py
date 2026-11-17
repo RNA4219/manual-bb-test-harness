@@ -42,7 +42,9 @@ def _publish(output: Path, payload: dict[str, Any]) -> dict[str, Any]:
     return {"status": "ok", "output": str(output), "artifacts": sorted(payload)}
 
 
-def export_charter(case_set_path: Path, charter_id: str, template_path: Path, output: Path) -> dict[str, Any]:
+def export_charter(
+    case_set_path: Path, charter_id: str, template_path: Path, output: Path
+) -> dict[str, Any]:
     case_set = _object(case_set_path)
     charter = next(
         (row for row in case_set.get("exploratory_charters", []) if row.get("id") == charter_id),
@@ -74,7 +76,10 @@ def export_charter(case_set_path: Path, charter_id: str, template_path: Path, ou
     source["origin"] = origin
     minutes = charter.get("timebox_minutes", charter.get("estimate_minutes"))
     if minutes is not None:
-        if isinstance(minutes, bool) or not isinstance(minutes, (int, float)) or not math.isfinite(minutes) or minutes <= 0:
+        if (
+            isinstance(minutes, bool) or not isinstance(minutes, (int, float))
+            or not math.isfinite(minutes) or minutes <= 0
+        ):
             raise ValueError("Charter timebox must be positive and finite")
         duration = minutes * 60000
         if duration != int(duration):
@@ -86,7 +91,9 @@ def export_charter(case_set_path: Path, charter_id: str, template_path: Path, ou
         "schemaVersion": "manual-bb/lakda-handoff/v1",
         "sourceSha256": hashlib.sha256(case_set_path.read_bytes()).hexdigest(),
         "charterId": charter_id,
-        "changedFields": ["charterId", *(["budget.durationMs"] if minutes is not None else []), "origin"],
+        "changedFields": [
+            "charterId", *(["budget.durationMs"] if minutes is not None else []), "origin"
+        ],
         "reviewRequired": ["scope", "platform", "executionMode", "baseUrl", "stopWhen"],
     }
     return _publish(output, {"charter.json": source, "handoff.json": handoff})
@@ -110,20 +117,32 @@ def import_report(
     charter_id = _required(origin, "charterId")
     if report.get("charterId") and report["charterId"] != f"{charter_id}-{report.get('platform')}":
         raise ValueError("Report charterId does not match exported manual-bb charter")
-    if report.get("sessionId") != session.get("sessionId") or report.get("charterDigest") != session.get("charterDigest"):
+    if (
+        report.get("sessionId") != session.get("sessionId")
+        or report.get("charterDigest") != session.get("charterDigest")
+    ):
         raise ValueError("Lakda session/digest mismatch")
-    if case_set.get("feature_id") != feature_id or origin.get("featureId", feature_id) != feature_id:
+    if (
+        case_set.get("feature_id") != feature_id
+        or origin.get("featureId", feature_id) != feature_id
+    ):
         raise ValueError("Feature identity mismatch")
     cases = [row for row in case_set.get("exploratory_charters", []) if row.get("id") == charter_id]
     if len(cases) != 1:
         raise ValueError("Charter identity missing or ambiguous")
     charter = cases[0]
-    for a, b in (("revision", "revision"), ("contentHash", "content_hash"), ("oracleRevision", "oracle_revision")):
+    for a, b in (
+        ("revision", "revision"), ("contentHash", "content_hash"),
+        ("oracleRevision", "oracle_revision"),
+    ):
         if origin.get(a) != charter.get(b):
             raise ValueError(f"Charter provenance mismatch: {a}")
     if configuration_id is not None:
         configs = {c.get("id") for c in case_set.get("execution_configurations", [])}
-        if configuration_id not in configs or configuration_id not in charter.get("configuration_ids", [configuration_id]):
+        if (
+            configuration_id not in configs
+            or configuration_id not in charter.get("configuration_ids", [configuration_id])
+        ):
             raise ValueError("Unknown or unauthorized execution configuration")
     findings = report.get("findings")
     if not isinstance(findings, list):
@@ -134,7 +153,10 @@ def import_report(
     for finding in findings:
         if not isinstance(finding, dict):
             raise ValueError("finding must be an object")
-        formatted.append(f"{_required(finding, 'kind')} / {_required(finding, 'severity')}: {_required(finding, 'message')}")
+        formatted.append(
+            f"{_required(finding, 'kind')} / {_required(finding, 'severity')}: "
+            f"{_required(finding, 'message')}"
+        )
         for ref in finding.get("oracleRefs", []):
             if not isinstance(ref, str) or not ref:
                 raise ValueError("Invalid oracle reference")
@@ -150,7 +172,10 @@ def import_report(
     if not oracle_refs:
         raise ValueError("Cannot create execution evidence without oracle refs")
     duration = session.get("activeDurationMs", 0)
-    if isinstance(duration, bool) or not isinstance(duration, (int, float)) or not math.isfinite(duration) or duration < 0:
+    if (
+        isinstance(duration, bool) or not isinstance(duration, (int, float))
+        or not math.isfinite(duration) or duration < 0
+    ):
         raise ValueError("Invalid activeDurationMs")
     evidence: dict[str, Any] = {
         "run_id": _required(report, "sessionId"),
@@ -167,7 +192,12 @@ def import_report(
         "findings": formatted,
         "attachments": attachments,
         "time_spent_minutes": round(duration / 60000, 4),
-        "result": "blocked" if report.get("technicalOutcome") == "error" or report.get("sessionStatus", report.get("status")) == "aborted" else "unknown",
+        "result": (
+            "blocked"
+            if report.get("technicalOutcome") == "error"
+            or report.get("sessionStatus", report.get("status")) == "aborted"
+            else "unknown"
+        ),
     }
     if configuration_id:
         evidence["configuration_id"] = configuration_id

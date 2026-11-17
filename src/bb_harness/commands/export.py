@@ -27,7 +27,9 @@ def add_subparser(subparsers: argparse._SubParsersAction) -> None:
         help="Export target system",
     )
 
-    lakda_parser = export_subparsers.add_parser("lakda-charter", help="Export a reviewable Lakda exploration charter")
+    lakda_parser = export_subparsers.add_parser(
+        "lakda-charter", help="Export a reviewable Lakda exploration charter"
+    )
     lakda_parser.add_argument("--input", type=Path, required=True)
     lakda_parser.add_argument("--charter-id", required=True)
     lakda_parser.add_argument("--template", type=Path, required=True)
