@@ -78,7 +78,8 @@ ignore = ["BLE001"]
 "scripts/*.py" = ["E501"]  # Long docstrings with usage examples
 "tests/*.py" = ["E501"]    # Long test assertions
 "src/bb_harness/tools/*.py" = ["E501"]  # Compatibility tool implementations
-"src/bb_harness/local_pipeline.py" = ["E501"]  # Japanese prompts and compact render rows
+"src/bb_harness/local_pipeline.py" = ["E501"]
+"src/bb_harness/e2e_export.py" = ["E501"]  # Japanese prompts and compact render rows
 
 [tool.coverage.run]
 source = ["scripts", "src/bb_harness"]

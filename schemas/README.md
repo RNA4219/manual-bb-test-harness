@@ -24,6 +24,14 @@
 | `xray-export.schema.json` | Xray export 形式定義 |
 | `shared_defs.schema.json` | SourceRef, Assumption などの共通型定義 |
 
+## E2E シナリオ生成（レビュー済みケースのみ）
+
+- `e2e_binding.schema.json`: 人手でレビューした操作・期待値の紐付け
+- `e2e_scenario.schema.json`: 生成した可読シナリオのレビュー証跡
+- `e2e_export.schema.json`: export成果物のハッシュmanifest
+
+対応例: `examples/artifacts/e2e-sample.*.json`。sourceとpackaged schemaを同期する。
+
 ## $id URL について
 
 ### 重要: $id は identifier（識別子）であり、resolution endpoint（解決endpoint）ではない

@@ -1,0 +1,31 @@
+{
+  "feature_id": "E2E-SAMPLE",
+  "spec_revision": "spec-1",
+  "manual_cases": [
+    {
+      "tc_id": "TC-001",
+      "revision": "case-rev-1",
+      "content_hash": "sha256:review-anchor-1",
+      "oracle_revision": "oracle-rev-1",
+      "title": "ホーム画面の表示",
+      "priority": "P1",
+      "primary_view": "black",
+      "steps": [
+        "ホーム画面を開く"
+      ],
+      "expected_results": [
+        "ホーム画面が表示される"
+      ],
+      "oracle": {
+        "type": "specified",
+        "refs": [
+          "AC-1"
+        ]
+      },
+      "trace_to": [
+        "AC-1"
+      ],
+      "status": "active"
+    }
+  ]
+}

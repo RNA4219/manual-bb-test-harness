@@ -1,0 +1,157 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/RNA4219/manual-bb-test-harness/schemas/e2e_scenario.schema.json",
+  "title": "E2E Reviewed Scenario",
+  "type": "object",
+  "required": [
+    "schemaVersion",
+    "featureId",
+    "specRevision",
+    "caseId",
+    "caseRevision",
+    "caseContentHash",
+    "oracleRevision",
+    "oracleRefs",
+    "reviewRef",
+    "reviewedBy",
+    "steps",
+    "expectedResults",
+    "machineChecks",
+    "sourceFeatureSha256",
+    "sourceCaseSetSha256"
+  ],
+  "properties": {
+    "schemaVersion": {
+      "const": "manual-bb/e2e-scenario/v1"
+    },
+    "featureId": {
+      "type": "string",
+      "minLength": 1
+    },
+    "specRevision": {
+      "type": "string",
+      "minLength": 1
+    },
+    "caseId": {
+      "type": "string",
+      "pattern": "^[A-Za-z][A-Za-z0-9_-]{0,79}$"
+    },
+    "caseRevision": {
+      "type": "string",
+      "minLength": 1
+    },
+    "caseContentHash": {
+      "type": "string",
+      "minLength": 1
+    },
+    "oracleRevision": {
+      "type": "string",
+      "minLength": 1
+    },
+    "oracleRefs": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "reviewRef": {
+      "type": "string",
+      "minLength": 1
+    },
+    "reviewedBy": {
+      "type": "string",
+      "minLength": 1
+    },
+    "steps": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "expectedResults": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "machineChecks": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": [
+          "kind"
+        ],
+        "properties": {
+          "kind": {
+            "type": "string",
+            "enum": [
+              "url",
+              "visible"
+            ]
+          },
+          "value": {
+            "type": "string",
+            "minLength": 1
+          },
+          "locator": {
+            "type": "object",
+            "properties": {
+              "testId": {
+                "type": "string",
+                "minLength": 1
+              },
+              "role": {
+                "type": "string",
+                "enum": [
+                  "button",
+                  "link",
+                  "textbox",
+                  "checkbox",
+                  "combobox",
+                  "option",
+                  "menuitem",
+                  "tab"
+                ]
+              },
+              "name": {
+                "type": "string",
+                "minLength": 1
+              }
+            },
+            "additionalProperties": false,
+            "anyOf": [
+              {
+                "required": [
+                  "testId"
+                ]
+              },
+              {
+                "required": [
+                  "role",
+                  "name"
+                ]
+              }
+            ]
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    "sourceFeatureSha256": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "sourceCaseSetSha256": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    }
+  },
+  "additionalProperties": false
+}

@@ -1,0 +1,15 @@
+{
+  "feature_id": "E2E-SAMPLE",
+  "revision": "spec-1",
+  "title": "ホーム画面",
+  "acceptance_criteria": [
+    "ホーム画面が表示される"
+  ],
+  "source_refs": [
+    {
+      "id": "AC-1",
+      "kind": "ac",
+      "excerpt": "ホーム画面が表示される"
+    }
+  ]
+}

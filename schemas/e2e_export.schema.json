@@ -1,0 +1,64 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/RNA4219/manual-bb-test-harness/schemas/e2e_export.schema.json",
+  "title": "E2E Export Manifest",
+  "type": "object",
+  "required": [
+    "schemaVersion",
+    "caseId",
+    "sourceFeatureSha256",
+    "sourceCaseSetSha256",
+    "filesSha256"
+  ],
+  "properties": {
+    "schemaVersion": {
+      "const": "manual-bb/e2e-export/v1"
+    },
+    "caseId": {
+      "type": "string",
+      "pattern": "^[A-Za-z][A-Za-z0-9_-]{0,79}$"
+    },
+    "sourceFeatureSha256": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "sourceCaseSetSha256": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "filesSha256": {
+      "type": "object",
+      "required": [
+        "scenario.json",
+        "scenario.md",
+        "scenario.spec.ts",
+        "action-sequence.json",
+        "lakda.config.json"
+      ],
+      "properties": {
+        "scenario.json": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        },
+        "scenario.md": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        },
+        "scenario.spec.ts": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        },
+        "action-sequence.json": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        },
+        "lakda.config.json": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        }
+      },
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": false
+}
