@@ -5,9 +5,8 @@ import hashlib
 import json
 from pathlib import Path
 
-from jsonschema import Draft202012Validator
-
 import pytest
+from jsonschema import Draft202012Validator
 
 from bb_harness.e2e_export import E2EExportError, export_e2e
 
