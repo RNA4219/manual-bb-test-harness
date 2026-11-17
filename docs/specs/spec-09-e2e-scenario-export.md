@@ -54,8 +54,11 @@ SHA-256を持つ。入力値やsecretは生成しない。Playwrightコードは
 - [x] AC-1: 人手指定bindingからreview IDと期待値・手順を紐づけて新規出力する。
 - [x] AC-2: unknown oracle、改訂/入力hash不一致、未承認caseを拒否する。
 - [x] AC-3: 同一入力の生成byteは決定的で出力manifestと一致する。
-- [ ] AC-4: 実target上でのLakda replay、独立したreal evidenceを確認する。
-- [ ] AC-5: 利用製品2件の実workflow導入を検証する。
+
+## 未検証事項（現段階では受入の対象外）
+
+- 実target上のLakda replayと独立したreal evidenceの検証。
+- 利用製品2件での共通workflow導入およびバージョン更新検証。
 
 ## 制約
 
