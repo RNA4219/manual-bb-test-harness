@@ -102,6 +102,10 @@ def configuration_plan(cases: dict[str, Any]) -> dict[str, dict[str, Any]]:
         if item["id"] in plan:
             raise GateInputError(f"Duplicate configuration id: {item['id']}")
         plan[item["id"]] = item
+    for case in cases.get("manual_cases", []):
+        refs = case.get("replacement_refs", [])
+        if any(isinstance(ref, str) and ref.startswith("lakda:") for ref in refs):
+            raise GateInputError("replacement_refs must contain HATE IDs, not lakda: IDs")
     for collection in ("manual_cases", "exploratory_charters"):
         for case in cases.get(collection, []):
             if not isinstance(case, dict):

@@ -7,6 +7,7 @@ import sys
 from pathlib import Path
 
 from bb_harness.commands._invoke import invoke_tool
+from bb_harness.lakda_bridge import export_charter
 from bb_harness.tools.export_notion import main as export_notion_main
 from bb_harness.tools.export_testrail import main as export_testrail_main
 from bb_harness.tools.export_xray import main as export_xray_main
@@ -25,6 +26,14 @@ def add_subparser(subparsers: argparse._SubParsersAction) -> None:
         dest="target",
         help="Export target system",
     )
+
+    lakda_parser = export_subparsers.add_parser(
+        "lakda-charter", help="Export a reviewable Lakda exploration charter"
+    )
+    lakda_parser.add_argument("--input", type=Path, required=True)
+    lakda_parser.add_argument("--charter-id", required=True)
+    lakda_parser.add_argument("--template", type=Path, required=True)
+    lakda_parser.add_argument("--output", type=Path, required=True)
 
     # TestRail
     testrail_parser = export_subparsers.add_parser(
@@ -109,6 +118,14 @@ def run(args: argparse.Namespace) -> int:
     if args.target is None:
         print("Error: export target required (testrail, xray, notion)", file=sys.stderr)
         return 1
+
+    if args.target == "lakda-charter":
+        try:
+            print(export_charter(args.input, args.charter_id, args.template, args.output))
+            return 0
+        except (OSError, ValueError, TypeError, KeyError) as exc:
+            print(f"Lakda charter export failed: {exc}", file=sys.stderr)
+            return 1
 
     if args.target == "testrail":
         extra_args = [
