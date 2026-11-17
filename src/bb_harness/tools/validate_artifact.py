@@ -33,6 +33,9 @@ SCHEMA_DIR = Path(__file__).resolve().parents[1] / "schemas"
 
 # Mapping artifact type to schema
 ARTIFACT_SCHEMA_MAP = {
+    "e2e-binding": "e2e_binding.schema.json",
+    "e2e-scenario": "e2e_scenario.schema.json",
+    "e2e-export": "e2e_export.schema.json",
     "rand_intake": "rand_intake.schema.json",
     "phase_contract": "phase_contract.schema.json",
     "feature_spec": "feature_spec.schema.json",

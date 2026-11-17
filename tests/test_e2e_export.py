@@ -159,3 +159,11 @@ def test_reviewed_example_round_trip_and_all_published_contracts(tmp_path):
         saved_bytes = (output / "TC-001" / filename).read_bytes()
         assert hashlib.sha256(saved_bytes).hexdigest() == expected
         assert b"\r\n" not in saved_bytes  # Windows byte-level stability
+
+
+def test_all_new_example_artifacts_are_discoverable_by_cli():
+    from bb_harness.tools.validate_artifact import validate_artifact
+    root = Path(__file__).resolve().parents[1] / "examples" / "artifacts"
+    for suffix in ("e2e-binding", "e2e-scenario", "e2e-export"):
+        result = validate_artifact(root / ("e2e-sample." + suffix + ".json"))
+        assert result["valid"], result["errors"]
