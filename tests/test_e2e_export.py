@@ -167,3 +167,117 @@ def test_all_new_example_artifacts_are_discoverable_by_cli():
     for suffix in ("e2e-binding", "e2e-scenario", "e2e-export"):
         result = validate_artifact(root / ("e2e-sample." + suffix + ".json"))
         assert result["valid"], result["errors"]
+
+
+def test_authenticated_verification_only_step_replays_at_correct_position(tmp_path):
+    paths, binding = inputs(tmp_path)
+    cases = json.loads(paths[1].read_text(encoding="utf-8"))
+    cases["manual_cases"][0]["steps"] = ["Go to admin", "Verify deletion is hidden"]
+    cases["manual_cases"][0]["expected_results"] = ["Deletion is hidden"]
+    paths[1].write_text(json.dumps(cases), encoding="utf-8")
+    binding["caseSetSha256"] = digest(cases)
+    entry = binding["cases"][0]
+    entry["actions"] = [{"id": "open-admin", "kind": "navigate", "path": "/admin", "stepIndex": 0}]
+    entry["checks"] = [{"text": "Deletion is hidden", "kind": "hidden",
+                        "locator": {"testId": "delete-button"}, "atStep": 1}]
+    entry["auth"] = {"persona": "member", "validationPath": "/dashboard",
+                     "loginUrlPattern": "/login", "requiredLocator": {"testId": "member-menu"}}
+    paths[2].write_text(json.dumps(binding), encoding="utf-8")
+    output = tmp_path / "export"
+    assert export_e2e(*paths, output) == ["TC-001"]
+    folder = output / "TC-001"
+    plan = json.loads((folder / "action-sequence.json").read_text())
+    config = json.loads((folder / "lakda.config.json").read_text())
+    scenario = json.loads((folder / "scenario.json").read_text())
+    assert plan["actions"] == [
+        {"id": "open-admin", "kind": "navigate", "path": "/admin"},
+        {"id": "assert-step-2-1", "kind": "assert", "assertion": {"hidden": {"testId": "delete-button"}}},
+    ]
+    assert config["persona"] == "member"
+    assert config["personas"]["member"]["validationPath"] == "/dashboard"
+    assert config["obligations"] == []
+    assert scenario["machineChecks"][0]["atStep"] == 1
+    script = (folder / "scenario.spec.ts").read_text()
+    assert 'test.use({ storageState: ".lakda/auth/member.json" });' in script
+    assert ".toBeHidden()" in script
+    schema = json.loads((Path(__file__).resolve().parents[1] / "schemas" / "e2e_scenario.schema.json").read_text())
+    Draft202012Validator(schema).validate(scenario)
+
+
+@pytest.mark.parametrize(("kind", "value", "expectation"), [
+    ("hidden", None, "toBeHidden"),
+    ("enabled", None, "toBeEnabled"),
+    ("disabled", None, "toBeDisabled"),
+    ("text", "Approved", "toHaveText"),
+])
+def test_new_final_oracles(tmp_path, kind, value, expectation):
+    paths, binding = inputs(tmp_path)
+    check = {"text": "Confirmation is visible", "kind": kind, "locator": {"testId": "confirmation"}}
+    if value is not None:
+        check["value"] = value
+    binding["cases"][0]["checks"] = [check]
+    paths[2].write_text(json.dumps(binding))
+    output = tmp_path / "out"
+    export_e2e(*paths, output)
+    config = json.loads((output / "TC-001" / "lakda.config.json").read_text())
+    assert config["obligations"][0].get(kind) is not None
+    assert expectation in (output / "TC-001" / "scenario.spec.ts").read_text()
+
+
+@pytest.mark.parametrize("change", [
+    "uncovered_step", "missing_action_index", "invalid_check_index",
+    "unauthorized_auth", "secret_text", "mutation_no_reset", "reset_remote",
+    "duplicate_assertion_id",
+])
+def test_new_bindings_fail_closed(tmp_path, change):
+    paths, binding = inputs(tmp_path)
+    entry = binding["cases"][0]
+    entry["actions"] = [{"id": "open", "kind": "navigate", "path": "/order", "stepIndex": 0}]
+    entry["checks"][0]["atStep"] = 1
+    if change == "uncovered_step":
+        entry["checks"][0].pop("atStep")
+    elif change == "missing_action_index":
+        entry["actions"][0].pop("stepIndex")
+    elif change == "invalid_check_index":
+        entry["checks"][0]["atStep"] = 999
+    elif change == "unauthorized_auth":
+        entry["auth"] = {"persona": "member", "validationPath": "/dashboard",
+                         "loginUrlPattern": "/login", "requiredLocator": {"testId": "foo"},
+                         "storageStatePath": "/tmp/unsafe"}
+    elif change == "secret_text":
+        entry["checks"][0]["kind"] = "text"
+        entry["checks"][0]["value"] = "password=raw"
+    elif change in {"mutation_no_reset", "reset_remote"}:
+        entry["actions"][0]["mutates"] = True
+        if change == "reset_remote":
+            entry["fixtureReset"] = {"url": "https://prod.example.test/reset"}
+    elif change == "duplicate_assertion_id":
+        entry["actions"][0]["id"] = "assert-step-2-1"
+    paths[2].write_text(json.dumps(binding), encoding="utf-8")
+    with pytest.raises(E2EExportError):
+        export_e2e(*paths, tmp_path / "out")
+    assert not (tmp_path / "out").exists()
+
+
+def test_mutation_requires_explicit_loopback_reset(tmp_path):
+    paths, binding = inputs(tmp_path)
+    binding["cases"][0]["actions"][1]["mutates"] = True
+    binding["cases"][0]["fixtureReset"] = {"url": "http://127.0.0.1:3000/reset"}
+    paths[2].write_text(json.dumps(binding))
+    export_e2e(*paths, tmp_path / "out")
+    config = json.loads((tmp_path / "out" / "TC-001" / "lakda.config.json").read_text())
+    assert config["fixtureReset"] == {"url": "http://127.0.0.1:3000/reset"}
+    assert config["actionCatalog"][1]["mutates"] is True
+
+
+def test_reviewed_auth_checkpoint_example_contract(tmp_path):
+    root = Path(__file__).resolve().parents[1]
+    sample = root / "examples" / "artifacts"
+    binding_path = sample / "e2e-sample.auth-checkpoint-binding.json"
+    schema = json.loads((root / "schemas" / "e2e_binding.schema.json").read_text())
+    Draft202012Validator(schema).validate(json.loads(binding_path.read_text()))
+    out = tmp_path / "new-example"
+    export_e2e(sample / "e2e-sample.feature_spec.json",
+               sample / "e2e-sample.manual_case_set.json", binding_path, out)
+    plan = json.loads((out / "TC-001" / "action-sequence.json").read_text())
+    assert plan["actions"][-1]["kind"] == "assert"
