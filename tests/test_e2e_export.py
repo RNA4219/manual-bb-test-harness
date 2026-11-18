@@ -273,7 +273,7 @@ def test_mutation_requires_explicit_loopback_reset(tmp_path):
 def test_reviewed_auth_checkpoint_example_contract(tmp_path):
     root = Path(__file__).resolve().parents[1]
     sample = root / "examples" / "artifacts"
-    binding_path = sample / "e2e-sample.auth-checkpoint-binding.json"
+    binding_path = sample / "e2e-auth-checkpoint.e2e-binding.json"
     schema = json.loads((root / "schemas" / "e2e_binding.schema.json").read_text())
     Draft202012Validator(schema).validate(json.loads(binding_path.read_text()))
     out = tmp_path / "new-example"

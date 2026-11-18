@@ -79,4 +79,4 @@ Lakdaの外部process起動/外部送信の禁止は緩めない。
 - 変更操作はレビュー済みloopback HTTP `fixtureReset.url` がある場合のみ許可し、Lakdaが実行前後にresetする。外部メール・DB・スマホ・複数タブは対象外。
 - この形式をreplayするには `assert` と拡張predicateに対応したLakdaが必要。旧版での再生成功を前提にしない。
 
-例: `examples/artifacts/e2e-sample.auth-checkpoint-binding.json` は既存1手順の直後に承認済み検証を挿入したbinding。
+例: `examples/artifacts/e2e-auth-checkpoint.e2e-binding.json` は既存1手順の直後に承認済み検証を挿入したbinding。
