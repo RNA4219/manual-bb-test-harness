@@ -52,7 +52,7 @@ def _text(value: object, label: str) -> str:
 
 def _action(raw: object, case_id: str, index: int) -> dict:
     _require(isinstance(raw, dict), "action must be object")
-    allowed = {"id", "kind", "path", "locator", "inputProfileId", "key", "mutates"}
+    allowed = {"id", "kind", "path", "locator", "inputProfileId", "key", "mutates", "stepIndex"}
     _require(not (set(raw) - allowed), "unsafe action fields")
     kind = raw.get("kind")
     _require(kind in ACTION_KINDS, "unsupported action kind")
@@ -81,55 +81,129 @@ def _action(raw: object, case_id: str, index: int) -> dict:
         _require(raw.get("key") in {"Enter", "Escape", "Space", "Tab"}, "invalid key")
     else:
         _require("key" not in raw, "unexpected key")
-    _require(not raw.get("mutates", False), "mutation requires separate approved reset policy")
+    _require(type(raw.get("mutates", False)) is bool, "mutates must be boolean")
+    return {key: value for key, value in raw.items() if key != "stepIndex"}
+
+
+def _locator(raw: object, label: str) -> dict:
+    _require(isinstance(raw, dict) and not set(raw) - {"testId", "role", "name"},
+             "invalid " + label + " locator")
+    if "testId" in raw:
+        _text(raw["testId"], "testId")
+        _require(len(raw) == 1, "ambiguous " + label + " locator")
+    else:
+        _require(set(raw) == {"role", "name"} and raw["role"] in LOCATOR_ROLES,
+                 "invalid " + label + " locator")
+        _text(raw["name"], "locator name")
+    return raw
+
+
+def _local_path(raw: object, label: str) -> str:
+    path = _text(raw, label)
+    _require(path.startswith("/") and not path.startswith("//") and "\\" not in path,
+             label + " must be a local absolute path")
+    return path
+
+
+def _auth(raw: object) -> dict | None:
+    if raw is None:
+        return None
+    _require(isinstance(raw, dict) and set(raw) ==
+             {"persona", "validationPath", "loginUrlPattern", "requiredLocator"},
+             "invalid auth setup")
+    persona = _text(raw["persona"], "persona")
+    _require(bool(CASE_ID.fullmatch(persona)) and persona != "guest", "invalid persona")
+    _local_path(raw["validationPath"], "validationPath")
+    _text(raw["loginUrlPattern"], "loginUrlPattern")
+    _locator(raw["requiredLocator"], "auth")
+    return dict(raw)
+
+
+def _fixture_reset(raw: object) -> dict:
+    _require(isinstance(raw, dict) and set(raw) == {"url"}, "invalid fixture reset")
+    url = urlsplit(_text(raw["url"], "fixture reset URL"))
+    _require(url.scheme == "http" and url.hostname in {"localhost", "127.0.0.1"}
+             and not url.username and not url.password and not url.query and not url.fragment,
+             "fixture reset must be a loopback HTTP endpoint")
     return dict(raw)
 
 
 def _check(raw: object, expected: str, base_url: str) -> tuple[dict, dict]:
     _require(isinstance(raw, dict), "expected result binding must be object")
     _require(raw.get("text") == expected, "expected result text changed after review")
-    kind = raw.get("kind")
+    details = {key: value for key, value in raw.items() if key != "atStep"}
+    kind = details.get("kind")
     if kind == "url":
-        _require(set(raw) == {"text", "kind", "value"}, "invalid URL oracle binding")
-        target = _text(raw.get("value"), "expected URL")
+        _require(set(details) == {"text", "kind", "value"}, "invalid URL oracle binding")
+        target = _text(details.get("value"), "expected URL")
         resolved = urljoin(base_url, target)
         _require(urlsplit(resolved).netloc == urlsplit(base_url).netloc
                  and urlsplit(resolved).scheme == urlsplit(base_url).scheme,
                  "expected URL must remain on approved target")
         return {"expectedUrl": resolved}, {"kind": "url", "value": resolved}
-    if kind == "visible":
-        _require(set(raw) == {"text", "kind", "locator"}, "invalid visibility binding")
-        locator = raw.get("locator")
-        _require(isinstance(locator, dict) and not set(locator) - {"testId", "role", "name"},
-                 "invalid visibility locator")
-        if "testId" in locator:
-            _text(locator["testId"], "testId")
-            _require(len(locator) == 1, "ambiguous visibility locator")
-        else:
-            _require(set(locator) == {"role", "name"} and locator["role"] in LOCATOR_ROLES,
-                     "invalid visibility locator")
-            _text(locator["name"], "locator name")
-        return {"visible": locator}, {"kind": "visible", "locator": locator}
+    if kind in {"visible", "hidden", "enabled", "disabled"}:
+        _require(set(details) == {"text", "kind", "locator"}, "invalid state binding")
+        locator = _locator(details.get("locator"), "state")
+        return {kind: locator}, {"kind": kind, "locator": locator}
+    if kind == "text":
+        _require(set(details) == {"text", "kind", "locator", "value"},
+                 "invalid text oracle binding")
+        locator = _locator(details.get("locator"), "text")
+        value = _text(details.get("value"), "exact text")
+        return {"text": {"locator": locator, "value": value}}, {
+            "kind": "text", "locator": locator, "value": value}
     raise E2EExportError("unsupported expected result: no mechanical oracle")
 
 
-def _playwright_script(actions: list[dict], checks: list[dict], base_url: str) -> str:
+def _playwright_script(actions: list[dict], checks: list[dict], base_url: str,
+                       auth: dict | None = None) -> str:
     def q(value: object) -> str:
         return json.dumps(value, ensure_ascii=False)
+
+    def target_for(loc: dict) -> str:
+        return ("page.getByTestId(" + q(loc["testId"]) + ")") if "testId" in loc else (
+            "page.getByRole(" + q(loc["role"]) + ", { name: " + q(loc["name"]) + ", exact: true })"
+        )
+
+    def emit_check(lines: list[str], check: dict) -> None:
+        kind = check["kind"]
+        if kind == "url":
+            lines.append("  await expect(page).toHaveURL(" + q(check["value"]) + ");")
+            return
+        target = target_for(check["locator"])
+        if kind == "text":
+            lines.append("  await expect(" + target + ").toHaveText(" + q(check["value"]) + ");")
+        else:
+            method = {
+                "visible": "toBeVisible", "hidden": "toBeHidden",
+                "enabled": "toBeEnabled", "disabled": "toBeDisabled",
+            }[kind]
+            lines.append("  await expect(" + target + ")." + method + "();")
+
     lines = [
         'import { test, expect } from "@playwright/test";',
         "",
         'test("reviewed scenario (generated; do not hand-edit)", async ({ page }) => {',
     ]
+    if auth:
+        lines[2:2] = ['test.use({ storageState: ' +
+                      q(".lakda/auth/" + auth["persona"] + ".json") + ' });', ""]
     for action in actions:
         kind = action["kind"]
+        if kind == "assert":
+            obligation = action["assertion"]
+            predicate, value = next(iter(obligation.items()))
+            if predicate == "expectedUrl":
+                emit_check(lines, {"kind": "url", "value": value})
+            elif predicate == "text":
+                emit_check(lines, {"kind": "text", **value})
+            else:
+                emit_check(lines, {"kind": predicate, "locator": value})
+            continue
         if kind in {"navigate", "goto"}:
             lines.append("  await page.goto(" + q(urljoin(base_url, action["path"])) + ");")
             continue
-        loc = action["locator"]
-        target = ("page.getByTestId(" + q(loc["testId"]) + ")") if "testId" in loc else (
-            "page.getByRole(" + q(loc["role"]) + ", { name: " + q(loc["name"]) + ", exact: true })"
-        )
+        target = target_for(action["locator"])
         if kind == "click":
             lines.append("  await " + target + ".click();")
         elif kind == "check":
@@ -145,14 +219,7 @@ def _playwright_script(actions: list[dict], checks: list[dict], base_url: str) -
             lines.append("  await " + target + (".fill(value);" if kind == "fill" else ".selectOption(value);"))
             lines.append("  }")
     for check in checks:
-        if check["kind"] == "url":
-            lines.append("  await expect(page).toHaveURL(" + q(check["value"]) + ");")
-        else:
-            loc = check["locator"]
-            target = ("page.getByTestId(" + q(loc["testId"]) + ")") if "testId" in loc else (
-                "page.getByRole(" + q(loc["role"]) + ", { name: " + q(loc["name"]) + ", exact: true })"
-            )
-            lines.append("  await expect(" + target + ").toBeVisible();")
+        emit_check(lines, check)
     return "\n".join(lines + ["});", ""])
 
 
@@ -210,22 +277,77 @@ def export_e2e(feature_spec: str | Path, case_set: str | Path, binding_path: str
                  and len(case["expected_results"]) > 0, "missing expected results")
         for raw_text in [*case["steps"], *case["expected_results"]]:
             _text(raw_text, "case content")
-        _require(isinstance(entry.get("actions"), list)
-                 and len(entry["actions"]) == len(case["steps"]), "step bindings must be complete")
+        _require(isinstance(entry.get("actions"), list) and len(entry["actions"]) > 0,
+                 "at least one reviewed browser action is required")
         _require(isinstance(entry.get("checks"), list)
                  and len(entry["checks"]) == len(case["expected_results"]),
                  "expectation bindings must be complete")
-        actions = [_action(a, case_id, i) for i, a in enumerate(entry["actions"])]
+        raw_actions, raw_checks = entry["actions"], entry["checks"]
+        actions = [_action(a, case_id, i) for i, a in enumerate(raw_actions)]
         _require(len({a["id"] for a in actions}) == len(actions), "duplicate action ID")
-        mapped = [_check(ch, text, base_url) for ch, text in zip(entry["checks"], case["expected_results"], strict=True)]
-        obligations = [p[0] for p in mapped]
-        checks = [p[1] for p in mapped]
+        mapped = [_check(ch, text, base_url) for ch, text in zip(raw_checks, case["expected_results"], strict=True)]
+        all_obligations = [pair[0] for pair in mapped]
+        checks = [pair[1] for pair in mapped]
+        explicit_steps = any("stepIndex" in item for item in raw_actions) or any(
+            "atStep" in item for item in raw_checks)
+        action_positions: dict[int, dict] = {}
+        check_positions: dict[int, list[int]] = {}
+        if explicit_steps:
+            for raw, action in zip(raw_actions, actions, strict=True):
+                pos = raw.get("stepIndex")
+                _require(type(pos) is int and 0 <= pos < len(case["steps"]),
+                         "action stepIndex is missing or invalid")
+                _require(pos not in action_positions, "multiple actions for one step")
+                action_positions[pos] = action
+            for index, raw in enumerate(raw_checks):
+                if "atStep" not in raw:
+                    continue
+                pos = raw["atStep"]
+                _require(type(pos) is int and 0 <= pos < len(case["steps"]),
+                         "check atStep is invalid")
+                check_positions.setdefault(pos, []).append(index)
+                checks[index]["atStep"] = pos
+            _require(set(action_positions) | set(check_positions) ==
+                     set(range(len(case["steps"]))), "step bindings must be complete")
+            replay_actions = []
+            for step_index in range(len(case["steps"])):
+                if step_index in action_positions:
+                    replay_actions.append(action_positions[step_index])
+                for check_index in check_positions.get(step_index, []):
+                    replay_actions.append({
+                        "id": f"assert-step-{step_index + 1}-{check_index + 1}",
+                        "kind": "assert", "assertion": all_obligations[check_index],
+                    })
+        else:
+            _require(len(actions) == len(case["steps"]), "step bindings must be complete")
+            replay_actions = actions
+        _require(len({action["id"] for action in replay_actions}) == len(replay_actions),
+                 "duplicate replay action ID")
+        final_indices = [i for i, raw in enumerate(raw_checks) if "atStep" not in raw]
+        obligations = [all_obligations[i] for i in final_indices]
+        final_checks = [checks[i] for i in final_indices]
+        auth = _auth(entry.get("auth"))
+        mutates = any(action.get("mutates", False) for action in actions)
+        _require(not mutates or "fixtureReset" in entry,
+                 "mutation requires separate approved reset policy")
+        _require(mutates or "fixtureReset" not in entry, "unused fixture reset policy")
+        fixture_reset = _fixture_reset(entry["fixtureReset"]) if mutates else None
         plan = {"schemaVersion": "lakda/action-plan/v1", "mode": "regression-replay",
-                "seed": binding["seed"], "baseUrl": base_url, "actions": actions}
+                "seed": binding["seed"], "baseUrl": base_url, "actions": replay_actions}
         config = {"schemaVersion": "lakda/v1", "browser": "chromium", "seed": binding["seed"],
-                  "persona": "guest", "workers": 1,
-                  "actionCatalog": actions,
+                  "persona": auth["persona"] if auth else "guest", "workers": 1,
+                  "actionCatalog": replay_actions,
                   "obligations": obligations, "safety": {"allowHosts": [url.hostname]}}
+        if auth:
+            config["personas"] = {auth["persona"]: {
+                "validationPath": auth["validationPath"],
+                "loginUrlPattern": auth["loginUrlPattern"],
+                "requiredLocator": auth["requiredLocator"],
+            }}
+        if fixture_reset:
+            config["fixtureReset"] = fixture_reset
+        if len(replay_actions) > 100:
+            config["maxActions"] = len(replay_actions)
         review = {"schemaVersion": "manual-bb/e2e-scenario/v1", "featureId": feature["feature_id"],
                   "specRevision": feature["revision"], "caseId": case_id,
                   "caseRevision": case["revision"], "caseContentHash": case["content_hash"],
@@ -234,6 +356,8 @@ def export_e2e(feature_spec: str | Path, case_set: str | Path, binding_path: str
                   "steps": case["steps"], "expectedResults": case["expected_results"],
                   "machineChecks": checks, "sourceFeatureSha256": _digest(feature),
                   "sourceCaseSetSha256": _digest(cases)}
+        if auth:
+            review["authSetup"] = auth
         markdown = ("# " + case["title"] + "\n\n" +
                     "Case: " + case_id + " / Review: " + entry["reviewRef"] + "\n\n" +
                     "## Steps\n" + "".join("- " + s + "\n" for s in case["steps"]) +
@@ -243,7 +367,7 @@ def export_e2e(feature_spec: str | Path, case_set: str | Path, binding_path: str
             "action-sequence.json": json.dumps(plan, ensure_ascii=False, sort_keys=True, indent=2) + "\n",
             "lakda.config.json": json.dumps(config, ensure_ascii=False, sort_keys=True, indent=2) + "\n",
             "scenario.md": markdown,
-            "scenario.spec.ts": _playwright_script(actions, checks, base_url),
+            "scenario.spec.ts": _playwright_script(replay_actions, final_checks, base_url, auth),
         }
         files = {name: hashlib.sha256(data.encode("utf-8")).hexdigest() for name, data in artifacts.items()}
         artifacts["manifest.json"] = json.dumps({
