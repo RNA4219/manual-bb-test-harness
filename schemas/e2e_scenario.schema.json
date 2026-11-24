@@ -93,7 +93,11 @@
             "type": "string",
             "enum": [
               "url",
-              "visible"
+              "visible",
+              "hidden",
+              "enabled",
+              "disabled",
+              "text"
             ]
           },
           "value": {
@@ -139,6 +143,10 @@
                 ]
               }
             ]
+          },
+          "atStep": {
+            "type": "integer",
+            "minimum": 0
           }
         },
         "additionalProperties": false
@@ -151,6 +159,70 @@
     "sourceCaseSetSha256": {
       "type": "string",
       "pattern": "^[a-f0-9]{64}$"
+    },
+    "authSetup": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "persona",
+        "validationPath",
+        "loginUrlPattern",
+        "requiredLocator"
+      ],
+      "properties": {
+        "persona": {
+          "type": "string",
+          "pattern": "^[A-Za-z][A-Za-z0-9_-]{0,79}$"
+        },
+        "validationPath": {
+          "type": "string",
+          "pattern": "^/(?!/)"
+        },
+        "loginUrlPattern": {
+          "type": "string",
+          "minLength": 1
+        },
+        "requiredLocator": {
+          "type": "object",
+          "properties": {
+            "testId": {
+              "type": "string",
+              "minLength": 1
+            },
+            "role": {
+              "type": "string",
+              "enum": [
+                "button",
+                "link",
+                "textbox",
+                "checkbox",
+                "combobox",
+                "option",
+                "menuitem",
+                "tab"
+              ]
+            },
+            "name": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          "additionalProperties": false,
+          "anyOf": [
+            {
+              "required": [
+                "testId"
+              ]
+            },
+            {
+              "required": [
+                "role",
+                "name"
+              ]
+            }
+          ]
+        }
+      }
     }
   },
   "additionalProperties": false

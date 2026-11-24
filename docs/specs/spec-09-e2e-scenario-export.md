@@ -13,7 +13,7 @@
 | ID | 要件 | 優先度 |
 |---|---|---|
 | MBB-E2E-R01 | feature_specのACとsource refs、およびcase版とoracle refsを要求する | P0 |
-| MBB-E2E-R02 | 手順と期待値の一対一bindingを要求し、未知oracleを拒否する | P0 |
+| MBB-E2E-R02 | すべての手順と期待値に明示bindingを要求し、未知oracleを拒否する | P0 |
 | MBB-E2E-R03 | 許可済みActionPlanと最終obligations、reviewableなPlaywright codeを生成する | P0 |
 | MBB-E2E-R04 | 入力hash、レビュー、ケースとoracleの版を照合する | P0 |
 | MBB-E2E-R05 | 保存済み証跡を変更しない | P0 |
@@ -68,3 +68,15 @@ SHA-256を持つ。入力値やsecretは生成しない。Playwrightコードは
 K-01〜K-07のcharter、Gate、定期実行とスターターセットを扱わない。
 Lakdaの外部process起動/外部送信の禁止は緩めない。
 この変換処理はブラウザ・ネットワーク・LLMを呼び出さない。
+
+## 実ケース対応の追加契約（2026-11）
+
+既存の binding/v1 を維持する後方互換拡張。
+
+- `auth` は `persona`, `validationPath`, `loginUrlPattern`, `requiredLocator` を持つ。LakdaのstorageStateを参照し、認証情報そのものは出力しない。事前に `lakda auth capture --persona <persona> --browser chromium --base-url <url>` を実行する。
+- `actions[].stepIndex` と `checks[].atStep` は**0始まり**の手動手順番号。明示モードでは全手順が操作または途中検証に対応しないと拒否する。途中検証は順序付きの `assert` actionとしてその時点で実施。指定のない期待結果だけ最終obligationとなる。
+- `hidden`, `enabled`, `disabled`, `text`（locatorとvalueの完全一致）を追加。期待結果の原文は変更しない。
+- 変更操作はレビュー済みloopback HTTP `fixtureReset.url` がある場合のみ許可し、Lakdaが実行前後にresetする。外部メール・DB・スマホ・複数タブは対象外。
+- この形式をreplayするには `assert` と拡張predicateに対応したLakdaが必要。旧版での再生成功を前提にしない。
+
+例: `examples/artifacts/e2e-auth-checkpoint.e2e-binding.json` は既存1手順の直後に承認済み検証を挿入したbinding。
