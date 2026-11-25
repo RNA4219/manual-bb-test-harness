@@ -11,6 +11,8 @@ import re
 from pathlib import Path
 from urllib.parse import urljoin, urlsplit
 
+from bb_harness.native_cli import native_command
+
 
 class E2EExportError(ValueError):
     """The supplied approval/binding cannot prove a runnable scenario."""
@@ -35,9 +37,13 @@ def _require(condition: bool, message: str) -> None:
         raise E2EExportError(message)
 
 
-def _read(path: str | Path) -> dict:
+def _read(path: str | Path, expected_sha256: str | None = None) -> dict:
     try:
-        data = json.loads(Path(path).read_text(encoding="utf-8"))
+        raw = Path(path).read_bytes()
+        if expected_sha256 is not None:
+            _require(hashlib.sha256(raw).hexdigest() == expected_sha256.lower(),
+                     "approved binding SHA-256 mismatch")
+        data = json.loads(raw.decode("utf-8"))
     except (OSError, UnicodeError, json.JSONDecodeError) as exc:
         raise E2EExportError("invalid input JSON") from exc
     _require(isinstance(data, dict), "input must be object")
@@ -157,11 +163,19 @@ def _playwright_script(actions: list[dict], checks: list[dict], base_url: str) -
 
 
 def export_e2e(feature_spec: str | Path, case_set: str | Path, binding_path: str | Path,
-               output: str | Path) -> list[str]:
+               output: str | Path, *, approved_binding_sha256: str | None = None) -> list[str]:
     """Export reviewed, active scripted cases to new-only deterministic directories."""
+    if approved_binding_sha256 is not None:
+        _require(isinstance(approved_binding_sha256, str)
+                 and re.fullmatch(r"[0-9a-fA-F]{64}", approved_binding_sha256), "invalid approved binding SHA-256")
+        command = native_command("bb-export-e2e", "e2e_export")
+        if command:
+            from bb_harness._e2e_native import native_export
+            return native_export(command, feature_spec, case_set, binding_path, output,
+                                 approved_binding_sha256=approved_binding_sha256)
     feature = _read(feature_spec)
     cases = _read(case_set)
-    binding = _read(binding_path)
+    binding = _read(binding_path, approved_binding_sha256)
     _require(binding.get("schemaVersion") == "manual-bb/e2e-binding/v1", "unsupported binding schema")
     _require(isinstance(feature.get("acceptance_criteria"), list)
              and len(feature["acceptance_criteria"]) > 0 and isinstance(feature.get("source_refs"), list)

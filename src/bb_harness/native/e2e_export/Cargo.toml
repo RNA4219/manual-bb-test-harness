@@ -1,0 +1,20 @@
+[package]
+name = "bb-export-e2e"
+version = "0.1.0"
+edition = "2021"
+publish = false
+description = "Export reviewed manual-bb test cases for Lakda replay"
+
+[dependencies]
+clap = { version = "4", features = ["derive"] }
+regex = "1"
+serde_json = { version = "1", features = ["arbitrary_precision", "float_roundtrip"] }
+sha2 = "0.10"
+tempfile = "3"
+unicode-normalization = "0.1"
+
+[target.'cfg(any(target_os = "linux", target_os = "android", target_vendor = "apple"))'.dependencies]
+rustix = { version = "1", features = ["fs"] }
+
+[target.'cfg(windows)'.dependencies]
+windows-sys = { version = "0.61", features = ["Win32_Storage_FileSystem"] }

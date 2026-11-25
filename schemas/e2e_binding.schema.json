@@ -186,12 +186,25 @@
                   "type": "string",
                   "enum": [
                     "url",
-                    "visible"
+                    "visible",
+                    "textEquals",
+                    "amountEquals",
+                    "countEquals",
+                    "countDelta"
                   ]
                 },
                 "value": {
-                  "type": "string",
-                  "minLength": 1
+                  "oneOf": [
+                    {
+                      "type": "string",
+                      "minLength": 1
+                    },
+                    {
+                      "type": "integer",
+                      "minimum": -9007199254740991,
+                      "maximum": 9007199254740991
+                    }
+                  ]
                 },
                 "locator": {
                   "type": "object",
@@ -236,9 +249,267 @@
                 "text": {
                   "type": "string",
                   "minLength": 1
+                },
+                "itemLocator": {
+                  "type": "object",
+                  "properties": {
+                    "testId": {
+                      "type": "string",
+                      "minLength": 1
+                    },
+                    "role": {
+                      "type": "string",
+                      "enum": [
+                        "button",
+                        "link",
+                        "textbox",
+                        "checkbox",
+                        "combobox",
+                        "option",
+                        "menuitem",
+                        "tab"
+                      ]
+                    },
+                    "name": {
+                      "type": "string",
+                      "minLength": 1
+                    }
+                  },
+                  "additionalProperties": false,
+                  "anyOf": [
+                    {
+                      "required": [
+                        "testId"
+                      ]
+                    },
+                    {
+                      "required": [
+                        "role",
+                        "name"
+                      ]
+                    }
+                  ]
+                },
+                "afterActionId": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "acceptanceRef": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "currency": {
+                  "enum": [
+                    "JPY",
+                    "USD"
+                  ]
+                },
+                "format": {
+                  "enum": [
+                    "jpy-yen-suffix",
+                    "usd-dollar-prefix"
+                  ]
+                },
+                "minorUnits": {
+                  "type": "integer",
+                  "minimum": -9007199254740991,
+                  "maximum": 9007199254740991
                 }
               },
-              "additionalProperties": false
+              "additionalProperties": false,
+              "allOf": [
+                {
+                  "if": {
+                    "properties": {
+                      "kind": {
+                        "const": "url"
+                      }
+                    }
+                  },
+                  "then": {
+                    "required": [
+                      "value"
+                    ]
+                  }
+                },
+                {
+                  "if": {
+                    "properties": {
+                      "kind": {
+                        "const": "visible"
+                      }
+                    }
+                  },
+                  "then": {
+                    "required": [
+                      "locator"
+                    ]
+                  }
+                },
+                {
+                  "if": {
+                    "properties": {
+                      "kind": {
+                        "const": "textEquals"
+                      }
+                    }
+                  },
+                  "then": {
+                    "required": [
+                      "locator",
+                      "value"
+                    ]
+                  }
+                },
+                {
+                  "if": {
+                    "properties": {
+                      "kind": {
+                        "const": "amountEquals"
+                      }
+                    }
+                  },
+                  "then": {
+                    "required": [
+                      "locator",
+                      "currency",
+                      "format",
+                      "minorUnits",
+                      "acceptanceRef"
+                    ]
+                  }
+                },
+                {
+                  "if": {
+                    "properties": {
+                      "kind": {
+                        "const": "countEquals"
+                      }
+                    }
+                  },
+                  "then": {
+                    "required": [
+                      "locator",
+                      "itemLocator",
+                      "value",
+                      "acceptanceRef"
+                    ]
+                  }
+                },
+                {
+                  "if": {
+                    "properties": {
+                      "kind": {
+                        "const": "countDelta"
+                      }
+                    }
+                  },
+                  "then": {
+                    "required": [
+                      "locator",
+                      "itemLocator",
+                      "value",
+                      "acceptanceRef",
+                      "afterActionId"
+                    ]
+                  }
+                },
+                {
+                  "if": {
+                    "properties": {
+                      "kind": {
+                        "enum": [
+                          "url",
+                          "textEquals"
+                        ]
+                      }
+                    }
+                  },
+                  "then": {
+                    "properties": {
+                      "value": {
+                        "type": "string",
+                        "minLength": 1
+                      }
+                    }
+                  }
+                },
+                {
+                  "if": {
+                    "properties": {
+                      "kind": {
+                        "enum": [
+                          "countEquals",
+                          "countDelta"
+                        ]
+                      }
+                    }
+                  },
+                  "then": {
+                    "properties": {
+                      "value": {
+                        "type": "integer",
+                        "minimum": -9007199254740991,
+                        "maximum": 9007199254740991
+                      }
+                    }
+                  }
+                },
+                {
+                  "if": {
+                    "properties": {
+                      "kind": {
+                        "const": "countEquals"
+                      }
+                    }
+                  },
+                  "then": {
+                    "properties": {
+                      "value": {
+                        "minimum": 0
+                      }
+                    }
+                  }
+                },
+                {
+                  "if": {
+                    "properties": {
+                      "kind": {
+                        "const": "amountEquals"
+                      }
+                    }
+                  },
+                  "then": {
+                    "oneOf": [
+                      {
+                        "properties": {
+                          "currency": {
+                            "const": "JPY"
+                          },
+                          "format": {
+                            "const": "jpy-yen-suffix"
+                          }
+                        }
+                      },
+                      {
+                        "properties": {
+                          "currency": {
+                            "const": "USD"
+                          },
+                          "format": {
+                            "const": "usd-dollar-prefix"
+                          }
+                        }
+                      }
+                    ]
+                  }
+                }
+              ],
+              "dependentRequired": {
+                "afterActionId": [
+                  "acceptanceRef"
+                ]
+              }
             }
           }
         },

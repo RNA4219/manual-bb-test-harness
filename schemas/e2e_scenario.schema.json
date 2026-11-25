@@ -93,12 +93,25 @@
             "type": "string",
             "enum": [
               "url",
-              "visible"
+              "visible",
+              "textEquals",
+              "amountEquals",
+              "countEquals",
+              "countDelta"
             ]
           },
           "value": {
-            "type": "string",
-            "minLength": 1
+            "oneOf": [
+              {
+                "type": "string",
+                "minLength": 1
+              },
+              {
+                "type": "integer",
+                "minimum": -9007199254740991,
+                "maximum": 9007199254740991
+              }
+            ]
           },
           "locator": {
             "type": "object",
@@ -139,9 +152,267 @@
                 ]
               }
             ]
+          },
+          "itemLocator": {
+            "type": "object",
+            "properties": {
+              "testId": {
+                "type": "string",
+                "minLength": 1
+              },
+              "role": {
+                "type": "string",
+                "enum": [
+                  "button",
+                  "link",
+                  "textbox",
+                  "checkbox",
+                  "combobox",
+                  "option",
+                  "menuitem",
+                  "tab"
+                ]
+              },
+              "name": {
+                "type": "string",
+                "minLength": 1
+              }
+            },
+            "additionalProperties": false,
+            "anyOf": [
+              {
+                "required": [
+                  "testId"
+                ]
+              },
+              {
+                "required": [
+                  "role",
+                  "name"
+                ]
+              }
+            ]
+          },
+          "afterActionId": {
+            "type": "string",
+            "minLength": 1
+          },
+          "acceptanceRef": {
+            "type": "string",
+            "minLength": 1
+          },
+          "currency": {
+            "enum": [
+              "JPY",
+              "USD"
+            ]
+          },
+          "format": {
+            "enum": [
+              "jpy-yen-suffix",
+              "usd-dollar-prefix"
+            ]
+          },
+          "minorUnits": {
+            "type": "integer",
+            "minimum": -9007199254740991,
+            "maximum": 9007199254740991
           }
         },
-        "additionalProperties": false
+        "additionalProperties": false,
+        "allOf": [
+          {
+            "if": {
+              "properties": {
+                "kind": {
+                  "const": "url"
+                }
+              }
+            },
+            "then": {
+              "required": [
+                "value"
+              ]
+            }
+          },
+          {
+            "if": {
+              "properties": {
+                "kind": {
+                  "const": "visible"
+                }
+              }
+            },
+            "then": {
+              "required": [
+                "locator"
+              ]
+            }
+          },
+          {
+            "if": {
+              "properties": {
+                "kind": {
+                  "const": "textEquals"
+                }
+              }
+            },
+            "then": {
+              "required": [
+                "locator",
+                "value"
+              ]
+            }
+          },
+          {
+            "if": {
+              "properties": {
+                "kind": {
+                  "const": "amountEquals"
+                }
+              }
+            },
+            "then": {
+              "required": [
+                "locator",
+                "currency",
+                "format",
+                "minorUnits",
+                "acceptanceRef"
+              ]
+            }
+          },
+          {
+            "if": {
+              "properties": {
+                "kind": {
+                  "const": "countEquals"
+                }
+              }
+            },
+            "then": {
+              "required": [
+                "locator",
+                "itemLocator",
+                "value",
+                "acceptanceRef"
+              ]
+            }
+          },
+          {
+            "if": {
+              "properties": {
+                "kind": {
+                  "const": "countDelta"
+                }
+              }
+            },
+            "then": {
+              "required": [
+                "locator",
+                "itemLocator",
+                "value",
+                "acceptanceRef",
+                "afterActionId"
+              ]
+            }
+          },
+          {
+            "if": {
+              "properties": {
+                "kind": {
+                  "enum": [
+                    "url",
+                    "textEquals"
+                  ]
+                }
+              }
+            },
+            "then": {
+              "properties": {
+                "value": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              }
+            }
+          },
+          {
+            "if": {
+              "properties": {
+                "kind": {
+                  "enum": [
+                    "countEquals",
+                    "countDelta"
+                  ]
+                }
+              }
+            },
+            "then": {
+              "properties": {
+                "value": {
+                  "type": "integer",
+                  "minimum": -9007199254740991,
+                  "maximum": 9007199254740991
+                }
+              }
+            }
+          },
+          {
+            "if": {
+              "properties": {
+                "kind": {
+                  "const": "countEquals"
+                }
+              }
+            },
+            "then": {
+              "properties": {
+                "value": {
+                  "minimum": 0
+                }
+              }
+            }
+          },
+          {
+            "if": {
+              "properties": {
+                "kind": {
+                  "const": "amountEquals"
+                }
+              }
+            },
+            "then": {
+              "oneOf": [
+                {
+                  "properties": {
+                    "currency": {
+                      "const": "JPY"
+                    },
+                    "format": {
+                      "const": "jpy-yen-suffix"
+                    }
+                  }
+                },
+                {
+                  "properties": {
+                    "currency": {
+                      "const": "USD"
+                    },
+                    "format": {
+                      "const": "usd-dollar-prefix"
+                    }
+                  }
+                }
+              ]
+            }
+          }
+        ],
+        "dependentRequired": {
+          "afterActionId": [
+            "acceptanceRef"
+          ]
+        }
       }
     },
     "sourceFeatureSha256": {
@@ -151,6 +422,19 @@
     "sourceCaseSetSha256": {
       "type": "string",
       "pattern": "^[a-f0-9]{64}$"
+    },
+    "approvedBindingSha256": {
+      "description": "\u65b0\u898f\u51fa\u529b\u3067\u306f\u627f\u8a8d\u8a18\u9332\u3068\u7167\u5408\u3057\u305f binding \u539f\u30d0\u30a4\u30c8\u306e SHA-256 \u3092\u8a18\u9332\u3059\u308b\u3002\u65e7 v1 \u8a3c\u8de1\u3067\u306f\u7701\u7565\u3055\u308c\u308b\u3002",
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "traceTo": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
     }
   },
   "additionalProperties": false
