@@ -6,6 +6,10 @@
 
 ## 目的
 
+`bb-harness export-e2e --approved-binding-sha256 <承認時のSHA-256>` は、固定した binding を Rust で変換する。実行には `bb-export-e2e` または Cargo を使用する。従来の引数での v1 出力も利用できる。
+
+操作直後の判定（`afterActionId`）、受入条件との対応（`acceptanceRef`）、金額・件数の判定を含むケースは、Lakda 設定に `reviewedOracleVersion: 2` を書き込む。設定と生成される Playwright シナリオには同じ版の判定規則を適用する。
+
 生成物を元AC/ケース/レビューに追跡できるようにし、LLMによる期待値推測やpass/fail判定を排除する。
 
 ## 要件

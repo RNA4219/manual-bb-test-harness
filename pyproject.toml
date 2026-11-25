@@ -54,7 +54,8 @@ Repository = "https://github.com/RNA4219/manual-bb-test-harness"
 [tool.setuptools.packages.find]
 where = ["src"]
 [tool.setuptools.package-data]
-bb_harness = ["schemas/*.json", "local_profiles.yaml"]
+bb_harness = ["schemas/*.json", "local_profiles.yaml", "native/e2e_export/Cargo.toml",
+              "native/e2e_export/Cargo.lock", "native/e2e_export/src/*.rs"]
 
 
 [tool.pytest.ini_options]
