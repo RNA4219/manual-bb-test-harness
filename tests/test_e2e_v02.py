@@ -83,6 +83,8 @@ def test_delta_export(tmp_path):
         < script.index("record.observed = await readCount")
     )
     assert "reviewed-observations.json" in script
+    assert "type Locator" in script and "const before:" in script
+    assert "const amount =" not in script
 
 
 @pytest.mark.parametrize(
@@ -121,6 +123,8 @@ def test_amount_export(tmp_path, currency, fmt, minor):
     assert config["obligations"][0]["amountEquals"]["minorUnits"] == minor
     script = (out / "TC-001" / "scenario.spec.ts").read_text(encoding="utf-8")
     assert "Number.isSafeInteger" in script and "timeout: 5000" in script
+    assert "const amount =" in script
+    assert all(unused not in script for unused in ("const before:", "readCount", "type Locator"))
 
 
 def test_invalid_currency_format_is_rejected(tmp_path):
@@ -226,6 +230,31 @@ def test_shipping_details_close_exports_ordered_checks(shipping_export):
     click = 'page.getByTestId("shipping-question").click()'
     opened, closed = script.index(click), script.rindex(click)
     assert opened < script.index(".toBeVisible(") < closed < script.index(".toBeHidden(")
+    assert all(unused not in script for unused in ("const before:", "const amount =", "readCount", "type Locator"))
+
+
+def test_count_equals_only_needs_the_count_helper(tmp_path):
+    check = {**base(), "kind": "countEquals"}
+    del check["afterActionId"]
+    result, out = run(tmp_path, check)
+    assert result.returncode == 0, result.stderr
+    script = (out / "TC-001/scenario.spec.ts").read_text(encoding="utf-8")
+    assert "type Locator" in script and "const readCount =" in script
+    assert "const before:" not in script and "const amount =" not in script
+
+
+def test_mixed_amount_and_delta_generate_both_helpers(shipping_export, tmp_path):
+    export, binding, out = shipping_export
+    data = json.loads(binding.read_text(encoding="utf-8"))
+    amount, delta = data["cases"][0]["checks"]
+    amount.update(kind="amountEquals", currency="JPY", format="jpy-yen-suffix", minorUnits=900)
+    delta.update(kind="countDelta", itemLocator={"testId": "row"}, value=1)
+    mixed = tmp_path / "mixed.json"
+    mixed.write_text(json.dumps(data), encoding="utf-8")
+    assert export(mixed) == 0
+    script = (out / "TC-SHIPPING-CLOSE/scenario.spec.ts").read_text(encoding="utf-8")
+    for needed in ("const amount =", "const readCount =", "const before:", "type Locator"):
+        assert script.count(needed) == 1
 
 
 @pytest.mark.parametrize("with_reference", [True, False])

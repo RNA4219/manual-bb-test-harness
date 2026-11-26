@@ -167,3 +167,47 @@ def test_all_new_example_artifacts_are_discoverable_by_cli():
     for suffix in ("e2e-binding", "e2e-scenario", "e2e-export"):
         result = validate_artifact(root / ("e2e-sample." + suffix + ".json"))
         assert result["valid"], result["errors"]
+
+
+@pytest.mark.parametrize("schema_name", ["e2e_binding", "e2e_scenario"])
+def test_published_locator_shapes(schema_name):
+    root = Path(__file__).resolve().parents[1]
+    sample = root / "examples/artifacts"
+    schema = json.loads((root / "schemas" / f"{schema_name}.schema.json").read_text())
+    validator = Draft202012Validator(schema)
+    count_check = {
+        "kind": "countEquals", "locator": {"testId": "list"}, "itemLocator": {"testId": "item"},
+        "value": 1, "acceptanceRef": "AC-1",
+    }
+    fields = [(count_check, "locator"), (count_check, "itemLocator")]
+    if schema_name == "e2e_binding":
+        artifact = json.loads((sample / "shipping-details/e2e-binding.json").read_text(encoding="utf-8"))
+        case = artifact["cases"][0]
+        count_check["text"] = "商品が1件表示される"
+        case["checks"].append(count_check)
+        fields.extend([(case["actions"][1], "locator"), (case["checks"][1], "locator")])
+    else:
+        artifact = json.loads((sample / "e2e-sample.e2e-scenario.json").read_text(encoding="utf-8"))
+        artifact["machineChecks"].append(count_check)
+
+    roles = ("button", "link", "textbox", "checkbox", "combobox", "option", "menuitem", "tab")
+    valid = [
+        {"testId": "item"}, {"testId": " item "}, {"role": "button", "name": " 商品 "},
+        *({"role": role, "name": "商品"} for role in roles),
+    ]
+    invalid = [
+        {}, {"name": "商品"}, {"role": "button"}, {"role": "unknown", "name": "商品"},
+        {"testId": "item", "name": "商品"}, {"testId": "item", "role": "button"},
+        {"testId": "item", "role": "button", "name": "商品"},
+    ]
+    for blank in ("", " ", "\t\n", "\u001c", "\u0085", "\u3000"):
+        invalid.extend([{"testId": blank}, {"role": "button", "name": blank}])
+    for parent, key in fields:
+        original = parent[key]
+        for locator in valid:
+            parent[key] = locator
+            validator.validate(artifact)
+        for locator in invalid:
+            parent[key] = locator
+            assert not validator.is_valid(artifact), (schema_name, key, locator)
+        parent[key] = original

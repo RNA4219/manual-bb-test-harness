@@ -32,6 +32,9 @@ contentHash、oracleRevision、reviewedBy、reviewRef、
 全手順に対応するactions配列と全文一致するchecks配列を持つ。
 hashはUTF-8、キーsortのcanonical JSONでSHA-256を計算する。
 
+操作と判定の `locator`、件数判定の `itemLocator` には、`{"testId": "shipping-answer"}` のようにテスト ID を単独で指定するか、`{"role": "button", "name": "閉じる"}` のようにロールと名前を組で指定する。
+テスト ID と名前には、空白以外の文字が少なくとも1文字必要になる。文字列の前後に付いた空白は出力にも保持する。
+
 ケースに記載した期待結果をそのまま使い、`oracle.type=specified` のケースを出力する。
 従来の v1 では、操作後の URL と要素の表示状態（`visible`）を判定できる。
 Rust で出力する v2 では、`kind: "hidden"` に対象の `locator` とケースが参照する
