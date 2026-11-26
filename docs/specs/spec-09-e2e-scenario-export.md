@@ -18,7 +18,7 @@
 |---|---|---|
 | MBB-E2E-R01 | feature_specのACとsource refs、およびcase版とoracle refsを要求する | P0 |
 | MBB-E2E-R02 | 手順と期待値の一対一bindingを要求し、未知oracleを拒否する | P0 |
-| MBB-E2E-R03 | 許可済みActionPlanと最終obligations、reviewableなPlaywright codeを生成する | P0 |
+| MBB-E2E-R03 | 承認済みの操作列と、指定した時点での判定条件を Lakda 設定と Playwright コードへ出力する | P0 |
 | MBB-E2E-R04 | 入力hash、レビュー、ケースとoracleの版を照合する | P0 |
 | MBB-E2E-R05 | 保存済み証跡を変更しない | P0 |
 
@@ -32,10 +32,12 @@ contentHash、oracleRevision、reviewedBy、reviewRef、
 全手順に対応するactions配列と全文一致するchecks配列を持つ。
 hashはUTF-8、キーsortのcanonical JSONでSHA-256を計算する。
 
-既存manual_case_setの指定期待結果を変更しない。oracle.type=specified
-のみ対応。URLとvisibleの最終状態をLakdaの既存obligationsに変換する。
-中間assertion、金額・件数・任意テキスト、visual、未知predicate、
-未承認derived/human/implicitは対応外として拒否する。
+ケースに記載した期待結果をそのまま使い、`oracle.type=specified` のケースを出力する。
+従来の v1 では、操作後の URL と要素の表示状態（`visible`）を判定できる。
+Rust で出力する v2 では、`kind: "hidden"` に対象の `locator` とケースが参照する
+受入条件 `acceptanceRef` を指定すると、要素の非表示を確認できる。
+`afterActionId` を指定するとその操作の直後に、省略すると最後の操作の後に判定する。
+Lakda の `obligations` には `hidden` と対象を、Playwright には `toBeHidden()` を出力する。
 
 出力はcaseごとにscenario.md、scenario.json、action-sequence.json、
 lakda.config.json、scenario.spec.ts、manifest.json。後者は各生成物の
@@ -61,6 +63,9 @@ SHA-256を持つ。入力値やsecretは生成しない。Playwrightコードは
 
 契約schema: `schemas/e2e_binding.schema.json`、`schemas/e2e_scenario.schema.json`、`schemas/e2e_export.schema.json`。
 承認済みサンプル: `examples/artifacts/e2e-sample.*.json`。WindowsでもUTF-8原バイト列を直接保存し、manifestのSHA-256と一致させる。
+
+配送サンプルの固定入力は [examples/artifacts/shipping-details](../../examples/artifacts/shipping-details/) にある。
+`TC-SHIPPING-CLOSE` は Lakda 同梱の配送ページで質問を開き、回答の表示を確認する。同じ質問をもう一度押し、同じ回答が非表示になることを確認する。
 
 ## 未検証事項（現段階では受入の対象外）
 

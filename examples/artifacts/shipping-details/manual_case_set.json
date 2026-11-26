@@ -1,0 +1,27 @@
+{
+  "feature_id": "SHIPPING-DETAILS",
+  "spec_revision": "spec-1",
+  "manual_cases": [
+    {
+      "tc_id": "TC-SHIPPING-CLOSE",
+      "revision": "case-1",
+      "content_hash": "shipping-details-1",
+      "oracle_revision": "oracle-1",
+      "title": "配送日数の質問をもう一度押すと回答が閉じる",
+      "priority": "P2",
+      "primary_view": "black",
+      "steps": [
+        "配送のご案内を開く",
+        "「注文してから何日で届きますか？」を押す",
+        "同じ質問をもう一度押す"
+      ],
+      "expected_results": [
+        "質問を開くと配送日数の回答が表示される",
+        "質問を閉じると同じ回答が非表示になる"
+      ],
+      "oracle": {"type": "specified", "refs": ["AC-SHIPPING-OPEN", "AC-SHIPPING-CLOSE"]},
+      "trace_to": ["AC-SHIPPING-OPEN", "AC-SHIPPING-CLOSE"],
+      "status": "active"
+    }
+  ]
+}

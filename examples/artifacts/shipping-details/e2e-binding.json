@@ -1,0 +1,40 @@
+{
+  "schemaVersion": "manual-bb/e2e-binding/v1",
+  "featureId": "SHIPPING-DETAILS",
+  "specRevision": "spec-1",
+  "baseUrl": "http://127.0.0.1:18943/",
+  "featureSha256": "ecd5e9c925cfe28a991c8971986bebcce216a8714aa28e127a5e677a78664091",
+  "caseSetSha256": "c7dc17b668eb7015ee1e00c8b5d08546ccde41e8dde60e40aa9359d045510579",
+  "seed": 1,
+  "cases": [
+    {
+      "caseId": "TC-SHIPPING-CLOSE",
+      "revision": "case-1",
+      "contentHash": "shipping-details-1",
+      "oracleRevision": "oracle-1",
+      "reviewedBy": "shipping-qa-fixture",
+      "reviewRef": "shipping-details-example-v1",
+      "actions": [
+        {"id": "visit", "kind": "navigate", "path": "/"},
+        {"id": "open", "kind": "click", "locator": {"testId": "shipping-question"}},
+        {"id": "close", "kind": "click", "locator": {"testId": "shipping-question"}}
+      ],
+      "checks": [
+        {
+          "text": "質問を開くと配送日数の回答が表示される",
+          "kind": "visible",
+          "locator": {"testId": "shipping-answer"},
+          "afterActionId": "open",
+          "acceptanceRef": "AC-SHIPPING-OPEN"
+        },
+        {
+          "text": "質問を閉じると同じ回答が非表示になる",
+          "kind": "hidden",
+          "locator": {"testId": "shipping-answer"},
+          "afterActionId": "close",
+          "acceptanceRef": "AC-SHIPPING-CLOSE"
+        }
+      ]
+    }
+  ]
+}

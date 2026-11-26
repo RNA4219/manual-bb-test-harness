@@ -1,0 +1,13 @@
+{
+  "feature_id": "SHIPPING-DETAILS",
+  "revision": "spec-1",
+  "title": "配送日数の質問を開閉する",
+  "acceptance_criteria": [
+    "質問を開くと配送日数の回答が表示される",
+    "質問を閉じると同じ回答が非表示になる"
+  ],
+  "source_refs": [
+    {"id": "AC-SHIPPING-OPEN", "kind": "ac", "excerpt": "質問を開くと配送日数の回答が表示される"},
+    {"id": "AC-SHIPPING-CLOSE", "kind": "ac", "excerpt": "質問を閉じると同じ回答が非表示になる"}
+  ]
+}
