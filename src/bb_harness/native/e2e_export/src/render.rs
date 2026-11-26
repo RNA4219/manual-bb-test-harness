@@ -111,15 +111,18 @@ fn render_legacy_check(check: &Value) -> Result<String, String> {
     Ok(line)
 }
 
+pub fn requires_acceptance_ref(check: &Value) -> bool {
+    check.get("afterActionId").is_some()
+        || matches!(
+            check["kind"].as_str(),
+            Some("hidden" | "amountEquals" | "countEquals" | "countDelta")
+        )
+}
+
 pub fn requires_v2(checks: &[Value]) -> bool {
-    checks.iter().any(|c| {
-        c.get("afterActionId").is_some()
-            || c.get("acceptanceRef").is_some()
-            || matches!(
-                c["kind"].as_str(),
-                Some("hidden" | "amountEquals" | "countEquals" | "countDelta")
-            )
-    })
+    checks
+        .iter()
+        .any(|check| requires_acceptance_ref(check) || check.get("acceptanceRef").is_some())
 }
 
 pub fn playwright(actions: &[Value], checks: &[Value], base_url: &str) -> Result<String, String> {
@@ -148,23 +151,7 @@ pub fn playwright(actions: &[Value], checks: &[Value], base_url: &str) -> Result
     Ok(lines.join("\n"))
 }
 
-fn playwright_v2(actions: &[Value], checks: &[Value], base_url: &str) -> Result<String, String> {
-    let mut lines = vec![
-        r#"import { test, expect, type Locator } from "@playwright/test";
-
-test("reviewed scenario (generated; do not hand-edit)", async ({ page }, testInfo) => {
-  type Observation = {
-    index: number;
-    acceptanceRef?: string;
-    actionId?: string;
-    before?: number | null;
-    observed?: number | null;
-    result: string;
-  };
-  const observations: Observation[] = [];
-  const before: Record<number, number> = {};
-
-  const amount = (text: string, format: string): number | null => {
+const AMOUNT_HELPER: &str = r#"  const amount = (text: string, format: string): number | null => {
     const trimmed = text.trim();
     const match = format === 'jpy-yen-suffix'
       ? /^(-?)([0-9]+|[0-9]{1,3}(?:,[0-9]{3})+)円$/.exec(trimmed)
@@ -174,20 +161,48 @@ test("reviewed scenario (generated; do not hand-edit)", async ({ page }, testInf
       + (format === 'usd-dollar-prefix' ? match[3] : '');
     const value = Number((match[1] || '') + digits);
     return Number.isSafeInteger(value) ? value : null;
-  };
+  };"#;
 
-  const readCount = async (
+const COUNT_HELPER: &str = r#"  const readCount = async (
     container: Locator,
     items: (container: Locator) => Locator,
   ): Promise<number | null> => {
     if (await container.count() !== 1) return null;
     const count = await items(container).count();
     return await container.count() === 1 ? count : null;
-  };
+  };"#;
 
-  try {"#
-            .to_string(),
+fn playwright_v2(actions: &[Value], checks: &[Value], base_url: &str) -> Result<String, String> {
+    let has_kind = |kind: &str| checks.iter().any(|check| check["kind"] == kind);
+    let delta = has_kind("countDelta");
+    let count = delta || has_kind("countEquals");
+    let amount = has_kind("amountEquals");
+    let locator_import = if count { ", type Locator" } else { "" };
+    let mut lines = vec![
+        format!(r#"import {{ test, expect{locator_import} }} from "@playwright/test";"#),
+        String::new(),
+        r#"test("reviewed scenario (generated; do not hand-edit)", async ({ page }, testInfo) => {
+  type Observation = {
+    index: number;
+    acceptanceRef?: string;
+    actionId?: string;
+    before?: number | null;
+    observed?: number | null;
+    result: string;
+  };
+  const observations: Observation[] = [];"#
+            .into(),
     ];
+    if delta {
+        lines.push("  const before: Record<number, number> = {};".into());
+    }
+    if amount {
+        lines.push(AMOUNT_HELPER.into());
+    }
+    if count {
+        lines.push(COUNT_HELPER.into());
+    }
+    lines.push("  try {".into());
 
     for action in actions {
         let id = field(action, "id")?;

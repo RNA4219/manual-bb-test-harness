@@ -2,6 +2,35 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://github.com/RNA4219/manual-bb-test-harness/schemas/e2e_binding.schema.json",
   "title": "Reviewed E2E Binding",
+  "$defs": {
+    "locatorText": {
+      "$comment": "Rust char::is_whitespace() + U+001C..U+001F",
+      "type": "string",
+      "pattern": "[^\\u0009-\\u000D\\u001C-\\u0020\\u0085\\u00A0\\u1680\\u2000-\\u200A\\u2028\\u2029\\u202F\\u205F\\u3000]"
+    },
+    "locator": {
+      "type": "object",
+      "oneOf": [
+        {
+          "required": ["testId"],
+          "properties": {
+            "testId": { "$ref": "#/$defs/locatorText" }
+          },
+          "additionalProperties": false
+        },
+        {
+          "required": ["role", "name"],
+          "properties": {
+            "role": {
+              "enum": ["button", "link", "textbox", "checkbox", "combobox", "option", "menuitem", "tab"]
+            },
+            "name": { "$ref": "#/$defs/locatorText" }
+          },
+          "additionalProperties": false
+        }
+      ]
+    }
+  },
   "type": "object",
   "required": [
     "schemaVersion",
@@ -112,46 +141,7 @@
                   "type": "string",
                   "minLength": 1
                 },
-                "locator": {
-                  "type": "object",
-                  "properties": {
-                    "testId": {
-                      "type": "string",
-                      "minLength": 1
-                    },
-                    "role": {
-                      "type": "string",
-                      "enum": [
-                        "button",
-                        "link",
-                        "textbox",
-                        "checkbox",
-                        "combobox",
-                        "option",
-                        "menuitem",
-                        "tab"
-                      ]
-                    },
-                    "name": {
-                      "type": "string",
-                      "minLength": 1
-                    }
-                  },
-                  "additionalProperties": false,
-                  "anyOf": [
-                    {
-                      "required": [
-                        "testId"
-                      ]
-                    },
-                    {
-                      "required": [
-                        "role",
-                        "name"
-                      ]
-                    }
-                  ]
-                },
+                "locator": { "$ref": "#/$defs/locator" },
                 "inputProfileId": {
                   "type": "string",
                   "pattern": "^[A-Za-z][A-Za-z0-9_-]{0,79}$"
@@ -207,90 +197,12 @@
                     }
                   ]
                 },
-                "locator": {
-                  "type": "object",
-                  "properties": {
-                    "testId": {
-                      "type": "string",
-                      "minLength": 1
-                    },
-                    "role": {
-                      "type": "string",
-                      "enum": [
-                        "button",
-                        "link",
-                        "textbox",
-                        "checkbox",
-                        "combobox",
-                        "option",
-                        "menuitem",
-                        "tab"
-                      ]
-                    },
-                    "name": {
-                      "type": "string",
-                      "minLength": 1
-                    }
-                  },
-                  "additionalProperties": false,
-                  "anyOf": [
-                    {
-                      "required": [
-                        "testId"
-                      ]
-                    },
-                    {
-                      "required": [
-                        "role",
-                        "name"
-                      ]
-                    }
-                  ]
-                },
+                "locator": { "$ref": "#/$defs/locator" },
                 "text": {
                   "type": "string",
                   "minLength": 1
                 },
-                "itemLocator": {
-                  "type": "object",
-                  "properties": {
-                    "testId": {
-                      "type": "string",
-                      "minLength": 1
-                    },
-                    "role": {
-                      "type": "string",
-                      "enum": [
-                        "button",
-                        "link",
-                        "textbox",
-                        "checkbox",
-                        "combobox",
-                        "option",
-                        "menuitem",
-                        "tab"
-                      ]
-                    },
-                    "name": {
-                      "type": "string",
-                      "minLength": 1
-                    }
-                  },
-                  "additionalProperties": false,
-                  "anyOf": [
-                    {
-                      "required": [
-                        "testId"
-                      ]
-                    },
-                    {
-                      "required": [
-                        "role",
-                        "name"
-                      ]
-                    }
-                  ]
-                },
+                "itemLocator": { "$ref": "#/$defs/locator" },
                 "afterActionId": {
                   "type": "string",
                   "minLength": 1

@@ -1,6 +1,6 @@
 use crate::binding::{action, check, text, valid_id};
 use crate::compat::{digest, hostname, pretty, sha256};
-use crate::render::{playwright, requires_v2};
+use crate::render::{playwright, requires_acceptance_ref, requires_v2};
 use serde_json::{json, Value};
 use std::collections::{BTreeMap, BTreeSet};
 use std::path::Path;
@@ -103,16 +103,10 @@ impl Design<'_> {
         let mut checks = Vec::new();
         for (raw, expectation) in raw_checks.iter().zip(&expectations) {
             let (mut obligation, mut mapped) = check(raw, expectation, self.base_url)?;
-            let kind = raw["kind"].as_str().unwrap_or("");
-            let modern = matches!(
-                kind,
-                "hidden" | "amountEquals" | "countEquals" | "countDelta"
-            );
-            if (modern || raw.get("afterActionId").is_some()) && raw.get("acceptanceRef").is_none()
-            {
+            if requires_acceptance_ref(raw) && raw.get("acceptanceRef").is_none() {
                 return Err("acceptanceRef is required".into());
             }
-            if kind == "countDelta" && raw.get("afterActionId").is_none() {
+            if raw["kind"] == "countDelta" && raw.get("afterActionId").is_none() {
                 return Err("countDelta requires afterActionId".into());
             }
             if let Some(reference) = raw.get("acceptanceRef") {
