@@ -187,6 +187,7 @@
                   "enum": [
                     "url",
                     "visible",
+                    "hidden",
                     "textEquals",
                     "amountEquals",
                     "countEquals",
@@ -344,6 +345,21 @@
                     "required": [
                       "locator"
                     ]
+                  }
+                },
+                {
+                  "if": {
+                    "properties": {
+                      "kind": {
+                        "const": "hidden"
+                      }
+                    }
+                  },
+                  "then": {
+                    "required": ["locator", "acceptanceRef"],
+                    "propertyNames": {
+                      "enum": ["text", "kind", "locator", "acceptanceRef", "afterActionId"]
+                    }
                   }
                 },
                 {

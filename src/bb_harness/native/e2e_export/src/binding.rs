@@ -192,7 +192,7 @@ pub fn check(raw: &Value, expected: &str, base_url: &str) -> Result<(Value, Valu
                 json!({"kind":"url","value":target}),
             ))
         }
-        Some(kind @ ("visible" | "textEquals")) => {
+        Some(kind @ ("visible" | "hidden" | "textEquals")) => {
             let fields = if kind == "textEquals" {
                 &["text", "kind", "locator", "value"][..]
             } else {
@@ -225,7 +225,7 @@ pub fn check(raw: &Value, expected: &str, base_url: &str) -> Result<(Value, Valu
                 ))
             } else {
                 Ok((
-                    json!({"visible":locator}),
+                    json!({(kind):locator}),
                     json!({"kind":kind,"locator":locator}),
                 ))
             }

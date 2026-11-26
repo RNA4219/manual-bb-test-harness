@@ -100,6 +100,11 @@ fn render_legacy_check(check: &Value) -> Result<String, String> {
             target(&check["locator"])?
         ),
 
+        "hidden" => format!(
+            "  await expect({}).toBeHidden({{ timeout: 5000 }});",
+            target(&check["locator"])?
+        ),
+
         _ => return Err("unsupported expected result: no mechanical oracle".into()),
     };
 
@@ -112,7 +117,7 @@ pub fn requires_v2(checks: &[Value]) -> bool {
             || c.get("acceptanceRef").is_some()
             || matches!(
                 c["kind"].as_str(),
-                Some("amountEquals" | "countEquals" | "countDelta")
+                Some("hidden" | "amountEquals" | "countEquals" | "countDelta")
             )
     })
 }

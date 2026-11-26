@@ -192,6 +192,63 @@ def test_visible_with_acceptance_reference_exports_v2_config(tmp_path, timing, m
     ]
 
 
+@pytest.fixture
+def shipping_export(tmp_path, monkeypatch):
+    from bb_harness.cli import main
+
+    sample = ROOT / "examples/artifacts/shipping-details"
+    out = tmp_path / "export"
+    monkeypatch.setenv("PATH", str(BIN.parent) + os.pathsep + os.environ["PATH"])
+
+    def export(binding):
+        return main([
+            "export-e2e", "--feature-spec", str(sample / "feature_spec.json"),
+            "--manual-case-set", str(sample / "manual_case_set.json"),
+            "--binding", str(binding), "--out", str(out),
+            "--approved-binding-sha256", hashlib.sha256(binding.read_bytes()).hexdigest(),
+        ])
+
+    return export, sample / "e2e-binding.json", out
+
+
+def test_shipping_details_close_exports_ordered_checks(shipping_export):
+    export, binding, out = shipping_export
+    assert export(binding) == 0
+    folder = out / "TC-SHIPPING-CLOSE"
+    config = json.loads((folder / "lakda.config.json").read_text(encoding="utf-8"))
+    answer = {"testId": "shipping-answer"}
+    assert config["reviewedOracleVersion"] == 2
+    assert config["obligations"] == [
+        {"visible": answer, "afterActionId": "open", "acceptanceRef": "AC-SHIPPING-OPEN"},
+        {"hidden": answer, "afterActionId": "close", "acceptanceRef": "AC-SHIPPING-CLOSE"},
+    ]
+    script = (folder / "scenario.spec.ts").read_text(encoding="utf-8")
+    click = 'page.getByTestId("shipping-question").click()'
+    opened, closed = script.index(click), script.rindex(click)
+    assert opened < script.index(".toBeVisible(") < closed < script.index(".toBeHidden(")
+
+
+@pytest.mark.parametrize("with_reference", [True, False])
+def test_final_hidden_check_requires_acceptance_ref(shipping_export, tmp_path, with_reference):
+    export, binding, out = shipping_export
+    data = json.loads(binding.read_text(encoding="utf-8"))
+    check = data["cases"][0]["checks"][1]
+    del check["afterActionId"]
+    if not with_reference:
+        del check["acceptanceRef"]
+    final_binding = tmp_path / "final-binding.json"
+    final_binding.write_text(json.dumps(data, ensure_ascii=False), encoding="utf-8")
+    if with_reference:
+        assert export(final_binding) == 0
+        config = json.loads((out / "TC-SHIPPING-CLOSE/lakda.config.json").read_text(encoding="utf-8"))
+        assert config["obligations"][1] == {
+            "hidden": {"testId": "shipping-answer"}, "acceptanceRef": "AC-SHIPPING-CLOSE",
+        }
+    else:
+        assert export(final_binding) == 2
+        assert not out.exists()
+
+
 def test_count_checks_recheck_container_around_measurement(tmp_path):
     result, out = run(tmp_path, base())
     assert result.returncode == 0, result.stderr

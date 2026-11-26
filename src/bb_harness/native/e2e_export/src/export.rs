@@ -104,7 +104,10 @@ impl Design<'_> {
         for (raw, expectation) in raw_checks.iter().zip(&expectations) {
             let (mut obligation, mut mapped) = check(raw, expectation, self.base_url)?;
             let kind = raw["kind"].as_str().unwrap_or("");
-            let modern = matches!(kind, "amountEquals" | "countEquals" | "countDelta");
+            let modern = matches!(
+                kind,
+                "hidden" | "amountEquals" | "countEquals" | "countDelta"
+            );
             if (modern || raw.get("afterActionId").is_some()) && raw.get("acceptanceRef").is_none()
             {
                 return Err("acceptanceRef is required".into());
