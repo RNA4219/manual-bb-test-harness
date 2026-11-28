@@ -63,7 +63,7 @@ jobs:
         run: >-
           uv run --extra dev python tools/ci/prepare_pypi_release.py --tag "$RELEASE_TAG"
           --input tmp/pypi-release --output tmp/pypi-dist
-      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: pypi-dist-${{ github.run_attempt }}
           path: tmp/pypi-dist/*
@@ -114,7 +114,7 @@ jobs:
           --expected tmp/pypi-expected --output tmp/pypi-verification
       - name: Preserve publication verification evidence
         if: always()
-        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: pypi-verification-${{ github.run_attempt }}
           path: |
